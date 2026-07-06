@@ -18,7 +18,7 @@
   "dependencies": {
     "@sidebase/nuxt-auth": "^0.9.1",
     "leaflet": "^1.9.4",
-    "next-auth": "4.22.5",
+    "next-auth": "4.21.1",
     "nuxt": "^4.4.8",
     "pinia": "^2.3.1",
     "vue": "^3.5.38",
@@ -36,5 +36,10 @@
     "typescript": "^5.6.3",
     "vitest": "^4.1.9",
     "vue-tsc": "^3.3.6"
+  },
+  "overrides": {
+    "vue-router": {
+      "pinia": "^2.3.1"
+    }
   }
 }
