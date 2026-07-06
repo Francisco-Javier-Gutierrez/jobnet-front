@@ -1,13 +1,13 @@
-import { defineConfig } from 'vitest/config';
-import vue from '@vitejs/plugin-vue';
+import { defineConfig } from "vitest/config";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
   plugins: [vue()],
   test: {
     globals: true,
-    environment: 'happy-dom',
+    environment: "happy-dom",
     coverage: {
-      provider: 'v8',
+      provider: "v8",
       lines: 100,
       functions: 100,
       branches: 100,
