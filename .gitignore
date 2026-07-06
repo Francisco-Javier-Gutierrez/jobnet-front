@@ -5,6 +5,7 @@
 .cache
 dist
 node_modules
+coverage
 logs
 *.log
 .DS_Store
