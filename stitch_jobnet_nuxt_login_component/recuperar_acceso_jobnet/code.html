@@ -1,0 +1,176 @@
+<!DOCTYPE html><html class="h-full" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Recupera tu acceso - JobNet</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container-high": "#dee8ff",
+                        "surface": "#f9f9ff",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#e7eeff",
+                        "on-primary-container": "#dad7ff",
+                        "on-surface-variant": "#464555",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-surface": "#111c2d",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#2f2ebe",
+                        "primary-container": "#4f46e5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#4edea3",
+                        "outline-variant": "#c7c4d8",
+                        "error-container": "#ffdad6",
+                        "secondary": "#006c49",
+                        "background": "#f9f9ff",
+                        "tertiary-container": "#4b4dd8",
+                        "tertiary-fixed-dim": "#c0c1ff",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "on-primary-fixed": "#0f0069",
+                        "outline": "#777587",
+                        "surface-bright": "#f9f9ff",
+                        "primary-fixed": "#e2dfff",
+                        "on-secondary-container": "#00714d",
+                        "secondary-container": "#6cf8bb",
+                        "surface-dim": "#cfdaf2",
+                        "surface-container-low": "#f0f3ff",
+                        "surface-tint": "#4d44e3",
+                        "surface-container-highest": "#d8e3fb",
+                        "on-error-container": "#93000a",
+                        "on-background": "#111c2d",
+                        "inverse-on-surface": "#ecf1ff",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#d9d8ff",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "inverse-surface": "#263143",
+                        "inverse-primary": "#c3c0ff",
+                        "surface-variant": "#d8e3fb",
+                        "on-secondary-fixed": "#002113",
+                        "tertiary": "#3130c0",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#e1e0ff",
+                        "primary": "#3525cd",
+                        "on-tertiary-fixed": "#07006c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "1rem",
+                        "2xl": "3rem",
+                        "base": "4px",
+                        "xs": "0.25rem",
+                        "xl": "2rem",
+                        "md": "1rem",
+                        "lg": "1.5rem",
+                        "gutter": "1.5rem",
+                        "sm": "0.5rem",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "headline-sm": ["Manrope"],
+                        "label-md": ["Manrope"],
+                        "body-sm": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "label-sm": ["Manrope"],
+                        "headline-lg": ["Manrope"],
+                        "display": ["Manrope"],
+                        "body-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-full bg-[#F8FAFC] flex items-center justify-center p-margin-mobile md:p-gutter">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-lg shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05)] p-xl">
+<div class="text-center mb-xl">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-surface-container-low text-primary mb-md">
+<span class="material-symbols-outlined text-[28px]" data-icon="lock_reset">lock_reset</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg md:font-headline-lg md:text-headline-lg text-[#4F46E5] mb-sm">
+                Recupera tu acceso
+            </h1>
+<p class="font-body-md text-body-md text-[#64748B]">
+                Ingresa tu correo para recibir un código de restablecimiento
+            </p>
+</div>
+<form @submit.prevent="submitForm" class="space-y-lg">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="email">
+                    Correo electrónico
+                </label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline" data-icon="mail">mail</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border border-outline-variant rounded-md bg-[#F1F5F9] font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] focus:bg-surface-container-lowest transition-colors shadow-sm" id="email" name="email" placeholder="ejemplo@correo.com" required="" type="email">
+</div>
+</div>
+<button class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-label-md text-label-md text-white bg-[#4F46E5] hover:bg-opacity-90 hover:-translate-y-[1px] hover:shadow-md active:translate-y-0 active:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5] transition-all" type="submit">
+                Enviar Código
+            </button>
+</form>
+<div class="mt-lg text-center">
+<a class="font-label-md text-label-md text-[#10B981] hover:underline flex items-center justify-center gap-xs transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_back">arrow_back</span>
+                Volver al inicio de sesión
+            </a>
+</div>
+</div>
+<script>
+        // Placeholder for Nuxt 3 / Vue 3 composition API behavior if needed in static HTML context
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]" data-icon="progress_activity">progress_activity</span>';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = 'Código Enviado';
+                btn.classList.replace('bg-[#4F46E5]', 'bg-[#10B981]');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.replace('bg-[#10B981]', 'bg-[#4F46E5]');
+                    btn.disabled = false;
+                }, 2000);
+            }, 1500);
+        });
+    </script>
+</body></html>
