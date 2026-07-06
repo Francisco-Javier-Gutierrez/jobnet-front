@@ -1,0 +1,41 @@
+name: CI Frontend
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - feature/*
+      - fix/*
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Run Prettier
+        run: npm run format:check
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Type Check
+        run: npm run typecheck
+
+      - name: Run Tests (100% Coverage)
+        run: npm run test:coverage
+
+      - name: Build
+        run: npm run build

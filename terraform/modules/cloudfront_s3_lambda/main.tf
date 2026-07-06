@@ -63,14 +63,12 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
 }
 
 resource "aws_lambda_function" "ssr_server" {
-  filename      = "dummy_payload.zip"
+  filename      = var.lambda_zip_path
   function_name = "jobnet-front-ssr-${var.environment}"
   role          = aws_iam_role.lambda_role.arn
   handler       = "index.handler"
   runtime       = "nodejs18.x"
-  lifecycle {
-    ignore_changes = [filename, source_code_hash]
-  }
+  source_code_hash = filebase64sha256(var.lambda_zip_path)
 }
 
 resource "aws_lambda_function_url" "ssr_url" {
