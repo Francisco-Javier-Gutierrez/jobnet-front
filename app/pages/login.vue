@@ -4,17 +4,22 @@
   >
     <div
       class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_40%)] pointer-events-none"
+      aria-hidden="true"
     ></div>
 
-    <div class="w-full max-w-md relative z-10">
+    <div class="w-full max-w-md relative z-10" role="main">
       <div
         class="bg-slate-950 border border-slate-800 rounded-2xl shadow-xl p-8"
       >
         <div class="text-center mb-8 flex flex-col items-center">
-          <NuxtLink to="/" class="inline-block mb-4">
+          <NuxtLink
+            to="/"
+            class="inline-block mb-4"
+            aria-label="Volver al inicio"
+          >
             <img
               src="/logo.svg"
-              alt="JobNet"
+              alt="Logotipo de JobNet"
               class="h-16 w-auto filter brightness-0 invert"
             />
           </NuxtLink>
@@ -29,9 +34,16 @@
         <form @submit.prevent="handleLogin" class="space-y-6">
           <div
             v-if="errorMessage"
+            id="login-error"
+            role="alert"
+            aria-live="assertive"
             class="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm flex items-start gap-2"
           >
-            <span class="material-symbols-outlined text-sm mt-0.5">error</span>
+            <span
+              class="material-symbols-outlined text-sm mt-0.5"
+              aria-hidden="true"
+              >error</span
+            >
             <span>{{ errorMessage }}</span>
           </div>
 
@@ -48,6 +60,9 @@
               type="email"
               placeholder="tu@email.com"
               required
+              aria-required="true"
+              :aria-invalid="!!errorMessage"
+              :aria-describedby="errorMessage ? 'login-error' : undefined"
               class="w-full bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-colors"
             />
           </div>
@@ -63,6 +78,7 @@
               <NuxtLink
                 to="/forgot-password"
                 class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition"
+                aria-label="Recuperar contraseña olvidada"
               >
                 ¿Olvidaste tu contraseña?
               </NuxtLink>
@@ -73,6 +89,8 @@
               type="password"
               placeholder="••••••••"
               required
+              aria-required="true"
+              :aria-invalid="!!errorMessage"
               class="w-full bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-colors"
             />
           </div>
@@ -80,11 +98,13 @@
           <button
             type="submit"
             :disabled="loading"
+            :aria-busy="loading"
             class="w-full h-12 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30"
           >
             <span
               v-if="loading"
               class="material-symbols-outlined animate-spin text-lg"
+              aria-hidden="true"
               >progress_activity</span
             >
             <span v-else>Iniciar Sesión</span>
@@ -97,6 +117,7 @@
             <NuxtLink
               to="/register"
               class="font-semibold text-emerald-400 hover:text-emerald-300 transition ml-1"
+              aria-label="Registrarse como candidato en JobNet"
             >
               Regístrate aquí
             </NuxtLink>

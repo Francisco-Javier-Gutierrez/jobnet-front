@@ -4,22 +4,28 @@
   >
     <div
       class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_40%)] pointer-events-none"
+      aria-hidden="true"
     ></div>
 
-    <div class="w-full max-w-md relative z-10">
+    <div class="w-full max-w-md relative z-10" role="main">
       <div
         class="bg-slate-950 border border-slate-800 rounded-2xl shadow-xl p-8"
       >
         <div class="text-center mb-8 flex flex-col items-center">
-          <NuxtLink to="/" class="inline-block mb-4">
+          <NuxtLink
+            to="/"
+            class="inline-block mb-4"
+            aria-label="Volver al inicio"
+          >
             <img
               src="/logo.svg"
-              alt="JobNet"
+              alt="Logotipo de JobNet"
               class="h-12 w-auto filter brightness-0 invert"
             />
           </NuxtLink>
           <div
             class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-400 mb-4"
+            aria-hidden="true"
           >
             <span class="material-symbols-outlined text-2xl">lock_person</span>
           </div>
@@ -35,24 +41,41 @@
         <form @submit.prevent="handleVerify" class="space-y-6">
           <div
             v-if="errorMessage"
+            id="mfa-error"
+            role="alert"
+            aria-live="assertive"
             class="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm flex items-start gap-2"
           >
-            <span class="material-symbols-outlined text-sm mt-0.5">error</span>
+            <span
+              class="material-symbols-outlined text-sm mt-0.5"
+              aria-hidden="true"
+              >error</span
+            >
             <span>{{ errorMessage }}</span>
           </div>
 
           <div
             v-if="successMessage"
+            id="mfa-success"
+            role="status"
+            aria-live="polite"
             class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-lg text-sm flex items-start gap-2"
           >
-            <span class="material-symbols-outlined text-sm mt-0.5"
+            <span
+              class="material-symbols-outlined text-sm mt-0.5"
+              aria-hidden="true"
               >check_circle</span
             >
             <span>{{ successMessage }}</span>
           </div>
 
           <!-- OTP Input Area -->
-          <div class="flex justify-between gap-2" id="otp-container">
+          <div
+            class="flex justify-between gap-2"
+            id="otp-container"
+            role="group"
+            aria-label="Código MFA de 6 dígitos"
+          >
             <input
               v-for="(digit, idx) in otp"
               :key="idx"
@@ -60,6 +83,16 @@
               v-model="otp[idx]"
               type="text"
               maxlength="1"
+              :aria-label="`Dígito ${idx + 1} de 6`"
+              aria-required="true"
+              :aria-invalid="!!errorMessage"
+              :aria-describedby="
+                errorMessage
+                  ? 'mfa-error'
+                  : successMessage
+                    ? 'mfa-success'
+                    : undefined
+              "
               class="w-12 h-14 text-center text-xl font-bold bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-xl outline-none transition-all"
               @input="handleInput($event, idx)"
               @keydown.delete="handleDelete($event, idx)"
@@ -70,16 +103,18 @@
           <button
             type="submit"
             :disabled="loading"
+            :aria-busy="loading"
             class="w-full h-12 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30"
           >
             <span
               v-if="loading"
               class="material-symbols-outlined animate-spin text-lg"
+              aria-hidden="true"
               >progress_activity</span
             >
             <span v-else class="flex items-center gap-1">
               Verificar Identidad
-              <span class="material-symbols-outlined text-lg"
+              <span class="material-symbols-outlined text-lg" aria-hidden="true"
                 >arrow_forward</span
               >
             </span>
@@ -90,6 +125,7 @@
           <a
             href="#"
             class="text-xs text-slate-400 hover:text-indigo-400 hover:underline transition"
+            aria-label="Contactar con el soporte técnico para resolver problemas con el token MFA"
           >
             ¿Problemas con tu token? Contactar soporte
           </a>
