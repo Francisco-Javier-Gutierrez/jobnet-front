@@ -77,3 +77,22 @@ npm run build
 ```
 
 Si todo sale verde, ¡tu código está listo para revisión y posterior despliegue automático a `develop`!
+
+---
+
+## 4. Reglas de Autenticación y Cognito
+
+Para asegurar el correcto funcionamiento del registro e inicio de sesión integrados con el backend de AWS Cognito, se deben cumplir las siguientes directrices:
+
+### A. Registro de Usuarios y Atributos de Cognito
+* **Esquemas de Atributos**: Al registrar un usuario mediante la API de autenticación (`server/api/auth/register.post.ts`), se deben enviar los atributos personalizados definidos en la infraestructura de AWS (Terraform):
+  - **`custom:role`**: Define el rol del usuario en inglés (`candidate` o `company`).
+  - **`custom:tax_id`**: Es obligatorio únicamente para cuentas de tipo corporativas (`company`) para registrar el identificador fiscal (RUC/RFC).
+* **Campos Obligatorios de Identidad**:
+  - Para Candidatos: Se debe enviar `name` con el Nombre Completo.
+  - Para Empresas: Se debe enviar `name` con la Razón Social de la empresa.
+
+### B. Configuración de Entornos (.env)
+* El frontend lee las credenciales del pool y el cliente del archivo local `.env`.
+* Al realizar cambios en la infraestructura de AWS con Terraform, se deben actualizar de inmediato las variables `NUXT_PUBLIC_COGNITO_USER_POOL_ID` y `NUXT_PUBLIC_COGNITO_CLIENT_ID` tanto en local como en los parámetros del pipeline de despliegue.
+
