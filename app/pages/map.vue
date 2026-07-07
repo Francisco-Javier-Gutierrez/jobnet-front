@@ -1,9 +1,19 @@
 <template>
-  <div class="flex-grow flex flex-col min-h-[calc(100vh-4rem-65px)]">
+  <div
+    class="flex-grow flex flex-col min-h-[calc(100vh-4rem-65px)]"
+    role="main"
+  >
     <div class="h-[500px] sm:h-auto flex-grow relative" id="map-container">
-      <div id="leaflet-map" class="absolute inset-0 z-10"></div>
+      <div
+        id="leaflet-map"
+        class="absolute inset-0 z-10"
+        role="application"
+        aria-label="Mapa interactivo de ofertas de empleo"
+      ></div>
       <div
         class="absolute top-4 right-4 z-20 bg-slate-950/90 border border-slate-800 p-4 rounded-xl max-w-sm backdrop-blur"
+        role="complementary"
+        aria-label="Información del filtro geográfico"
       >
         <h2 class="text-sm font-bold text-white mb-2">Filtro Geográfico</h2>
         <p class="text-xs text-slate-400">
