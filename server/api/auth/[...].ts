@@ -4,7 +4,8 @@ import _CredentialsProvider from "next-auth/providers/credentials";
 // @ts-expect-error - Vite ESM interop
 const CognitoProvider = _CognitoProvider.default || _CognitoProvider;
 // @ts-expect-error - Vite ESM interop
-const CredentialsProvider = _CredentialsProvider.default || _CredentialsProvider;
+const CredentialsProvider =
+  _CredentialsProvider.default || _CredentialsProvider;
 import { NuxtAuthHandler } from "#auth";
 import crypto from "crypto";
 
