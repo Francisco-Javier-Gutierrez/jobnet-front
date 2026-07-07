@@ -18,7 +18,7 @@ Por favor, lee con detenimiento este documento antes de comenzar a programar.
 
 ## 2. Integración Continua (CI)
 
-Hemos configurado un Action de GitHub (`ci.yml`) que se dispara automáticamente cuando haces `push` a una rama `feature/*` o `fix/*`, y al abrir un Pull Request hacia `develop` o `main`.
+Hemos configurado un Action de GitHub (`ci.yml`) que se dispara automáticamente al abrir o actualizar un Pull Request hacia `develop` o `main`, y cuando se hace un merge/push a `develop`.
 
 El CI ejecutará una serie de validaciones secuenciales. **Si tu código falla en alguna de ellas, el Pull Request será bloqueado.**
 
