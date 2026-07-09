@@ -1,8 +1,10 @@
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-800 font-sans flex">
+  <div
+    class="h-screen overflow-hidden bg-slate-50 text-slate-800 font-sans flex"
+  >
     <!-- Desktop Sidebar -->
     <aside
-      class="hidden md:flex flex-col w-64 bg-white border-r border-slate-200"
+      class="hidden md:flex flex-col w-64 h-screen bg-white border-r border-slate-200 flex-shrink-0"
     >
       <div class="p-6 border-b border-slate-100">
         <NuxtLink
@@ -10,14 +12,18 @@
           class="flex items-center gap-3"
           aria-label="Inicio de JobNet"
         >
-          <img src="/logo.svg" alt="JobNet" class="h-8 w-8 flex-shrink-0" />
+          <img
+            src="/logo.svg"
+            alt="JobNet Logo"
+            class="h-8 w-8 flex-shrink-0"
+          />
           <span class="text-xl font-bold tracking-tight text-primary"
             >JobNet</span
           >
         </NuxtLink>
       </div>
 
-      <nav class="flex-grow p-4 space-y-1.5">
+      <nav class="flex-grow p-4 space-y-1.5 overflow-y-auto">
         <NuxtLink
           v-for="item in navItems"
           :key="item.to"
@@ -36,7 +42,7 @@
         </NuxtLink>
       </nav>
 
-      <div class="p-4 border-t border-slate-100">
+      <div class="p-4 border-t border-slate-100 flex-shrink-0">
         <button
           @click="handleSignOut"
           class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition"
@@ -48,10 +54,10 @@
     </aside>
 
     <!-- Main Workspace -->
-    <div class="flex-grow flex flex-col min-w-0">
+    <div class="flex-grow flex flex-col min-w-0 h-screen overflow-hidden">
       <!-- Mobile Header -->
       <header
-        class="md:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200"
+        class="md:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200 flex-shrink-0"
       >
         <NuxtLink to="/" class="flex items-center gap-2">
           <img src="/logo.svg" alt="JobNet" class="h-7 w-7" />
@@ -67,7 +73,7 @@
         </button>
       </header>
 
-      <!-- Main Slot -->
+      <!-- Main Slot (Only this scrolls) -->
       <main class="flex-grow overflow-y-auto">
         <slot />
       </main>
@@ -107,7 +113,7 @@
           </button>
         </div>
 
-        <nav class="flex-grow space-y-1.5">
+        <nav class="flex-grow space-y-1.5 overflow-y-auto">
           <NuxtLink
             v-for="item in navItems"
             :key="item.to"
@@ -127,7 +133,7 @@
           </NuxtLink>
         </nav>
 
-        <div class="pt-4 border-t border-slate-100">
+        <div class="pt-4 border-t border-slate-100 flex-shrink-0">
           <button
             @click="handleSignOut"
             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition"
