@@ -190,22 +190,76 @@ export default NuxtAuthHandler({
 
           return null;
         } catch (error: any) {
-          throw new Error(error.message);
+          return {
+            id: "error",
+            error: error.message,
+          };
         }
       },
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      if (user && (user as any).error) {
+        throw new Error((user as any).error);
+      }
+      return true;
+    },
+    async redirect({ url, baseUrl }) {
+      if (!url || url === "undefined") {
+        return baseUrl;
+      }
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
+      }
+      try {
+        const parsedUrl = new URL(url);
+        if (parsedUrl.origin === baseUrl) {
+          return url;
+        }
+      } catch (e) {
+        // Fallback to baseUrl
+      }
+      return baseUrl;
+    },
     async jwt({ token, user, account }) {
       if (account) {
         token.idToken = account.id_token;
         token.accessToken = account.access_token;
       }
-      if (user) {
-        token.id = user.id;
+
+      // If we have an idToken, decode it to extract Cognito sub (id) and roles (groups)
+      if (token.idToken) {
+        try {
+          const payloadBase64 = (token.idToken as string).split(".")[1];
+          if (payloadBase64) {
+            const payloadJson = Buffer.from(payloadBase64, "base64").toString(
+              "ascii",
+            );
+            const payload = JSON.parse(payloadJson);
+
+            token.id = payload.sub; // Real Cognito UUID sub
+
+            const groups = payload["cognito:groups"] || [];
+            if (groups.includes("EMPRESA")) {
+              token.tipoUsuario = "EMPRESA";
+            } else if (groups.includes("ADMIN")) {
+              token.tipoUsuario = "ADMIN";
+            } else if (groups.includes("MODERATOR")) {
+              token.tipoUsuario = "MODERATOR";
+            } else {
+              token.tipoUsuario = "CANDIDATO";
+            }
+          }
+        } catch (e) {
+          console.error("Error decoding Cognito IdToken payload:", e);
+        }
+      }
+
+      if (user && !(user as any).error) {
         token.email = user.email;
-        token.idToken = (user as any).idToken;
-        token.accessToken = (user as any).accessToken;
+        token.idToken = (user as any).idToken || token.idToken;
+        token.accessToken = (user as any).accessToken || token.accessToken;
         token.refreshToken = (user as any).refreshToken;
       }
       return token;
@@ -215,6 +269,10 @@ export default NuxtAuthHandler({
         (session as any).idToken = token.idToken;
         (session as any).accessToken = token.accessToken;
         (session as any).refreshToken = token.refreshToken;
+
+        // Expose id and role to the frontend useAuth() session user
+        (session.user as any).id = token.id;
+        (session.user as any).tipoUsuario = token.tipoUsuario;
       }
       return session;
     },

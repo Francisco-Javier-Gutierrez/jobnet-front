@@ -2,6 +2,12 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
   modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt", "@sidebase/nuxt-auth"],
+  runtimeConfig: {
+    public: {
+      apiUrl: "",
+      wsUrl: "",
+    },
+  },
   app: {
     head: {
       link: [
@@ -19,6 +25,7 @@ export default defineNuxtConfig({
   },
   auth: {
     globalAppMiddleware: false,
+    origin: process.env.NUXT_AUTH_ORIGIN || "http://localhost:3000",
     provider: {
       type: "authjs",
       pages: {

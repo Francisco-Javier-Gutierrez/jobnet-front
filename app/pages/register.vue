@@ -1,15 +1,15 @@
 <template>
   <div
-    class="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-4"
+    class="min-h-screen bg-background text-on-background flex items-center justify-center p-4"
   >
     <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_40%)] pointer-events-none"
+      class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(53,37,205,0.06),transparent_40%)] pointer-events-none"
       aria-hidden="true"
     ></div>
 
     <div class="w-full max-w-md relative z-10" role="main">
       <div
-        class="bg-slate-950 border border-slate-800 rounded-2xl shadow-xl p-8"
+        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm p-8"
       >
         <div class="text-center mb-8 flex flex-col items-center">
           <NuxtLink
@@ -17,23 +17,28 @@
             class="inline-block mb-4"
             aria-label="Volver al inicio"
           >
-            <img
-              src="/logo.svg"
-              alt="Logotipo de JobNet"
-              class="h-16 w-auto filter brightness-0 invert"
-            />
+            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-16 w-auto" />
           </NuxtLink>
-          <h1 class="text-2xl font-bold tracking-tight text-white mt-2">
-            Crear tu Cuenta
+          <h1 class="text-2xl font-bold tracking-tight text-on-background mt-2">
+            Crear cuenta
           </h1>
-          <p class="text-sm text-slate-400 mt-1">
-            Únete a la red global de talento técnico
-          </p>
+          <div class="mt-3 w-full text-left">
+            <NuxtLink
+              to="/login"
+              class="font-semibold text-primary hover:underline transition text-sm inline-flex items-center gap-1"
+              aria-label="Volver a la pantalla de inicio de sesión"
+            >
+              <span class="material-symbols-outlined text-sm" aria-hidden="true"
+                >arrow_back</span
+              >
+              Volver al inicio de sesión
+            </NuxtLink>
+          </div>
         </div>
 
         <!-- Role Selector Tabs -->
         <div
-          class="flex bg-slate-900 p-1 rounded-xl mb-6 border border-slate-800"
+          class="flex bg-[#F1F5F9] p-1 rounded-xl mb-6 border border-outline-variant/30"
           role="tablist"
           aria-label="Tipo de registro"
         >
@@ -42,7 +47,7 @@
             role="tab"
             aria-selected="true"
             aria-label="Registrarse como Candidato"
-            class="flex-1 py-2 text-sm font-semibold rounded-lg transition bg-indigo-600 text-white shadow"
+            class="flex-1 py-2 text-sm font-semibold rounded-lg transition bg-primary text-white shadow-sm"
           >
             Candidato
           </button>
@@ -50,10 +55,10 @@
             to="/register-company"
             role="tab"
             aria-selected="false"
-            aria-label="Registrarse como Empresa"
-            class="flex-1 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-slate-200 text-center transition"
+            aria-label="Registrarse como organización"
+            class="flex-1 py-2 text-sm font-semibold rounded-lg text-on-surface-variant hover:text-primary text-center transition"
           >
-            Empresa
+            Organización
           </NuxtLink>
         </div>
 
@@ -63,7 +68,7 @@
             id="register-error"
             role="alert"
             aria-live="assertive"
-            class="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm flex items-start gap-2"
+            class="bg-rose-500/10 border border-rose-500/20 text-rose-600 p-3 rounded-lg text-sm flex items-start gap-2"
           >
             <span
               class="material-symbols-outlined text-sm mt-0.5"
@@ -78,7 +83,7 @@
             id="register-success"
             role="status"
             aria-live="polite"
-            class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-lg text-sm flex items-start gap-2"
+            class="bg-secondary/10 border border-secondary/20 text-secondary p-3 rounded-lg text-sm flex items-start gap-2"
           >
             <span
               class="material-symbols-outlined text-sm mt-0.5"
@@ -90,16 +95,15 @@
 
           <div>
             <label
-              class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2"
+              class="block text-xs font-semibold tracking-wider text-on-surface-variant mb-2"
               for="fullname"
             >
-              Nombre Completo
+              Ingrese su nombre completo
             </label>
             <input
               id="fullname"
               v-model="fullname"
               type="text"
-              placeholder="Ej. Juan Pérez"
               required
               aria-required="true"
               :aria-invalid="!!errorMessage"
@@ -110,46 +114,72 @@
                     ? 'register-success'
                     : undefined
               "
-              class="w-full bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-colors"
+              class="w-full bg-[#F1F5F9] border border-[#F1F5F9] hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background outline-none transition-colors"
             />
           </div>
 
           <div>
             <label
-              class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2"
+              class="block text-xs font-semibold tracking-wider text-on-surface-variant mb-2"
               for="email"
             >
-              Correo Electrónico
+              Ingrese su correo electrónico
             </label>
             <input
               id="email"
               v-model="email"
               type="email"
-              placeholder="tu@email.com"
               required
               aria-required="true"
               :aria-invalid="!!errorMessage"
-              class="w-full bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-colors"
+              class="w-full bg-[#F1F5F9] border border-[#F1F5F9] hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background outline-none transition-colors"
             />
           </div>
 
           <div>
             <label
-              class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2"
+              class="block text-xs font-semibold tracking-wider text-on-surface-variant mb-2"
               for="password"
             >
-              Contraseña
+              Ingrese su contraseña
             </label>
             <input
               id="password"
               v-model="password"
               type="password"
-              placeholder="Mínimo 8 caracteres"
               required
               aria-required="true"
               :aria-invalid="!!errorMessage"
-              class="w-full bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-colors"
+              class="w-full bg-[#F1F5F9] border border-[#F1F5F9] hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background outline-none transition-colors"
             />
+          </div>
+
+          <div
+            class="select-none pointer-events-none rounded-xl border border-outline-variant/60 bg-[#F1F5F9] p-3 text-on-surface-variant"
+            aria-live="polite"
+          >
+            <p class="mb-2 text-sm font-semibold text-on-surface">
+              Requisitos de contraseña
+            </p>
+            <div class="flex flex-col gap-1">
+              <label
+                v-for="rule in passwordRuleItems"
+                :key="rule.key"
+                class="flex items-center gap-2 text-xs"
+                :class="
+                  rule.valid ? 'text-secondary' : 'text-on-surface-variant/60'
+                "
+              >
+                <input
+                  type="checkbox"
+                  disabled
+                  :checked="rule.valid"
+                  class="h-4 w-4 rounded border-outline-variant/60 bg-white text-secondary accent-secondary"
+                  aria-hidden="true"
+                />
+                <span>{{ rule.label }}</span>
+              </label>
+            </div>
           </div>
 
           <div class="flex items-start gap-3">
@@ -159,20 +189,23 @@
               type="checkbox"
               required
               aria-required="true"
-              class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-800 rounded focus:ring-indigo-500 mt-1"
+              class="w-4 h-4 text-primary bg-[#F1F5F9] border-outline-variant/60 rounded focus:ring-primary mt-1"
             />
-            <label for="terms" class="text-xs text-slate-400 leading-normal">
+            <label
+              for="terms"
+              class="text-xs text-on-surface-variant leading-normal"
+            >
               Acepto los
               <a
                 href="#"
-                class="text-indigo-400 hover:underline"
+                class="text-primary hover:underline"
                 aria-label="Ver los Términos de Servicio"
                 >Términos de Servicio</a
               >
               y la
               <a
                 href="#"
-                class="text-indigo-400 hover:underline"
+                class="text-primary hover:underline"
                 aria-label="Ver la Política de Privacidad"
                 >Política de Privacidad</a
               >.
@@ -183,7 +216,7 @@
             type="submit"
             :disabled="loading"
             :aria-busy="loading"
-            class="w-full h-12 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30"
+            class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm hover:shadow"
           >
             <span
               v-if="loading"
@@ -191,29 +224,16 @@
               aria-hidden="true"
               >progress_activity</span
             >
-            <span v-else>Crear Cuenta</span>
+            <span v-else>Registrarse</span>
           </button>
         </form>
-
-        <div class="mt-6 pt-6 border-t border-slate-800/60 text-center">
-          <p class="text-sm text-slate-400">
-            ¿Ya tienes una cuenta?
-            <NuxtLink
-              to="/login"
-              class="font-semibold text-indigo-400 hover:text-indigo-300 transition ml-1"
-              aria-label="Ir a la pantalla de inicio de sesión"
-            >
-              Inicia sesión
-            </NuxtLink>
-          </p>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
 definePageMeta({
@@ -221,13 +241,43 @@ definePageMeta({
 });
 
 useSeoMeta({
-  title: "Crear Cuenta - JobNet",
+  title: "Crear cuenta - JobNet",
   description: "Regístrate en JobNet para buscar empleo",
 });
 
 const fullname = ref("");
 const email = ref("");
 const password = ref("");
+const passwordRules = computed(() => ({
+  length: password.value.length >= 8,
+  uppercase: /[A-Z]/.test(password.value),
+  lowercase: /[a-z]/.test(password.value),
+  number: /\d/.test(password.value),
+  special: /[@$!%*?&._-]/.test(password.value),
+}));
+const passwordRuleItems = computed(() => [
+  {
+    key: "length",
+    label: "Al menos 8 caracteres",
+    valid: passwordRules.value.length,
+  },
+  {
+    key: "uppercase",
+    label: "Una letra mayúscula",
+    valid: passwordRules.value.uppercase,
+  },
+  {
+    key: "lowercase",
+    label: "Una letra minúscula",
+    valid: passwordRules.value.lowercase,
+  },
+  { key: "number", label: "Un número", valid: passwordRules.value.number },
+  {
+    key: "special",
+    label: "Un carácter especial (@$!%*?&._-)",
+    valid: passwordRules.value.special,
+  },
+]);
 const acceptTerms = ref(false);
 const loading = ref(false);
 const errorMessage = ref("");

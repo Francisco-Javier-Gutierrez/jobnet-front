@@ -1,15 +1,15 @@
 <template>
   <div
-    class="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-4"
+    class="min-h-screen bg-background text-on-background flex items-center justify-center p-4"
   >
     <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_40%)] pointer-events-none"
+      class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(53,37,205,0.06),transparent_40%)] pointer-events-none"
       aria-hidden="true"
     ></div>
 
     <div class="w-full max-w-md relative z-10" role="main">
       <div
-        class="bg-slate-950 border border-slate-800 rounded-2xl shadow-xl p-8"
+        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm p-8"
       >
         <div class="text-center mb-8 flex flex-col items-center">
           <NuxtLink
@@ -17,27 +17,23 @@
             class="inline-block mb-4"
             aria-label="Volver al inicio"
           >
-            <img
-              src="/logo.svg"
-              alt="Logotipo de JobNet"
-              class="h-12 w-auto filter brightness-0 invert"
-            />
+            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-12 w-auto" />
           </NuxtLink>
-          <div
-            class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-400 mb-4"
-            aria-hidden="true"
-          >
-            <span class="material-symbols-outlined text-2xl"
-              >mark_email_read</span
-            >
-          </div>
-          <h1 class="text-2xl font-bold tracking-tight text-white">
-            Verifica tu cuenta
+          <h1 class="text-2xl font-bold tracking-tight text-on-background">
+            Verificar cuenta
           </h1>
-          <p class="text-sm text-slate-400 mt-2">
-            Ingresa el código de 6 dígitos enviado a
-            <span class="text-indigo-400 font-semibold">{{ email }}</span>
-          </p>
+          <div class="mt-3 w-full text-left">
+            <NuxtLink
+              to="/login"
+              class="font-semibold text-primary hover:underline transition text-sm inline-flex items-center gap-1"
+              aria-label="Volver a la pantalla de inicio de sesión"
+            >
+              <span class="material-symbols-outlined text-sm" aria-hidden="true"
+                >arrow_back</span
+              >
+              Volver al inicio de sesión
+            </NuxtLink>
+          </div>
         </div>
 
         <form @submit.prevent="handleVerify" class="space-y-6">
@@ -46,7 +42,7 @@
             id="otp-error"
             role="alert"
             aria-live="assertive"
-            class="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm flex items-start gap-2"
+            class="bg-rose-500/10 border border-rose-500/20 text-rose-600 p-3 rounded-lg text-sm flex items-start gap-2"
           >
             <span
               class="material-symbols-outlined text-sm mt-0.5"
@@ -61,7 +57,7 @@
             id="otp-success"
             role="status"
             aria-live="polite"
-            class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-lg text-sm flex items-start gap-2"
+            class="bg-secondary/10 border border-secondary/20 text-secondary p-3 rounded-lg text-sm flex items-start gap-2"
           >
             <span
               class="material-symbols-outlined text-sm mt-0.5"
@@ -70,43 +66,48 @@
             >
             <span>{{ successMessage }}</span>
           </div>
-
-          <!-- OTP Input Area -->
-          <div
-            class="flex justify-between gap-2"
-            id="otp-container"
-            role="group"
-            aria-label="Código de verificación de 6 dígitos"
-          >
-            <input
-              v-for="(digit, idx) in otp"
-              :key="idx"
-              ref="otpInputs"
-              v-model="otp[idx]"
-              type="text"
-              maxlength="1"
-              :aria-label="`Dígito ${idx + 1} de 6`"
-              aria-required="true"
-              :aria-invalid="!!errorMessage"
-              :aria-describedby="
-                errorMessage
-                  ? 'otp-error'
-                  : successMessage
-                    ? 'otp-success'
-                    : undefined
-              "
-              class="w-12 h-14 text-center text-xl font-bold bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-xl outline-none transition-all"
-              @input="handleInput($event, idx)"
-              @keydown.delete="handleDelete($event, idx)"
-              @paste="handlePaste"
-            />
+          <div>
+            <p
+              class="block text-xs font-semibold tracking-wider text-on-surface-variant mb-2"
+            >
+              Ingrese el código de verificación
+            </p>
+            <div
+              class="flex justify-between gap-2"
+              id="otp-container"
+              role="group"
+              aria-label="Código de verificación de 6 dígitos"
+            >
+              <input
+                v-for="(digit, idx) in otp"
+                :key="idx"
+                ref="otpInputs"
+                v-model="otp[idx]"
+                type="text"
+                maxlength="1"
+                :aria-label="`Dígito ${idx + 1} de 6`"
+                aria-required="true"
+                :aria-invalid="!!errorMessage"
+                :aria-describedby="
+                  errorMessage
+                    ? 'otp-error'
+                    : successMessage
+                      ? 'otp-success'
+                      : undefined
+                "
+                class="w-12 h-14 text-center text-xl font-bold bg-[#F1F5F9] border border-[#F1F5F9] hover:border-outline focus:border-primary rounded-xl outline-none transition-all text-on-background"
+                @input="handleInput($event, idx)"
+                @keydown.delete="handleDelete($event, idx)"
+                @paste="handlePaste"
+              />
+            </div>
           </div>
 
           <button
             type="submit"
             :disabled="loading"
             :aria-busy="loading"
-            class="w-full h-12 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30"
+            class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm hover:shadow"
           >
             <span
               v-if="loading"
@@ -114,20 +115,19 @@
               aria-hidden="true"
               >progress_activity</span
             >
-            <span v-else>Confirmar Registro</span>
+            <span v-else>Confirmar</span>
           </button>
         </form>
 
-        <!-- Footer Action -->
         <div class="mt-6 text-center">
-          <p class="text-sm text-slate-400">
+          <p class="text-sm text-on-surface-variant">
             ¿No recibiste el código?
             <button
               @click="handleResend"
               :disabled="resendLoading"
               :aria-busy="resendLoading"
               aria-label="Reenviar el código de verificación por correo"
-              class="font-semibold text-indigo-400 hover:text-indigo-300 transition ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="font-semibold text-primary hover:underline transition ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {{ resendLoading ? "Reenviando..." : "Reenviar" }}
             </button>
