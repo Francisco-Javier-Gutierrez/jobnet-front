@@ -218,7 +218,9 @@ const isOwner = computed(() => data.value?.user?.id === route.params.id);
 const { data: profileData } = await useAsyncData(
   `candidate-profile-${candidateId}`,
   () =>
-    $fetch(`${config.public.apiUrl}/profile/${candidateId}`).catch(() => null),
+    $fetch(`${config.public.apiUrl}/profile/${candidateId}`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => null),
 );
 
 const showDropdown = ref(false);

@@ -194,12 +194,16 @@ const isOwner = computed(() => data.value?.user?.id === route.params.id);
 const { data: profileData } = await useAsyncData(
   `company-profile-${companyId}`,
   () =>
-    $fetch(`${config.public.apiUrl}/profile/${companyId}`).catch(() => null),
+    $fetch(`${config.public.apiUrl}/profile/${companyId}`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => null),
 );
 
 // Fetch all jobs from the backend API to filter vacancies for this company
 const { data: jobsData } = await useAsyncData(`company-jobs-${companyId}`, () =>
-  $fetch(`${config.public.apiUrl}/jobs`).catch(() => []),
+  $fetch(`${config.public.apiUrl}/jobs`)
+    .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+    .catch(() => []),
 );
 
 const company = ref({
