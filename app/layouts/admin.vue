@@ -4,18 +4,17 @@
     <aside
       class="hidden md:flex flex-col w-64 bg-white border-r border-slate-200"
     >
-      <div class="p-6 border-b border-slate-100 flex items-center gap-2">
-        <img src="/logotipo.svg" alt="JobNet Logo" class="h-8 w-8" />
-        <div>
-          <span
-            class="font-bold text-lg tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+      <div class="p-6 border-b border-slate-100">
+        <NuxtLink
+          to="/"
+          class="flex items-center gap-3"
+          aria-label="Inicio de JobNet"
+        >
+          <img src="/logo.svg" alt="JobNet" class="h-8 w-8 flex-shrink-0" />
+          <span class="text-xl font-bold tracking-tight text-primary"
             >JobNet</span
           >
-          <span
-            class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider"
-            >Consola Admin</span
-          >
-        </div>
+        </NuxtLink>
       </div>
 
       <nav class="flex-grow p-4 space-y-1.5">
@@ -54,12 +53,12 @@
       <header
         class="md:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200"
       >
-        <div class="flex items-center gap-2">
-          <img src="/logotipo.svg" alt="JobNet Logo" class="h-7 w-7" />
+        <NuxtLink to="/" class="flex items-center gap-2">
+          <img src="/logo.svg" alt="JobNet" class="h-7 w-7" />
           <span class="font-bold text-sm tracking-tight text-slate-800"
-            >JobNet Admin</span
+            >JobNet</span
           >
-        </div>
+        </NuxtLink>
         <button
           @click="isMobileMenuOpen = true"
           class="text-slate-600 hover:text-slate-900"
