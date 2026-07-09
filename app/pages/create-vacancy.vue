@@ -5,7 +5,8 @@
         Crear Nueva Vacante
       </h1>
       <p class="text-on-surface-variant text-sm">
-        Registra una oferta de empleo para comenzar a recibir candidaturas.
+        Registra una oferta de empleo y define sus coordenadas geográficas y
+        habilidades del catálogo.
       </p>
     </div>
 
@@ -27,12 +28,12 @@
 
     <form
       @submit.prevent="handleSubmit"
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-5 shadow-sm"
+      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-6 shadow-sm"
     >
       <!-- Job Title -->
       <div class="flex flex-col gap-1.5">
         <label class="text-xs font-bold text-on-surface-variant" for="title"
-          >Título del Puesto</label
+          >Título del Puesto (Obligatorio)</label
         >
         <input
           v-model="title"
@@ -44,13 +45,13 @@
         />
       </div>
 
-      <!-- Mode & Salary -->
+      <!-- Mode & Description -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="flex flex-col gap-1.5">
           <label
             class="text-xs font-bold text-on-surface-variant"
             for="modality"
-            >Modalidad de Trabajo</label
+            >Modalidad de Trabajo (Obligatorio)</label
           >
           <select
             v-model="modality"
@@ -63,14 +64,17 @@
           </select>
         </div>
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-on-surface-variant" for="salary"
-            >Salario Mensual (MXN)</label
+          <label
+            class="text-xs font-bold text-on-surface-variant"
+            for="experience-years"
+            >Experiencia Requerida (Opcional)</label
           >
           <input
-            v-model.number="salary"
-            id="salary"
+            v-model.number="experienceYears"
+            id="experience-years"
             type="number"
-            placeholder="Ej: 45000"
+            min="0"
+            placeholder="Años de experiencia (Ej: 3)"
             class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
           />
         </div>
@@ -81,69 +85,113 @@
         <label
           class="text-xs font-bold text-on-surface-variant"
           for="description"
-          >Descripción de Responsabilidades</label
+          >Descripción Detallada de Actividades (Obligatorio)</label
         >
         <textarea
           v-model="description"
           id="description"
-          rows="5"
+          rows="4"
           required
-          placeholder="Describe las funciones, requisitos y lo que ofrece el puesto..."
+          placeholder="Describe detalladamente las responsabilidades, tareas diarias y requisitos técnicos del puesto..."
           class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition resize-none"
         ></textarea>
       </div>
 
-      <!-- Coordinates (Lat/Lng) -->
+      <!-- Ubicación Geográfica (Leaflet Map) -->
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-on-surface-variant"
+          >Ubicación Geográfica (Obligatorio)</label
+        >
+        <p class="text-xs text-on-surface-variant">
+          Haz clic en el mapa o arrastra el marcador para definir las
+          coordenadas de la vacante.
+        </p>
+        <div
+          id="vacancy-leaflet-map"
+          class="w-full h-60 rounded-xl border border-outline-variant/60 overflow-hidden bg-surface-container-low shadow-sm z-10"
+        ></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1 text-[11px]">
+            <span class="font-bold text-on-surface-variant">Latitud</span>
+            <span
+              class="bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 font-mono font-semibold"
+              >{{ lat.toFixed(6) }}</span
+            >
+          </div>
+          <div class="flex flex-col gap-1 text-[11px]">
+            <span class="font-bold text-on-surface-variant">Longitud</span>
+            <span
+              class="bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 font-mono font-semibold"
+              >{{ lng.toFixed(6) }}</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Rango Salarial (Opcional) -->
       <div
-        class="bg-surface-container-low/50 p-4 border border-outline-variant/60 rounded-xl flex flex-col gap-3"
+        class="bg-surface-container-low/30 border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-4"
       >
-        <h3 class="text-xs font-bold text-on-background">
-          Coordenadas Geográficas (Para el buscador con mapa)
+        <h3
+          class="text-xs font-bold text-on-background uppercase tracking-wider"
+        >
+          Rango Salarial Mensual (Opcional)
         </h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="flex flex-col gap-1">
+          <div class="flex flex-col gap-1.5">
             <label
               class="text-[10px] font-bold text-on-surface-variant"
-              for="lat"
-              >Latitud</label
+              for="salary-min"
+              >Monto Mínimo (MXN)</label
             >
             <input
-              v-model.number="lat"
-              id="lat"
+              v-model.number="salaryMin"
+              id="salary-min"
               type="number"
-              step="0.000001"
-              class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
+              min="0"
+              placeholder="Ej: 30000"
+              class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2 text-xs text-on-background outline-none transition"
             />
           </div>
-          <div class="flex flex-col gap-1">
+          <div class="flex flex-col gap-1.5">
             <label
               class="text-[10px] font-bold text-on-surface-variant"
-              for="lng"
-              >Longitud</label
+              for="salary-max"
+              >Monto Máximo (MXN)</label
             >
             <input
-              v-model.number="lng"
-              id="lng"
+              v-model.number="salaryMax"
+              id="salary-max"
               type="number"
-              step="0.000001"
-              class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
+              min="0"
+              placeholder="Ej: 50000"
+              class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2 text-xs text-on-background outline-none transition"
             />
           </div>
         </div>
-        <button
-          type="button"
-          @click="setToMexicoCity"
-          class="text-primary hover:text-primary-container text-[10px] font-bold transition text-left self-start"
-        >
-          Usar coordenadas de Ciudad de México (Centro)
-        </button>
       </div>
 
-      <!-- Habilidades Requeridas -->
+      <!-- Aptitudes y Habilidades Opcionales -->
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-bold text-on-surface-variant"
-          >Habilidades Requeridas</label
+        <label class="text-xs font-bold text-on-surface-variant" for="aptitudes"
+          >Aptitudes y Competencias Blandas (Opcional)</label
         >
+        <input
+          v-model="aptitudes"
+          id="aptitudes"
+          type="text"
+          placeholder="Ej: Liderazgo, Comunicación asertiva, Trabajo en equipo"
+          class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
+        />
+      </div>
+
+      <!-- Habilidades Requeridas (Catálogo Maestro Dinámico) -->
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-on-surface-variant"
+          >Selección de Habilidades Requeridas (Obligatorio)</label
+        >
+
+        <!-- Selected Skill Tags -->
         <div class="flex flex-wrap gap-2 mb-2">
           <span
             v-for="skill in skills"
@@ -159,29 +207,70 @@
               <span class="material-symbols-outlined text-xs">close</span>
             </button>
           </span>
-        </div>
-        <div class="flex gap-2">
-          <input
-            v-model="newSkill"
-            @keyup.enter.prevent="addSkill"
-            type="text"
-            placeholder="Ej: React, AWS, Docker"
-            class="flex-grow bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2 text-xs text-on-background outline-none transition"
-          />
-          <button
-            type="button"
-            @click="addSkill"
-            class="bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary text-xs font-bold px-4 py-2 rounded-xl transition"
+          <span
+            v-if="skills.length === 0"
+            class="text-xs text-on-surface-variant italic"
           >
-            Agregar
-          </button>
+            Ninguna habilidad seleccionada aún. Selecciona del catálogo abajo.
+          </span>
+        </div>
+
+        <!-- Catalog autocomplete and suggestion box -->
+        <div
+          class="space-y-3 bg-surface-container-low/40 p-4 border border-outline-variant/50 rounded-xl"
+        >
+          <div class="flex gap-2">
+            <div class="relative flex-grow">
+              <span
+                class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm"
+                >search</span
+              >
+              <input
+                v-model="skillSearchQuery"
+                type="text"
+                placeholder="Buscar habilidades en el catálogo..."
+                class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl pl-9 pr-4 py-2 text-xs text-on-background outline-none transition"
+              />
+            </div>
+
+            <!-- Quick Add Option for non-existing skills -->
+            <button
+              type="button"
+              @click="handleQuickAddSkill"
+              :disabled="!skillSearchQuery.trim()"
+              class="bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary text-xs font-bold px-4 py-2 rounded-xl transition disabled:opacity-50"
+            >
+              Crear y Agregar
+            </button>
+          </div>
+
+          <!-- Suggested Master Catalog Skills -->
+          <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+            <button
+              v-for="masterSkill in filteredCatalogSkills"
+              :key="masterSkill.id"
+              type="button"
+              @click="addSkill(masterSkill.name)"
+              class="bg-surface hover:bg-surface-container-high border border-outline-variant/50 hover:border-primary text-on-surface hover:text-primary transition px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-[10px]">add</span>
+              {{ masterSkill.name }}
+            </button>
+            <span
+              v-if="filteredCatalogSkills.length === 0"
+              class="text-[11px] text-on-surface-variant italic py-1"
+            >
+              No se encontraron habilidades adicionales. Escribe para crear una
+              nueva.
+            </span>
+          </div>
         </div>
       </div>
 
       <!-- Submit button -->
       <button
         type="submit"
-        :disabled="submitting"
+        :disabled="submitting || skills.length === 0"
         class="bg-primary hover:bg-primary-container disabled:opacity-50 text-white font-semibold text-sm h-12 rounded-xl transition shadow-md shadow-primary/20 flex items-center justify-center gap-2 active:scale-95 duration-100 mt-2"
       >
         <span class="material-symbols-outlined text-lg">{{
@@ -194,33 +283,68 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useCatalogStore } from "~/stores/catalog";
+
+// Load Leaflet stylesheet in the head
+useHead({
+  link: [
+    {
+      rel: "stylesheet",
+      href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+      crossorigin: "",
+    },
+  ],
+});
 
 useSeoMeta({
   title: "Publicar Oferta de Empleo - JobNet",
   description:
-    "Crea una nueva vacante de reclutamiento en la plataforma JobNet",
+    "Crea una nueva vacante de reclutamiento utilizando geolocalización y el catálogo maestro",
 });
 
 const router = useRouter();
 const config = useRuntimeConfig();
 const { data: session, status } = useAuth();
+const catalogStore = useCatalogStore();
 
+// Form fields
 const title = ref("");
 const modality = ref("Remoto");
-const salary = ref<number | null>(null);
 const description = ref("");
-const lat = ref(19.432608); // Default CDMX
-const lng = ref(-99.133209);
 const skills = ref<string[]>([]);
-const newSkill = ref("");
+const aptitudes = ref("");
+const experienceYears = ref<number | null>(null);
+const salaryMin = ref<number | null>(null);
+const salaryMax = ref<number | null>(null);
 
+// Leaflet Map State
+const lat = ref(19.432608); // CDMX Default
+const lng = ref(-99.133209);
+let map: any = null;
+let marker: any = null;
+
+// Habilidades Catalog search
+const skillSearchQuery = ref("");
+
+// Notifications/Actions
 const submitting = ref(false);
 const successMessage = ref("");
 const errorMessage = ref("");
-
 const companyName = ref("Empresa Corporativa");
+
+// Filter catalog skills by search query and exclude already added ones
+const filteredCatalogSkills = computed(() => {
+  const query = skillSearchQuery.value.toLowerCase().trim();
+  return catalogStore.skills.filter((skill) => {
+    const matchesQuery = skill.name.toLowerCase().includes(query);
+    const notSelectedYet = !skills.value.some(
+      (s) => s.toLowerCase() === skill.name.toLowerCase(),
+    );
+    return matchesQuery && notSelectedYet;
+  });
+});
 
 const fetchCompanyName = async () => {
   if (status.value !== "authenticated" || !session.value?.user?.id) {
@@ -240,57 +364,117 @@ const fetchCompanyName = async () => {
   }
 };
 
-onMounted(() => {
-  fetchCompanyName();
+onMounted(async () => {
+  await fetchCompanyName();
+
+  // Initialize Leaflet map on client side
+  if (process.client) {
+    const L = await import("leaflet");
+
+    map = L.map("vacancy-leaflet-map").setView([lat.value, lng.value], 11);
+
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+      {
+        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+      },
+    ).addTo(map);
+
+    marker = L.marker([lat.value, lng.value], {
+      draggable: true,
+    }).addTo(map);
+
+    // Sync coordinates when dragging
+    marker.on("dragend", () => {
+      const position = marker.getLatLng();
+      lat.value = Number(position.lat.toFixed(6));
+      lng.value = Number(position.lng.toFixed(6));
+    });
+
+    // Move marker when clicking on the map
+    map.on("click", (e: any) => {
+      marker.setLatLng(e.latlng);
+      lat.value = Number(e.latlng.lat.toFixed(6));
+      lng.value = Number(e.latlng.lng.toFixed(6));
+    });
+  }
 });
 
-const addSkill = () => {
-  if (!newSkill.value.trim()) return;
-  const s = newSkill.value.trim();
-  if (!skills.value.includes(s)) {
-    skills.value.push(s);
+onUnmounted(() => {
+  if (map) {
+    map.remove();
   }
-  newSkill.value = "";
+});
+
+// Selection actions
+const addSkill = (skillName: string) => {
+  if (!skills.value.some((s) => s.toLowerCase() === skillName.toLowerCase())) {
+    skills.value.push(skillName);
+  }
+  // Clear search query
+  skillSearchQuery.value = "";
 };
 
-const removeSkill = (skill: string) => {
-  skills.value = skills.value.filter((s) => s !== skill);
+const removeSkill = (skillName: string) => {
+  skills.value = skills.value.filter((s) => s !== skillName);
 };
 
-const setToMexicoCity = () => {
-  lat.value = 19.432608;
-  lng.value = -99.133209;
+// Expand Catalog and Add immediately
+const handleQuickAddSkill = () => {
+  const queryName = skillSearchQuery.value.trim();
+  if (!queryName) return;
+
+  // 1. Add to global master catalog Pinia store (which validates duplicates)
+  const result = catalogStore.addItem(queryName, "Habilidad");
+
+  // 2. Add to active vacancy skills list
+  addSkill(queryName);
+  skillSearchQuery.value = "";
 };
 
 const handleSubmit = async () => {
   if (!session.value?.user?.id) return;
+  if (skills.value.length === 0) {
+    errorMessage.value = "Debes seleccionar al menos una habilidad requerida.";
+    return;
+  }
 
   submitting.value = true;
   successMessage.value = "";
   errorMessage.value = "";
 
   try {
+    const payload = {
+      title: title.value,
+      company: companyName.value,
+      empresaUuid: session.value.user.id,
+      lat: lat.value,
+      lng: lng.value,
+      modalidad: modality.value,
+      salarioMinimo: salaryMin.value || 0,
+      salarioMaximo: salaryMax.value || 0,
+      salario: salaryMin.value || 0, // Fallback standard field
+      descripcion: description.value,
+      habilidadesRequeridas: skills.value,
+      aptitudes: aptitudes.value,
+      experienciaAnos: experienceYears.value || 0,
+    };
+
     const response = await $fetch<any>(`${config.public.apiUrl}/jobs`, {
       method: "POST",
-      body: {
-        title: title.value,
-        company: companyName.value,
-        empresaUuid: session.value.user.id,
-        lat: lat.value,
-        lng: lng.value,
-        modalidad: modality.value,
-        salario: salary.value || 0,
-        descripcion: description.value,
-        habilidadesRequeridas: skills.value,
-      },
+      body: payload,
     });
 
     if (response) {
-      successMessage.value = "¡Vacante publicada con éxito en la plataforma!";
+      successMessage.value =
+        "¡Vacante de empleo publicada y registrada con éxito!";
       title.value = "";
       description.value = "";
-      salary.value = null;
       skills.value = [];
+      aptitudes.value = "";
+      experienceYears.value = null;
+      salaryMin.value = null;
+      salaryMax.value = null;
 
       setTimeout(() => {
         router.push("/my-vacancies");
@@ -298,7 +482,7 @@ const handleSubmit = async () => {
     }
   } catch (error: any) {
     console.error("Error creating vacancy:", error);
-    errorMessage.value = "Error al intentar registrar la vacante de empleo.";
+    errorMessage.value = "Ocurrió un error al intentar publicar la vacante.";
   } finally {
     submitting.value = false;
   }
