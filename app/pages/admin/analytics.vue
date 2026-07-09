@@ -53,6 +53,11 @@
 </template>
 
 <script setup lang="ts">
+// Use layout admin
+definePageMeta({
+  layout: "admin",
+});
+
 useSeoMeta({
   title: "Analítica de Negocio - Administrador",
 });

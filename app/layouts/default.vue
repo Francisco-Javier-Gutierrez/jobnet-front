@@ -246,12 +246,6 @@ const guestNav: NavItem[] = [
     label: "Explorar Vacantes",
     shortLabel: "Explorar",
   },
-  {
-    to: "/companies",
-    icon: "domain",
-    label: "Directorio de Empresas",
-    shortLabel: "Empresas",
-  },
 ];
 
 const candidateNav: NavItem[] = [

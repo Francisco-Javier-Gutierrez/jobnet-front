@@ -315,6 +315,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+
+// Use layout admin
+definePageMeta({
+  layout: "admin",
+});
 import { useCatalogStore, type CatalogItem } from "~/stores/catalog";
 
 useSeoMeta({
