@@ -1,18 +1,18 @@
 <template>
-  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans flex">
+  <div class="min-h-screen bg-slate-50 text-slate-800 font-sans flex">
     <!-- Desktop Sidebar -->
     <aside
-      class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800"
+      class="hidden md:flex flex-col w-64 bg-white border-r border-slate-200"
     >
-      <div class="p-6 border-b border-slate-800 flex items-center gap-2">
+      <div class="p-6 border-b border-slate-100 flex items-center gap-2">
         <img src="/logotipo.svg" alt="JobNet Logo" class="h-8 w-8" />
         <div>
           <span
-            class="font-bold text-lg tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+            class="font-bold text-lg tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
             >JobNet</span
           >
           <span
-            class="block text-[10px] text-slate-500 font-bold uppercase tracking-wider"
+            class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider"
             >Consola Admin</span
           >
         </div>
@@ -27,7 +27,7 @@
             'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150',
             isActive(item.to)
               ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-              : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200',
+              : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600',
           ]"
         >
           <span class="material-symbols-outlined text-[20px]">{{
@@ -37,10 +37,10 @@
         </NuxtLink>
       </nav>
 
-      <div class="p-4 border-t border-slate-800">
+      <div class="p-4 border-t border-slate-100">
         <button
           @click="handleSignOut"
-          class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-500/10 transition"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition"
         >
           <span class="material-symbols-outlined text-[20px]">logout</span>
           Cerrar Sesión
@@ -52,17 +52,17 @@
     <div class="flex-grow flex flex-col min-w-0">
       <!-- Mobile Header -->
       <header
-        class="md:hidden flex items-center justify-between px-6 py-4 bg-slate-900 border-b border-slate-800"
+        class="md:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200"
       >
         <div class="flex items-center gap-2">
           <img src="/logotipo.svg" alt="JobNet Logo" class="h-7 w-7" />
-          <span class="font-bold text-sm tracking-tight text-white"
+          <span class="font-bold text-sm tracking-tight text-slate-800"
             >JobNet Admin</span
           >
         </div>
         <button
           @click="isMobileMenuOpen = true"
-          class="text-slate-400 hover:text-white"
+          class="text-slate-600 hover:text-slate-900"
         >
           <span class="material-symbols-outlined text-[24px]">menu</span>
         </button>
@@ -74,14 +74,14 @@
       </main>
     </div>
 
-    <!-- Mobile Drawer Drawer -->
+    <!-- Mobile Drawer -->
     <Transition
       enter-active-class="transition-opacity duration-200 ease-out"
       leave-active-class="transition-opacity duration-150 ease-in"
     >
       <div
         v-if="isMobileMenuOpen"
-        class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm md:hidden"
+        class="fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-sm md:hidden"
         @click="isMobileMenuOpen = false"
       ></div>
     </Transition>
@@ -92,17 +92,17 @@
     >
       <div
         v-if="isMobileMenuOpen"
-        class="fixed inset-y-0 right-0 z-55 w-64 bg-slate-900 border-l border-slate-800 p-6 flex flex-col md:hidden"
+        class="fixed inset-y-0 right-0 z-55 w-64 bg-white border-l border-slate-200 p-6 flex flex-col md:hidden"
       >
         <div
-          class="flex items-center justify-between mb-8 pb-4 border-b border-slate-800"
+          class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100"
         >
-          <span class="font-bold text-sm text-slate-300"
+          <span class="font-bold text-sm text-slate-700"
             >Menú Administrativo</span
           >
           <button
             @click="isMobileMenuOpen = false"
-            class="text-slate-400 hover:text-white"
+            class="text-slate-600 hover:text-slate-900"
           >
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -118,7 +118,7 @@
               'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150',
               isActive(item.to)
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200',
+                : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600',
             ]"
           >
             <span class="material-symbols-outlined text-[20px]">{{
@@ -128,10 +128,10 @@
           </NuxtLink>
         </nav>
 
-        <div class="pt-4 border-t border-slate-800">
+        <div class="pt-4 border-t border-slate-100">
           <button
             @click="handleSignOut"
-            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-500/10 transition"
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition"
           >
             <span class="material-symbols-outlined text-[20px]">logout</span>
             Cerrar Sesión
