@@ -366,6 +366,7 @@ const fetchCompanyName = async () => {
 
 onMounted(async () => {
   await fetchCompanyName();
+  await catalogStore.fetchCatalog();
 
   // Initialize Leaflet map on client side
   if (process.client) {
@@ -420,12 +421,12 @@ const removeSkill = (skillName: string) => {
 };
 
 // Expand Catalog and Add immediately
-const handleQuickAddSkill = () => {
+const handleQuickAddSkill = async () => {
   const queryName = skillSearchQuery.value.trim();
   if (!queryName) return;
 
   // 1. Add to global master catalog Pinia store (which validates duplicates)
-  const result = catalogStore.addItem(queryName, "Habilidad");
+  const result = await catalogStore.addItem(queryName, "Habilidad");
 
   // 2. Add to active vacancy skills list
   addSkill(queryName);

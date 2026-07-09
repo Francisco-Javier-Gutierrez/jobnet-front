@@ -314,7 +314,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 // Use layout admin
 definePageMeta({
@@ -329,6 +329,10 @@ useSeoMeta({
 });
 
 const catalog = useCatalogStore();
+
+onMounted(async () => {
+  await catalog.fetchCatalog();
+});
 
 // Setup UI Tab state
 const activeCategoryTab = ref<"Habilidad" | "Sector">("Habilidad");
@@ -390,11 +394,11 @@ const formatDate = (isoString: string) => {
 };
 
 // RF-10: Expansión - Creación de Elemento
-const handleCreateItem = () => {
+const handleCreateItem = async () => {
   globalSuccess.value = "";
   globalError.value = "";
 
-  const result = catalog.addItem(newItemName.value, newItemCategory.value);
+  const result = await catalog.addItem(newItemName.value, newItemCategory.value);
   if (result.success) {
     globalSuccess.value = `¡"${newItemName.value}" se agregó con éxito a ${newItemCategory.value === "Habilidad" ? "habilidades" : "sectores"}!`;
     activeCategoryTab.value = newItemCategory.value; // Switch to the category we just added to see it
@@ -419,11 +423,11 @@ const cancelEdit = () => {
 };
 
 // RF-11: Modificación - Guardar edición inline
-const handleSaveEdit = (id: string) => {
+const handleSaveEdit = async (id: string) => {
   globalSuccess.value = "";
   globalError.value = "";
 
-  const result = catalog.updateItem(id, editingName.value);
+  const result = await catalog.updateItem(id, editingName.value);
   if (result.success) {
     globalSuccess.value = "Elemento actualizado correctamente.";
     editingId.value = null;
@@ -434,7 +438,7 @@ const handleSaveEdit = (id: string) => {
 };
 
 // RF-11: Modificación - Eliminar Elemento
-const handleDeleteItem = (id: string) => {
+const handleDeleteItem = async (id: string) => {
   globalSuccess.value = "";
   globalError.value = "";
 
@@ -443,7 +447,7 @@ const handleDeleteItem = (id: string) => {
       "¿Estás seguro de que deseas eliminar este registro del catálogo global?",
     )
   ) {
-    const success = catalog.deleteItem(id);
+    const success = await catalog.deleteItem(id);
     if (success) {
       globalSuccess.value = "Registro eliminado del catálogo correctamente.";
       // Adjust current page if we deleted the last item on the page
