@@ -9,7 +9,7 @@ if (typeof Object.create === "function") {
       try {
         Object.defineProperty(obj, "hasOwnProperty", {
           value: function (prop: string | symbol) {
-            return Object.prototype.hasOwnProperty.call(this, prop);
+            return Object.prototype.hasOwnProperty.call(obj, prop);
           },
           writable: true,
           configurable: true,
