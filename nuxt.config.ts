@@ -4,8 +4,12 @@ export default defineNuxtConfig({
   modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt", "@sidebase/nuxt-auth"],
   runtimeConfig: {
     public: {
-      apiUrl: "",
-      wsUrl: "",
+      apiUrl:
+        process.env.NUXT_PUBLIC_API_URL ||
+        "https://av7lebx0sf.execute-api.us-east-1.amazonaws.com",
+      wsUrl:
+        process.env.NUXT_PUBLIC_WS_URL ||
+        "wss://oa7jw5dfza.execute-api.us-east-1.amazonaws.com/dev",
     },
   },
   app: {
