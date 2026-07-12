@@ -1,14 +1,27 @@
 import { defineStore } from "pinia";
 
+export interface Job {
+  id: string;
+  title: string;
+  company: string;
+  empresaUuid?: string;
+  lat: number;
+  lng: number;
+  modalidad?: string;
+  descripcion?: string;
+  habilidadesRequeridas?: string[];
+  aptitudes?: string;
+  salario?: number;
+  salarioMinimo?: number;
+  salarioMaximo?: number;
+  experienciaAnos?: number;
+  sector?: string;
+  createdAt?: string;
+}
+
 export const useJobsStore = defineStore("jobs", {
   state: () => ({
-    jobs: [] as Array<{
-      id: string;
-      title: string;
-      company: string;
-      lat: number;
-      lng: number;
-    }>,
+    jobs: [] as Job[],
     loading: false,
   }),
   actions: {

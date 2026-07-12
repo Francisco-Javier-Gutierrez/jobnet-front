@@ -14,18 +14,14 @@
         <div>
           <NuxtLink
             to="/"
-            class="flex items-center gap-3 px-4 h-[72px] mb-2"
+            class="flex items-center justify-center w-full h-[72px] mb-2"
             aria-label="Inicio de JobNet"
           >
             <img
               src="/logo.svg"
               alt="JobNet"
-              class="h-8 w-8 flex-shrink-0 filter brightness-100"
+              class="h-16 w-16 flex-shrink-0 filter brightness-100"
             />
-            <span
-              class="text-xl font-bold tracking-tight text-primary hidden lg:inline"
-              >JobNet</span
-            >
           </NuxtLink>
 
           <!-- Nav Items -->
@@ -122,22 +118,19 @@
     <div class="md:hidden flex flex-col min-h-screen">
       <!-- Mobile Top Bar -->
       <header
-        class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-lg border-b border-outline-variant/60 h-14 flex items-center justify-between px-4"
+        class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-lg border-b border-outline-variant/60 h-16 flex items-center justify-between px-4"
         role="banner"
       >
         <NuxtLink
           to="/"
-          class="flex items-center gap-2"
+          class="flex items-center"
           aria-label="Inicio de JobNet"
         >
           <img
             src="/logo.svg"
             alt="JobNet"
-            class="h-7 w-7 filter brightness-100"
+            class="h-14 w-14 filter brightness-100"
           />
-          <span class="text-lg font-bold tracking-tight text-primary"
-            >JobNet</span
-          >
         </NuxtLink>
         <div class="flex items-center gap-2">
           <template v-if="status === 'authenticated'">
@@ -166,7 +159,7 @@
       </header>
 
       <!-- Main Content -->
-      <main class="flex-grow pt-14 pb-16" role="main">
+      <main class="flex-grow pt-16 pb-16" role="main">
         <slot />
       </main>
 

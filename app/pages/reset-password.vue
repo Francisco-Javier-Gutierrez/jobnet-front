@@ -17,7 +17,7 @@
             class="inline-block mb-4"
             aria-label="Volver al inicio"
           >
-            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-12 w-auto" />
+            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-24 w-auto" />
           </NuxtLink>
           <h1 class="text-2xl font-bold tracking-tight text-on-background">
             Nueva contraseña
@@ -143,6 +143,22 @@
             <span v-else>Actualizar</span>
           </button>
         </form>
+
+        <div class="mt-6 text-center">
+          <p class="text-sm text-on-surface-variant">
+            ¿No recibiste el código?
+            <button
+              type="button"
+              @click="handleResend"
+              :disabled="resendLoading"
+              :aria-busy="resendLoading"
+              aria-label="Reenviar el código de restablecimiento por correo"
+              class="font-semibold text-primary hover:underline transition ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ resendLoading ? "Reenviando..." : "Reenviar" }}
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -170,6 +186,7 @@ const newPassword = ref("");
 const confirmPassword = ref("");
 
 const loading = ref(false);
+const resendLoading = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
 
@@ -213,6 +230,33 @@ const handleReset = async () => {
       "Código inválido o error al restablecer contraseña";
   } finally {
     loading.value = false;
+  }
+};
+
+const handleResend = async () => {
+  if (!email.value) {
+    errorMessage.value =
+      "El correo electrónico es requerido para reenviar el código. Vuelve a iniciar el proceso.";
+    return;
+  }
+
+  resendLoading.value = true;
+  errorMessage.value = "";
+  successMessage.value = "";
+
+  try {
+    const res = await $fetch("/api/auth/forgot-password", {
+      method: "POST",
+      body: { email: email.value },
+    });
+    if (res.success) {
+      successMessage.value = "Código reenviado con éxito. Revisa tu correo.";
+    }
+  } catch (error: any) {
+    errorMessage.value =
+      error.data?.message || error.message || "Error al reenviar el código";
+  } finally {
+    resendLoading.value = false;
   }
 };
 </script>

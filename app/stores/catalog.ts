@@ -26,7 +26,9 @@ export const useCatalogStore = defineStore("catalog", {
     async fetchCatalog() {
       const config = useRuntimeConfig();
       try {
-        const data = await $fetch<CatalogItem[]>(`${config.public.apiUrl}/catalog`);
+        const data = await $fetch<CatalogItem[]>(
+          `${config.public.apiUrl}/catalog`,
+        );
         this.items = data || [];
         this.loaded = true;
       } catch (error) {
@@ -58,10 +60,13 @@ export const useCatalogStore = defineStore("catalog", {
 
       const config = useRuntimeConfig();
       try {
-        const response = await $fetch<CatalogItem>(`${config.public.apiUrl}/catalog`, {
-          method: "POST",
-          body: { name: cleanName, category },
-        });
+        const response = await $fetch<CatalogItem>(
+          `${config.public.apiUrl}/catalog`,
+          {
+            method: "POST",
+            body: { name: cleanName, category },
+          },
+        );
         this.items.push(response);
         return { success: true };
       } catch (error: any) {
@@ -103,10 +108,13 @@ export const useCatalogStore = defineStore("catalog", {
 
       const config = useRuntimeConfig();
       try {
-        const response = await $fetch<CatalogItem>(`${config.public.apiUrl}/catalog/${id}`, {
-          method: "PUT",
-          body: { name: cleanName },
-        });
+        const response = await $fetch<CatalogItem>(
+          `${config.public.apiUrl}/catalog/${id}`,
+          {
+            method: "PUT",
+            body: { name: cleanName },
+          },
+        );
         this.items[itemIndex].name = response.name;
         return { success: true };
       } catch (error: any) {

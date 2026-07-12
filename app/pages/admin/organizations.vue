@@ -208,140 +208,201 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 text-slate-600">
-            <tr
-              v-for="org in paginatedOrgs"
-              :key="org.id"
-              class="hover:bg-slate-50/60 transition duration-150"
-            >
-              <!-- Org Name & Logo -->
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
+            <!-- Skeleton Rows -->
+            <template v-if="loading">
+              <tr v-for="i in 5" :key="i" class="animate-pulse">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 rounded-xl bg-slate-100 flex-shrink-0 animate-pulse"
+                    ></div>
+                    <div class="space-y-2 flex-grow">
+                      <div
+                        class="h-4 w-32 bg-slate-200 rounded animate-pulse"
+                      ></div>
+                      <div
+                        class="h-3 w-20 bg-slate-100 rounded animate-pulse"
+                      ></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="space-y-2">
+                    <div
+                      class="h-3.5 w-24 bg-slate-200 rounded animate-pulse"
+                    ></div>
+                    <div
+                      class="h-3 w-28 bg-slate-100 rounded animate-pulse"
+                    ></div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
                   <div
-                    class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center p-1 overflow-hidden flex-shrink-0"
-                  >
-                    <img
-                      v-if="org.fotoPerfil"
-                      :src="org.fotoPerfil"
-                      alt="Logo"
-                      class="w-full h-full object-contain"
-                    />
-                    <span v-else class="font-bold text-slate-400 text-sm">{{
-                      org.nombre.charAt(0)
-                    }}</span>
-                  </div>
-                  <div>
-                    <h4
-                      class="text-sm font-bold text-slate-900 flex items-center gap-1.5"
-                    >
-                      {{ org.nombre }}
-                      <!-- RF-6 Verification icon in public profile -->
-                      <span
-                        v-if="org.organizacionVerificada"
-                        class="material-symbols-outlined text-secondary text-sm flex items-center"
-                        style="font-variation-settings: &quot;FILL&quot; 1"
-                        title="Empresa Verificada"
-                      >
-                        verified
-                      </span>
-                    </h4>
-                    <span class="text-[10px] text-slate-400 font-medium">{{
-                      org.sector || "Sector no especificado"
-                    }}</span>
-                  </div>
-                </div>
-              </td>
+                    class="h-3.5 w-20 bg-slate-100 rounded animate-pulse"
+                  ></div>
+                </td>
+                <td class="px-6 py-4">
+                  <div
+                    class="h-3.5 w-24 bg-slate-100 rounded animate-pulse"
+                  ></div>
+                </td>
+                <td class="px-6 py-4">
+                  <div
+                    class="h-6 w-16 bg-slate-200 rounded-full animate-pulse"
+                  ></div>
+                </td>
+                <td class="px-6 py-4 text-right flex justify-end gap-2">
+                  <div
+                    class="h-9 w-9 bg-slate-200 rounded-xl animate-pulse"
+                  ></div>
+                  <div
+                    class="h-9 w-9 bg-slate-200 rounded-xl animate-pulse"
+                  ></div>
+                </td>
+              </tr>
+            </template>
 
-              <!-- RFC & Email -->
-              <td class="px-6 py-4">
-                <p class="text-xs font-mono text-slate-800">
-                  {{ org.taxId || "SIN RFC" }}
-                </p>
-                <p class="text-[11px] text-slate-400 mt-0.5">{{ org.email }}</p>
-              </td>
-
-              <!-- Phone -->
-              <td class="px-6 py-4 text-xs text-slate-700">
-                {{ org.telefono || "No registrado" }}
-              </td>
-
-              <!-- Registration Date -->
-              <td class="px-6 py-4 text-xs font-mono text-slate-500">
-                {{ formatDate(org.fechaCreacion) }}
-              </td>
-
-              <!-- Status Badge -->
-              <td class="px-6 py-4">
-                <span
-                  :class="[
-                    'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider',
-                    org.estadoCuenta === 'ACTIVO'
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : '',
-                    org.estadoCuenta === 'REVISION'
-                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                      : '',
-                    org.estadoCuenta === 'SUSPENDIDA'
-                      ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                      : '',
-                  ]"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                  {{
-                    org.estadoCuenta === "ACTIVO"
-                      ? "Activa"
-                      : org.estadoCuenta === "REVISION"
-                        ? "En Revisión"
-                        : "Suspendida"
-                  }}
-                </span>
-              </td>
-
-              <!-- Actions -->
-              <td class="px-6 py-4 text-right">
-                <div class="flex items-center justify-end gap-2">
-                  <!-- RF-6 Verify Insignia Trigger -->
-                  <button
-                    @click="toggleVerification(org)"
-                    :class="[
-                      'p-2 rounded-xl transition active:scale-95 duration-100 flex items-center justify-center border',
-                      org.organizacionVerificada
-                        ? 'bg-secondary/10 border-secondary/20 text-secondary hover:bg-secondary hover:text-white'
-                        : 'bg-white border-slate-200 text-slate-400 hover:bg-indigo-600 hover:text-white hover:border-indigo-600',
-                    ]"
-                    :title="
-                      org.organizacionVerificada
-                        ? 'Quitar Verificación de Confianza'
-                        : 'Asignar Insignia de Confianza'
-                    "
-                  >
-                    <span class="material-symbols-outlined text-[18px]"
-                      >verified</span
-                    >
-                  </button>
-
-                  <!-- RF-7 Sanctioning Button -->
-                  <button
-                    @click="openSanctionModal(org)"
-                    class="bg-white border border-slate-200 hover:border-rose-600 hover:text-rose-600 p-2 rounded-xl text-slate-400 transition active:scale-95 duration-100 flex items-center justify-center"
-                    title="Administrar Sanciones / Suspensión"
-                  >
-                    <span class="material-symbols-outlined text-[18px]"
-                      >gavel</span
-                    >
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Empty State -->
-            <tr v-if="filteredOrgs.length === 0">
-              <td
-                colspan="6"
-                class="px-6 py-12 text-center text-slate-400 text-sm"
+            <template v-else>
+              <tr
+                v-for="org in paginatedOrgs"
+                :key="org.id"
+                class="hover:bg-slate-50/60 transition duration-150"
               >
-                No se encontraron organizaciones con los filtros seleccionados.
-              </td>
-            </tr>
+                <!-- Org Name & Logo -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center p-1 overflow-hidden flex-shrink-0"
+                    >
+                      <img
+                        v-if="org.fotoPerfil"
+                        :src="org.fotoPerfil"
+                        alt="Logo"
+                        class="w-full h-full object-contain"
+                      />
+                      <span v-else class="font-bold text-slate-400 text-sm">{{
+                        org.nombre.charAt(0)
+                      }}</span>
+                    </div>
+                    <div>
+                      <h4
+                        class="text-sm font-bold text-slate-900 flex items-center gap-1.5"
+                      >
+                        {{ org.nombre }}
+                        <!-- RF-6 Verification icon in public profile -->
+                        <span
+                          v-if="org.organizacionVerificada"
+                          class="material-symbols-outlined text-secondary text-sm flex items-center"
+                          style="font-variation-settings: &quot;FILL&quot; 1"
+                          title="Empresa Verificada"
+                        >
+                          verified
+                        </span>
+                      </h4>
+                      <span class="text-[10px] text-slate-400 font-medium">{{
+                        org.sector || "Sector no especificado"
+                      }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- RFC & Email -->
+                <td class="px-6 py-4 text-xs font-mono text-slate-500">
+                  <div class="flex flex-col">
+                    <span class="font-bold text-slate-800">{{
+                      org.taxId || "SIN RFC"
+                    }}</span>
+                    <span class="text-[11px] text-slate-400 mt-0.5">{{
+                      org.email
+                    }}</span>
+                  </div>
+                </td>
+
+                <!-- Phone -->
+                <td class="px-6 py-4 text-xs text-slate-700">
+                  {{ org.telefono || "No registrado" }}
+                </td>
+
+                <!-- Reg Date -->
+                <td class="px-6 py-4 text-xs text-slate-400 font-mono">
+                  {{ formatDate(org.fechaCreacion) }}
+                </td>
+
+                <!-- Account Status Badge -->
+                <td class="px-6 py-4">
+                  <span
+                    :class="[
+                      'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase',
+                      org.estadoCuenta === 'ACTIVO'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : '',
+                      org.estadoCuenta === 'REVISION'
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                        : '',
+                      org.estadoCuenta === 'SUSPENDIDA'
+                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                        : '',
+                    ]"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                    {{
+                      org.estadoCuenta === "ACTIVO"
+                        ? "Activa"
+                        : org.estadoCuenta === "REVISION"
+                          ? "En Revisión"
+                          : "Suspendida"
+                    }}
+                  </span>
+                </td>
+
+                <!-- Actions -->
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <!-- RF-6 Verify Insignia Trigger -->
+                    <button
+                      @click="toggleVerification(org)"
+                      :class="[
+                        'p-2 rounded-xl transition active:scale-95 duration-100 flex items-center justify-center border',
+                        org.organizacionVerificada
+                          ? 'bg-secondary/10 border-secondary/20 text-secondary hover:bg-secondary hover:text-white'
+                          : 'bg-white border-slate-200 text-slate-400 hover:bg-indigo-600 hover:text-white hover:border-indigo-600',
+                      ]"
+                      :title="
+                        org.organizacionVerificada
+                          ? 'Quitar Verificación de Confianza'
+                          : 'Asignar Insignia de Confianza'
+                      "
+                    >
+                      <span class="material-symbols-outlined text-[18px]"
+                        >verified</span
+                      >
+                    </button>
+
+                    <!-- RF-7 Sanctioning Button -->
+                    <button
+                      @click="openSanctionModal(org)"
+                      class="bg-white border border-slate-200 hover:border-rose-600 hover:text-rose-600 p-2 rounded-xl text-slate-400 transition active:scale-95 duration-100 flex items-center justify-center"
+                      title="Administrar Sanciones / Suspensión"
+                    >
+                      <span class="material-symbols-outlined text-[18px]"
+                        >gavel</span
+                      >
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr v-if="filteredOrgs.length === 0">
+                <td
+                  colspan="6"
+                  class="px-6 py-12 text-center text-slate-400 text-sm"
+                >
+                  No se encontraron organizaciones con los filtros
+                  seleccionados.
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -672,13 +733,17 @@ const isSanctionModalOpen = ref(false);
 const selectedOrg = ref<any | null>(null);
 
 // Fetch data from DynamoDB listProfiles endpoint
-const { data: rawProfiles, refresh } = await useAsyncData(
-  "admin-profiles-list",
-  () =>
-    $fetch(`${config.public.apiUrl}/profiles`)
-      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => []),
+const {
+  data: rawProfiles,
+  pending: profilesPending,
+  refresh,
+} = useLazyAsyncData("admin-profiles-list", () =>
+  $fetch(`${config.public.apiUrl}/profiles`)
+    .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+    .catch(() => []),
 );
+
+const loading = computed(() => profilesPending.value);
 
 // Derived Companies computed list
 const orgs = computed(() => {

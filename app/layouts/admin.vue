@@ -6,20 +6,17 @@
     <aside
       class="hidden md:flex flex-col w-64 h-screen bg-white border-r border-slate-200 flex-shrink-0"
     >
-      <div class="p-6 border-b border-slate-100">
+      <div class="p-6 border-b border-slate-100 flex justify-center">
         <NuxtLink
           to="/"
-          class="flex items-center gap-3"
+          class="flex items-center justify-center"
           aria-label="Inicio de JobNet"
         >
           <img
             src="/logo.svg"
             alt="JobNet Logo"
-            class="h-8 w-8 flex-shrink-0"
+            class="h-16 w-16 flex-shrink-0"
           />
-          <span class="text-xl font-bold tracking-tight text-primary"
-            >JobNet</span
-          >
         </NuxtLink>
       </div>
 
@@ -59,11 +56,8 @@
       <header
         class="md:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200 flex-shrink-0"
       >
-        <NuxtLink to="/" class="flex items-center gap-2">
-          <img src="/logo.svg" alt="JobNet" class="h-7 w-7" />
-          <span class="font-bold text-sm tracking-tight text-slate-800"
-            >JobNet</span
-          >
+        <NuxtLink to="/" class="flex items-center">
+          <img src="/logo.svg" alt="JobNet" class="h-14 w-14" />
         </NuxtLink>
         <button
           @click="isMobileMenuOpen = true"

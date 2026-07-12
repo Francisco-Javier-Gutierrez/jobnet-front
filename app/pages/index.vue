@@ -4,208 +4,248 @@
     <main class="flex-grow max-w-lg mx-auto w-full px-4 py-8" role="main">
       <!-- Feed Container -->
       <div class="flex flex-col gap-6">
-        <!-- Feed Card -->
-        <div
-          v-for="item in feedItems"
-          :key="item.uniqueId"
-          class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200"
-        >
-          <!-- HEADER: User/Company info -->
-          <div class="flex items-center gap-3 p-4">
-            <div
-              class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary-container flex items-center justify-center text-white text-sm font-bold shadow-sm flex-shrink-0"
-            >
-              {{ item.author.charAt(0).toUpperCase() }}
-            </div>
-            <div class="flex-grow min-w-0">
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-bold text-on-background truncate">
-                  {{ item.author }}
-                </h3>
-                <span
-                  v-if="item.type === 'vacancy'"
-                  class="text-[9px] font-extrabold bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0"
-                >
-                  Vacante
-                </span>
-              </div>
-              <p class="text-[11px] text-on-surface-variant/80 truncate">
-                {{ item.role }} · {{ item.timeAgo }}
-              </p>
-            </div>
-            <button
-              class="text-on-surface-variant hover:text-primary transition p-1"
-              aria-label="Opciones de publicación"
-            >
-              <span class="material-symbols-outlined text-[20px]"
-                >more_horiz</span
-              >
-            </button>
-          </div>
-
-          <!-- POST IMAGE/MEDIA CONTAINER -->
+        <!-- Skeleton Loading Feed -->
+        <template v-if="jobsStore.loading">
           <div
-            v-if="item.type === 'post' && item.media"
-            class="aspect-video w-full bg-slate-100 relative overflow-hidden border-y border-outline-variant/20"
+            v-for="i in 3"
+            :key="i"
+            class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm animate-pulse p-4"
           >
-            <img
-              :src="item.media"
-              :alt="item.title || 'Imagen del post'"
-              class="w-full h-full object-cover"
-            />
-          </div>
+            <!-- Header Skeleton -->
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-outline/20"></div>
+              <div class="flex-grow flex flex-col gap-2">
+                <div class="h-4 w-28 bg-outline/20 rounded"></div>
+                <div class="h-3 w-36 bg-outline/20 rounded"></div>
+              </div>
+            </div>
+            <!-- Body Text Skeleton -->
+            <div class="h-3.5 w-full bg-outline/20 rounded mb-2"></div>
+            <div class="h-3.5 w-5/6 bg-outline/20 rounded mb-4"></div>
 
-          <!-- POST/VACANCY CONTENT BODY -->
-          <div class="p-4 flex flex-col gap-3">
-            <p class="text-sm text-on-surface-variant leading-relaxed">
-              {{ item.content }}
-            </p>
-
-            <!-- VACANTE EMBEDDED CARD (if it's a vacancy) -->
+            <!-- Media Placeholder Skeleton (optional, let's show for some) -->
             <div
-              v-if="item.type === 'vacancy'"
-              class="bg-[#F1F5F9] rounded-xl border border-outline-variant/40 p-4 flex flex-col gap-3"
+              v-if="i === 1"
+              class="aspect-video w-full bg-outline/10 rounded-xl mb-4"
+            ></div>
+
+            <!-- Footer Actions Skeleton -->
+            <div
+              class="flex items-center gap-4 border-t border-outline-variant/30 pt-3 mt-2"
             >
-              <div>
-                <h4 class="text-base font-bold text-on-background">
-                  {{ item.jobTitle }}
-                </h4>
-                <p class="text-xs text-on-surface-variant font-semibold mt-0.5">
-                  {{ item.author }}
+              <div class="h-4 w-12 bg-outline/20 rounded"></div>
+              <div class="h-4 w-12 bg-outline/20 rounded"></div>
+              <div class="h-4 w-8 bg-outline/20 rounded"></div>
+            </div>
+          </div>
+        </template>
+
+        <!-- Feed Card -->
+        <template v-else>
+          <div
+            v-for="item in feedItems"
+            :key="item.uniqueId"
+            class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            <!-- HEADER: User/Company info -->
+            <div class="flex items-center gap-3 p-4">
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary-container flex items-center justify-center text-white text-sm font-bold shadow-sm flex-shrink-0"
+              >
+                {{ item.author.charAt(0).toUpperCase() }}
+              </div>
+              <div class="flex-grow min-w-0">
+                <div class="flex items-center gap-2">
+                  <h3 class="text-sm font-bold text-on-background truncate">
+                    {{ item.author }}
+                  </h3>
+                  <span
+                    v-if="item.type === 'vacancy'"
+                    class="text-[9px] font-extrabold bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0"
+                  >
+                    Vacante
+                  </span>
+                </div>
+                <p class="text-[11px] text-on-surface-variant/80 truncate">
+                  {{ item.role }} · {{ item.timeAgo }}
                 </p>
               </div>
+              <button
+                class="text-on-surface-variant hover:text-primary transition p-1"
+                aria-label="Opciones de publicación"
+              >
+                <span class="material-symbols-outlined text-[20px]"
+                  >more_horiz</span
+                >
+              </button>
+            </div>
 
-              <div class="flex flex-wrap gap-2 text-xs">
-                <span
-                  class="bg-primary/10 text-primary px-2.5 py-0.5 rounded-full font-bold"
+            <!-- POST IMAGE/MEDIA CONTAINER -->
+            <div
+              v-if="item.type === 'post' && item.media"
+              class="aspect-video w-full bg-slate-100 relative overflow-hidden border-y border-outline-variant/20"
+            >
+              <img
+                :src="item.media"
+                :alt="item.title || 'Imagen del post'"
+                class="w-full h-full object-cover"
+              />
+            </div>
+
+            <!-- POST/VACANCY CONTENT BODY -->
+            <div class="p-4 flex flex-col gap-3">
+              <p class="text-sm text-on-surface-variant leading-relaxed">
+                {{ item.content }}
+              </p>
+
+              <!-- VACANTE EMBEDDED CARD (if it's a vacancy) -->
+              <div
+                v-if="item.type === 'vacancy'"
+                class="bg-[#F1F5F9] rounded-xl border border-outline-variant/40 p-4 flex flex-col gap-3"
+              >
+                <div>
+                  <h4 class="text-base font-bold text-on-background">
+                    {{ item.jobTitle }}
+                  </h4>
+                  <p
+                    class="text-xs text-on-surface-variant font-semibold mt-0.5"
+                  >
+                    {{ item.author }}
+                  </p>
+                </div>
+
+                <div class="flex flex-wrap gap-2 text-xs">
+                  <span
+                    class="bg-primary/10 text-primary px-2.5 py-0.5 rounded-full font-bold"
+                  >
+                    {{ item.jobType || "Tiempo Completo" }}
+                  </span>
+                  <span
+                    class="bg-secondary/15 text-secondary px-2.5 py-0.5 rounded-full font-bold"
+                  >
+                    {{ item.salary || "$25,000 - $35,000 MXN" }}
+                  </span>
+                </div>
+
+                <div
+                  class="flex items-center justify-between border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant"
                 >
-                  {{ item.jobType || "Tiempo Completo" }}
-                </span>
-                <span
-                  class="bg-secondary/15 text-secondary px-2.5 py-0.5 rounded-full font-bold"
-                >
-                  {{ item.salary || "$25,000 - $35,000 MXN" }}
-                </span>
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm"
+                      >location_on</span
+                    >
+                    Lat: {{ item.lat }}, Lng: {{ item.lng }}
+                  </span>
+                  <NuxtLink
+                    :to="`/map?lat=${item.lat}&lng=${item.lng}`"
+                    class="text-primary hover:underline font-bold flex items-center gap-0.5"
+                    aria-label="Ver vacante en el mapa"
+                  >
+                    <span class="material-symbols-outlined text-sm">map</span>
+                    Ver en mapa
+                  </NuxtLink>
+                </div>
               </div>
+            </div>
+
+            <!-- BOTTOM ACTIONS BAR -->
+            <div
+              class="px-4 py-2 flex items-center gap-1 border-t border-outline-variant/30"
+            >
+              <button
+                @click="toggleLike(item)"
+                class="flex items-center gap-1.5 text-on-surface-variant transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+                :class="item.liked ? 'text-rose-600' : 'hover:text-rose-600'"
+                :aria-label="item.liked ? 'Quitar like' : 'Dar like'"
+              >
+                <span
+                  class="material-symbols-outlined text-[20px]"
+                  :class="{ 'font-fill-1': item.liked }"
+                >
+                  {{ item.liked ? "favorite" : "favorite_border" }}
+                </span>
+                <span class="text-xs font-semibold">{{ item.likes }}</span>
+              </button>
+              <button
+                @click="focusCommentInput(item.uniqueId)"
+                class="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+                aria-label="Escribir comentario"
+              >
+                <span class="material-symbols-outlined text-[20px]"
+                  >chat_bubble_outline</span
+                >
+                <span class="text-xs font-semibold">{{
+                  item.comments.length
+                }}</span>
+              </button>
+              <button
+                @click="sharePost(item)"
+                class="flex items-center gap-1.5 text-on-surface-variant hover:text-secondary transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+                aria-label="Compartir publicación"
+              >
+                <span class="material-symbols-outlined text-[20px]">share</span>
+              </button>
+              <button
+                @click="toggleBookmark(item)"
+                class="ml-auto text-on-surface-variant transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+                :class="
+                  item.bookmarked ? 'text-amber-500' : 'hover:text-amber-500'
+                "
+                :aria-label="item.bookmarked ? 'Quitar marcador' : 'Guardar'"
+              >
+                <span
+                  class="material-symbols-outlined text-[20px]"
+                  :class="{ 'font-fill-1': item.bookmarked }"
+                >
+                  {{ item.bookmarked ? "bookmark" : "bookmark_border" }}
+                </span>
+              </button>
+            </div>
+
+            <!-- LIKES AND RECENT COMMENTS -->
+            <div
+              class="px-4 pb-3 flex flex-col gap-1 text-xs border-t border-outline-variant/10 pt-2 bg-surface-container-lowest"
+            >
+              <p v-if="item.likes > 0" class="font-bold text-on-background">
+                Les gusta a {{ item.likes }} personas
+              </p>
 
               <div
-                class="flex items-center justify-between border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant"
+                v-if="item.comments.length > 0"
+                class="flex flex-col gap-1 mt-1"
               >
-                <span class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-sm"
-                    >location_on</span
+                <div v-for="c in item.comments" :key="c.id" class="text-xs">
+                  <span class="font-bold text-on-background mr-1.5"
+                    >{{ c.user }}:</span
                   >
-                  Lat: {{ item.lat }}, Lng: {{ item.lng }}
-                </span>
-                <NuxtLink
-                  :to="`/map?lat=${item.lat}&lng=${item.lng}`"
-                  class="text-primary hover:underline font-bold flex items-center gap-0.5"
-                  aria-label="Ver vacante en el mapa"
-                >
-                  <span class="material-symbols-outlined text-sm">map</span>
-                  Ver en mapa
-                </NuxtLink>
+                  <span class="text-on-surface-variant">{{ c.text }}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- BOTTOM ACTIONS BAR -->
-          <div
-            class="px-4 py-2 flex items-center gap-1 border-t border-outline-variant/30"
-          >
-            <button
-              @click="toggleLike(item)"
-              class="flex items-center gap-1.5 text-on-surface-variant transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-              :class="item.liked ? 'text-rose-600' : 'hover:text-rose-600'"
-              :aria-label="item.liked ? 'Quitar like' : 'Dar like'"
+            <!-- COMMENT INPUT -->
+            <form
+              @submit.prevent="addComment(item)"
+              class="flex border-t border-outline-variant/30 px-3 py-2 bg-surface-container-lowest"
             >
-              <span
-                class="material-symbols-outlined text-[20px]"
-                :class="{ 'font-fill-1': item.liked }"
+              <input
+                :id="`comment-input-${item.uniqueId}`"
+                v-model="item.newCommentText"
+                type="text"
+                placeholder="Agrega un comentario..."
+                class="flex-grow bg-transparent text-xs text-on-background outline-none py-1 placeholder-on-surface-variant/50"
+                aria-label="Escribe tu comentario"
+              />
+              <button
+                type="submit"
+                :disabled="!item.newCommentText.trim()"
+                class="text-primary disabled:text-primary/40 text-xs font-bold px-2 hover:underline transition"
               >
-                {{ item.liked ? "favorite" : "favorite_border" }}
-              </span>
-              <span class="text-xs font-semibold">{{ item.likes }}</span>
-            </button>
-            <button
-              @click="focusCommentInput(item.uniqueId)"
-              class="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-              aria-label="Escribir comentario"
-            >
-              <span class="material-symbols-outlined text-[20px]"
-                >chat_bubble_outline</span
-              >
-              <span class="text-xs font-semibold">{{
-                item.comments.length
-              }}</span>
-            </button>
-            <button
-              @click="sharePost(item)"
-              class="flex items-center gap-1.5 text-on-surface-variant hover:text-secondary transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-              aria-label="Compartir publicación"
-            >
-              <span class="material-symbols-outlined text-[20px]">share</span>
-            </button>
-            <button
-              @click="toggleBookmark(item)"
-              class="ml-auto text-on-surface-variant transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-              :class="
-                item.bookmarked ? 'text-amber-500' : 'hover:text-amber-500'
-              "
-              :aria-label="item.bookmarked ? 'Quitar marcador' : 'Guardar'"
-            >
-              <span
-                class="material-symbols-outlined text-[20px]"
-                :class="{ 'font-fill-1': item.bookmarked }"
-              >
-                {{ item.bookmarked ? "bookmark" : "bookmark_border" }}
-              </span>
-            </button>
+                Publicar
+              </button>
+            </form>
           </div>
-
-          <!-- LIKES AND RECENT COMMENTS -->
-          <div
-            class="px-4 pb-3 flex flex-col gap-1 text-xs border-t border-outline-variant/10 pt-2 bg-surface-container-lowest"
-          >
-            <p v-if="item.likes > 0" class="font-bold text-on-background">
-              Les gusta a {{ item.likes }} personas
-            </p>
-
-            <div
-              v-if="item.comments.length > 0"
-              class="flex flex-col gap-1 mt-1"
-            >
-              <div v-for="c in item.comments" :key="c.id" class="text-xs">
-                <span class="font-bold text-on-background mr-1.5"
-                  >{{ c.user }}:</span
-                >
-                <span class="text-on-surface-variant">{{ c.text }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- COMMENT INPUT -->
-          <form
-            @submit.prevent="addComment(item)"
-            class="flex border-t border-outline-variant/30 px-3 py-2 bg-surface-container-lowest"
-          >
-            <input
-              :id="`comment-input-${item.uniqueId}`"
-              v-model="item.newCommentText"
-              type="text"
-              placeholder="Agrega un comentario..."
-              class="flex-grow bg-transparent text-xs text-on-background outline-none py-1 placeholder-on-surface-variant/50"
-              aria-label="Escribe tu comentario"
-            />
-            <button
-              type="submit"
-              :disabled="!item.newCommentText.trim()"
-              class="text-primary disabled:text-primary/40 text-xs font-bold px-2 hover:underline transition"
-            >
-              Publicar
-            </button>
-          </form>
-        </div>
+        </template>
       </div>
     </main>
   </div>
@@ -376,22 +416,30 @@ const sharePost = (item: any) => {
 };
 
 onMounted(async () => {
-  // Fetch actual backend jobs
-  await jobsStore.fetchJobs();
-  buildFeed();
-
   // Redirect if logged in
   if (status.value === "authenticated") {
     const tipo = (session.value?.user as any)?.tipoUsuario;
     if (tipo?.toUpperCase() === "EMPRESA") {
       router.push("/dashboard");
+      return;
     } else if (
       tipo?.toUpperCase() === "CANDIDATO" ||
       tipo?.toUpperCase() === "CANDIDATE"
     ) {
       router.push("/feed");
+      return;
+    } else if (tipo?.toUpperCase() === "ADMIN") {
+      router.push("/admin/organizations");
+      return;
+    } else if (tipo?.toUpperCase() === "MODERATOR") {
+      router.push("/mod/incidents");
+      return;
     }
   }
+
+  // Fetch actual backend jobs
+  await jobsStore.fetchJobs();
+  buildFeed();
 });
 
 // Rebuild feed if jobs store changes

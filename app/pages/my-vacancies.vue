@@ -25,10 +25,29 @@
     <div
       class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
     >
-      <div v-if="loading" class="flex justify-center py-20">
+      <!-- Loading State (Skeleton) -->
+      <div
+        v-if="loading"
+        class="divide-y divide-outline-variant/30 animate-pulse"
+      >
         <div
-          class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"
-        ></div>
+          v-for="i in 3"
+          :key="i"
+          class="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        >
+          <div class="flex-grow space-y-3">
+            <div class="h-5 w-1/3 bg-outline/20 rounded-lg"></div>
+            <div class="flex items-center gap-3">
+              <div class="h-4 w-16 bg-outline/10 rounded-full"></div>
+              <div class="h-4 w-28 bg-outline/10 rounded-full"></div>
+              <div class="h-4 w-24 bg-outline/10 rounded-full"></div>
+            </div>
+          </div>
+          <div class="flex gap-2 self-start sm:self-center shrink-0">
+            <div class="h-10 w-24 bg-outline/20 rounded-lg"></div>
+            <div class="h-10 w-20 bg-outline/20 rounded-lg"></div>
+          </div>
+        </div>
       </div>
 
       <div v-else-if="vacancies.length === 0" class="text-center py-20 px-6">

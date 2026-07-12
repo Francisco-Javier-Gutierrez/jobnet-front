@@ -17,7 +17,7 @@
             class="inline-block mb-4"
             aria-label="Volver al inicio"
           >
-            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-12 w-auto" />
+            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-24 w-auto" />
           </NuxtLink>
           <h1 class="text-2xl font-bold tracking-tight text-on-background">
             Recuperar contraseña

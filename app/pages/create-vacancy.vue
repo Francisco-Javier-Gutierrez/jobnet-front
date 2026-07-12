@@ -26,6 +26,26 @@
       {{ errorMessage }}
     </div>
 
+    <!-- Draft Restore Notification Banner -->
+    <div
+      v-if="hasDraft"
+      class="mb-4 bg-primary/10 border border-primary/20 text-on-surface text-xs p-3 rounded-xl flex items-center justify-between"
+    >
+      <span class="flex items-center gap-1.5 font-medium">
+        <span class="material-symbols-outlined text-base text-primary"
+          >info</span
+        >
+        Se ha restaurado un borrador con cambios sin guardar de esta vacante.
+      </span>
+      <button
+        type="button"
+        @click="discardDraft"
+        class="text-rose-500 hover:text-rose-600 font-bold transition"
+      >
+        Descartar
+      </button>
+    </div>
+
     <form
       @submit.prevent="handleSubmit"
       class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-6 shadow-sm"
@@ -99,9 +119,19 @@
 
       <!-- Ubicación Geográfica (Leaflet Map) -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-on-surface-variant"
-          >Ubicación Geográfica (Obligatorio)</label
-        >
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold text-on-surface-variant"
+            >Ubicación Geográfica (Obligatorio)</label
+          >
+          <button
+            type="button"
+            @click="useCurrentLocation"
+            class="text-xs font-bold text-primary hover:underline flex items-center gap-1 transition"
+          >
+            <span class="material-symbols-outlined text-sm">my_location</span>
+            Usar ubicación actual
+          </button>
+        </div>
         <p class="text-xs text-on-surface-variant">
           Haz clic en el mapa o arrastra el marcador para definir las
           coordenadas de la vacante.
@@ -325,6 +355,117 @@ const lng = ref(-99.133209);
 let map: any = null;
 let marker: any = null;
 
+// Draft State
+const hasDraft = ref(false);
+let isRestoring = false;
+
+const saveDraft = () => {
+  if (process.client && !isRestoring) {
+    // Only save draft if there is actual input to prevent empty drafts
+    if (
+      title.value ||
+      description.value ||
+      skills.value.length > 0 ||
+      aptitudes.value ||
+      experienceYears.value ||
+      salaryMin.value ||
+      salaryMax.value
+    ) {
+      localStorage.setItem(
+        "jobnet_draft_vacancy",
+        JSON.stringify({
+          title: title.value,
+          modality: modality.value,
+          description: description.value,
+          skills: skills.value,
+          aptitudes: aptitudes.value,
+          experienceYears: experienceYears.value,
+          salaryMin: salaryMin.value,
+          salaryMax: salaryMax.value,
+          lat: lat.value,
+          lng: lng.value,
+        }),
+      );
+    }
+  }
+};
+
+const loadDraft = () => {
+  if (process.client) {
+    const saved = localStorage.getItem("jobnet_draft_vacancy");
+    if (saved) {
+      try {
+        const draft = JSON.parse(saved);
+        if (
+          draft.title ||
+          draft.description ||
+          draft.skills?.length > 0 ||
+          draft.aptitudes
+        ) {
+          isRestoring = true;
+          title.value = draft.title || "";
+          modality.value = draft.modality || "Remoto";
+          description.value = draft.description || "";
+          skills.value = draft.skills || [];
+          aptitudes.value = draft.aptitudes || "";
+          experienceYears.value = draft.experienceYears;
+          salaryMin.value = draft.salaryMin;
+          salaryMax.value = draft.salaryMax;
+          lat.value = draft.lat || 19.432608;
+          lng.value = draft.lng || -99.133209;
+          hasDraft.value = true;
+          isRestoring = false;
+        }
+      } catch (e) {
+        console.error("Error loading vacancy draft:", e);
+      }
+    }
+  }
+};
+
+const discardDraft = () => {
+  if (process.client) {
+    localStorage.removeItem("jobnet_draft_vacancy");
+    hasDraft.value = false;
+    isRestoring = true;
+    title.value = "";
+    modality.value = "Remoto";
+    description.value = "";
+    skills.value = [];
+    aptitudes.value = "";
+    experienceYears.value = null;
+    salaryMin.value = null;
+    salaryMax.value = null;
+    lat.value = 19.432608;
+    lng.value = -99.133209;
+    if (map && marker) {
+      map.setView([lat.value, lng.value], 11);
+      marker.setLatLng([lat.value, lng.value]);
+    }
+    isRestoring = false;
+  }
+};
+
+// Auto-save watch
+watch(
+  [
+    title,
+    modality,
+    description,
+    skills,
+    aptitudes,
+    experienceYears,
+    salaryMin,
+    salaryMax,
+    lat,
+    lng,
+  ],
+  () => {
+    saveDraft();
+  },
+  { deep: true },
+);
+
 // Habilidades Catalog search
 const skillSearchQuery = ref("");
 
@@ -364,20 +505,44 @@ const fetchCompanyName = async () => {
   }
 };
 
+const useCurrentLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        lat.value = Number(position.coords.latitude.toFixed(6));
+        lng.value = Number(position.coords.longitude.toFixed(6));
+        if (map && marker) {
+          map.setView([lat.value, lng.value], 13);
+          marker.setLatLng([lat.value, lng.value]);
+        }
+      },
+      (error) => {
+        console.error("Error getting current location:", error);
+      },
+    );
+  } else {
+    console.error("Geolocation is not supported by this browser.");
+  }
+};
+
 onMounted(async () => {
   await fetchCompanyName();
   await catalogStore.fetchCatalog();
+  loadDraft();
 
   // Initialize Leaflet map on client side
   if (process.client) {
     const L = await import("leaflet");
 
-    map = L.map("vacancy-leaflet-map").setView([lat.value, lng.value], 11);
+    map = L.map("vacancy-leaflet-map", { attributionControl: false }).setView(
+      [lat.value, lng.value],
+      11,
+    );
 
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
       {
-        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+        attribution: "",
       },
     ).addTo(map);
 
@@ -469,6 +634,12 @@ const handleSubmit = async () => {
     if (response) {
       successMessage.value =
         "¡Vacante de empleo publicada y registrada con éxito!";
+
+      // Clear draft on successful submit
+      if (process.client) {
+        localStorage.removeItem("jobnet_draft_vacancy");
+      }
+
       title.value = "";
       description.value = "";
       skills.value = [];
