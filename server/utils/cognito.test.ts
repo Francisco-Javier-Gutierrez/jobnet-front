@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getCognitoConfig, calculateSecretHash, callCognito } from "./cognito";
+import {
+  getCognitoConfig,
+  calculateSecretHash,
+  callCognito,
+  translateCognitoError,
+} from "./cognito";
 
 // Mock global createError for Nuxt environment
 global.createError = vi.fn((err: any) => {
@@ -116,11 +121,12 @@ describe("Cognito Utils", () => {
       global.fetch = fetchMock;
 
       await expect(callCognito("SignUp", { ClientId: "123" })).rejects.toThrow(
-        "User already exists",
+        "Ya existe una cuenta registrada con este correo electrónico.",
       );
       expect(global.createError).toHaveBeenCalledWith({
         statusCode: 400,
-        statusMessage: "User already exists",
+        statusMessage:
+          "Ya existe una cuenta registrada con este correo electrónico.",
         data: { code: "UsernameExistsException" },
       });
     });
@@ -186,13 +192,136 @@ describe("Cognito Utils", () => {
       global.fetch = fetchMock;
 
       await expect(callCognito("SignUp", { ClientId: "123" })).rejects.toThrow(
-        "Error executing Cognito operation",
+        "Ocurrió un error de autenticación.",
       );
       expect(global.createError).toHaveBeenCalledWith({
         statusCode: 400,
-        statusMessage: "Error executing Cognito operation",
+        statusMessage: "Ocurrió un error de autenticación.",
         data: { code: "CognitoError" },
       });
+    });
+  });
+
+  describe("translateCognitoError", () => {
+    it("should translate UserNotFoundException", () => {
+      expect(translateCognitoError("UserNotFoundException", "")).toBe(
+        "Verifique sus datos.",
+      );
+    });
+
+    it("should translate NotAuthorizedException", () => {
+      expect(translateCognitoError("NotAuthorizedException", "")).toBe(
+        "El usuario o la contraseña son incorrectos.",
+      );
+    });
+
+    it("should translate UserNotConfirmedException", () => {
+      expect(translateCognitoError("UserNotConfirmedException", "")).toBe(
+        "El usuario no ha sido confirmado. Por favor, verifique su código OTP.",
+      );
+    });
+
+    it("should translate LimitExceededException", () => {
+      expect(translateCognitoError("LimitExceededException", "")).toBe(
+        "Se ha superado el límite de intentos. Inténtelo más tarde.",
+      );
+    });
+
+    it("should translate CodeMismatchException", () => {
+      expect(translateCognitoError("CodeMismatchException", "")).toBe(
+        "El código de verificación ingresado es incorrecto.",
+      );
+    });
+
+    it("should translate ExpiredCodeMismatchException and ExpiredCodeException", () => {
+      expect(translateCognitoError("ExpiredCodeMismatchException", "")).toBe(
+        "El código de verificación ha expirado.",
+      );
+      expect(translateCognitoError("ExpiredCodeException", "")).toBe(
+        "El código de verificación ha expirado.",
+      );
+    });
+
+    it("should translate InvalidPasswordException", () => {
+      expect(translateCognitoError("InvalidPasswordException", "")).toBe(
+        "La contraseña no cumple con los requisitos mínimos de seguridad (debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y un número).",
+      );
+    });
+
+    it("should translate UsernameExistsException", () => {
+      expect(translateCognitoError("UsernameExistsException", "")).toBe(
+        "Ya existe una cuenta registrada con este correo electrónico.",
+      );
+    });
+
+    it("should translate TooManyRequestsException", () => {
+      expect(translateCognitoError("TooManyRequestsException", "")).toBe(
+        "Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.",
+      );
+    });
+
+    it("should translate InvalidParameterException", () => {
+      expect(
+        translateCognitoError(
+          "InvalidParameterException",
+          "username format is bad",
+        ),
+      ).toBe("El formato del correo electrónico es inválido.");
+      expect(
+        translateCognitoError(
+          "InvalidParameterException",
+          "email format is bad",
+        ),
+      ).toBe("El formato del correo electrónico es inválido.");
+      expect(
+        translateCognitoError("InvalidParameterException", "other param"),
+      ).toBe(
+        "Los parámetros proporcionados son inválidos o faltan campos obligatorios.",
+      );
+    });
+
+    it("should translate AliasExistsException", () => {
+      expect(translateCognitoError("AliasExistsException", "")).toBe(
+        "Este correo electrónico ya se encuentra registrado por otro usuario.",
+      );
+    });
+
+    it("should translate CodeDeliveryFailureException", () => {
+      expect(translateCognitoError("CodeDeliveryFailureException", "")).toBe(
+        "No se pudo entregar el código de verificación. Por favor intente más tarde.",
+      );
+    });
+
+    it("should translate InvalidLambdaResponseException and UnexpectedLambdaException", () => {
+      expect(translateCognitoError("InvalidLambdaResponseException", "")).toBe(
+        "Error interno del servicio de autenticación. Por favor intente nuevamente.",
+      );
+      expect(translateCognitoError("UnexpectedLambdaException", "")).toBe(
+        "Error interno del servicio de autenticación. Por favor intente nuevamente.",
+      );
+    });
+
+    it("should fallback to generic translations from originalMessage", () => {
+      expect(
+        translateCognitoError("UnknownException", "user does not exist"),
+      ).toBe("Verifique sus datos.");
+      expect(
+        translateCognitoError(
+          "UnknownException",
+          "incorrect username or password",
+        ),
+      ).toBe("El usuario o la contraseña son incorrectos.");
+      expect(
+        translateCognitoError("UnknownException", "password attempts exceeded"),
+      ).toBe("Límite de intentos excedido. Por favor intente más tarde.");
+      expect(
+        translateCognitoError("UnknownException", "user is not confirmed"),
+      ).toBe(
+        "El usuario no ha sido confirmado. Por favor, verifique su código OTP.",
+      );
+      expect(
+        translateCognitoError("UnknownException", "some other message"),
+      ).toBe("some other message");
     });
   });
 });
