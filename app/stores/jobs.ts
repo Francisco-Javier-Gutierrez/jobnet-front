@@ -16,6 +16,7 @@ export interface Job {
   salarioMaximo?: number;
   experienciaAnos?: number;
   sector?: string;
+  sectores?: string[];
   pdfUrl?: string;
   createdAt?: string;
 }

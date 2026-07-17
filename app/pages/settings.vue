@@ -289,6 +289,98 @@
         </div>
       </div>
 
+      <!-- Section: Sectores de Interés -->
+      <div
+        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-4 shadow-sm"
+      >
+        <h2
+          class="text-base font-bold text-on-background mb-2 flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-primary"
+            >business_center</span
+          >
+          Sectores de Interés
+        </h2>
+        <p class="text-xs text-on-surface-variant leading-relaxed">
+          Indica los sectores de industria a los que perteneces o te interesa
+          postularte.
+        </p>
+
+        <!-- Selected Sector Tags -->
+        <div class="flex flex-wrap gap-2 mb-2">
+          <span
+            v-for="sector in sectors"
+            :key="sector"
+            class="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 font-bold"
+          >
+            {{ sector }}
+            <button
+              type="button"
+              @click="removeSector(sector)"
+              class="hover:text-rose-600 transition flex items-center"
+            >
+              <span class="material-symbols-outlined text-xs">close</span>
+            </button>
+          </span>
+          <span
+            v-if="sectors.length === 0"
+            class="text-xs text-on-surface-variant italic"
+          >
+            Ningún sector seleccionado aún. Selecciona del catálogo abajo.
+          </span>
+        </div>
+
+        <!-- Catalog autocomplete input box -->
+        <div
+          class="space-y-3 bg-surface-container-low/40 p-4 border border-outline-variant/50 rounded-xl"
+        >
+          <div class="flex gap-2">
+            <div class="relative flex-grow">
+              <span
+                class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm"
+                >search</span
+              >
+              <input
+                v-model="sectorSearchQuery"
+                type="text"
+                placeholder="Buscar sectores en el catálogo..."
+                class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl pl-9 pr-4 py-2 text-xs text-on-background outline-none transition"
+              />
+            </div>
+
+            <button
+              type="button"
+              @click="handleQuickAddSector"
+              :disabled="!sectorSearchQuery.trim()"
+              class="bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary text-xs font-bold px-4 py-2 rounded-xl transition disabled:opacity-50"
+            >
+              Crear y Agregar
+            </button>
+          </div>
+
+          <!-- Suggested Master Catalog Sectors -->
+          <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
+            <button
+              v-for="masterSector in filteredCatalogSectors"
+              :key="masterSector.id"
+              type="button"
+              @click="selectCatalogSector(masterSector.name)"
+              class="bg-surface hover:bg-surface-container-high border border-outline-variant/50 hover:border-primary text-on-surface hover:text-primary transition px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-[10px]">add</span>
+              {{ masterSector.name }}
+            </button>
+            <span
+              v-if="filteredCatalogSectors.length === 0"
+              class="text-[11px] text-on-surface-variant italic py-1"
+            >
+              No se encontraron sectores adicionales. Escribe para crear uno
+              nuevo.
+            </span>
+          </div>
+        </div>
+      </div>
+
       <!-- Section 4: Seguridad -->
       <div
         class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-4 shadow-sm"
@@ -377,6 +469,7 @@ const name = ref("");
 const location = ref("");
 const bio = ref("");
 const skills = ref<string[]>([]);
+const sectors = ref<string[]>([]);
 const saving = ref(false);
 const successMessage = ref("");
 
@@ -388,6 +481,7 @@ let marker: any = null;
 
 // Catalog search state
 const skillSearchQuery = ref("");
+const sectorSearchQuery = ref("");
 
 // CV upload state
 const cvUrl = ref("");
@@ -401,7 +495,13 @@ let isRestoring = false;
 
 const saveDraft = () => {
   if (process.client && !isRestoring) {
-    if (name.value || bio.value || location.value || skills.value.length > 0) {
+    if (
+      name.value ||
+      bio.value ||
+      location.value ||
+      skills.value.length > 0 ||
+      sectors.value.length > 0
+    ) {
       localStorage.setItem(
         "jobnet_draft_settings",
         JSON.stringify({
@@ -409,6 +509,7 @@ const saveDraft = () => {
           location: location.value,
           bio: bio.value,
           skills: skills.value,
+          sectors: sectors.value,
           cvUrl: cvUrl.value,
           cvFileName: cvFileName.value,
           lat: lat.value,
@@ -429,13 +530,15 @@ const loadDraft = () => {
           draft.name ||
           draft.bio ||
           draft.location ||
-          draft.skills?.length > 0
+          draft.skills?.length > 0 ||
+          draft.sectors?.length > 0
         ) {
           isRestoring = true;
           name.value = draft.name || "";
           location.value = draft.location || "";
           bio.value = draft.bio || "";
           skills.value = draft.skills || [];
+          sectors.value = draft.sectors || [];
           cvUrl.value = draft.cvUrl || "";
           cvFileName.value = draft.cvFileName || "";
           lat.value = draft.lat || 19.432608;
@@ -465,7 +568,7 @@ const discardDraft = () => {
 
 // Auto-save watch
 watch(
-  [name, location, bio, skills, cvUrl, cvFileName, lat, lng],
+  [name, location, bio, skills, sectors, cvUrl, cvFileName, lat, lng],
   () => {
     saveDraft();
   },
@@ -479,6 +582,18 @@ const filteredCatalogSkills = computed(() => {
     const matchesQuery = skill.name.toLowerCase().includes(query);
     const notSelectedYet = !skills.value.some(
       (s) => s.toLowerCase() === skill.name.toLowerCase(),
+    );
+    return matchesQuery && notSelectedYet;
+  });
+});
+
+// Computed filtered catalog sectors
+const filteredCatalogSectors = computed(() => {
+  const query = sectorSearchQuery.value.toLowerCase().trim();
+  return catalogStore.sectors.filter((sector) => {
+    const matchesQuery = sector.name.toLowerCase().includes(query);
+    const notSelectedYet = !sectors.value.some(
+      (s) => s.toLowerCase() === sector.name.toLowerCase(),
     );
     return matchesQuery && notSelectedYet;
   });
@@ -513,6 +628,7 @@ const fetchProfile = async () => {
       }
 
       skills.value = data.habilidades || [];
+      sectors.value = data.sectores || [];
       cvUrl.value = data.cvUrl || "";
       cvFileName.value = data.cvFileName || "";
 
@@ -649,6 +765,29 @@ const handleQuickAddSkill = async () => {
   skillSearchQuery.value = "";
 };
 
+// Sectores selection actions
+const selectCatalogSector = (sectorName: string) => {
+  if (
+    !sectors.value.some((s) => s.toLowerCase() === sectorName.toLowerCase())
+  ) {
+    sectors.value.push(sectorName);
+  }
+  sectorSearchQuery.value = "";
+};
+
+const removeSector = (sectorName: string) => {
+  sectors.value = sectors.value.filter((s) => s !== sectorName);
+};
+
+const handleQuickAddSector = async () => {
+  const queryName = sectorSearchQuery.value.trim();
+  if (!queryName) return;
+
+  await catalogStore.addItem(queryName, "Sector");
+  selectCatalogSector(queryName);
+  sectorSearchQuery.value = "";
+};
+
 // CV upload handlers
 const processCvFile = async (file: File) => {
   cvError.value = "";
@@ -715,6 +854,7 @@ const saveSettings = async () => {
             formatted: location.value,
           },
           habilidades: skills.value,
+          sectores: sectors.value,
           cvUrl: cvUrl.value,
           cvFileName: cvFileName.value,
         },

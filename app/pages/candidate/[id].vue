@@ -309,6 +309,25 @@
           No se han agregado habilidades aún.
         </p>
       </div>
+
+      <!-- Sectores -->
+      <div v-if="sectors.length > 0">
+        <h2
+          class="font-headline-md text-headline-md text-on-background mb-md flex items-center gap-sm border-b border-surface-container pb-sm"
+        >
+          <span class="material-symbols-outlined">business_center</span>
+          Sectores de Interés
+        </h2>
+        <div class="flex flex-wrap gap-2">
+          <span
+            v-for="sector in sectors"
+            :key="sector"
+            class="bg-surface-container text-secondary font-label-md text-label-md px-4 py-2 rounded-full border border-surface-container-high hover:bg-secondary-container hover:text-on-secondary-container transition-colors"
+          >
+            {{ sector }}
+          </span>
+        </div>
+      </div>
     </section>
   </main>
 </template>
@@ -350,6 +369,10 @@ const locationText = computed(() => {
 
 const skills = computed<string[]>(() => {
   return profile.value.habilidades || [];
+});
+
+const sectors = computed<string[]>(() => {
+  return profile.value.sectores || [];
 });
 
 const webLinks = computed(() => {
