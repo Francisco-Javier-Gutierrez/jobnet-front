@@ -8,6 +8,7 @@ const CredentialsProvider =
   _CredentialsProvider.default || _CredentialsProvider;
 import { NuxtAuthHandler } from "#auth";
 import crypto from "crypto";
+import { translateCognitoError } from "../../utils/cognito";
 
 // Helper to compute Cognito Client Secret Hash
 function calculateSecretHash(
@@ -106,9 +107,11 @@ export default NuxtAuthHandler({
               throw new Error(
                 JSON.stringify({
                   code: errorCode,
-                  message:
+                  message: translateCognitoError(
+                    errorCode,
                     responseData.message ||
-                    "Código de MFA incorrecto o expirado",
+                      "Código de MFA incorrecto o expirado",
+                  ),
                 }),
               );
             }
@@ -157,8 +160,10 @@ export default NuxtAuthHandler({
               throw new Error(
                 JSON.stringify({
                   code: errorCode,
-                  message:
+                  message: translateCognitoError(
+                    errorCode,
                     responseData.message || "Usuario o contraseña incorrectos",
+                  ),
                 }),
               );
             }

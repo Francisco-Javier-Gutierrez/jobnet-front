@@ -316,6 +316,27 @@
             </button>
           </div>
 
+          <div
+            v-if="
+              skillSearchQuery.trim() &&
+              !filteredCatalogSkills.some(
+                (s) =>
+                  s.name.toLowerCase() ===
+                  skillSearchQuery.toLowerCase().trim(),
+              )
+            "
+            class="text-[10px] text-amber-600 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-lg flex items-start gap-1.5 leading-relaxed"
+          >
+            <span class="material-symbols-outlined text-xs mt-0.5"
+              >warning</span
+            >
+            <span>
+              Esta habilidad no se encuentra en el catálogo y será enviada al
+              equipo de moderación para su aprobación. Se asociará temporalmente
+              a tu perfil; por favor, valida la ortografía antes de crearla.
+            </span>
+          </div>
+
           <!-- Suggested Master Catalog Skills -->
           <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
             <button
@@ -334,6 +355,109 @@
             >
               No se encontraron habilidades adicionales. Escribe para crear una
               nueva.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sectores de la Vacante (Catálogo Maestro Dinámico) -->
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-on-surface-variant"
+          >Sectores de la Industria (Obligatorio)</label
+        >
+
+        <!-- Selected Sector Tags -->
+        <div class="flex flex-wrap gap-2 mb-2">
+          <span
+            v-for="sector in sectors"
+            :key="sector"
+            class="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 font-bold"
+          >
+            {{ sector }}
+            <button
+              type="button"
+              @click="removeSector(sector)"
+              class="hover:text-rose-600 transition flex items-center"
+            >
+              <span class="material-symbols-outlined text-xs">close</span>
+            </button>
+          </span>
+          <span
+            v-if="sectors.length === 0"
+            class="text-xs text-on-surface-variant italic"
+          >
+            Ningún sector seleccionado aún. Selecciona del catálogo abajo.
+          </span>
+        </div>
+
+        <!-- Catalog autocomplete and suggestion box -->
+        <div
+          class="space-y-3 bg-surface-container-low/40 p-4 border border-outline-variant/50 rounded-xl"
+        >
+          <div class="flex gap-2">
+            <div class="relative flex-grow">
+              <span
+                class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm"
+                >search</span
+              >
+              <input
+                v-model="sectorSearchQuery"
+                type="text"
+                placeholder="Buscar sectores en el catálogo..."
+                class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl pl-9 pr-4 py-2 text-xs text-on-background outline-none transition"
+              />
+            </div>
+
+            <!-- Quick Add Option for non-existing sectors -->
+            <button
+              type="button"
+              @click="handleQuickAddSector"
+              :disabled="!sectorSearchQuery.trim()"
+              class="bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary text-xs font-bold px-4 py-2 rounded-xl transition disabled:opacity-50"
+            >
+              Crear y Agregar
+            </button>
+          </div>
+
+          <div
+            v-if="
+              sectorSearchQuery.trim() &&
+              !filteredCatalogSectors.some(
+                (s) =>
+                  s.name.toLowerCase() ===
+                  sectorSearchQuery.toLowerCase().trim(),
+              )
+            "
+            class="text-[10px] text-amber-600 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-lg flex items-start gap-1.5 leading-relaxed"
+          >
+            <span class="material-symbols-outlined text-xs mt-0.5"
+              >warning</span
+            >
+            <span>
+              Este sector no se encuentra en el catálogo y será enviado al
+              equipo de moderación para su aprobación. Se asociará temporalmente
+              a tu perfil; por favor, valida la ortografía antes de crearlo.
+            </span>
+          </div>
+
+          <!-- Suggested Master Catalog Sectors -->
+          <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+            <button
+              v-for="masterSector in filteredCatalogSectors"
+              :key="masterSector.id"
+              type="button"
+              @click="addSector(masterSector.name)"
+              class="bg-surface hover:bg-surface-container-high border border-outline-variant/50 hover:border-primary text-on-surface hover:text-primary transition px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-[10px]">add</span>
+              {{ masterSector.name }}
+            </button>
+            <span
+              v-if="filteredCatalogSectors.length === 0"
+              class="text-[11px] text-on-surface-variant italic py-1"
+            >
+              No se encontraron sectores adicionales. Escribe para crear uno
+              nuevo.
             </span>
           </div>
         </div>
@@ -386,6 +510,7 @@ const title = ref("");
 const modality = ref("Remoto");
 const description = ref("");
 const skills = ref<string[]>([]);
+const sectors = ref<string[]>([]);
 const aptitudes = ref("");
 const experienceYears = ref<number | null>(null);
 const salaryMin = ref<number | null>(null);
@@ -434,6 +559,7 @@ const saveDraft = () => {
       title.value ||
       description.value ||
       skills.value.length > 0 ||
+      sectors.value.length > 0 ||
       aptitudes.value ||
       experienceYears.value ||
       salaryMin.value ||
@@ -446,6 +572,7 @@ const saveDraft = () => {
           modality: modality.value,
           description: description.value,
           skills: skills.value,
+          sectors: sectors.value,
           aptitudes: aptitudes.value,
           experienceYears: experienceYears.value,
           salaryMin: salaryMin.value,
@@ -468,6 +595,7 @@ const loadDraft = () => {
           draft.title ||
           draft.description ||
           draft.skills?.length > 0 ||
+          draft.sectors?.length > 0 ||
           draft.aptitudes
         ) {
           isRestoring = true;
@@ -475,6 +603,7 @@ const loadDraft = () => {
           modality.value = draft.modality || "Remoto";
           description.value = draft.description || "";
           skills.value = draft.skills || [];
+          sectors.value = draft.sectors || [];
           aptitudes.value = draft.aptitudes || "";
           experienceYears.value = draft.experienceYears;
           salaryMin.value = draft.salaryMin;
@@ -500,6 +629,7 @@ const discardDraft = () => {
     modality.value = "Remoto";
     description.value = "";
     skills.value = [];
+    sectors.value = [];
     aptitudes.value = "";
     experienceYears.value = null;
     salaryMin.value = null;
@@ -521,6 +651,7 @@ watch(
     modality,
     description,
     skills,
+    sectors,
     aptitudes,
     experienceYears,
     salaryMin,
@@ -536,6 +667,7 @@ watch(
 
 // Habilidades Catalog search
 const skillSearchQuery = ref("");
+const sectorSearchQuery = ref("");
 
 // Notifications/Actions
 const submitting = ref(false);
@@ -550,6 +682,18 @@ const filteredCatalogSkills = computed(() => {
     const matchesQuery = skill.name.toLowerCase().includes(query);
     const notSelectedYet = !skills.value.some(
       (s) => s.toLowerCase() === skill.name.toLowerCase(),
+    );
+    return matchesQuery && notSelectedYet;
+  });
+});
+
+// Filter catalog sectors by search query and exclude already added ones
+const filteredCatalogSectors = computed(() => {
+  const query = sectorSearchQuery.value.toLowerCase().trim();
+  return catalogStore.sectors.filter((sector) => {
+    const matchesQuery = sector.name.toLowerCase().includes(query);
+    const notSelectedYet = !sectors.value.some(
+      (s) => s.toLowerCase() === sector.name.toLowerCase(),
     );
     return matchesQuery && notSelectedYet;
   });
@@ -653,6 +797,28 @@ const removeSkill = (skillName: string) => {
   skills.value = skills.value.filter((s) => s !== skillName);
 };
 
+const addSector = (sectorName: string) => {
+  if (
+    !sectors.value.some((s) => s.toLowerCase() === sectorName.toLowerCase())
+  ) {
+    sectors.value.push(sectorName);
+  }
+  sectorSearchQuery.value = "";
+};
+
+const removeSector = (sectorName: string) => {
+  sectors.value = sectors.value.filter((s) => s !== sectorName);
+};
+
+const handleQuickAddSector = async () => {
+  const queryName = sectorSearchQuery.value.trim();
+  if (!queryName) return;
+
+  await catalogStore.addItem(queryName, "Sector");
+  addSector(queryName);
+  sectorSearchQuery.value = "";
+};
+
 // Expand Catalog and Add immediately
 const handleQuickAddSkill = async () => {
   const queryName = skillSearchQuery.value.trim();
@@ -670,6 +836,10 @@ const handleSubmit = async () => {
   if (!session.value?.user?.id) return;
   if (skills.value.length === 0) {
     errorMessage.value = "Debes seleccionar al menos una habilidad requerida.";
+    return;
+  }
+  if (sectors.value.length === 0) {
+    errorMessage.value = "Debes seleccionar al menos un sector de industria.";
     return;
   }
 
@@ -708,6 +878,7 @@ const handleSubmit = async () => {
       salario: salaryMin.value || 0, // Fallback standard field
       descripcion: description.value,
       habilidadesRequeridas: skills.value,
+      sectores: sectors.value,
       aptitudes: aptitudes.value,
       experienciaAnos: experienceYears.value || 0,
       pdfUrl: specPdfUrl,
@@ -730,6 +901,7 @@ const handleSubmit = async () => {
       title.value = "";
       description.value = "";
       skills.value = [];
+      sectors.value = [];
       aptitudes.value = "";
       experienceYears.value = null;
       salaryMin.value = null;

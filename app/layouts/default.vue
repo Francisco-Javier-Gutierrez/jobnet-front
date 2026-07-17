@@ -75,7 +75,7 @@
             </div>
           </NuxtLink>
           <button
-            @click="signOut()"
+            @click="signOut({ callbackUrl: '/' })"
             class="flex items-center gap-4 px-3 py-3 rounded-xl text-on-surface-variant hover:text-rose-600 hover:bg-surface-container-high/60 transition-all duration-150 w-full"
             aria-label="Cerrar sesión"
           >

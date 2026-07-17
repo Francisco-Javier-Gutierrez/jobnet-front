@@ -289,6 +289,30 @@
               </span>
             </div>
           </div>
+
+          <!-- Sectores Card -->
+          <div
+            v-if="job.sectores && job.sectores.length > 0"
+            class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4"
+          >
+            <h2
+              class="text-base font-bold text-on-background flex items-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-secondary text-lg"
+                >business_center</span
+              >
+              Sectores de la industria
+            </h2>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="sector in job.sectores"
+                :key="sector"
+                class="bg-secondary/5 text-secondary px-3 py-1 rounded-full text-xs font-bold border border-secondary/10"
+              >
+                {{ sector }}
+              </span>
+            </div>
+          </div>
         </div>
 
         <!-- Sidebar Widgets (1 Column) -->
