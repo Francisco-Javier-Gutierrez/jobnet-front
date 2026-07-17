@@ -430,14 +430,17 @@ const submitComment = async () => {
   const username = session.value?.user?.name || "Usuario Anónimo";
 
   try {
-    const created = await $fetch<any>(`/api/posts/${post.value.uniqueId}/comment`, {
-      method: "POST",
-      body: {
-        author: username,
-        content: newCommentText.value.trim(),
-        parentId: null,
+    const created = await $fetch<any>(
+      `/api/posts/${post.value.uniqueId}/comment`,
+      {
+        method: "POST",
+        body: {
+          author: username,
+          content: newCommentText.value.trim(),
+          parentId: null,
+        },
       },
-    });
+    );
 
     if (!post.value.comments) post.value.comments = [];
     post.value.comments.push(created);
@@ -472,14 +475,17 @@ const submitReply = async (parentId: string) => {
   const username = session.value?.user?.name || "Usuario Anónimo";
 
   try {
-    const created = await $fetch<any>(`/api/posts/${post.value.uniqueId}/comment`, {
-      method: "POST",
-      body: {
-        author: username,
-        content: replyText.value.trim(),
-        parentId: parentId,
+    const created = await $fetch<any>(
+      `/api/posts/${post.value.uniqueId}/comment`,
+      {
+        method: "POST",
+        body: {
+          author: username,
+          content: replyText.value.trim(),
+          parentId: parentId,
+        },
       },
-    });
+    );
 
     if (!post.value.comments) post.value.comments = [];
     post.value.comments.push(created);
@@ -506,9 +512,12 @@ const deleteComment = async (id: string) => {
   if (!post.value?.comments) return;
 
   try {
-    await $fetch(`/api/posts/${post.value.uniqueId}/comment/${encodeURIComponent(id)}`, {
-      method: "DELETE",
-    });
+    await $fetch(
+      `/api/posts/${post.value.uniqueId}/comment/${encodeURIComponent(id)}`,
+      {
+        method: "DELETE",
+      },
+    );
 
     const toRemove = new Set<string>([String(id)]);
     let queue = [String(id)];

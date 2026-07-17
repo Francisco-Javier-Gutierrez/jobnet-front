@@ -12,7 +12,8 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     throw createError({
       statusCode: error.statusCode || 500,
-      statusMessage: error.statusMessage || "Error creating post in AWS backend",
+      statusMessage:
+        error.statusMessage || "Error creating post in AWS backend",
       data: error.data || {},
     });
   }

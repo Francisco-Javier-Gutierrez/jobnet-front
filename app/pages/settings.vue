@@ -641,10 +641,10 @@ const handleQuickAddSkill = async () => {
   const queryName = skillSearchQuery.value.trim();
   if (!queryName) return;
 
-  // Add to global master catalog
-  await catalogStore.addItem(queryName, "Habilidad");
+  // 1. Suggest skill to the global master catalog (moderator queue)
+  await catalogStore.suggestSkill(queryName);
 
-  // Add to active candidate profile skills
+  // 2. Add locally to active candidate profile skills
   selectCatalogSkill(queryName);
   skillSearchQuery.value = "";
 };

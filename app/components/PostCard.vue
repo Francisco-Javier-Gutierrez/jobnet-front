@@ -20,7 +20,9 @@
             {{ post.author || "Usuario JobNet" }}
           </h3>
         </div>
-        <p class="text-[11px] text-on-surface-variant/80 truncate animate-fade-in">
+        <p
+          class="text-[11px] text-on-surface-variant/80 truncate animate-fade-in"
+        >
           {{ post.role || "Candidato" }} · {{ formatTime(post.createdAt) }}
         </p>
       </div>
@@ -165,7 +167,7 @@ const props = withDefaults(
   }>(),
   {
     isDetail: false,
-  }
+  },
 );
 
 const emit = defineEmits(["like", "bookmark", "share", "navigate"]);
@@ -189,7 +191,7 @@ const commentsCount = computed(() => {
 
 const handleClick = (event: Event) => {
   if (props.isDetail) return;
-  
+
   const target = event.target as HTMLElement;
   if (
     target.closest("button") ||
@@ -207,17 +209,17 @@ const formatTime = (dateStr: string) => {
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
-  
+
   // Safe fallback for future dates or local clock offset
   if (diffMs < 0) return "Hace un momento";
-  
+
   const diffMins = Math.floor(diffMs / 60000);
   if (diffMins < 1) return "Hace un momento";
   if (diffMins < 60) return `Hace ${diffMins} min`;
-  
+
   const hours = Math.floor(diffMins / 60);
   if (hours < 24) return `Hace ${hours} h`;
-  
+
   return date.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
 };
 </script>

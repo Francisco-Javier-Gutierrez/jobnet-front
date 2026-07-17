@@ -64,7 +64,8 @@
         No hay vacantes disponibles
       </h2>
       <p class="text-on-surface-variant text-sm max-w-sm">
-        Aún no se han publicado ofertas de empleo en la plataforma. ¡Vuelve pronto para explorar nuevas oportunidades!
+        Aún no se han publicado ofertas de empleo en la plataforma. ¡Vuelve
+        pronto para explorar nuevas oportunidades!
       </p>
     </div>
 

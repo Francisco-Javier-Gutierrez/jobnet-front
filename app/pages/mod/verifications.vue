@@ -22,11 +22,49 @@
         </h2>
         <span
           class="bg-secondary/10 text-secondary text-xs px-2.5 py-0.5 rounded-full font-bold"
-          >1 Pendiente</span
+          >{{ requests.length }} Pendiente{{
+            requests.length !== 1 ? "s" : ""
+          }}</span
         >
       </div>
 
-      <div class="divide-y divide-outline-variant/30">
+      <!-- Loading skeleton -->
+      <div v-if="loading" class="p-8 space-y-6">
+        <div
+          v-for="n in 2"
+          :key="n"
+          class="animate-pulse flex flex-col sm:flex-row justify-between gap-4"
+        >
+          <div class="flex-grow space-y-2">
+            <div class="h-4 bg-outline-variant/30 rounded w-1/3"></div>
+            <div class="h-3 bg-outline-variant/30 rounded w-1/4"></div>
+            <div class="h-3 bg-outline-variant/30 rounded w-1/2"></div>
+            <div
+              class="h-[200px] bg-outline-variant/20 rounded max-w-2xl mt-4"
+            ></div>
+          </div>
+          <div
+            class="h-10 bg-outline-variant/30 rounded w-24 self-center"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        v-else-if="requests.length === 0"
+        class="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant"
+      >
+        <span class="material-symbols-outlined text-[48px] text-primary/40 mb-3"
+          >verified_user</span
+        >
+        <p class="text-sm font-semibold text-on-surface">Cola limpia</p>
+        <p class="text-xs text-on-surface-variant mt-1">
+          No hay solicitudes de verificación de empresas pendientes de revisión.
+        </p>
+      </div>
+
+      <!-- Requests List -->
+      <div v-else class="divide-y divide-outline-variant/30">
         <div
           v-for="req in requests"
           :key="req.companyId"
@@ -96,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 useSeoMeta({
   title: "Verificaciones Corporativas - JobNet",
@@ -105,26 +143,38 @@ useSeoMeta({
 });
 
 const config = useRuntimeConfig();
+const requests = ref<any[]>([]);
+const loading = ref(true);
 
-const requests = ref([
-  {
-    companyId: "44f88418-9081-70d4-b8d9-e04f2e8230fc",
-    companyName: "Francisco Tech",
-    taxId: "XDDDD",
-    email: "chinopaco.05@gmail.com",
-    docUrl:
-      "https://jobnet-jobs-dev-uploads.s3.amazonaws.com/verification_stub.pdf",
-  },
-]);
+const fetchRequests = async () => {
+  loading.value = true;
+  try {
+    const data = await $fetch<any[]>(
+      `${config.public.apiUrl}/moderator/verifications`,
+    );
+    requests.value = data || [];
+  } catch (e) {
+    console.error("Error loading verification requests:", e);
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchRequests();
+});
 
 const handleAction = async (companyId: string, approve: boolean) => {
   try {
-    await $fetch(`${config.public.apiUrl}/profile/${companyId}`, {
-      method: "POST",
-      body: {
-        organizacionVerificada: approve,
+    await $fetch(
+      `${config.public.apiUrl}/moderator/verifications/${companyId}/resolve`,
+      {
+        method: "POST",
+        body: {
+          approve,
+        },
       },
-    });
+    );
     requests.value = requests.value.filter((r) => r.companyId !== companyId);
   } catch (e) {
     console.error("Error updating company verification:", e);

@@ -77,6 +77,29 @@ export const useCatalogStore = defineStore("catalog", {
       }
     },
 
+    async suggestSkill(
+      name: string,
+    ): Promise<{ success: boolean; error?: string }> {
+      const cleanName = name.trim();
+      if (!cleanName) {
+        return { success: false, error: "El nombre no puede estar vacío" };
+      }
+
+      const config = useRuntimeConfig();
+      try {
+        await $fetch(`${config.public.apiUrl}/moderator/skills/suggestions`, {
+          method: "POST",
+          body: { name: cleanName },
+        });
+        return { success: true };
+      } catch (error: any) {
+        return {
+          success: false,
+          error: error.data?.error || "Error al registrar la sugerencia.",
+        };
+      }
+    },
+
     async updateItem(
       id: string,
       newName: string,

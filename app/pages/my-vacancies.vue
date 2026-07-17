@@ -76,9 +76,29 @@
           class="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition hover:bg-surface-container-low/20"
         >
           <div class="min-w-0">
-            <h2 class="text-base font-bold text-on-background mb-1.5 truncate">
-              {{ job.title }}
-            </h2>
+            <div class="flex items-center gap-2 mb-1.5">
+              <h2 class="text-base font-bold text-on-background truncate">
+                {{ job.title }}
+              </h2>
+              <span
+                v-if="job.estado === 'EVALUACION' || job.estado === 'APELADA'"
+                :class="[
+                  'px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border',
+                  job.estado === 'EVALUACION'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                    : '',
+                  job.estado === 'APELADA'
+                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                    : '',
+                ]"
+              >
+                {{
+                  job.estado === "EVALUACION"
+                    ? "Bajo Evaluación"
+                    : "Apelación en curso"
+                }}
+              </span>
+            </div>
             <div
               class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-on-surface-variant"
             >
@@ -104,7 +124,19 @@
           </div>
 
           <div class="flex items-center gap-2 flex-shrink-0">
+            <!-- If under evaluation, show Apelar button -->
+            <button
+              v-if="job.estado === 'EVALUACION'"
+              @click="openAppealModal(job.id)"
+              class="bg-amber-600 hover:bg-amber-750 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition active:scale-95 duration-100 flex items-center gap-1 shadow-sm"
+            >
+              <span class="material-symbols-outlined text-sm flex items-center"
+                >gavel</span
+              >
+              Apelar Sanción
+            </button>
             <NuxtLink
+              v-if="job.estado !== 'EVALUACION'"
               :to="`/applicants?jobId=${job.id}`"
               class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-4 py-2.5 rounded-lg transition shadow-sm active:scale-95 duration-100 flex items-center gap-1"
             >
@@ -112,6 +144,7 @@
               Ver Candidatos
             </NuxtLink>
             <button
+              v-if="job.estado !== 'EVALUACION'"
               class="bg-surface border border-outline-variant hover:border-primary text-on-surface-variant hover:text-primary font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
             >
               Editar
@@ -119,6 +152,76 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal de Apelación de Vacante -->
+  <div
+    v-if="isAppealModalOpen"
+    class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+  >
+    <div
+      class="bg-white border border-outline-variant/60 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
+    >
+      <div
+        class="flex items-center justify-between border-b border-outline-variant/30 pb-3"
+      >
+        <h3
+          class="text-base font-bold text-on-background flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-indigo-600">gavel</span>
+          Apelar Sanción de Vacante
+        </h3>
+        <button
+          @click="isAppealModalOpen = false"
+          class="text-on-surface-variant hover:bg-surface-container rounded-lg p-1 transition flex items-center justify-center"
+        >
+          <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+      </div>
+
+      <form @submit.prevent="submitAppeal" class="space-y-4 text-left">
+        <p class="text-xs text-on-surface-variant leading-relaxed">
+          Ingresa los argumentos y la justificación para solicitar la
+          reactivación de esta vacante. El equipo de moderación analizará las
+          pruebas provistas.
+        </p>
+
+        <div class="space-y-2 flex flex-col">
+          <label
+            class="text-xs font-bold text-on-surface-variant"
+            for="appeal-text"
+            >Mensaje de Apelación y Evidencia</label
+          >
+          <textarea
+            v-model="appealComments"
+            id="appeal-text"
+            placeholder="Explica detalladamente las correcciones realizadas o justificaciones de legitimidad..."
+            rows="5"
+            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl p-3 text-xs text-on-background outline-none transition resize-none"
+            required
+          ></textarea>
+        </div>
+
+        <div
+          class="flex justify-end gap-2 pt-2 border-t border-outline-variant/30"
+        >
+          <button
+            type="button"
+            @click="isAppealModalOpen = false"
+            class="bg-surface border border-outline-variant hover:bg-surface-container text-on-surface-variant font-semibold text-xs px-4 py-2.5 rounded-xl transition"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            :disabled="!appealComments.trim()"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm active:scale-95 duration-100 flex items-center gap-1.5"
+          >
+            Enviar Apelación
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -139,6 +242,42 @@ const { data: session, status } = useAuth();
 const loading = ref(true);
 const vacancies = ref<any[]>([]);
 
+// Appeal State Variables
+const isAppealModalOpen = ref(false);
+const appealComments = ref("");
+const selectedJobIdForAppeal = ref("");
+
+const openAppealModal = (jobId: string) => {
+  selectedJobIdForAppeal.value = jobId;
+  appealComments.value = "";
+  isAppealModalOpen.value = true;
+};
+
+const submitAppeal = async () => {
+  if (!appealComments.value.trim()) return;
+  try {
+    await $fetch(
+      `${config.public.apiUrl}/jobs/${selectedJobIdForAppeal.value}`,
+      {
+        method: "PUT",
+        body: {
+          estado: "APELADA",
+          apelacionComentarios: appealComments.value.trim(),
+        },
+      },
+    );
+
+    isAppealModalOpen.value = false;
+    await fetchVacancies();
+    alert(
+      "Apelación enviada con éxito. El equipo de moderación evaluará tu caso.",
+    );
+  } catch (e) {
+    console.error("Error submitting appeal:", e);
+    alert("Hubo un error al enviar la apelación.");
+  }
+};
+
 const fetchVacancies = async () => {
   if (status.value !== "authenticated" || !session.value?.user?.id) {
     router.push("/login");
@@ -152,12 +291,14 @@ const fetchVacancies = async () => {
     const allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
       () => [],
     );
+    // Keep all jobs for the company regardless of active/evaluation/appeal status
     const filtered = allJobs.filter((j) => j.empresaUuid === companyId);
 
     vacancies.value = filtered.map((j) => ({
       id: j.id,
       title: j.title || "Vacante sin título",
       type: j.modalidad || "Presencial",
+      estado: j.estado || "Activa",
       location:
         j.lat && j.lng ? `Lat: ${j.lat}, Lng: ${j.lng}` : "Ubicación remota",
       salary:

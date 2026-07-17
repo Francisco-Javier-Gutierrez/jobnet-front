@@ -20,11 +20,78 @@ export const useUploadStore = defineStore("upload", {
     ): Promise<{ url: string; success: boolean; error?: string }> {
       const config = useRuntimeConfig();
       this.uploading = true;
-      this.uploadProgress = "Obteniendo URL de carga...";
+      this.uploadProgress = "Validando archivo...";
       this.uploadError = "";
 
+      // 1. Double extension check
+      const parts = file.name.toLowerCase().split(".");
+      const dangerousExtensions = [
+        "exe",
+        "bat",
+        "cmd",
+        "sh",
+        "js",
+        "vbs",
+        "scr",
+        "msi",
+        "jar",
+        "com",
+        "pif",
+        "wsf",
+        "dll",
+        "sys",
+      ];
+      const knownExtensions = [
+        "pdf",
+        "png",
+        "jpg",
+        "jpeg",
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "txt",
+        "zip",
+        "rar",
+        "exe",
+        "bat",
+        "cmd",
+        "sh",
+        "js",
+        "vbs",
+      ];
+
+      if (parts.length > 1) {
+        const finalExt = parts[parts.length - 1];
+        if (dangerousExtensions.includes(finalExt)) {
+          this.uploadError = "Extensión de archivo peligrosa no permitida.";
+          this.uploading = false;
+          return { url: "", success: false, error: this.uploadError };
+        }
+
+        if (parts.length > 2) {
+          for (let i = 1; i < parts.length - 1; i++) {
+            if (knownExtensions.includes(parts[i])) {
+              this.uploadError =
+                "Validación de doble extensión fallida. Nombre de archivo sospechoso (ej. cv.pdf.exe).";
+              this.uploading = false;
+              return { url: "", success: false, error: this.uploadError };
+            }
+          }
+        }
+      }
+
+      // 2. Strict 5MB size limit check on frontend
+      const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+      if (file.size > MAX_SIZE) {
+        this.uploadError = "El archivo supera el límite de 5MB.";
+        this.uploading = false;
+        return { url: "", success: false, error: this.uploadError };
+      }
+
       try {
-        // 1. Get presigned upload URL from backend
+        this.uploadProgress = "Obteniendo URL de carga segura...";
+        // 3. Get presigned upload URL from backend, sending size param
         const response = await $fetch<{ url: string }>(
           `${config.public.apiUrl}/upload-url`,
           {
@@ -33,6 +100,7 @@ export const useUploadStore = defineStore("upload", {
               contentType: file.type,
               folder,
               userId: userId || "anonymous",
+              size: file.size,
             },
           },
         );
@@ -41,17 +109,38 @@ export const useUploadStore = defineStore("upload", {
           throw new Error("No se obtuvo una URL de carga del servidor.");
         }
 
-        // 2. Upload file directly to S3 using presigned URL
-        this.uploadProgress = "Subiendo archivo...";
-        await fetch(response.url, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type,
-          },
+        // 4. Upload file directly to S3 using presigned URL with progress tracking
+        this.uploadProgress = "Iniciando carga...";
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("PUT", response.url);
+          xhr.setRequestHeader("Content-Type", file.type);
+
+          xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+              const percent = Math.round((e.loaded / e.total) * 100);
+              this.uploadProgress = `Subiendo archivo... ${percent}%`;
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve();
+            } else {
+              reject(
+                new Error(`Carga fallida con código de estado ${xhr.status}`),
+              );
+            }
+          };
+
+          xhr.onerror = () => {
+            reject(new Error("Error de red durante la carga del archivo."));
+          };
+
+          xhr.send(file);
         });
 
-        // 3. Construct the public S3 URL (strip query params from presigned URL)
+        // 5. Construct the public S3 URL
         const publicUrl = response.url.split("?")[0];
 
         this.uploadProgress = "";

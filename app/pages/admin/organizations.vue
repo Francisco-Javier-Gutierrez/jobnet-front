@@ -339,7 +339,8 @@
                       org.estadoCuenta === 'REVISION'
                         ? 'bg-amber-50 text-amber-700 border border-amber-200'
                         : '',
-                      org.estadoCuenta === 'SUSPENDIDA'
+                      org.estadoCuenta === 'SUSPENDIDA' ||
+                      org.estadoCuenta === 'SUSPENDIDA_TEMPORAL'
                         ? 'bg-rose-50 text-rose-700 border border-rose-200'
                         : '',
                     ]"
@@ -350,7 +351,9 @@
                         ? "Activa"
                         : org.estadoCuenta === "REVISION"
                           ? "En Revisión"
-                          : "Suspendida"
+                          : org.estadoCuenta === "SUSPENDIDA_TEMPORAL"
+                            ? "Sanción Temp."
+                            : "Suspendida"
                     }}
                   </span>
                 </td>
@@ -625,10 +628,44 @@
               <h4 class="text-xs font-bold text-slate-800">
                 Emitir Dictamen de Apelación (Fase 3)
               </h4>
+              <div
+                class="flex flex-col gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200"
+              >
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[11px] font-bold text-slate-600"
+                    >Tipo de Sanción en caso de rechazo</label
+                  >
+                  <select
+                    v-model="sanctionType"
+                    class="bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none text-slate-800"
+                  >
+                    <option value="SUSPENDIDA">
+                      Suspensión Definitiva (Baneo total)
+                    </option>
+                    <option value="SUSPENDIDA_TEMPORAL">
+                      Suspensión Temporal (Por días)
+                    </option>
+                  </select>
+                </div>
+                <div
+                  v-if="sanctionType === 'SUSPENDIDA_TEMPORAL'"
+                  class="flex flex-col gap-1.5"
+                >
+                  <label class="text-[11px] font-bold text-slate-600"
+                    >Número de días de suspensión</label
+                  >
+                  <input
+                    type="number"
+                    v-model="tempSuspensionDays"
+                    min="1"
+                    class="bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none text-slate-800 w-24"
+                  />
+                </div>
+              </div>
               <div class="flex flex-col sm:flex-row gap-3">
                 <button
                   @click="applySanction('ACTIVO')"
-                  class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-3 rounded-xl transition shadow active:scale-95 duration-100 flex items-center justify-center gap-2"
+                  class="flex-grow bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-3 rounded-xl transition shadow active:scale-95 duration-100 flex items-center justify-center gap-2"
                 >
                   <span class="material-symbols-outlined text-[18px]"
                     >task_alt</span
@@ -636,20 +673,30 @@
                   Aceptar Apelación (Revocar)
                 </button>
                 <button
-                  @click="applySanction('SUSPENDIDA')"
-                  class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-3 rounded-xl transition shadow active:scale-95 duration-100 flex items-center justify-center gap-2"
+                  @click="
+                    applySanction(
+                      sanctionType,
+                      sanctionType === 'SUSPENDIDA_TEMPORAL'
+                        ? tempSuspensionDays
+                        : undefined,
+                    )
+                  "
+                  class="flex-grow bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-3 rounded-xl transition shadow active:scale-95 duration-100 flex items-center justify-center gap-2"
                 >
                   <span class="material-symbols-outlined text-[18px]"
                     >block</span
                   >
-                  Rechazar Apelación y Suspender
+                  Rechazar Apelación y Aplicar Sanción
                 </button>
               </div>
             </div>
 
             <!-- Phase 3: Action (Reactivate / Lift suspension) -->
             <div
-              v-else-if="selectedOrg?.estadoCuenta === 'SUSPENDIDA'"
+              v-else-if="
+                selectedOrg?.estadoCuenta === 'SUSPENDIDA' ||
+                selectedOrg?.estadoCuenta === 'SUSPENDIDA_TEMPORAL'
+              "
               class="space-y-4"
             >
               <h4 class="text-xs font-bold text-slate-800">
@@ -660,6 +707,16 @@
                 posterior, puede reactivar su cuenta a su estado normal de forma
                 manual.
               </p>
+              <div
+                v-if="
+                  selectedOrg?.estadoCuenta === 'SUSPENDIDA_TEMPORAL' &&
+                  selectedOrg?.fechaFinSuspension
+                "
+                class="text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-100 p-3 rounded-lg font-mono"
+              >
+                Sanción temporal expira:
+                {{ formatDate(selectedOrg.fechaFinSuspension) }}
+              </div>
               <button
                 @click="applySanction('ACTIVO')"
                 class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs px-4 py-3 rounded-xl border border-slate-200 transition active:scale-95 duration-100 flex items-center justify-center gap-2 shadow-sm"
@@ -726,6 +783,8 @@ const sanctionSteps = [
 // Sanction Modal States
 const isSanctionModalOpen = ref(false);
 const selectedOrg = ref<any | null>(null);
+const sanctionType = ref<"SUSPENDIDA" | "SUSPENDIDA_TEMPORAL">("SUSPENDIDA");
+const tempSuspensionDays = ref(7);
 
 // Fetch data from DynamoDB listProfiles endpoint
 const {
@@ -755,7 +814,12 @@ const inReviewCount = computed(
   () => orgs.value.filter((o: any) => o.estadoCuenta === "REVISION").length,
 );
 const suspendedCount = computed(
-  () => orgs.value.filter((o: any) => o.estadoCuenta === "SUSPENDIDA").length,
+  () =>
+    orgs.value.filter(
+      (o: any) =>
+        o.estadoCuenta === "SUSPENDIDA" ||
+        o.estadoCuenta === "SUSPENDIDA_TEMPORAL",
+    ).length,
 );
 
 // Date formatting helper
@@ -882,7 +946,8 @@ const openSanctionModal = (org: any) => {
 
 // RF-7 apply sanction status transitions (Fases 1, 2, 3)
 const applySanction = async (
-  newStatus: "ACTIVO" | "REVISION" | "SUSPENDIDA",
+  newStatus: "ACTIVO" | "REVISION" | "SUSPENDIDA" | "SUSPENDIDA_TEMPORAL",
+  diasTemporal?: number,
 ) => {
   if (!selectedOrg.value) return;
   try {
@@ -897,6 +962,17 @@ const applySanction = async (
       graceLimit.setDate(graceLimit.getDate() + 15);
       bodyUpdate.fechaLimiteApelacion = graceLimit.toISOString();
       bodyUpdate.diasGracia = 15;
+    } else if (newStatus === "SUSPENDIDA_TEMPORAL") {
+      const days = diasTemporal || 7;
+      const fin = new Date();
+      fin.setDate(fin.getDate() + days);
+      bodyUpdate.fechaFinSuspension = fin.toISOString();
+      bodyUpdate.diasSancion = days;
+    } else if (newStatus === "ACTIVO") {
+      bodyUpdate.fechaLimiteApelacion = null;
+      bodyUpdate.fechaFinSuspension = null;
+      bodyUpdate.diasSancion = null;
+      bodyUpdate.diasGracia = null;
     }
 
     await $fetch(`${config.public.apiUrl}/profile/${org.id}`, {
@@ -911,6 +987,8 @@ const applySanction = async (
       successMsg.value = `Fase 3 completada: Apelación evaluada favorablemente. Sanción revocada y cuenta devuelta a la normalidad para ${org.nombre}.`;
     } else if (newStatus === "SUSPENDIDA") {
       successMsg.value = `Fase 3 completada: Dictamen final desfavorable emitido. Cuenta de ${org.nombre} suspendida definitivamente y vacantes ocultadas.`;
+    } else if (newStatus === "SUSPENDIDA_TEMPORAL") {
+      successMsg.value = `Fase 3 completada: Cuenta de ${org.nombre} suspendida temporalmente por ${diasTemporal || 7} días.`;
     } else {
       successMsg.value = `Estatus de cuenta actualizado con éxito a ${newStatus}.`;
     }

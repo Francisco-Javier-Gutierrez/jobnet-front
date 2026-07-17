@@ -54,7 +54,7 @@
             @navigate="navigateToPost"
           />
         </template>
-        
+
         <!-- Empty Feed State -->
         <template v-else>
           <div
@@ -71,7 +71,8 @@
               No hay publicaciones en la comunidad
             </h2>
             <p class="text-on-surface-variant text-sm max-w-sm mb-6">
-              Aún no se han compartido publicaciones en el feed. ¡Sé el primero en compartir algo interesante con la comunidad!
+              Aún no se han compartido publicaciones en el feed. ¡Sé el primero
+              en compartir algo interesante con la comunidad!
             </p>
           </div>
         </template>
@@ -88,7 +89,12 @@
       <div
         class="bg-surface-container-lowest border border-outline-variant/60 w-full max-w-lg rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh]"
         :class="isDragging ? '' : 'transition-transform duration-300'"
-        :style="{ transform: sheetOffset > 0 ? `translateY(${sheetOffset}px)` : 'translateY(0px)' }"
+        :style="{
+          transform:
+            sheetOffset > 0
+              ? `translateY(${sheetOffset}px)`
+              : 'translateY(0px)',
+        }"
         @click.stop
       >
         <!-- Drag Handle Indicator -->
@@ -100,7 +106,9 @@
           @mousedown="onMouseDown"
           @click="closeBottomSheet"
         >
-          <div class="w-12 h-1.5 rounded-full bg-outline/20 hover:bg-outline/40 transition"></div>
+          <div
+            class="w-12 h-1.5 rounded-full bg-outline/20 hover:bg-outline/40 transition"
+          ></div>
         </div>
 
         <!-- Header -->
@@ -111,8 +119,12 @@
           @touchend="onTouchEnd"
           @mousedown="onMouseDown"
         >
-          <h3 class="text-sm font-bold text-on-background flex items-center gap-1 pointer-events-none">
-            <span class="material-symbols-outlined text-primary text-lg">forum</span>
+          <h3
+            class="text-sm font-bold text-on-background flex items-center gap-1 pointer-events-none"
+          >
+            <span class="material-symbols-outlined text-primary text-lg"
+              >forum</span
+            >
             Publicación y Comentarios
           </h3>
           <button
@@ -137,8 +149,12 @@
           />
 
           <!-- Comments List -->
-          <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/30 space-y-4">
-            <h4 class="text-xs font-bold text-on-background flex items-center gap-1 pb-2 border-b border-outline-variant/20">
+          <div
+            class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/30 space-y-4"
+          >
+            <h4
+              class="text-xs font-bold text-on-background flex items-center gap-1 pb-2 border-b border-outline-variant/20"
+            >
               Comentarios y Respuestas ({{ commentsCount(selectedPost) }})
             </h4>
 
@@ -162,8 +178,14 @@
             </form>
 
             <!-- Threaded tree list -->
-            <div v-if="commentTree.length === 0" class="text-center py-6 text-on-surface-variant/60 text-xs">
-              <span class="material-symbols-outlined text-[28px] text-outline mb-1">comments_disabled</span>
+            <div
+              v-if="commentTree.length === 0"
+              class="text-center py-6 text-on-surface-variant/60 text-xs"
+            >
+              <span
+                class="material-symbols-outlined text-[28px] text-outline mb-1"
+                >comments_disabled</span
+              >
               <p>No hay comentarios todavía.</p>
             </div>
             <div v-else class="space-y-4 pt-2">
@@ -175,12 +197,18 @@
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-1.5">
-                    <div class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px] shadow-sm">
+                    <div
+                      class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px] shadow-sm"
+                    >
                       {{ node.user ? node.user.charAt(0).toUpperCase() : "U" }}
                     </div>
                     <div>
-                      <h5 class="text-[11px] font-bold text-on-background">{{ node.user || "Usuario" }}</h5>
-                      <span class="text-[9px] text-on-surface-variant/75">{{ node.timeAgo || "Hace un momento" }}</span>
+                      <h5 class="text-[11px] font-bold text-on-background">
+                        {{ node.user || "Usuario" }}
+                      </h5>
+                      <span class="text-[9px] text-on-surface-variant/75">{{
+                        node.timeAgo || "Hace un momento"
+                      }}</span>
                     </div>
                   </div>
                   <button
@@ -188,10 +216,19 @@
                     @click="deleteComment(node.id)"
                     class="text-rose-600 hover:bg-rose-50 p-1 rounded-md transition opacity-0 group-hover:opacity-100"
                   >
-                    <span class="material-symbols-outlined text-xs">delete</span>
+                    <span class="material-symbols-outlined text-xs"
+                      >delete</span
+                    >
                   </button>
                 </div>
-                <p class="text-xs text-on-surface-variant leading-relaxed" :class="{ 'italic text-on-surface-variant/60': node.isDeleted }">{{ node.text }}</p>
+                <p
+                  class="text-xs text-on-surface-variant leading-relaxed"
+                  :class="{
+                    'italic text-on-surface-variant/60': node.isDeleted,
+                  }"
+                >
+                  {{ node.text }}
+                </p>
 
                 <!-- Actions -->
                 <div v-if="!node.isDeleted" class="flex items-center gap-3">
@@ -238,12 +275,22 @@
                   >
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-1.5">
-                        <div class="w-5 h-5 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[9px]">
-                          {{ reply.user ? reply.user.charAt(0).toUpperCase() : "U" }}
+                        <div
+                          class="w-5 h-5 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[9px]"
+                        >
+                          {{
+                            reply.user
+                              ? reply.user.charAt(0).toUpperCase()
+                              : "U"
+                          }}
                         </div>
                         <div>
-                          <h6 class="text-[10px] font-bold text-on-background">{{ reply.user || "Usuario" }}</h6>
-                          <span class="text-[8px] text-on-surface-variant/75">{{ reply.timeAgo || "Hace un momento" }}</span>
+                          <h6 class="text-[10px] font-bold text-on-background">
+                            {{ reply.user || "Usuario" }}
+                          </h6>
+                          <span class="text-[8px] text-on-surface-variant/75">{{
+                            reply.timeAgo || "Hace un momento"
+                          }}</span>
                         </div>
                       </div>
                       <button
@@ -251,16 +298,23 @@
                         @click="deleteComment(reply.id)"
                         class="text-rose-600 hover:bg-rose-50 p-0.5 rounded transition opacity-0 group-hover:opacity-100"
                       >
-                        <span class="material-symbols-outlined text-[10px]">delete</span>
+                        <span class="material-symbols-outlined text-[10px]"
+                          >delete</span
+                        >
                       </button>
                     </div>
-                    <p class="text-xs text-on-surface-variant leading-relaxed" :class="{ 'italic text-on-surface-variant/60': reply.isDeleted }">{{ reply.text }}</p>
+                    <p
+                      class="text-xs text-on-surface-variant leading-relaxed"
+                      :class="{
+                        'italic text-on-surface-variant/60': reply.isDeleted,
+                      }"
+                    >
+                      {{ reply.text }}
+                    </p>
                   </div>
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -449,7 +503,9 @@ const buildFeed = () => {
     showPreview: false,
   }));
   if (selectedPost.value) {
-    const updatedPost = feedItems.value.find((p: any) => p.uniqueId === selectedPost.value.uniqueId);
+    const updatedPost = feedItems.value.find(
+      (p: any) => p.uniqueId === selectedPost.value.uniqueId,
+    );
     if (updatedPost) {
       selectedPost.value = updatedPost;
     }
@@ -540,7 +596,7 @@ const toggleLike = async (item: any) => {
     showAuthModal.value = true;
     return;
   }
-  
+
   if (!item.likesList) {
     item.likesList = [];
   }
@@ -727,7 +783,8 @@ onBeforeUnmount(() => {
 });
 
 const navigateToPost = (postId: string) => {
-  selectedPost.value = feedItems.value.find((p: any) => p.uniqueId === postId) || null;
+  selectedPost.value =
+    feedItems.value.find((p: any) => p.uniqueId === postId) || null;
 };
 
 // Share post
@@ -794,21 +851,26 @@ const submitComment = async () => {
   const username = session.value?.user?.name || "Usuario Anónimo";
 
   try {
-    const created = await $fetch<any>(`/api/posts/${selectedPost.value.uniqueId}/comment`, {
-      method: "POST",
-      body: {
-        author: username,
-        content: newCommentText.value.trim(),
-        parentId: null,
+    const created = await $fetch<any>(
+      `/api/posts/${selectedPost.value.uniqueId}/comment`,
+      {
+        method: "POST",
+        body: {
+          author: username,
+          content: newCommentText.value.trim(),
+          parentId: null,
+        },
       },
-    });
+    );
 
     if (!selectedPost.value.comments) selectedPost.value.comments = [];
     selectedPost.value.comments.push(created);
     newCommentText.value = "";
 
     // Sync with postsList to update feed card comment counter
-    const postInList = postsList.value.find((p: any) => p.uniqueId === selectedPost.value.uniqueId);
+    const postInList = postsList.value.find(
+      (p: any) => p.uniqueId === selectedPost.value.uniqueId,
+    );
     if (postInList) {
       if (!postInList.comments) postInList.comments = [];
       postInList.comments.push(created);
@@ -844,14 +906,17 @@ const submitReply = async (parentId: string) => {
   const username = session.value?.user?.name || "Usuario Anónimo";
 
   try {
-    const created = await $fetch<any>(`/api/posts/${selectedPost.value.uniqueId}/comment`, {
-      method: "POST",
-      body: {
-        author: username,
-        content: replyText.value.trim(),
-        parentId: parentId,
+    const created = await $fetch<any>(
+      `/api/posts/${selectedPost.value.uniqueId}/comment`,
+      {
+        method: "POST",
+        body: {
+          author: username,
+          content: replyText.value.trim(),
+          parentId: parentId,
+        },
       },
-    });
+    );
 
     if (!selectedPost.value.comments) selectedPost.value.comments = [];
     selectedPost.value.comments.push(created);
@@ -859,7 +924,9 @@ const submitReply = async (parentId: string) => {
     replyingToId.value = null;
 
     // Sync with postsList to update feed card comment counter
-    const postInList = postsList.value.find((p: any) => p.uniqueId === selectedPost.value.uniqueId);
+    const postInList = postsList.value.find(
+      (p: any) => p.uniqueId === selectedPost.value.uniqueId,
+    );
     if (postInList) {
       if (!postInList.comments) postInList.comments = [];
       postInList.comments.push(created);
@@ -884,36 +951,44 @@ const deleteComment = async (id: string) => {
   if (!selectedPost.value?.comments) return;
 
   try {
-    await $fetch(`/api/posts/${selectedPost.value.uniqueId}/comment/${encodeURIComponent(id)}`, {
-      method: "DELETE",
-    });
+    await $fetch(
+      `/api/posts/${selectedPost.value.uniqueId}/comment/${encodeURIComponent(id)}`,
+      {
+        method: "DELETE",
+      },
+    );
 
-    const targetIndex = selectedPost.value.comments.findIndex((c: any) => String(c.id) === String(id));
+    const targetIndex = selectedPost.value.comments.findIndex(
+      (c: any) => String(c.id) === String(id),
+    );
     if (targetIndex !== -1) {
       const target = selectedPost.value.comments[targetIndex];
       const isLevel2 = !!target.parentId;
-      
+
       if (isLevel2) {
         // Hard delete reply from local array
         selectedPost.value.comments.splice(targetIndex, 1);
-        
+
         // If parent was soft-deleted and this was its last child, delete parent entirely
         const parentId = target.parentId;
-        const parent = selectedPost.value.comments.find((c: any) => String(c.id) === String(parentId));
+        const parent = selectedPost.value.comments.find(
+          (c: any) => String(c.id) === String(parentId),
+        );
         if (parent && parent.isDeleted) {
           const parentHasOtherChildren = selectedPost.value.comments.some(
-            (c: any) => String(c.parentId) === String(parentId) && c.id !== target.id
+            (c: any) =>
+              String(c.parentId) === String(parentId) && c.id !== target.id,
           );
           if (!parentHasOtherChildren) {
             selectedPost.value.comments = selectedPost.value.comments.filter(
-              (c: any) => String(c.id) !== String(parentId)
+              (c: any) => String(c.id) !== String(parentId),
             );
           }
         }
       } else {
         // Level 1 main comment
         const hasChildren = selectedPost.value.comments.some(
-          (c: any) => String(c.parentId) === String(id)
+          (c: any) => String(c.parentId) === String(id),
         );
         if (hasChildren) {
           // Soft delete to preserve nested tree
@@ -931,7 +1006,9 @@ const deleteComment = async (id: string) => {
     }
 
     // Sync with postsList to preserve local modifications in feed mapping
-    const postInList = postsList.value.find((p: any) => p.uniqueId === selectedPost.value.uniqueId);
+    const postInList = postsList.value.find(
+      (p: any) => p.uniqueId === selectedPost.value.uniqueId,
+    );
     if (postInList) {
       postInList.comments = selectedPost.value.comments;
     }

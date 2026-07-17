@@ -76,6 +76,24 @@
 
     <!-- Vacancy Real Details -->
     <div v-else class="space-y-6">
+      <!-- Alert if under evaluation (RF-23) -->
+      <div
+        v-if="job.estado === 'EVALUACION'"
+        class="bg-amber-500/10 border border-amber-500/20 text-amber-800 p-4 rounded-2xl flex items-start gap-3 text-xs leading-relaxed shadow-sm text-left"
+      >
+        <span class="material-symbols-outlined text-amber-600 mt-0.5"
+          >warning</span
+        >
+        <div>
+          <p class="font-bold text-slate-900 mb-0.5">Vacante bajo evaluación</p>
+          <p class="text-on-surface-variant">
+            Esta oferta de empleo ha sido pausada temporalmente por moderadores
+            para validar reportes de fraude o información inexacta. No se
+            permiten nuevas postulaciones en este momento.
+          </p>
+        </div>
+      </div>
+
       <!-- 1. Header Card -->
       <div
         class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm relative overflow-hidden"
@@ -114,8 +132,17 @@
           <div
             class="flex flex-col sm:flex-row items-stretch md:items-center gap-2 flex-shrink-0"
           >
+            <!-- Disable postulations if job is under evaluation -->
             <button
-              v-if="hasApplied"
+              v-if="job.estado === 'EVALUACION'"
+              disabled
+              class="bg-amber-50 border border-amber-200 text-amber-700 font-bold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm cursor-not-allowed"
+            >
+              <span class="material-symbols-outlined text-base">warning</span>
+              Bajo Evaluación
+            </button>
+            <button
+              v-else-if="hasApplied"
               disabled
               class="bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
             >
@@ -125,10 +152,18 @@
             <button
               v-else
               @click="scrollToApply"
-              class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-5 py-3 rounded-xl transition shadow-md shadow-primary/10 flex items-center justify-center gap-1 active:scale-95 duration-100"
+              class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-5 py-3 rounded-xl transition shadow-md shadow-primary/10 flex items-center justify-center gap-1 active:scale-95 duration-100 flex-grow md:flex-grow-0"
             >
               <span class="material-symbols-outlined text-base">send</span>
               Postularme ahora
+            </button>
+            <button
+              @click="showReportModal = true"
+              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant hover:text-rose-600 font-bold text-xs px-4 py-3 rounded-xl transition flex items-center justify-center gap-1 active:scale-95 duration-100"
+              title="Reportar vacante sospechosa"
+            >
+              <span class="material-symbols-outlined text-base">flag</span>
+              Reportar
             </button>
           </div>
         </div>
@@ -304,7 +339,22 @@
         </h2>
 
         <div
-          v-if="hasApplied"
+          v-if="job.estado === 'EVALUACION'"
+          class="p-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-xs leading-relaxed space-y-2 text-left"
+        >
+          <p class="font-bold flex items-center gap-1">
+            <span class="material-symbols-outlined text-base">warning</span>
+            Postulaciones pausadas temporalmente
+          </p>
+          <p>
+            Esta vacante se encuentra bajo revisión por el equipo de moderación.
+            No se permiten nuevas postulaciones hasta que se resuelva su
+            estatus.
+          </p>
+        </div>
+
+        <div
+          v-else-if="hasApplied"
           class="p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-xs leading-relaxed space-y-2"
         >
           <p class="font-bold flex items-center gap-1">
@@ -536,6 +586,106 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal de Reporte -->
+  <div
+    v-if="showReportModal"
+    class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+  >
+    <div
+      class="bg-white border border-outline-variant/60 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
+    >
+      <div
+        class="flex items-center justify-between border-b border-outline-variant/30 pb-3"
+      >
+        <h3
+          class="text-base font-bold text-on-background flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-rose-600">flag</span>
+          Reportar vacante sospechosa
+        </h3>
+        <button
+          @click="showReportModal = false"
+          class="text-on-surface-variant hover:bg-surface-container rounded-lg p-1 transition flex items-center justify-center"
+        >
+          <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+      </div>
+
+      <div
+        v-if="reportSuccess"
+        class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-xl flex items-center gap-2 text-xs font-semibold"
+      >
+        <span class="material-symbols-outlined text-lg">check_circle</span>
+        Reporte enviado exitosamente. Moderadores revisarán este contenido.
+      </div>
+
+      <form v-else @submit.prevent="submitReport" class="space-y-4 text-left">
+        <p class="text-xs text-on-surface-variant leading-relaxed">
+          Tu reporte será analizado de forma anónima por nuestro equipo de
+          moderación. Por favor selecciona el motivo principal de la denuncia.
+        </p>
+
+        <div class="space-y-2 flex flex-col">
+          <label class="text-xs font-bold text-on-surface-variant"
+            >Motivo del reporte</label
+          >
+          <select
+            v-model="reportReason"
+            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2.5 text-xs text-on-background outline-none transition appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23777587%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.5rem_center] bg-[length:1.5em_1.5em] pr-8"
+          >
+            <option value="Vacante falsa">Vacante falsa / Estafa</option>
+            <option value="Información engañosa">
+              Información engañosa o imprecisa
+            </option>
+            <option value="Contenido inapropiado">
+              Contenido inapropiado / Discriminatorio
+            </option>
+            <option value="Otro">Otro motivo</option>
+          </select>
+        </div>
+
+        <div class="space-y-2 flex flex-col">
+          <label
+            class="text-xs font-bold text-on-surface-variant"
+            for="report-comments"
+            >Comentarios adicionales</label
+          >
+          <textarea
+            v-model="reportComments"
+            id="report-comments"
+            placeholder="Explica detalladamente por qué consideras que esta vacante infringe las políticas..."
+            rows="4"
+            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl p-3 text-xs text-on-background outline-none transition resize-none"
+            required
+          ></textarea>
+        </div>
+
+        <div
+          class="flex justify-end gap-2 pt-2 border-t border-outline-variant/30"
+        >
+          <button
+            type="button"
+            @click="showReportModal = false"
+            class="bg-surface border border-outline-variant hover:bg-surface-container text-on-surface-variant font-semibold text-xs px-4 py-2.5 rounded-xl transition"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            :disabled="!reportComments.trim() || isReporting"
+            class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+          >
+            <span
+              v-if="isReporting"
+              class="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"
+            ></span>
+            Enviar Denuncia
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -543,6 +693,61 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useJobsStore } from "~/stores/jobs";
 import { useUploadStore } from "~/stores/upload";
+
+const config = useRuntimeConfig();
+
+// Report state variables
+const showReportModal = ref(false);
+const reportReason = ref("Vacante falsa");
+const reportComments = ref("");
+const isReporting = ref(false);
+const reportSuccess = ref(false);
+
+const submitReport = async () => {
+  if (!reportComments.value.trim()) return;
+  isReporting.value = true;
+  try {
+    const severityMap: Record<string, string> = {
+      "Vacante falsa": "alta",
+      "Información engañosa": "media",
+      "Contenido inapropiado": "media",
+      Otro: "baja",
+    };
+    const infraccionMap: Record<string, string> = {
+      "Vacante falsa": "fraude",
+      "Información engañosa": "fraude",
+      "Contenido inapropiado": "contenido",
+      Otro: "otro",
+    };
+
+    const reporterEmail =
+      session.value?.user?.email || "candidato.anonimo@gmail.com";
+
+    await $fetch(`${config.public.apiUrl}/moderator/incidents`, {
+      method: "POST",
+      body: {
+        jobId: jobId,
+        jobTitle: job.value?.title || "Vacante",
+        reporter: reporterEmail,
+        reason: `${reportReason.value}: ${reportComments.value.trim()}`,
+        severity: severityMap[reportReason.value] || "media",
+        infraccion: infraccionMap[reportReason.value] || "otro",
+      },
+    });
+
+    reportSuccess.value = true;
+    setTimeout(() => {
+      showReportModal.value = false;
+      reportSuccess.value = false;
+      reportComments.value = "";
+    }, 2000);
+  } catch (e) {
+    console.error("Error creating report:", e);
+    alert("Hubo un error al enviar el reporte. Por favor, intenta de nuevo.");
+  } finally {
+    isReporting.value = false;
+  }
+};
 
 // Comment interfaces mirroring Comuni-red tree architecture
 interface CommentData {

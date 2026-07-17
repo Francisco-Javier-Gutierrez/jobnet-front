@@ -21,9 +21,10 @@
         <select
           id="job-select"
           v-model="selectedJobId"
+          @change="fetchApplicants"
           class="bg-surface-container-lowest border border-outline-variant/60 hover:border-primary text-xs text-on-background rounded-lg px-3 py-2 outline-none transition"
         >
-          <option value="">Todas las vacantes</option>
+          <option value="">Selecciona una vacante...</option>
           <option v-for="job in myJobs" :key="job.id" :value="job.id">
             {{ job.title }}
           </option>
@@ -34,6 +35,14 @@
       <span class="text-xs text-on-surface-variant font-bold"
         >Total de Postulaciones: {{ totalCandidates }}</span
       >
+    </div>
+
+    <div
+      v-if="successMsg"
+      class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-xl flex items-center gap-2 text-xs font-semibold"
+    >
+      <span class="material-symbols-outlined text-sm">check_circle</span>
+      {{ successMsg }}
     </div>
 
     <!-- Kanban Board Grid -->
@@ -63,25 +72,66 @@
         <div class="flex flex-col gap-3 flex-grow overflow-y-auto">
           <div
             v-for="item in column.items"
-            :key="item.name"
+            :key="item.id"
             class="bg-surface-container-lowest border border-outline-variant/60 hover:border-primary p-4 rounded-xl cursor-pointer transition shadow-sm"
           >
-            <h3 class="text-xs font-bold text-on-background mb-1">
-              {{ item.name }}
-            </h3>
+            <div class="flex justify-between items-start gap-2 mb-1">
+              <h3 class="text-xs font-bold text-on-background">
+                {{ item.name }}
+              </h3>
+              <!-- Status indicator -->
+              <span
+                v-if="item.status === 'RECHAZADO'"
+                class="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wide bg-rose-100 text-rose-800"
+              >
+                Rechazado
+              </span>
+            </div>
+
             <p class="text-[10px] text-primary font-semibold mb-2">
               {{ item.job }}
             </p>
 
+            <div class="text-[10px] text-on-surface-variant mb-3">
+              {{ item.email }}
+            </div>
+
+            <!-- CV integrated viewer button -->
+            <div v-if="item.cvUrl" class="mb-3">
+              <button
+                @click.stop="openPdfViewer(item)"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition w-full justify-center"
+              >
+                <span class="material-symbols-outlined text-[14px]"
+                  >picture_as_pdf</span
+                >
+                Ver CV Integrado
+              </button>
+            </div>
+
+            <!-- Action panel for candidates -->
             <div
               class="flex items-center justify-between mt-3 pt-3 border-t border-outline-variant/40"
             >
-              <span class="text-[9px] text-on-surface-variant font-semibold">{{
-                item.time
-              }}</span>
+              <span class="text-[9px] text-on-surface-variant font-semibold">
+                {{ item.time }}
+              </span>
 
               <!-- Simple drag simulation actions -->
-              <div class="flex gap-1.5">
+              <div class="flex items-center gap-1.5">
+                <!-- Chat link if selected/interview -->
+                <nuxt-link
+                  v-if="
+                    item.status === 'ENTREVISTA' || item.status === 'ACEPTADO'
+                  "
+                  :to="`/messages?jobId=${item.jobId}&candidateId=${item.id}`"
+                  class="w-6 h-6 rounded-md bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 flex items-center justify-center transition"
+                  title="Abrir Chat de Mensajería"
+                >
+                  <span class="material-symbols-outlined text-xs">forum</span>
+                </nuxt-link>
+
+                <!-- Move back button -->
                 <button
                   v-if="column.id !== 'applied'"
                   @click="moveCandidate(item, column.id, 'prev')"
@@ -92,8 +142,10 @@
                     >chevron_left</span
                   >
                 </button>
+
+                <!-- Move forward button -->
                 <button
-                  v-if="column.id !== 'hired'"
+                  v-if="column.id !== 'hired' && item.status !== 'RECHAZADO'"
                   @click="moveCandidate(item, column.id, 'next')"
                   class="w-6 h-6 rounded-md bg-primary hover:bg-primary-container text-white flex items-center justify-center transition shadow-sm"
                   title="Mover adelante"
@@ -102,9 +154,186 @@
                     >chevron_right</span
                   >
                 </button>
+
+                <!-- Reject button -->
+                <button
+                  v-if="item.status !== 'RECHAZADO'"
+                  @click="triggerReject(item)"
+                  class="w-6 h-6 rounded-md bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 flex items-center justify-center transition"
+                  title="Rechazar Postulante"
+                >
+                  <span class="material-symbols-outlined text-xs">close</span>
+                </button>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals Section -->
+    <!-- Interview Details Modal -->
+    <div
+      v-if="isInterviewModalOpen"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+    >
+      <div
+        class="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full shadow-xl"
+      >
+        <h3
+          class="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-primary text-lg"
+            >calendar_month</span
+          >
+          Agendar Entrevista de Selección
+        </h3>
+        <p class="text-xs text-slate-500 mb-4">
+          Indica los detalles de la entrevista para notificar al candidato por
+          correo electrónico de forma automática.
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1"
+              >Detalles de la Cita (Ej: Fecha, Hora, Link de Meet/Zoom):</label
+            >
+            <textarea
+              v-model="interviewDetails"
+              rows="4"
+              class="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-primary rounded-xl px-3 py-2 text-xs text-slate-800 outline-none transition"
+              placeholder="Ej: Lunes 24 de Julio a las 10:00 AM (GMT-6). Reunión de Teams: https://teams.microsoft.com/l/meetup-join/..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div
+          class="flex justify-end gap-2.5 mt-6 pt-4 border-t border-slate-100"
+        >
+          <button
+            @click="isInterviewModalOpen = false"
+            class="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs transition"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="submitInterviewTransition"
+            :disabled="!interviewDetails.trim()"
+            class="px-4 py-2 bg-primary hover:bg-primary-container text-white disabled:opacity-50 rounded-xl text-xs font-semibold shadow-sm transition"
+          >
+            Confirmar y Agendar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rejection Reason Modal -->
+    <div
+      v-if="isRejectModalOpen"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+    >
+      <div
+        class="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full shadow-xl"
+      >
+        <h3
+          class="text-sm font-bold text-rose-900 mb-2 flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-rose-600 text-lg"
+            >cancel</span
+          >
+          Descartar Postulante
+        </h3>
+        <p class="text-xs text-slate-500 mb-4">
+          Ingresa el motivo del descarte. Esto se enviará de forma automática e
+          individual al candidato por correo electrónico.
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1"
+              >Motivo de Rechazo:</label
+            >
+            <textarea
+              v-model="rejectionReason"
+              rows="4"
+              class="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-rose-500 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none transition"
+              placeholder="Ej: Agradecemos tu participación en el proceso, pero hemos decidido avanzar con perfiles que se alinean más estrechamente con la experiencia requerida en arquitecturas en la nube."
+            ></textarea>
+          </div>
+        </div>
+
+        <div
+          class="flex justify-end gap-2.5 mt-6 pt-4 border-t border-slate-100"
+        >
+          <button
+            @click="isRejectModalOpen = false"
+            class="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs transition"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="submitRejection"
+            :disabled="!rejectionReason.trim()"
+            class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white disabled:opacity-50 rounded-xl text-xs font-semibold shadow-sm transition"
+          >
+            Confirmar Descarte
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF Viewer Modal -->
+    <div
+      v-if="isPdfViewerOpen"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 max-w-4xl w-full h-[85vh] flex flex-col shadow-xl"
+      >
+        <div
+          class="flex items-center justify-between pb-4 border-b border-outline-variant/40 mb-4"
+        >
+          <h3
+            class="text-sm font-bold text-on-background flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-primary"
+              >picture_as_pdf</span
+            >
+            CV de {{ selectedPdfCandidateName }}
+          </h3>
+          <div class="flex items-center gap-2">
+            <a
+              :href="selectedPdfUrl"
+              download
+              target="_blank"
+              class="px-3 py-1.5 rounded-lg border border-outline-variant hover:border-primary text-on-surface-variant hover:text-primary text-xs font-bold transition flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-[16px]"
+                >download</span
+              >
+              Descargar
+            </a>
+            <button
+              @click="isPdfViewerOpen = false"
+              class="text-on-surface-variant hover:text-error transition flex items-center gap-1 font-semibold text-xs"
+              aria-label="Cerrar visor PDF"
+            >
+              <span class="material-symbols-outlined text-sm">close</span>
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="flex-grow w-full border border-outline-variant/30 rounded-xl overflow-hidden bg-surface relative"
+        >
+          <iframe
+            :src="selectedPdfUrl"
+            class="w-full h-full border-none"
+            title="Visor PDF Integrado"
+          ></iframe>
         </div>
       </div>
     </div>
@@ -128,49 +357,28 @@ const { data: session, status } = useAuth();
 
 const selectedJobId = ref("");
 const myJobs = ref<any[]>([]);
+const candidates = ref<any[]>([]);
+const successMsg = ref("");
 
-const candidates = ref([
-  {
-    id: 1,
-    name: "Alejandro Silva",
-    job: "Senior Frontend Developer",
-    jobId: "1",
-    stage: "applied",
-    time: "Hace 10 mins",
-  },
-  {
-    id: 2,
-    name: "Lucía Fernández",
-    job: "UX/UI Designer",
-    jobId: "2",
-    stage: "interview",
-    time: "Hace 2 horas",
-  },
-  {
-    id: 3,
-    name: "Carlos Ortega",
-    job: "Product Manager",
-    jobId: "3",
-    stage: "offer",
-    time: "Ayer",
-  },
-  {
-    id: 4,
-    name: "Maria Jose",
-    job: "Senior Frontend Developer",
-    jobId: "1",
-    stage: "interview",
-    time: "Hace 3 días",
-  },
-  {
-    id: 5,
-    name: "Daniel Martinez",
-    job: "Senior Frontend Developer",
-    jobId: "1",
-    stage: "hired",
-    time: "Hace 1 semana",
-  },
-]);
+// Modal States
+const isInterviewModalOpen = ref(false);
+const interviewDetails = ref("");
+const pendingCandidateItem = ref<any>(null);
+const pendingStageMove = ref<any>(null);
+
+const isRejectModalOpen = ref(false);
+const rejectionReason = ref("");
+
+// PDF Viewer State
+const isPdfViewerOpen = ref(false);
+const selectedPdfUrl = ref("");
+const selectedPdfCandidateName = ref("");
+
+const openPdfViewer = (candidate: any) => {
+  selectedPdfUrl.value = candidate.cvUrl || "";
+  selectedPdfCandidateName.value = candidate.name || "";
+  isPdfViewerOpen.value = true;
+};
 
 const fetchMyJobs = async () => {
   if (status.value !== "authenticated" || !session.value?.user?.id) {
@@ -185,49 +393,108 @@ const fetchMyJobs = async () => {
       () => [],
     );
     myJobs.value = allJobs.filter((j) => j.empresaUuid === companyId);
+
+    // Auto-select first job if query param is missing
+    if (myJobs.value.length > 0 && !selectedJobId.value) {
+      selectedJobId.value = myJobs.value[0].id;
+      await fetchApplicants();
+    }
   } catch (e) {
     console.error("Error fetching company jobs for ATS filtering:", e);
   }
 };
 
-onMounted(() => {
-  fetchMyJobs();
+const fetchApplicants = async () => {
+  if (!selectedJobId.value) {
+    candidates.value = [];
+    return;
+  }
+
+  try {
+    const apps = await $fetch<any[]>(
+      `${config.public.apiUrl}/jobs/${selectedJobId.value}/applicants`,
+    ).catch(() => []);
+
+    const resolvedCandidates = await Promise.all(
+      apps.map(async (app) => {
+        const profile = await $fetch<any>(
+          `${config.public.apiUrl}/profile/${app.candidateId}`,
+        ).catch(() => ({}));
+        let stage = "applied";
+        if (app.status === "ENTREVISTA") {
+          stage = "interview";
+        } else if (app.status === "ACEPTADO") {
+          stage = app.stage || "offer";
+        }
+
+        return {
+          id: app.candidateId,
+          name: profile.nombre || "Candidato sin nombre",
+          email: profile.email || app.candidateId,
+          job:
+            myJobs.value.find((j) => j.id === selectedJobId.value)?.title ||
+            "Vacante",
+          jobId: selectedJobId.value,
+          stage: stage,
+          status: app.status,
+          time: new Date(app.appliedAt || Date.now()).toLocaleDateString(),
+          cvUrl: profile.cvUrl || null,
+        };
+      }),
+    );
+
+    candidates.value = resolvedCandidates;
+  } catch (e) {
+    console.error("Error fetching job applicants:", e);
+  }
+};
+
+onMounted(async () => {
   if (route.query.jobId) {
     selectedJobId.value = route.query.jobId as string;
   }
+  await fetchMyJobs();
 });
 
 const filteredCandidates = computed(() => {
-  if (!selectedJobId.value) return candidates.value;
-  return candidates.value.filter((c) => c.jobId === selectedJobId.value);
+  if (!selectedJobId.value) return [];
+  return candidates.value;
 });
 
 const boardColumns = computed(() => [
   {
     id: "applied",
     title: "Aplicados",
-    items: filteredCandidates.value.filter((c) => c.stage === "applied"),
+    items: filteredCandidates.value.filter(
+      (c) => c.stage === "applied" && c.status !== "RECHAZADO",
+    ),
   },
   {
     id: "interview",
     title: "Entrevista",
-    items: filteredCandidates.value.filter((c) => c.stage === "interview"),
+    items: filteredCandidates.value.filter(
+      (c) => c.stage === "interview" && c.status !== "RECHAZADO",
+    ),
   },
   {
     id: "offer",
     title: "Oferta",
-    items: filteredCandidates.value.filter((c) => c.stage === "offer"),
+    items: filteredCandidates.value.filter(
+      (c) => c.stage === "offer" && c.status !== "RECHAZADO",
+    ),
   },
   {
     id: "hired",
     title: "Contratados",
-    items: filteredCandidates.value.filter((c) => c.stage === "hired"),
+    items: filteredCandidates.value.filter(
+      (c) => c.stage === "hired" && c.status !== "RECHAZADO",
+    ),
   },
 ]);
 
 const totalCandidates = computed(() => filteredCandidates.value.length);
 
-const moveCandidate = (
+const moveCandidate = async (
   candidate: any,
   currentStage: string,
   direction: "next" | "prev",
@@ -236,12 +503,102 @@ const moveCandidate = (
   const currIndex = stages.indexOf(currentStage);
   if (currIndex === -1) return;
 
-  let nextIndex = direction === "next" ? currIndex + 1 : currIndex - 1;
+  const nextIndex = direction === "next" ? currIndex + 1 : currIndex - 1;
   if (nextIndex >= 0 && nextIndex < stages.length) {
-    const found = candidates.value.find((c) => c.id === candidate.id);
-    if (found) {
-      found.stage = stages[nextIndex];
+    const targetStage = stages[nextIndex];
+
+    // Check if transitioning to interview stage
+    if (targetStage === "interview") {
+      pendingCandidateItem.value = candidate;
+      pendingStageMove.value = targetStage;
+      interviewDetails.value = "";
+      isInterviewModalOpen.value = true;
+      return;
     }
+
+    // Direct transition for other stages (applied, offer, hired)
+    await submitStatusUpdate(candidate, targetStage);
+  }
+};
+
+const submitStatusUpdate = async (
+  candidate: any,
+  targetStage: string,
+  details?: string,
+) => {
+  let backendStatus = "PENDIENTE";
+  if (targetStage === "interview") {
+    backendStatus = "ENTREVISTA";
+  } else if (targetStage === "offer" || targetStage === "hired") {
+    backendStatus = "ACEPTADO";
+  }
+
+  try {
+    await $fetch(
+      `${config.public.apiUrl}/applications/${candidate.jobId}/${candidate.id}/status`,
+      {
+        method: "PUT",
+        body: {
+          status: backendStatus,
+          detallesEntrevista: details || null,
+          stage: targetStage, // Keep track of frontend stage
+        },
+      },
+    );
+
+    successMsg.value = `Estado de candidato ${candidate.name} actualizado con éxito a ${backendStatus}.`;
+    setTimeout(() => (successMsg.value = ""), 4500);
+    await fetchApplicants();
+  } catch (e) {
+    console.error("Error updating candidate application status:", e);
+  }
+};
+
+const submitInterviewTransition = async () => {
+  if (!pendingCandidateItem.value || !pendingStageMove.value) return;
+
+  await submitStatusUpdate(
+    pendingCandidateItem.value,
+    pendingStageMove.value,
+    interviewDetails.value,
+  );
+
+  isInterviewModalOpen.value = false;
+  pendingCandidateItem.value = null;
+  pendingStageMove.value = null;
+};
+
+// Rejection actions
+const triggerReject = (candidate: any) => {
+  pendingCandidateItem.value = candidate;
+  rejectionReason.value = "";
+  isRejectModalOpen.value = true;
+};
+
+const submitRejection = async () => {
+  if (!pendingCandidateItem.value) return;
+  const candidate = pendingCandidateItem.value;
+
+  try {
+    await $fetch(
+      `${config.public.apiUrl}/applications/${candidate.jobId}/${candidate.id}/status`,
+      {
+        method: "PUT",
+        body: {
+          status: "RECHAZADO",
+          motivoRechazo: rejectionReason.value,
+        },
+      },
+    );
+
+    successMsg.value = `Postulante ${candidate.name} descartado con éxito. Se le ha enviado un correo electrónico.`;
+    setTimeout(() => (successMsg.value = ""), 4500);
+    await fetchApplicants();
+  } catch (e) {
+    console.error("Error rejecting candidate application:", e);
+  } finally {
+    isRejectModalOpen.value = false;
+    pendingCandidateItem.value = null;
   }
 };
 </script>
