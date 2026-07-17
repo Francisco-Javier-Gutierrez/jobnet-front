@@ -331,9 +331,9 @@
               >warning</span
             >
             <span>
-              Atención, esta habilidad se mandará para ser aprobada. Se agregará
-              por el momento a tu perfil, pero si tiene faltas ortográficas se
-              quedará de esa forma hasta que el moderador lo valide.
+              Esta habilidad no se encuentra en el catálogo y será enviada al
+              equipo de moderación para su aprobación. Se asociará temporalmente
+              a tu perfil; por favor, valida la ortografía antes de crearla.
             </span>
           </div>
 
@@ -434,9 +434,9 @@
               >warning</span
             >
             <span>
-              Atención, este sector se mandará para ser aprobado. Se agregará
-              por el momento a tu perfil, pero si tiene faltas ortográficas se
-              quedará de esa forma hasta que el moderador lo valide.
+              Este sector no se encuentra en el catálogo y será enviado al
+              equipo de moderación para su aprobación. Se asociará temporalmente
+              a tu perfil; por favor, valida la ortografía antes de crearlo.
             </span>
           </div>
 
