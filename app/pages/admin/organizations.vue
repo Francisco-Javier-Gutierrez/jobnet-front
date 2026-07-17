@@ -692,11 +692,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 
-// Use layout admin
-definePageMeta({
-  layout: "admin",
-});
-
 useSeoMeta({
   title: "Control de Organizaciones - Administrador",
   description:

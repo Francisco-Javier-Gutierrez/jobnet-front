@@ -50,11 +50,21 @@
     <!-- Empty State -->
     <div
       v-else-if="store.jobs.length === 0"
-      class="text-center py-20 border border-dashed border-outline-variant rounded-2xl bg-surface-container-lowest shadow-sm"
+      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm px-6"
       role="status"
     >
-      <p class="text-on-surface-variant">
-        No se encontraron empleos disponibles en este momento.
+      <div
+        class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6"
+      >
+        <span class="material-symbols-outlined text-[40px] text-primary"
+          >work</span
+        >
+      </div>
+      <h2 class="text-xl font-bold text-on-background mb-2">
+        No hay vacantes disponibles
+      </h2>
+      <p class="text-on-surface-variant text-sm max-w-sm">
+        Aún no se han publicado ofertas de empleo en la plataforma. ¡Vuelve pronto para explorar nuevas oportunidades!
       </p>
     </div>
 
@@ -67,7 +77,8 @@
       <div
         v-for="job in store.jobs"
         :key="job.id"
-        class="border border-outline-variant/60 rounded-2xl p-6 bg-surface-container-lowest hover:border-primary transition duration-300 flex flex-col justify-between group hover:shadow-md"
+        @click="router.push(`/jobs/${job.id}`)"
+        class="border border-outline-variant/60 rounded-2xl p-6 bg-surface-container-lowest hover:border-primary transition duration-300 flex flex-col justify-between group hover:shadow-md cursor-pointer"
         role="article"
         :aria-label="`Vacante de ${job.title} en ${job.company}`"
       >
@@ -84,11 +95,13 @@
               {{ job.modalidad || "Remoto" }}
             </span>
           </div>
-          <h2
-            class="text-lg font-bold text-on-background group-hover:text-primary transition mb-2"
-          >
-            {{ job.title }}
-          </h2>
+          <NuxtLink :to="`/jobs/${job.id}`">
+            <h2
+              class="text-lg font-bold text-on-background hover:text-primary transition mb-2 cursor-pointer"
+            >
+              {{ job.title }}
+            </h2>
+          </NuxtLink>
           <p class="text-on-surface-variant text-sm font-semibold mb-6">
             {{ job.company }}
           </p>
@@ -104,6 +117,7 @@
           </div>
           <NuxtLink
             :to="`/map?lat=${job.lat}&lng=${job.lng}`"
+            @click.stop
             class="text-primary hover:text-primary-container text-xs font-bold transition"
             :aria-label="`Ver ubicación de ${job.title} en el mapa`"
           >
@@ -117,8 +131,10 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { useJobsStore } from "../stores/jobs";
 
+const router = useRouter();
 const store = useJobsStore();
 onMounted(() => {
   store.fetchJobs();

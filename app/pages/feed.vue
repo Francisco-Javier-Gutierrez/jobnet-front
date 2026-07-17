@@ -258,7 +258,8 @@
       <div
         v-for="job in filteredJobs"
         :key="job.id"
-        class="border border-outline-variant/60 rounded-2xl p-5 bg-surface-container-lowest hover:border-primary transition duration-300 flex flex-col justify-between group hover:shadow-md"
+        @click="router.push(`/jobs/${job.id}`)"
+        class="border border-outline-variant/60 rounded-2xl p-5 bg-surface-container-lowest hover:border-primary transition duration-300 flex flex-col justify-between group hover:shadow-md cursor-pointer"
         role="article"
         :aria-label="`Vacante de ${job.title} en ${job.company}`"
       >
@@ -285,11 +286,13 @@
           </div>
 
           <!-- Title & Company -->
-          <h2
-            class="text-base font-bold text-on-background group-hover:text-primary transition mb-1"
-          >
-            {{ job.title }}
-          </h2>
+          <NuxtLink :to="`/jobs/${job.id}`">
+            <h2
+              class="text-base font-bold text-on-background hover:text-primary transition mb-1 cursor-pointer"
+            >
+              {{ job.title }}
+            </h2>
+          </NuxtLink>
           <p class="text-on-surface-variant text-xs font-semibold mb-3">
             {{ job.company }}
           </p>
@@ -337,6 +340,7 @@
           </div>
           <NuxtLink
             :to="`/map?lat=${job.lat}&lng=${job.lng}`"
+            @click.stop
             class="text-primary hover:text-primary-container text-xs font-bold transition flex items-center gap-0.5"
           >
             Ver mapa
@@ -490,18 +494,6 @@ const handleClickOutside = (e: MouseEvent) => {
 };
 
 onMounted(async () => {
-  // Redirect admins and moderators to their dashboards
-  if (status.value === "authenticated") {
-    const role = (session.value?.user as any)?.tipoUsuario;
-    if (role?.toUpperCase() === "ADMIN") {
-      router.replace("/admin/organizations");
-      return;
-    } else if (role?.toUpperCase() === "MODERATOR") {
-      router.replace("/mod/incidents");
-      return;
-    }
-  }
-
   jobsStore.fetchJobs();
   if (!catalogStore.loaded) {
     catalogStore.fetchCatalog();

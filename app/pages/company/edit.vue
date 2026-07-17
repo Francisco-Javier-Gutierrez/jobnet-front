@@ -796,7 +796,7 @@ const handleLogoUpload = async (event: Event) => {
   successMessage.value = "";
   errorMessage.value = "";
 
-  const result = await uploadStore.uploadFile(file, "logos");
+  const result = await uploadStore.uploadFile(file, "logos", companyId.value);
 
   if (result.success) {
     fotoPerfil.value = result.url;
@@ -838,7 +838,11 @@ const handleVerificationRequest = async () => {
   errorMessage.value = "";
 
   // 1. Upload PDF to S3 via upload store
-  const result = await uploadStore.uploadFile(pdfFile.value, "verification");
+  const result = await uploadStore.uploadFile(
+    pdfFile.value,
+    "verification",
+    companyId.value,
+  );
 
   if (!result.success) {
     errorMessage.value =

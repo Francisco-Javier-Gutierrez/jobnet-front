@@ -117,6 +117,48 @@
         ></textarea>
       </div>
 
+      <!-- Documento de Especificación (PDF) -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-on-surface-variant"
+          >Descriptor de Puesto o Especificaciones (PDF - Opcional)</label
+        >
+        <div class="flex gap-2 items-center">
+          <button
+            type="button"
+            @click="triggerVacancyFileSelect"
+            class="flex items-center gap-2 px-4 py-2.5 bg-surface border border-outline-variant/60 hover:border-primary text-primary text-xs font-bold rounded-xl transition active:scale-[0.98]"
+          >
+            <span class="material-symbols-outlined text-sm">upload_file</span>
+            Subir Documento PDF
+          </button>
+          <input
+            type="file"
+            accept=".pdf"
+            ref="vacancyFileInput"
+            @change="handleVacancyFileSelect"
+            class="hidden"
+          />
+          <div
+            v-if="selectedVacancyFile"
+            class="flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-xl text-xs font-bold max-w-sm truncate"
+          >
+            <span class="material-symbols-outlined text-sm text-rose-600"
+              >picture_as_pdf</span
+            >
+            <span class="truncate max-w-[200px]">{{
+              selectedVacancyFile.name
+            }}</span>
+            <button
+              type="button"
+              @click="clearVacancyFile"
+              class="text-on-surface-variant hover:text-rose-600 flex items-center transition"
+            >
+              <span class="material-symbols-outlined text-xs">close</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Ubicación Geográfica (Leaflet Map) -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center justify-between">
@@ -348,6 +390,32 @@ const aptitudes = ref("");
 const experienceYears = ref<number | null>(null);
 const salaryMin = ref<number | null>(null);
 const salaryMax = ref<number | null>(null);
+
+// PDF Spec Upload
+import { useUploadStore } from "~/stores/upload";
+const selectedVacancyFile = ref<File | null>(null);
+const vacancyFileInput = ref<HTMLInputElement | null>(null);
+
+const triggerVacancyFileSelect = () => {
+  vacancyFileInput.value?.click();
+};
+
+const handleVacancyFileSelect = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    const file = target.files[0];
+    if (file.type !== "application/pdf") {
+      alert("Por favor selecciona un archivo PDF.");
+      return;
+    }
+    selectedVacancyFile.value = file;
+  }
+};
+
+const clearVacancyFile = () => {
+  selectedVacancyFile.value = null;
+  if (vacancyFileInput.value) vacancyFileInput.value.value = "";
+};
 
 // Leaflet Map State
 const lat = ref(19.432608); // CDMX Default
@@ -610,6 +678,24 @@ const handleSubmit = async () => {
   errorMessage.value = "";
 
   try {
+    let specPdfUrl = "";
+    if (selectedVacancyFile.value) {
+      const uploadStore = useUploadStore();
+      const companyId = session.value?.user?.id || "anonymous";
+      const uploadResult = await uploadStore.uploadFile(
+        selectedVacancyFile.value,
+        "jobs",
+        companyId,
+      );
+      if (!uploadResult.success) {
+        errorMessage.value =
+          "Error al subir el documento PDF de especificaciones a S3.";
+        submitting.value = false;
+        return;
+      }
+      specPdfUrl = uploadResult.url;
+    }
+
     const payload = {
       title: title.value,
       company: companyName.value,
@@ -624,6 +710,7 @@ const handleSubmit = async () => {
       habilidadesRequeridas: skills.value,
       aptitudes: aptitudes.value,
       experienciaAnos: experienceYears.value || 0,
+      pdfUrl: specPdfUrl,
     };
 
     const response = await $fetch<any>(`${config.public.apiUrl}/jobs`, {
@@ -647,6 +734,7 @@ const handleSubmit = async () => {
       experienceYears.value = null;
       salaryMin.value = null;
       salaryMax.value = null;
+      selectedVacancyFile.value = null;
 
       setTimeout(() => {
         router.push("/my-vacancies");

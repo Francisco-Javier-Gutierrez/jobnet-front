@@ -16,6 +16,7 @@ export const useUploadStore = defineStore("upload", {
     async uploadFile(
       file: File,
       folder: string,
+      userId?: string,
     ): Promise<{ url: string; success: boolean; error?: string }> {
       const config = useRuntimeConfig();
       this.uploading = true;
@@ -31,6 +32,7 @@ export const useUploadStore = defineStore("upload", {
               filename: file.name,
               contentType: file.type,
               folder,
+              userId: userId || "anonymous",
             },
           },
         );

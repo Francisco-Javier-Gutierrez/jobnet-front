@@ -663,7 +663,8 @@ const processCvFile = async (file: File) => {
     return;
   }
 
-  const result = await uploadStore.uploadFile(file, "cv");
+  const userId = session.value?.user?.id || "anonymous";
+  const result = await uploadStore.uploadFile(file, "cv", userId);
 
   if (result.success) {
     cvUrl.value = result.url;
