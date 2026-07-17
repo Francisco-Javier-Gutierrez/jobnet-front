@@ -824,8 +824,8 @@ const handleQuickAddSkill = async () => {
   const queryName = skillSearchQuery.value.trim();
   if (!queryName) return;
 
-  // 1. Suggest skill to the global master catalog (moderator queue)
-  await catalogStore.suggestSkill(queryName);
+  // 1. Add directly to the master catalog as an active item
+  await catalogStore.addItem(queryName, "Habilidad");
 
   // 2. Add locally to active vacancy skills list
   addSkill(queryName);
