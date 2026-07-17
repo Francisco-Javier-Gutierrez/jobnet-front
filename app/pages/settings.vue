@@ -866,10 +866,12 @@ const saveSettings = async () => {
         localStorage.removeItem("jobnet_draft_settings");
         hasDraft.value = false;
       }
-      successMessage.value = "¡Configuración de candidato guardada con éxito!";
+      successMessage.value =
+        "¡Configuración de candidato guardada con éxito! Redirigiendo a tu perfil...";
       setTimeout(() => {
         successMessage.value = "";
-      }, 4000);
+        router.push(`/candidate/${session.value?.user?.id}`);
+      }, 1500);
     }
   } catch (e) {
     console.error("Error updating settings:", e);
