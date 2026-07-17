@@ -2,7 +2,7 @@
   <div class="max-w-4xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-on-background mb-2">
-        Catálogo Maestro (Administrador)
+        Catálogo Maestro
       </h1>
       <p class="text-on-surface-variant text-sm">
         Gestiona y expande de forma global la lista maestra de habilidades
@@ -170,97 +170,126 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-outline-variant/30 text-sm">
-          <tr v-if="paginatedItems.length === 0">
-            <td
-              colspan="4"
-              class="py-8 text-center text-on-surface-variant text-xs"
+          <!-- Skeleton Loading Rows -->
+          <template v-if="loading">
+            <tr v-for="i in 5" :key="i" class="animate-pulse">
+              <td class="py-4 px-6">
+                <div class="h-4 w-40 bg-outline/20 rounded animate-pulse"></div>
+              </td>
+              <td class="py-4 px-6 hidden sm:table-cell">
+                <div
+                  class="h-5 w-20 bg-outline/20 rounded-full animate-pulse"
+                ></div>
+              </td>
+              <td class="py-4 px-6 hidden md:table-cell font-mono">
+                <div class="h-4 w-28 bg-outline/15 rounded animate-pulse"></div>
+              </td>
+              <td class="py-4 px-6 text-right flex justify-end gap-2">
+                <div
+                  class="h-7 w-12 bg-outline/20 rounded-lg animate-pulse"
+                ></div>
+                <div
+                  class="h-7 w-12 bg-outline/20 rounded-lg animate-pulse"
+                ></div>
+              </td>
+            </tr>
+          </template>
+
+          <template v-else>
+            <tr v-if="paginatedItems.length === 0">
+              <td
+                colspan="4"
+                class="py-8 text-center text-on-surface-variant text-xs"
+              >
+                No hay elementos registrados en esta categoría.
+              </td>
+            </tr>
+            <tr
+              v-for="item in paginatedItems"
+              :key="item.id"
+              class="hover:bg-surface-container-low/10 transition-colors"
             >
-              No hay elementos registrados en esta categoría.
-            </td>
-          </tr>
-          <tr
-            v-for="item in paginatedItems"
-            :key="item.id"
-            class="hover:bg-surface-container-low/10 transition-colors"
-          >
-            <!-- Name (and Inline Editing Field) -->
-            <td class="py-4 px-6 font-medium text-on-background">
-              <div
-                v-if="editingId === item.id"
-                class="flex items-center gap-2 max-w-sm"
-              >
-                <input
-                  v-model="editingName"
-                  type="text"
-                  class="flex-grow bg-surface border border-primary focus:border-primary rounded-lg px-3 py-1.5 text-sm text-on-background outline-none transition"
-                  @keyup.enter="handleSaveEdit(item.id)"
-                  @keyup.esc="cancelEdit"
-                />
-              </div>
-              <span v-else>{{ item.name }}</span>
-            </td>
+              <!-- Name (and Inline Editing Field) -->
+              <td class="py-4 px-6 font-medium text-on-background">
+                <div
+                  v-if="editingId === item.id"
+                  class="flex items-center gap-2 max-w-sm"
+                >
+                  <input
+                    v-model="editingName"
+                    type="text"
+                    class="flex-grow bg-surface border border-primary focus:border-primary rounded-lg px-3 py-1.5 text-sm text-on-background outline-none transition"
+                    @keyup.enter="handleSaveEdit(item.id)"
+                    @keyup.esc="cancelEdit"
+                  />
+                </div>
+                <span v-else>{{ item.name }}</span>
+              </td>
 
-            <!-- Category -->
-            <td class="py-4 px-6 hidden sm:table-cell">
-              <span
-                :class="
-                  item.category === 'Habilidad'
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-secondary/10 text-secondary'
-                "
-                class="px-2.5 py-0.5 rounded-full text-xs font-bold"
-              >
-                {{ item.category }}
-              </span>
-            </td>
+              <!-- Category -->
+              <td class="py-4 px-6 hidden sm:table-cell">
+                <span
+                  :class="
+                    item.category === 'Habilidad'
+                      ? 'bg-primary/10 text-primary'
+                      : 'bg-secondary/10 text-secondary'
+                  "
+                  class="px-2.5 py-0.5 rounded-full text-xs font-bold"
+                >
+                  {{ item.category }}
+                </span>
+              </td>
 
-            <!-- Registration Date -->
-            <td
-              class="py-4 px-6 text-on-surface-variant text-xs hidden md:table-cell font-mono"
-            >
-              {{ formatDate(item.createdAt) }}
-            </td>
-
-            <!-- Actions (Edit/Delete/Save/Cancel) -->
-            <td class="py-4 px-6 text-right">
-              <div
-                v-if="editingId === item.id"
-                class="flex items-center justify-end gap-2"
+              <!-- Registration Date -->
+              <td
+                class="py-4 px-6 text-on-surface-variant text-xs hidden md:table-cell font-mono"
               >
-                <button
-                  @click="handleSaveEdit(item.id)"
-                  class="bg-secondary text-white hover:bg-[#005236] transition px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm"
-                  title="Guardar cambios"
+                {{ formatDate(item.createdAt) }}
+              </td>
+
+              <!-- Actions (Edit/Delete/Save/Cancel) -->
+              <td class="py-4 px-6 text-right">
+                <div
+                  v-if="editingId === item.id"
+                  class="flex items-center justify-end gap-2"
                 >
-                  <span class="material-symbols-outlined text-sm">done</span>
-                  Guardar
-                </button>
-                <button
-                  @click="cancelEdit"
-                  class="bg-surface border border-outline-variant hover:bg-surface-container-high text-on-surface-variant transition px-3 py-1.5 rounded-lg text-xs font-semibold"
-                  title="Cancelar edición"
-                >
-                  Cancelar
-                </button>
-              </div>
-              <div v-else class="flex items-center justify-end gap-2">
-                <button
-                  @click="startEdit(item)"
-                  class="text-primary hover:bg-primary/5 transition p-1.5 rounded-lg flex items-center"
-                  title="Editar registro"
-                >
-                  <span class="material-symbols-outlined text-sm">edit</span>
-                </button>
-                <button
-                  @click="handleDeleteItem(item.id)"
-                  class="text-rose-600 hover:bg-rose-50/50 transition p-1.5 rounded-lg flex items-center"
-                  title="Eliminar registro"
-                >
-                  <span class="material-symbols-outlined text-sm">delete</span>
-                </button>
-              </div>
-            </td>
-          </tr>
+                  <button
+                    @click="handleSaveEdit(item.id)"
+                    class="bg-secondary text-white hover:bg-[#005236] transition px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm"
+                    title="Guardar cambios"
+                  >
+                    <span class="material-symbols-outlined text-sm">done</span>
+                    Guardar
+                  </button>
+                  <button
+                    @click="cancelEdit"
+                    class="bg-surface border border-outline-variant hover:bg-surface-container-high text-on-surface-variant transition px-3 py-1.5 rounded-lg text-xs font-semibold"
+                    title="Cancelar edición"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+                <div v-else class="flex items-center justify-end gap-2">
+                  <button
+                    @click="startEdit(item)"
+                    class="text-primary hover:bg-primary/5 transition p-1.5 rounded-lg flex items-center"
+                    title="Editar registro"
+                  >
+                    <span class="material-symbols-outlined text-sm">edit</span>
+                  </button>
+                  <button
+                    @click="handleDeleteItem(item.id)"
+                    class="text-rose-600 hover:bg-rose-50/50 transition p-1.5 rounded-lg flex items-center"
+                    title="Eliminar registro"
+                  >
+                    <span class="material-symbols-outlined text-sm"
+                      >delete</span
+                    >
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
 
@@ -314,12 +343,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 
-// Use layout admin
-definePageMeta({
-  layout: "admin",
-});
 import { useCatalogStore, type CatalogItem } from "~/stores/catalog";
 
 useSeoMeta({
@@ -329,6 +354,13 @@ useSeoMeta({
 });
 
 const catalog = useCatalogStore();
+const loading = ref(true);
+
+onMounted(async () => {
+  loading.value = true;
+  await catalog.fetchCatalog();
+  loading.value = false;
+});
 
 // Setup UI Tab state
 const activeCategoryTab = ref<"Habilidad" | "Sector">("Habilidad");
@@ -390,11 +422,14 @@ const formatDate = (isoString: string) => {
 };
 
 // RF-10: Expansión - Creación de Elemento
-const handleCreateItem = () => {
+const handleCreateItem = async () => {
   globalSuccess.value = "";
   globalError.value = "";
 
-  const result = catalog.addItem(newItemName.value, newItemCategory.value);
+  const result = await catalog.addItem(
+    newItemName.value,
+    newItemCategory.value,
+  );
   if (result.success) {
     globalSuccess.value = `¡"${newItemName.value}" se agregó con éxito a ${newItemCategory.value === "Habilidad" ? "habilidades" : "sectores"}!`;
     activeCategoryTab.value = newItemCategory.value; // Switch to the category we just added to see it
@@ -419,11 +454,11 @@ const cancelEdit = () => {
 };
 
 // RF-11: Modificación - Guardar edición inline
-const handleSaveEdit = (id: string) => {
+const handleSaveEdit = async (id: string) => {
   globalSuccess.value = "";
   globalError.value = "";
 
-  const result = catalog.updateItem(id, editingName.value);
+  const result = await catalog.updateItem(id, editingName.value);
   if (result.success) {
     globalSuccess.value = "Elemento actualizado correctamente.";
     editingId.value = null;
@@ -434,7 +469,7 @@ const handleSaveEdit = (id: string) => {
 };
 
 // RF-11: Modificación - Eliminar Elemento
-const handleDeleteItem = (id: string) => {
+const handleDeleteItem = async (id: string) => {
   globalSuccess.value = "";
   globalError.value = "";
 
@@ -443,7 +478,7 @@ const handleDeleteItem = (id: string) => {
       "¿Estás seguro de que deseas eliminar este registro del catálogo global?",
     )
   ) {
-    const success = catalog.deleteItem(id);
+    const success = await catalog.deleteItem(id);
     if (success) {
       globalSuccess.value = "Registro eliminado del catálogo correctamente.";
       // Adjust current page if we deleted the last item on the page

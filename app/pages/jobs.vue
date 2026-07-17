@@ -13,28 +13,59 @@
       </p>
     </div>
 
-    <!-- Loading State -->
+    <!-- Loading State (Skeleton) -->
     <div
       v-if="store.loading"
-      class="flex justify-center items-center py-20"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse"
       role="status"
       aria-label="Cargando ofertas de empleo"
       aria-live="polite"
     >
       <div
-        class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
-        aria-hidden="true"
-      ></div>
+        v-for="i in 6"
+        :key="i"
+        class="border border-outline-variant/60 rounded-2xl p-6 bg-surface-container-lowest flex flex-col justify-between h-[230px]"
+      >
+        <div>
+          <!-- Tags Skeleton -->
+          <div class="flex items-center gap-2 mb-4">
+            <div class="h-6 w-14 bg-outline/20 rounded-full"></div>
+            <div class="h-6 w-16 bg-outline/20 rounded-full"></div>
+          </div>
+          <!-- Title Skeleton -->
+          <div class="h-6 w-3/4 bg-outline/20 rounded-lg mb-2"></div>
+          <!-- Company Skeleton -->
+          <div class="h-4 w-1/3 bg-outline/20 rounded-lg mb-4"></div>
+        </div>
+        <!-- Footer Skeleton -->
+        <div
+          class="border-t border-outline-variant/30 pt-4 mt-4 flex justify-between items-center"
+        >
+          <div class="h-3.5 w-24 bg-outline/20 rounded"></div>
+          <div class="h-3.5 w-16 bg-outline/20 rounded"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Empty State -->
     <div
       v-else-if="store.jobs.length === 0"
-      class="text-center py-20 border border-dashed border-outline-variant rounded-2xl bg-surface-container-lowest shadow-sm"
+      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm px-6"
       role="status"
     >
-      <p class="text-on-surface-variant">
-        No se encontraron empleos disponibles en este momento.
+      <div
+        class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6"
+      >
+        <span class="material-symbols-outlined text-[40px] text-primary"
+          >work</span
+        >
+      </div>
+      <h2 class="text-xl font-bold text-on-background mb-2">
+        No hay vacantes disponibles
+      </h2>
+      <p class="text-on-surface-variant text-sm max-w-sm">
+        Aún no se han publicado ofertas de empleo en la plataforma. ¡Vuelve
+        pronto para explorar nuevas oportunidades!
       </p>
     </div>
 
@@ -47,7 +78,8 @@
       <div
         v-for="job in store.jobs"
         :key="job.id"
-        class="border border-outline-variant/60 rounded-2xl p-6 bg-surface-container-lowest hover:border-primary transition duration-300 flex flex-col justify-between group hover:shadow-md"
+        @click="router.push(`/jobs/${job.id}`)"
+        class="border border-outline-variant/60 rounded-2xl p-6 bg-surface-container-lowest hover:border-primary transition duration-300 flex flex-col justify-between group hover:shadow-md cursor-pointer"
         role="article"
         :aria-label="`Vacante de ${job.title} en ${job.company}`"
       >
@@ -64,11 +96,13 @@
               {{ job.modalidad || "Remoto" }}
             </span>
           </div>
-          <h2
-            class="text-lg font-bold text-on-background group-hover:text-primary transition mb-2"
-          >
-            {{ job.title }}
-          </h2>
+          <NuxtLink :to="`/jobs/${job.id}`">
+            <h2
+              class="text-lg font-bold text-on-background hover:text-primary transition mb-2 cursor-pointer"
+            >
+              {{ job.title }}
+            </h2>
+          </NuxtLink>
           <p class="text-on-surface-variant text-sm font-semibold mb-6">
             {{ job.company }}
           </p>
@@ -84,6 +118,7 @@
           </div>
           <NuxtLink
             :to="`/map?lat=${job.lat}&lng=${job.lng}`"
+            @click.stop
             class="text-primary hover:text-primary-container text-xs font-bold transition"
             :aria-label="`Ver ubicación de ${job.title} en el mapa`"
           >
@@ -97,8 +132,10 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { useJobsStore } from "../stores/jobs";
 
+const router = useRouter();
 const store = useJobsStore();
 onMounted(() => {
   store.fetchJobs();

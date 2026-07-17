@@ -203,6 +203,56 @@ export default NuxtAuthHandler({
       if (user && (user as any).error) {
         throw new Error((user as any).error);
       }
+
+      if (user && (user as any).idToken) {
+        try {
+          const payloadBase64 = (user as any).idToken.split(".")[1];
+          const payload = JSON.parse(
+            Buffer.from(payloadBase64, "base64").toString("ascii"),
+          );
+          const userId = payload.sub;
+
+          const config = useRuntimeConfig();
+          const profile = await $fetch<any>(
+            `${config.public.apiUrl}/profile/${userId}`,
+          ).catch(() => null);
+
+          if (profile) {
+            if (profile.estadoCuenta === "SUSPENDIDA") {
+              throw new Error(
+                "Su cuenta ha sido suspendida definitivamente por infracción.",
+              );
+            }
+            if (profile.estadoCuenta === "SUSPENDIDA_TEMPORAL") {
+              const fin = profile.fechaFinSuspension
+                ? new Date(profile.fechaFinSuspension)
+                : null;
+              if (fin && new Date() < fin) {
+                const diasRestantes = Math.ceil(
+                  (fin.getTime() - new Date().getTime()) / (1000 * 3600 * 24),
+                );
+                throw new Error(
+                  `Su cuenta está suspendida temporalmente. Restan ${diasRestantes} días.`,
+                );
+              } else {
+                // Suspension expired, automatically restore profile status to ACTIVO!
+                await $fetch(`${config.public.apiUrl}/profile/${userId}`, {
+                  method: "POST",
+                  body: {
+                    estadoCuenta: "ACTIVO",
+                    fechaFinSuspension: null,
+                  },
+                }).catch(() => null);
+              }
+            }
+          }
+        } catch (e: any) {
+          if (e.message && e.message.includes("suspendida")) {
+            throw e;
+          }
+          console.error("Error checking account suspension on login:", e);
+        }
+      }
       return true;
     },
     async redirect({ url, baseUrl }) {
@@ -228,7 +278,7 @@ export default NuxtAuthHandler({
         token.accessToken = account.access_token;
       }
 
-      // If we have an idToken, decode it to extract Cognito sub (id) and roles (groups)
+      // If we have an idToken, decode it to extract Cognito sub (id), name and roles (groups)
       if (token.idToken) {
         try {
           const payloadBase64 = (token.idToken as string).split(".")[1];
@@ -239,6 +289,11 @@ export default NuxtAuthHandler({
             const payload = JSON.parse(payloadJson);
 
             token.id = payload.sub; // Real Cognito UUID sub
+
+            // Extract fullname/company name registered in Cognito
+            if (payload.name) {
+              token.name = payload.name;
+            }
 
             const groups = payload["cognito:groups"] || [];
             if (groups.includes("EMPRESA")) {
@@ -261,6 +316,7 @@ export default NuxtAuthHandler({
         token.idToken = (user as any).idToken || token.idToken;
         token.accessToken = (user as any).accessToken || token.accessToken;
         token.refreshToken = (user as any).refreshToken;
+        token.name = user.name || token.name;
       }
       return token;
     },
@@ -270,9 +326,10 @@ export default NuxtAuthHandler({
         (session as any).accessToken = token.accessToken;
         (session as any).refreshToken = token.refreshToken;
 
-        // Expose id and role to the frontend useAuth() session user
+        // Expose id, name and role to the frontend useAuth() session user
         (session.user as any).id = token.id;
         (session.user as any).tipoUsuario = token.tipoUsuario;
+        session.user.name = token.name;
       }
       return session;
     },

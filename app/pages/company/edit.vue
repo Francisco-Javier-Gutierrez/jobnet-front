@@ -69,6 +69,27 @@
       {{ errorMessage }}
     </div>
 
+    <!-- Draft Restore Notification Banner -->
+    <div
+      v-if="hasDraft"
+      class="mb-4 bg-primary/10 border border-primary/20 text-on-surface text-xs p-3 rounded-xl flex items-center justify-between"
+    >
+      <span class="flex items-center gap-1.5 font-medium">
+        <span class="material-symbols-outlined text-base text-primary"
+          >info</span
+        >
+        Se ha restaurado un borrador con cambios sin guardar del perfil de la
+        empresa.
+      </span>
+      <button
+        type="button"
+        @click="discardDraft"
+        class="text-rose-500 hover:text-rose-600 font-bold transition"
+      >
+        Descartar
+      </button>
+    </div>
+
     <!-- Section 1: Identidad Corporativa -->
     <section v-show="activeTab === 'identidad'" class="flex flex-col gap-md">
       <div class="card-level-1">
@@ -198,9 +219,21 @@
 
           <!-- Leaflet Map Container -->
           <div class="flex flex-col gap-xs">
-            <label class="font-label-md text-label-md text-on-surface"
-              >Ubicación en el mapa</label
-            >
+            <div class="flex items-center justify-between">
+              <label class="font-label-md text-label-md text-on-surface"
+                >Ubicación en el mapa</label
+              >
+              <button
+                type="button"
+                @click="useCurrentLocation"
+                class="text-xs font-bold text-primary hover:underline flex items-center gap-1 transition"
+              >
+                <span class="material-symbols-outlined text-sm"
+                  >my_location</span
+                >
+                Usar ubicación actual
+              </button>
+            </div>
             <div
               class="h-[250px] w-full rounded-xl overflow-hidden border border-outline-variant/60 relative"
               id="map-container"
@@ -428,7 +461,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, watch } from "vue";
+import { useUploadStore } from "../../stores/upload";
 import { useRouter } from "vue-router";
 
 useSeoMeta({
@@ -450,6 +484,7 @@ const router = useRouter();
 const config = useRuntimeConfig();
 const { data: sessionData, status } = useAuth();
 
+const uploadStore = useUploadStore();
 const activeTab = ref("identidad");
 
 const tabItems = [
@@ -463,6 +498,100 @@ const tabItems = [
 const companyId = ref("");
 const nombreComercial = ref("");
 const sector = ref("Tecnología y Software");
+
+// Draft State
+const hasDraft = ref(false);
+let isRestoring = false;
+
+const saveDraft = () => {
+  if (process.client && !isRestoring) {
+    if (
+      nombreComercial.value ||
+      descripcion.value ||
+      website.value ||
+      linkedin.value ||
+      taxId.value
+    ) {
+      localStorage.setItem(
+        "jobnet_draft_company_edit",
+        JSON.stringify({
+          nombreComercial: nombreComercial.value,
+          sector: sector.value,
+          descripcion: descripcion.value,
+          latitude: latitude.value,
+          longitude: longitude.value,
+          website: website.value,
+          linkedin: linkedin.value,
+          taxId: taxId.value,
+          fotoPerfil: fotoPerfil.value,
+        }),
+      );
+    }
+  }
+};
+
+const loadDraft = () => {
+  if (process.client) {
+    const saved = localStorage.getItem("jobnet_draft_company_edit");
+    if (saved) {
+      try {
+        const draft = JSON.parse(saved);
+        if (
+          draft.nombreComercial ||
+          draft.descripcion ||
+          draft.website ||
+          draft.taxId
+        ) {
+          isRestoring = true;
+          nombreComercial.value = draft.nombreComercial || "";
+          sector.value = draft.sector || "Tecnología y Software";
+          descripcion.value = draft.descripcion || "";
+          latitude.value = draft.latitude || 19.4326;
+          longitude.value = draft.longitude || -99.1332;
+          website.value = draft.website || "";
+          linkedin.value = draft.linkedin || "";
+          taxId.value = draft.taxId || "";
+          fotoPerfil.value = draft.fotoPerfil || "";
+          hasDraft.value = true;
+          isRestoring = false;
+          if (map && marker) {
+            map.setView([latitude.value, longitude.value], 13);
+            marker.setLatLng([latitude.value, longitude.value]);
+          }
+        }
+      } catch (e) {
+        console.error("Error loading company edit draft:", e);
+      }
+    }
+  }
+};
+
+const discardDraft = () => {
+  if (process.client) {
+    localStorage.removeItem("jobnet_draft_company_edit");
+    hasDraft.value = false;
+    fetchCompanyProfile();
+  }
+};
+
+// Auto-save watch
+watch(
+  [
+    nombreComercial,
+    sector,
+    descripcion,
+    latitude,
+    longitude,
+    website,
+    linkedin,
+    taxId,
+    fotoPerfil,
+  ],
+  () => {
+    saveDraft();
+  },
+  { deep: true },
+);
 const descripcion = ref("");
 const latitude = ref(19.4326);
 const longitude = ref(-99.1332);
@@ -540,14 +669,35 @@ const fetchCompanyProfile = async () => {
   }
 };
 
+const useCurrentLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        latitude.value = Number(position.coords.latitude.toFixed(6));
+        longitude.value = Number(position.coords.longitude.toFixed(6));
+        if (map && marker) {
+          map.setView([latitude.value, longitude.value], 13);
+          marker.setLatLng([latitude.value, longitude.value]);
+        }
+      },
+      (error) => {
+        console.error("Error getting current location:", error);
+      },
+    );
+  } else {
+    console.error("Geolocation is not supported by this browser.");
+  }
+};
+
 onMounted(async () => {
   await fetchCompanyProfile();
+  loadDraft();
 
   if (process.client) {
     const L = await import("leaflet");
 
     // Initialize map centered at current coordinates
-    map = L.map("company-leaflet-map").setView(
+    map = L.map("company-leaflet-map", { attributionControl: false }).setView(
       [latitude.value, longitude.value],
       13,
     );
@@ -556,7 +706,7 @@ onMounted(async () => {
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
       {
-        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+        attribution: "",
       },
     ).addTo(map);
 
@@ -595,30 +745,39 @@ const handleSave = async () => {
   errorMessage.value = "";
 
   try {
-    await $fetch(`${config.public.apiUrl}/profile/${companyId.value}`, {
-      method: "POST",
-      body: {
-        nombre: nombreComercial.value,
-        sector: sector.value,
-        biografia: descripcion.value,
-        fotoPerfil: fotoPerfil.value,
-        ubicacion: {
-          lat: latitude.value,
-          lng: longitude.value,
-        },
-        taxId: taxId.value,
-        enlacesWeb: {
-          website: website.value,
-          linkedin: linkedin.value,
+    const response = await $fetch(
+      `${config.public.apiUrl}/profile/${companyId.value}`,
+      {
+        method: "POST",
+        body: {
+          nombre: nombreComercial.value,
+          sector: sector.value,
+          biografia: descripcion.value,
+          fotoPerfil: fotoPerfil.value,
+          ubicacion: {
+            lat: latitude.value,
+            lng: longitude.value,
+          },
+          taxId: taxId.value,
+          enlacesWeb: {
+            website: website.value,
+            linkedin: linkedin.value,
+          },
         },
       },
-    });
+    );
 
-    successMessage.value =
-      "¡Configuración guardada exitosamente en la base de datos!";
-    setTimeout(() => {
-      successMessage.value = "";
-    }, 4000);
+    if (response) {
+      if (process.client) {
+        localStorage.removeItem("jobnet_draft_company_edit");
+        hasDraft.value = false;
+      }
+      successMessage.value =
+        "¡Configuración guardada exitosamente en la base de datos!";
+      setTimeout(() => {
+        successMessage.value = "";
+      }, 4000);
+    }
   } catch (error: any) {
     console.error("Error saving company configuration:", error);
     errorMessage.value = "Error al intentar guardar el perfil corporativo.";
@@ -627,7 +786,7 @@ const handleSave = async () => {
   }
 };
 
-// S3 Upload Logo logic
+// S3 Upload Logo logic (via upload store)
 const handleLogoUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
@@ -637,34 +796,20 @@ const handleLogoUpload = async (event: Event) => {
   successMessage.value = "";
   errorMessage.value = "";
 
-  try {
-    // 1. Get presigned upload URL from serverless API
-    const response = await $fetch<any>(`${config.public.apiUrl}/upload-url`);
-    if (!response.url) throw new Error("No presigned URL returned from API");
+  const result = await uploadStore.uploadFile(file, "logos", companyId.value);
 
-    // 2. Upload file directly to S3
-    await $fetch(response.url, {
-      method: "PUT",
-      body: file,
-      headers: {
-        "Content-Type": file.type,
-      },
-    });
-
-    // 3. Construct public S3 URL (using key)
-    const publicUrl = response.url.split("?")[0];
-    fotoPerfil.value = publicUrl;
-
+  if (result.success) {
+    fotoPerfil.value = result.url;
     successMessage.value = "¡Logotipo subido exitosamente!";
     setTimeout(() => {
       successMessage.value = "";
     }, 3000);
-  } catch (error: any) {
-    console.error("Error uploading logo:", error);
-    errorMessage.value = "Error al intentar subir el logotipo corporativo.";
-  } finally {
-    uploadingLogo.value = false;
+  } else {
+    errorMessage.value =
+      result.error || "Error al intentar subir el logotipo corporativo.";
   }
+
+  uploadingLogo.value = false;
 };
 
 const handlePdfSelect = (event: Event) => {
@@ -692,29 +837,28 @@ const handleVerificationRequest = async () => {
   successMessage.value = "";
   errorMessage.value = "";
 
+  // 1. Upload PDF to S3 via upload store
+  const result = await uploadStore.uploadFile(
+    pdfFile.value,
+    "verification",
+    companyId.value,
+  );
+
+  if (!result.success) {
+    errorMessage.value =
+      result.error || "Ocurrió un error al cargar la constancia fiscal.";
+    submittingVerification.value = false;
+    return;
+  }
+
   try {
-    // 1. Get presigned upload URL from backend
-    const response = await $fetch<any>(`${config.public.apiUrl}/upload-url`);
-    if (!response.url) throw new Error("Failed to get upload URL");
-
-    // 2. Upload PDF file directly to S3
-    await $fetch(response.url, {
-      method: "PUT",
-      body: pdfFile.value,
-      headers: {
-        "Content-Type": "application/pdf",
-      },
-    });
-
-    const docUrl = response.url.split("?")[0];
-
-    // 3. Notify verification request (updates taxId/verified request)
+    // 2. Notify verification request (updates taxId/verified request)
     await $fetch(`${config.public.apiUrl}/profile/${companyId.value}`, {
       method: "POST",
       body: {
         taxId: taxId.value,
         organizacionVerificada: false, // Request pending
-        documentoVerificacion: docUrl,
+        documentoVerificacion: result.url,
       },
     });
 

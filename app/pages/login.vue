@@ -17,7 +17,7 @@
             class="inline-block mb-4"
             aria-label="Volver al inicio"
           >
-            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-16 w-auto" />
+            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-24 w-auto" />
           </NuxtLink>
           <h1 class="text-2xl font-bold tracking-tight text-on-background mt-2">
             Iniciar sesión
@@ -141,7 +141,7 @@ const loading = ref(false);
 const errorMessage = ref("");
 
 const router = useRouter();
-const { signIn } = useAuth();
+const { signIn, data: session } = useAuth();
 
 const handleLogin = async () => {
   loading.value = true;
@@ -184,8 +184,18 @@ const handleLogin = async () => {
           : result.error;
       }
     } else {
-      // Success, route to dashboard or home
-      router.push("/");
+      // Success, route to dashboard or home based on role
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      const userRole = (session.value?.user as any)?.tipoUsuario;
+      if (userRole?.toUpperCase() === "EMPRESA") {
+        router.push("/dashboard");
+      } else if (userRole?.toUpperCase() === "ADMIN") {
+        router.push("/admin/organizations");
+      } else if (userRole?.toUpperCase() === "MODERATOR") {
+        router.push("/mod/incidents");
+      } else {
+        router.push("/");
+      }
     }
   } catch (error: any) {
     errorMessage.value = error.message || "Ocurrió un error inesperado";

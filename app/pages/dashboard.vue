@@ -65,10 +65,19 @@
             >
           </div>
 
-          <div v-if="loading" class="flex justify-center py-10">
+          <!-- Loading State (Skeleton) -->
+          <div v-if="loading" class="flex flex-col gap-4 animate-pulse">
             <div
-              class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"
-            ></div>
+              v-for="i in 3"
+              :key="i"
+              class="flex items-center justify-between p-4 border border-outline-variant/60 rounded-xl bg-surface-container-low/20"
+            >
+              <div class="flex-grow space-y-2">
+                <div class="h-4 w-1/3 bg-outline/20 rounded-lg"></div>
+                <div class="h-3 w-1/4 bg-outline/10 rounded"></div>
+              </div>
+              <div class="h-8 w-24 bg-outline/20 rounded-lg"></div>
+            </div>
           </div>
 
           <div v-else-if="myVacancies.length === 0" class="text-center py-10">

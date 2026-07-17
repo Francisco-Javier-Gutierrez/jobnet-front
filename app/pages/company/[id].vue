@@ -1,5 +1,38 @@
 <template>
+  <!-- Loading State -->
   <main
+    v-if="loading"
+    class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16 space-y-6 animate-pulse"
+  >
+    <!-- Banner Skeleton -->
+    <div
+      class="relative bg-outline/10 h-48 md:h-64 rounded-b-xl md:rounded-xl overflow-hidden mb-16"
+    >
+      <div
+        class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-24 h-24 bg-surface rounded-xl border-4 border-outline/15 z-10 flex items-center justify-center p-2"
+      >
+        <div class="w-full h-full bg-outline/20 rounded-lg"></div>
+      </div>
+    </div>
+
+    <!-- Company Identity Skeleton -->
+    <div class="flex flex-col items-center text-center mt-2 mb-8">
+      <div class="h-8 w-64 bg-outline/20 rounded-lg mb-2"></div>
+      <div class="h-6 w-36 bg-outline/20 rounded-full mb-4"></div>
+      <div class="h-4 w-48 bg-outline/20 rounded mb-6"></div>
+
+      <!-- About Skeleton -->
+      <div class="w-full max-w-lg space-y-2">
+        <div class="h-4 w-full bg-outline/10 rounded"></div>
+        <div class="h-4 w-5/6 bg-outline/10 rounded"></div>
+        <div class="h-4 w-2/3 bg-outline/10 rounded"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Real Content -->
+  <main
+    v-else
     class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16"
   >
     <!-- Header / Banner Section -->
@@ -179,7 +212,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
@@ -191,7 +224,7 @@ const config = useRuntimeConfig();
 const isOwner = computed(() => data.value?.user?.id === route.params.id);
 
 // Fetch profile dynamically from deployed backend API
-const { data: profileData } = await useAsyncData(
+const { data: profileData, pending: profilePending } = useLazyAsyncData(
   `company-profile-${companyId}`,
   () =>
     $fetch(`${config.public.apiUrl}/profile/${companyId}`)
@@ -200,11 +233,15 @@ const { data: profileData } = await useAsyncData(
 );
 
 // Fetch all jobs from the backend API to filter vacancies for this company
-const { data: jobsData } = await useAsyncData(`company-jobs-${companyId}`, () =>
-  $fetch(`${config.public.apiUrl}/jobs`)
-    .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-    .catch(() => []),
+const { data: jobsData, pending: jobsPending } = useLazyAsyncData(
+  `company-jobs-${companyId}`,
+  () =>
+    $fetch(`${config.public.apiUrl}/jobs`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => []),
 );
+
+const loading = computed(() => profilePending.value || jobsPending.value);
 
 const company = ref({
   id: companyId,
@@ -220,43 +257,53 @@ const company = ref({
   vacancies: [] as any[],
 });
 
-// If profile exists in DynamoDB, apply real details
-if (profileData.value) {
-  const p = profileData.value as any;
-  company.value.name = p.nombre || p.name || "Sin Nombre";
-  company.value.logo =
-    p.fotoPerfil ||
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuDSzjpaT0Ede7QLy3zl1zft4f4V9csQyhGIsAyNHyyg4lmk54ha7yMkfDw5hbVoBOME8PTGFax9iKrHHZjAmqwMRA4i1UpqhgebzJGIkwq1DS6PKK1G5jxCNSxxPjHi_ezhM-ik2qaFtqa9JYp6ruPrCozHQM4UvsZpk2HUAg07aFTdAk58De2NTtSjHaO49ddhrtHPFA-trQm7WZbFMHwS-NZ7jyJ7ZrGaZD9yxWogET6EbwJ_H8Tk0g";
-  company.value.sector = p.sector || "Sector no especificado";
-  company.value.about = p.biografia || "Sin descripción corporativa.";
-  company.value.location =
-    typeof p.ubicacion === "string"
-      ? p.ubicacion
-      : p.ubicacion?.city || p.ubicacion?.pais || "Ubicación no especificada";
-  company.value.verified =
-    p.organizacionVerificada !== undefined ? p.organizacionVerificada : false;
-  company.value.website = p.enlacesWeb?.website || p.website || "";
-  company.value.websiteDisplay =
-    company.value.website
-      .replace("https://", "")
-      .replace("http://", "")
-      .split("/")[0] || "Sitio web";
+// If profile exists in DynamoDB, apply real details reactively
+watch(
+  [profileData, jobsData],
+  () => {
+    if (profileData.value) {
+      const p = profileData.value as any;
+      company.value.name = p.nombre || p.name || "Sin Nombre";
+      company.value.logo =
+        p.fotoPerfil ||
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuDSzjpaT0Ede7QLy3zl1zft4f4V9csQyhGIsAyNHyyg4lmk54ha7yMkfDw5hbVoBOME8PTGFax9iKrHHZjAmqwMRA4i1UpqhgebzJGIkwq1DS6PKK1G5jxCNSxxPjHi_ezhM-ik2qaFtqa9JYp6ruPrCozHQM4UvsZpk2HUAg07aFTdAk58De2NTtSjHaO49ddhrtHPFA-trQm7WZbFMHwS-NZ7jyJ7ZrGaZD9yxWogET6EbwJ_H8Tk0g";
+      company.value.sector = p.sector || "Sector no especificado";
+      company.value.about = p.biografia || "Sin descripción corporativa.";
+      company.value.location =
+        typeof p.ubicacion === "string"
+          ? p.ubicacion
+          : p.ubicacion?.city ||
+            p.ubicacion?.pais ||
+            "Ubicación no especificada";
+      company.value.verified =
+        p.organizacionVerificada !== undefined
+          ? p.organizacionVerificada
+          : false;
+      company.value.website = p.enlacesWeb?.website || p.website || "";
+      company.value.websiteDisplay =
+        company.value.website
+          .replace("https://", "")
+          .replace("http://", "")
+          .split("/")[0] || "Sitio web";
 
-  // Filter vacancies matching this company ID from DB
-  const rawJobs = (jobsData.value || []) as any[];
-  company.value.vacancies = rawJobs
-    .filter((j) => j.empresaUuid === companyId)
-    .map((j) => ({
-      id: j.id,
-      title: j.title || "Vacante",
-      type: j.modalidad || "Presencial",
-      schedule: "Tiempo Completo",
-      salary:
-        typeof j.salario === "number"
-          ? `$${(j.salario / 1000).toFixed(0)}k MXN`
-          : j.salario || "No especificado",
-    }));
-}
+      // Filter vacancies matching this company ID from DB
+      const rawJobs = (jobsData.value || []) as any[];
+      company.value.vacancies = rawJobs
+        .filter((j) => j.empresaUuid === companyId)
+        .map((j) => ({
+          id: j.id,
+          title: j.title || "Vacante",
+          type: j.modalidad || "Presencial",
+          schedule: "Tiempo Completo",
+          salary:
+            typeof j.salario === "number"
+              ? `$${(j.salario / 1000).toFixed(0)}k MXN`
+              : j.salario || "No especificado",
+        }));
+    }
+  },
+  { immediate: true },
+);
 
 useSeoMeta({
   title: `${company.value.name} - Perfil de Empresa`,

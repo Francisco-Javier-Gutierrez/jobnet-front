@@ -12,8 +12,24 @@ const handleRedirect = () => {
   }
 
   if (status.value === "authenticated") {
-    const role = data.value?.user?.tipoUsuario;
-    const id = data.value?.user?.id;
+    const user = data.value?.user;
+
+    if (!user) {
+      // No user data available — redirect to login
+      router.replace("/login");
+      return;
+    }
+
+    // Default to 'CANDIDATO' if tipoUsuario is not set (users without Cognito groups)
+    const role = (user as any).tipoUsuario || "CANDIDATO";
+    // Use Cognito sub as primary ID, fall back to email
+    const id = (user as any).id || user.email;
+
+    if (!id) {
+      // Cannot determine user identity at all
+      router.replace("/login");
+      return;
+    }
 
     if (role === "CANDIDATO") {
       router.replace(`/candidate/${id}`);

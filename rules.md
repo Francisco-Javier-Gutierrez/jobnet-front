@@ -101,3 +101,15 @@ Para asegurar el correcto funcionamiento del registro e inicio de sesión integr
 
 - El frontend lee las credenciales del pool y el cliente del archivo local `.env`.
 - Al realizar cambios en la infraestructura de AWS con Terraform, se deben actualizar de inmediato las variables `NUXT_PUBLIC_COGNITO_USER_POOL_ID` y `NUXT_PUBLIC_COGNITO_CLIENT_ID` tanto en local como en los parámetros del pipeline de despliegue.
+
+---
+
+## 5. Diseño y Skeleton Loaders (UI/UX)
+
+Para garantizar una experiencia de usuario premium y fluida, se deben cumplir las siguientes directrices de diseño visual en el frontend:
+
+### A. Estados de Carga Asíncronos
+
+- **Carga de Datos de Backend**: En cualquier vista o componente que realice una petición HTTP al backend (mediante `$fetch`, `useAsyncData`, `useLazyAsyncData`, etc.) para pintar listas, grillas, tablas o detalles de perfil, **está estrictamente prohibido dejar la pantalla en blanco o usar exclusivamente un spinner de carga genérico** en la sección principal del contenido.
+- **Implementación de Skeleton Loaders**: Se debe diseñar y renderizar un marcador visual pulsante (`animate-pulse`) que imite la estructura exacta del contenido real que se va a cargar (por ejemplo, tarjetas de vacantes, filas de tablas, avatares, o bloques de texto del perfil).
+- **Carga No Bloqueante (Lazy Loading)**: Evita usar `await` de manera bloqueante en la raíz del bloque `<script setup>` si eso va a detener el renderizado inicial de la página o layout. Usa `useLazyAsyncData` o inicializaciones asíncronas y controla la visibilidad del esqueleto usando un flag reactivo `loading`.

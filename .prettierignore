@@ -1,0 +1,12 @@
+# Ignore git and node modules
+.git
+node_modules
+.nuxt
+.output
+dist
+coverage
+terraform
+.github/workflows/*.yml
+*.yml
+*.yaml
+package-lock.json

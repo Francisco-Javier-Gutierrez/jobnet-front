@@ -56,14 +56,34 @@ onMounted(async () => {
       : -99.1332;
     const zoom = route.query.lat ? 14 : 12;
 
-    map = L.map("leaflet-map").setView([initialLat, initialLng], zoom);
+    map = L.map("leaflet-map", { attributionControl: false }).setView(
+      [initialLat, initialLng],
+      zoom,
+    );
 
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
-        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+        attribution: "",
       },
     ).addTo(map);
+
+    // Request user location to center the map if not specified in query params
+    if (!route.query.lat && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          map.setView([lat, lng], 12);
+        },
+        (error) => {
+          console.log(
+            "Geolocation permission denied or failed:",
+            error.message,
+          );
+        },
+      );
+    }
 
     store.jobs.forEach((job) => {
       const marker = L.marker([job.lat, job.lng]).addTo(map);

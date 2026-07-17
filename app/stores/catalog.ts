@@ -9,220 +9,8 @@ export interface CatalogItem {
 
 export const useCatalogStore = defineStore("catalog", {
   state: () => ({
-    items: [
-      {
-        id: "1",
-        name: "Angular",
-        category: "Habilidad",
-        createdAt: "2026-07-01T00:00:00.000Z",
-      },
-      {
-        id: "2",
-        name: "AWS (Amazon Web Services)",
-        category: "Habilidad",
-        createdAt: "2026-07-01T00:00:00.000Z",
-      },
-      {
-        id: "3",
-        name: "Azure",
-        category: "Habilidad",
-        createdAt: "2026-07-02T00:00:00.000Z",
-      },
-      {
-        id: "4",
-        name: "CSS3 / Flexbox",
-        category: "Habilidad",
-        createdAt: "2026-07-02T00:00:00.000Z",
-      },
-      {
-        id: "5",
-        name: "Docker & Containers",
-        category: "Habilidad",
-        createdAt: "2026-07-03T00:00:00.000Z",
-      },
-      {
-        id: "6",
-        name: "Express.js",
-        category: "Habilidad",
-        createdAt: "2026-07-03T00:00:00.000Z",
-      },
-      {
-        id: "7",
-        name: "Figma UI/UX Design",
-        category: "Habilidad",
-        createdAt: "2026-07-04T00:00:00.000Z",
-      },
-      {
-        id: "8",
-        name: "Git & GitHub",
-        category: "Habilidad",
-        createdAt: "2026-07-04T00:00:00.000Z",
-      },
-      {
-        id: "9",
-        name: "Go / Golang",
-        category: "Habilidad",
-        createdAt: "2026-07-05T00:00:00.000Z",
-      },
-      {
-        id: "10",
-        name: "GraphQL API",
-        category: "Habilidad",
-        createdAt: "2026-07-05T00:00:00.000Z",
-      },
-      {
-        id: "11",
-        name: "HTML5 Semantic Web",
-        category: "Habilidad",
-        createdAt: "2026-07-06T00:00:00.000Z",
-      },
-      {
-        id: "12",
-        name: "Java EE",
-        category: "Habilidad",
-        createdAt: "2026-07-06T00:00:00.000Z",
-      },
-      {
-        id: "13",
-        name: "JavaScript ES6+",
-        category: "Habilidad",
-        createdAt: "2026-07-07T00:00:00.000Z",
-      },
-      {
-        id: "14",
-        name: "Kubernetes Orchestration",
-        category: "Habilidad",
-        createdAt: "2026-07-07T00:00:00.000Z",
-      },
-      {
-        id: "15",
-        name: "MongoDB NoSQL",
-        category: "Habilidad",
-        createdAt: "2026-07-08T00:00:00.000Z",
-      },
-      {
-        id: "16",
-        name: "Nuxt.js 3 Framework",
-        category: "Habilidad",
-        createdAt: "2026-07-08T00:00:00.000Z",
-      },
-      {
-        id: "17",
-        name: "PostgreSQL Database",
-        category: "Habilidad",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-      {
-        id: "18",
-        name: "Python / Django",
-        category: "Habilidad",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-      {
-        id: "19",
-        name: "React & Next.js",
-        category: "Habilidad",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-      {
-        id: "20",
-        name: "Ruby on Rails",
-        category: "Habilidad",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-      {
-        id: "21",
-        name: "Rust Programming",
-        category: "Habilidad",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-      {
-        id: "22",
-        name: "TailwindCSS styling",
-        category: "Habilidad",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-      {
-        id: "23",
-        name: "TypeScript standard",
-        category: "Habilidad",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-      {
-        id: "24",
-        name: "Vue.js 3 Composition API",
-        category: "Habilidad",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-      {
-        id: "25",
-        name: "Webpack & Vite bundlers",
-        category: "Habilidad",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-
-      // Sectors
-      {
-        id: "s1",
-        name: "Tecnología y Software",
-        category: "Sector",
-        createdAt: "2026-07-01T00:00:00.000Z",
-      },
-      {
-        id: "s2",
-        name: "Finanzas y Banca",
-        category: "Sector",
-        createdAt: "2026-07-02T00:00:00.000Z",
-      },
-      {
-        id: "s3",
-        name: "Salud y Farmacéutica",
-        category: "Sector",
-        createdAt: "2026-07-03T00:00:00.000Z",
-      },
-      {
-        id: "s4",
-        name: "Educación y E-learning",
-        category: "Sector",
-        createdAt: "2026-07-04T00:00:00.000Z",
-      },
-      {
-        id: "s5",
-        name: "E-commerce y Retail",
-        category: "Sector",
-        createdAt: "2026-07-05T00:00:00.000Z",
-      },
-      {
-        id: "s6",
-        name: "Marketing y Publicidad",
-        category: "Sector",
-        createdAt: "2026-07-06T00:00:00.000Z",
-      },
-      {
-        id: "s7",
-        name: "Logística y Transporte",
-        category: "Sector",
-        createdAt: "2026-07-07T00:00:00.000Z",
-      },
-      {
-        id: "s8",
-        name: "Turismo y Hostelería",
-        category: "Sector",
-        createdAt: "2026-07-08T00:00:00.000Z",
-      },
-      {
-        id: "s9",
-        name: "Automotriz y Manufactura",
-        category: "Sector",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-      {
-        id: "s10",
-        name: "Construcción e Inmobiliaria",
-        category: "Sector",
-        createdAt: "2026-07-09T00:00:00.000Z",
-      },
-    ] as CatalogItem[],
+    items: [] as CatalogItem[],
+    loaded: false,
   }),
   getters: {
     skills: (state) =>
@@ -235,10 +23,23 @@ export const useCatalogStore = defineStore("catalog", {
         .sort((a, b) => a.name.localeCompare(b.name)),
   },
   actions: {
-    addItem(
+    async fetchCatalog() {
+      const config = useRuntimeConfig();
+      try {
+        const data = await $fetch<CatalogItem[]>(
+          `${config.public.apiUrl}/catalog`,
+        );
+        this.items = data || [];
+        this.loaded = true;
+      } catch (error) {
+        console.error("Error fetching catalog from AWS:", error);
+      }
+    },
+
+    async addItem(
       name: string,
       category: "Habilidad" | "Sector",
-    ): { success: boolean; error?: string } {
+    ): Promise<{ success: boolean; error?: string }> {
       const cleanName = name.trim();
       if (!cleanName) {
         return { success: false, error: "El nombre no puede estar vacío" };
@@ -257,21 +58,52 @@ export const useCatalogStore = defineStore("catalog", {
         };
       }
 
-      const newItem: CatalogItem = {
-        id: Math.random().toString(36).substring(2, 9),
-        name: cleanName,
-        category,
-        createdAt: new Date().toISOString(),
-      };
-
-      this.items.push(newItem);
-      return { success: true };
+      const config = useRuntimeConfig();
+      try {
+        const response = await $fetch<CatalogItem>(
+          `${config.public.apiUrl}/catalog`,
+          {
+            method: "POST",
+            body: { name: cleanName, category },
+          },
+        );
+        this.items.push(response);
+        return { success: true };
+      } catch (error: any) {
+        return {
+          success: false,
+          error: error.data?.error || "Error al registrar el elemento.",
+        };
+      }
     },
 
-    updateItem(
+    async suggestSkill(
+      name: string,
+    ): Promise<{ success: boolean; error?: string }> {
+      const cleanName = name.trim();
+      if (!cleanName) {
+        return { success: false, error: "El nombre no puede estar vacío" };
+      }
+
+      const config = useRuntimeConfig();
+      try {
+        await $fetch(`${config.public.apiUrl}/moderator/skills/suggestions`, {
+          method: "POST",
+          body: { name: cleanName },
+        });
+        return { success: true };
+      } catch (error: any) {
+        return {
+          success: false,
+          error: error.data?.error || "Error al registrar la sugerencia.",
+        };
+      }
+    },
+
+    async updateItem(
       id: string,
       newName: string,
-    ): { success: boolean; error?: string } {
+    ): Promise<{ success: boolean; error?: string }> {
       const cleanName = newName.trim();
       if (!cleanName) {
         return { success: false, error: "El nombre no puede estar vacío" };
@@ -297,14 +129,37 @@ export const useCatalogStore = defineStore("catalog", {
         };
       }
 
-      this.items[itemIndex].name = cleanName;
-      return { success: true };
+      const config = useRuntimeConfig();
+      try {
+        const response = await $fetch<CatalogItem>(
+          `${config.public.apiUrl}/catalog/${id}`,
+          {
+            method: "PUT",
+            body: { name: cleanName },
+          },
+        );
+        this.items[itemIndex].name = response.name;
+        return { success: true };
+      } catch (error: any) {
+        return {
+          success: false,
+          error: error.data?.error || "Error al actualizar.",
+        };
+      }
     },
 
-    deleteItem(id: string): boolean {
-      const lengthBefore = this.items.length;
-      this.items = this.items.filter((item) => item.id !== id);
-      return this.items.length < lengthBefore;
+    async deleteItem(id: string): Promise<boolean> {
+      const config = useRuntimeConfig();
+      try {
+        await $fetch(`${config.public.apiUrl}/catalog/${id}`, {
+          method: "DELETE",
+        });
+        this.items = this.items.filter((item) => item.id !== id);
+        return true;
+      } catch (error) {
+        console.error("Error deleting catalog item:", error);
+        return false;
+      }
     },
   },
 });
