@@ -337,6 +337,13 @@
                 Lat: {{ job.lat }}, Lng: {{ job.lng }}
               </p>
             </div>
+
+            <!-- Leaflet Map Container -->
+            <div
+              id="job-detail-leaflet-map"
+              class="h-48 rounded-xl overflow-hidden border border-outline-variant/60 mb-2 z-0"
+            ></div>
+
             <NuxtLink
               :to="`/map?lat=${job.lat}&lng=${job.lng}`"
               class="w-full bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-1"
@@ -395,54 +402,100 @@
           </p>
         </div>
 
-        <form v-else @submit.prevent="submitApplication" class="space-y-4">
-          <p class="text-xs text-on-surface-variant">
-            Sube tu currículum vitae en formato PDF para enviar tu postulación
-            de forma automática.
-          </p>
-
-          <!-- Upload CV Input Area -->
+        <div v-else class="space-y-4">
+          <!-- Easy Apply Option if Candidate has a CV in their Profile -->
           <div
-            class="border-2 border-dashed border-outline-variant hover:border-primary rounded-2xl p-6 text-center cursor-pointer transition relative"
+            v-if="profileCvUrl"
+            class="bg-primary/5 border border-primary/20 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
           >
-            <input
-              type="file"
-              accept=".pdf"
-              @change="handleFileChange"
-              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              id="cv-upload-input"
-            />
-            <div class="space-y-2">
-              <span class="material-symbols-outlined text-[40px] text-outline"
-                >cloud_upload</span
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary text-3xl"
+                >bolt</span
               >
-              <p class="text-xs font-bold text-on-background">
-                {{
-                  selectedFile
-                    ? selectedFile.name
-                    : "Arrastra o haz clic para subir tu CV (PDF)"
-                }}
-              </p>
-              <p class="text-[10px] text-on-surface-variant/80">
-                Límite de tamaño: 5MB
-              </p>
+              <div class="text-left">
+                <p class="text-xs font-bold text-on-background">
+                  Aplicar rápido con tu CV del perfil
+                </p>
+                <p
+                  class="text-[10px] text-on-surface-variant/85 truncate max-w-xs md:max-w-md"
+                >
+                  Archivo: {{ profileCvName }}
+                </p>
+              </div>
             </div>
-          </div>
-
-          <div class="flex justify-end pt-2">
             <button
-              type="submit"
-              :disabled="!selectedFile || isApplying"
-              class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 disabled:text-white/60 font-bold text-xs px-5 py-2.5 rounded-xl transition flex items-center gap-1 shadow-md shadow-primary/10"
+              type="button"
+              @click="submitEasyApplication"
+              :disabled="isApplying"
+              class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95 duration-100 disabled:opacity-50 flex-shrink-0"
             >
               <span
                 v-if="isApplying"
-                class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"
+                class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"
               ></span>
-              {{ isApplying ? "Enviando CV..." : "Enviar Postulación" }}
+              <span class="material-symbols-outlined text-sm">bolt</span>
+              Postulación Rápida
             </button>
           </div>
-        </form>
+
+          <div v-if="profileCvUrl" class="relative flex py-2 items-center">
+            <div class="flex-grow border-t border-outline-variant/30"></div>
+            <span
+              class="flex-shrink mx-4 text-[10px] text-on-surface-variant font-bold uppercase tracking-wider"
+              >O subir un nuevo CV</span
+            >
+            <div class="flex-grow border-t border-outline-variant/30"></div>
+          </div>
+
+          <form @submit.prevent="submitApplication" class="space-y-4">
+            <p class="text-xs text-on-surface-variant">
+              Sube tu currículum vitae en formato PDF para enviar tu postulación
+              de forma automática.
+            </p>
+
+            <!-- Upload CV Input Area -->
+            <div
+              class="border-2 border-dashed border-outline-variant hover:border-primary rounded-2xl p-6 text-center cursor-pointer transition relative"
+            >
+              <input
+                type="file"
+                accept=".pdf"
+                @change="handleFileChange"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                id="cv-upload-input"
+              />
+              <div class="space-y-2">
+                <span class="material-symbols-outlined text-[40px] text-outline"
+                  >cloud_upload</span
+                >
+                <p class="text-xs font-bold text-on-background">
+                  {{
+                    selectedFile
+                      ? selectedFile.name
+                      : "Arrastra o haz clic para subir tu CV (PDF)"
+                  }}
+                </p>
+                <p class="text-[10px] text-on-surface-variant/80">
+                  Límite de tamaño: 5MB
+                </p>
+              </div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+              <button
+                type="submit"
+                :disabled="!selectedFile || isApplying"
+                class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 disabled:text-white/60 font-bold text-xs px-5 py-2.5 rounded-xl transition flex items-center gap-1 shadow-md shadow-primary/10"
+              >
+                <span
+                  v-if="isApplying"
+                  class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"
+                ></span>
+                {{ isApplying ? "Enviando CV..." : "Enviar Postulación" }}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- 4. Comuni-red Pattern Threaded Comments Section -->
@@ -713,12 +766,68 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useJobsStore } from "~/stores/jobs";
 import { useUploadStore } from "~/stores/upload";
 
+let map: any = null;
+let marker: any = null;
+
 const config = useRuntimeConfig();
+
+const profileCvUrl = ref("");
+const profileCvName = ref("");
+
+const fetchCandidateProfile = async () => {
+  if (status.value !== "authenticated" || !session.value?.user?.id) return;
+  try {
+    const profile = await $fetch<any>(
+      `${config.public.apiUrl}/profile/${session.value.user.id}`,
+    );
+    if (profile && profile.cvUrl) {
+      profileCvUrl.value = profile.cvUrl;
+      profileCvName.value = profile.cvFileName || "mi-curriculum.pdf";
+    }
+  } catch (e) {
+    console.error("Error fetching candidate profile for easy apply:", e);
+  }
+};
+
+const submitEasyApplication = async () => {
+  if (!profileCvUrl.value) return;
+  isApplying.value = true;
+
+  try {
+    const headers: Record<string, string> = {};
+    if (session.value?.accessToken) {
+      headers.Authorization = `Bearer ${session.value.accessToken}`;
+    }
+
+    const candidateId = session.value?.user?.id || "mock-candidate-id";
+
+    await $fetch(`${config.public.apiUrl}/jobs/${jobId}/apply`, {
+      method: "POST",
+      headers,
+      body: {
+        candidateId,
+        coverLetter: `CV adjunto: ${profileCvUrl.value}`,
+      },
+    });
+
+    hasApplied.value = true;
+    if (process.client) {
+      localStorage.setItem(`job-applied-${jobId}`, "true");
+    }
+  } catch (e: any) {
+    console.error("Error submitting easy application:", e);
+    alert(
+      "Hubo un inconveniente al registrar la postulación. Intenta nuevamente.",
+    );
+  } finally {
+    isApplying.value = false;
+  }
+};
 
 // Report state variables
 const showReportModal = ref(false);
@@ -1113,6 +1222,7 @@ const deleteComment = (commentId: string) => {
 onMounted(async () => {
   checkAppliedStatus();
   loadComments();
+  await fetchCandidateProfile();
 
   // If jobs not loaded in store, fetch them
   if (jobsStore.jobs.length === 0) {
@@ -1120,5 +1230,38 @@ onMounted(async () => {
     await jobsStore.fetchJobs();
   }
   loading.value = false;
+
+  // Initialize Leaflet map on client side after loading is false and job exists
+  if (process.client && job.value) {
+    await nextTick();
+    try {
+      const L = await import("leaflet");
+
+      map = L.map("job-detail-leaflet-map", {
+        attributionControl: false,
+        scrollWheelZoom: false,
+      }).setView([job.value.lat || 19.4326, job.value.lng || -99.1332], 13);
+
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        {
+          attribution: "",
+        },
+      ).addTo(map);
+
+      marker = L.marker([
+        job.value.lat || 19.4326,
+        job.value.lng || -99.1332,
+      ]).addTo(map);
+    } catch (err) {
+      console.error("Error initializing Leaflet map in job details:", err);
+    }
+  }
+});
+
+onUnmounted(() => {
+  if (map) {
+    map.remove();
+  }
 });
 </script>
