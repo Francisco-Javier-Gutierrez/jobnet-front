@@ -323,5 +323,18 @@ describe("Cognito Utils", () => {
         translateCognitoError("UnknownException", "some other message"),
       ).toBe("some other message");
     });
+
+    it("should handle undefined and null parameters gracefully", () => {
+      expect(translateCognitoError(undefined, undefined)).toBe(
+        "Ocurrió un error de autenticación.",
+      );
+      expect(translateCognitoError(undefined, "some message")).toBe(
+        "some message",
+      );
+      // @ts-expect-error - testing invalid parameters runtime behavior
+      expect(translateCognitoError(null, null)).toBe(
+        "Ocurrió un error de autenticación.",
+      );
+    });
   });
 });

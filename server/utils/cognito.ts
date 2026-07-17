@@ -32,10 +32,13 @@ export function calculateSecretHash(
 }
 
 export function translateCognitoError(
-  errorCode: string,
-  originalMessage: string,
+  errorCode?: string,
+  originalMessage?: string,
 ): string {
-  const code = errorCode.replace("Exception", "");
+  const safeCode = typeof errorCode === "string" ? errorCode : "CognitoError";
+  const safeMessage =
+    typeof originalMessage === "string" ? originalMessage : "";
+  const code = safeCode.replace("Exception", "");
   switch (code) {
     case "UserNotFound":
       return "Verifique sus datos.";
@@ -58,8 +61,8 @@ export function translateCognitoError(
       return "Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.";
     case "InvalidParameter":
       if (
-        originalMessage.toLowerCase().includes("email") ||
-        originalMessage.toLowerCase().includes("username")
+        safeMessage.toLowerCase().includes("email") ||
+        safeMessage.toLowerCase().includes("username")
       ) {
         return "El formato del correo electrónico es inválido.";
       }
@@ -72,7 +75,7 @@ export function translateCognitoError(
     case "UnexpectedLambda":
       return "Error interno del servicio de autenticación. Por favor intente nuevamente.";
     default: {
-      const msgLower = originalMessage.toLowerCase();
+      const msgLower = safeMessage.toLowerCase();
       if (
         msgLower.includes("user does not exist") ||
         msgLower.includes("user doesnotexist")
@@ -88,7 +91,7 @@ export function translateCognitoError(
       if (msgLower.includes("user is not confirmed")) {
         return "El usuario no ha sido confirmado. Por favor, verifique su código OTP.";
       }
-      return originalMessage || "Ocurrió un error de autenticación.";
+      return safeMessage || "Ocurrió un error de autenticación.";
     }
   }
 }
