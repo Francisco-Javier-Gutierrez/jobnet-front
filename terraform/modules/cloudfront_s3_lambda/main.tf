@@ -80,7 +80,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = ""
-  aliases             = var.environment == "prod" ? [var.domain_name] : []
+  aliases             = []
 
   origin {
     domain_name = aws_s3_bucket.assets.bucket_regional_domain_name
@@ -161,9 +161,6 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = var.environment == "prod" ? false : true
-    acm_certificate_arn            = var.environment == "prod" ? "arn:aws:acm:us-east-1:123456789012:certificate/dummy" : null
-    ssl_support_method             = var.environment == "prod" ? "sni-only" : null
-    minimum_protocol_version       = var.environment == "prod" ? "TLSv1.2_2021" : null
+    cloudfront_default_certificate = true
   }
 }
