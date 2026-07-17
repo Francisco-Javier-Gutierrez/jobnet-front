@@ -266,6 +266,27 @@
             </button>
           </div>
 
+          <div
+            v-if="
+              skillSearchQuery.trim() &&
+              !filteredCatalogSkills.some(
+                (s) =>
+                  s.name.toLowerCase() ===
+                  skillSearchQuery.toLowerCase().trim(),
+              )
+            "
+            class="text-[10px] text-amber-600 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-lg flex items-start gap-1.5 leading-relaxed"
+          >
+            <span class="material-symbols-outlined text-xs mt-0.5"
+              >warning</span
+            >
+            <span>
+              Atención, esta habilidad se mandará para ser aprobada. Se agregará
+              por el momento a tu perfil, pero si tiene faltas ortográficas se
+              quedará de esa forma hasta que el moderador lo valide.
+            </span>
+          </div>
+
           <!-- Suggested Master Catalog Skills -->
           <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
             <button
@@ -356,6 +377,27 @@
             >
               Crear y Agregar
             </button>
+          </div>
+
+          <div
+            v-if="
+              sectorSearchQuery.trim() &&
+              !filteredCatalogSectors.some(
+                (s) =>
+                  s.name.toLowerCase() ===
+                  sectorSearchQuery.toLowerCase().trim(),
+              )
+            "
+            class="text-[10px] text-amber-600 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-lg flex items-start gap-1.5 leading-relaxed"
+          >
+            <span class="material-symbols-outlined text-xs mt-0.5"
+              >warning</span
+            >
+            <span>
+              Atención, este sector se mandará para ser aprobado. Se agregará
+              por el momento a tu perfil, pero si tiene faltas ortográficas se
+              quedará de esa forma hasta que el moderador lo valide.
+            </span>
           </div>
 
           <!-- Suggested Master Catalog Sectors -->
