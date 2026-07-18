@@ -782,8 +782,15 @@ const profileCvName = ref("");
 const fetchCandidateProfile = async () => {
   if (status.value !== "authenticated" || !session.value?.user?.id) return;
   try {
+    const headers: Record<string, string> = {};
+    if (session.value?.idToken) {
+      headers.Authorization = `Bearer ${session.value.idToken}`;
+    } else if (session.value?.accessToken) {
+      headers.Authorization = `Bearer ${session.value.accessToken}`;
+    }
     const profile = await $fetch<any>(
       `${config.public.apiUrl}/profile/${session.value.user.id}`,
+      { headers }
     );
     if (profile && profile.cvUrl) {
       profileCvUrl.value = profile.cvUrl;
@@ -800,7 +807,9 @@ const submitEasyApplication = async () => {
 
   try {
     const headers: Record<string, string> = {};
-    if (session.value?.accessToken) {
+    if (session.value?.idToken) {
+      headers.Authorization = `Bearer ${session.value.idToken}`;
+    } else if (session.value?.accessToken) {
       headers.Authorization = `Bearer ${session.value.accessToken}`;
     }
 
@@ -819,6 +828,9 @@ const submitEasyApplication = async () => {
     if (process.client) {
       localStorage.setItem(`job-applied-${jobId}`, "true");
     }
+
+    // Redirect to the chat conversation
+    navigateTo(`/messages?jobId=${jobId}&candidateId=${candidateId}`);
   } catch (e: any) {
     console.error("Error submitting easy application:", e);
     alert(
@@ -994,7 +1006,9 @@ const submitApplication = async () => {
   try {
     const config = useRuntimeConfig();
     const headers: Record<string, string> = {};
-    if (session.value?.accessToken) {
+    if (session.value?.idToken) {
+      headers.Authorization = `Bearer ${session.value.idToken}`;
+    } else if (session.value?.accessToken) {
       headers.Authorization = `Bearer ${session.value.accessToken}`;
     }
 
@@ -1013,6 +1027,9 @@ const submitApplication = async () => {
     if (process.client) {
       localStorage.setItem(`job-applied-${jobId}`, "true");
     }
+
+    // Redirect to the chat conversation
+    navigateTo(`/messages?jobId=${jobId}&candidateId=${candidateId}`);
   } catch (e: any) {
     console.error("Error submitting application record:", e);
     alert(
