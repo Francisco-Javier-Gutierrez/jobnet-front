@@ -311,17 +311,28 @@ const fetchConversations = async () => {
       ).catch(() => []);
 
       for (const app of apps) {
-        if (app.status === "ENTREVISTA" || app.status === "ACEPTADO") {
+        if (
+          app.status === "PENDIENTE" ||
+          app.status === "REVISADO" ||
+          app.status === "ENTREVISTA" ||
+          app.status === "ACEPTADO"
+        ) {
           const job = allJobs.find((j) => j.id === app.jobId);
           if (job) {
+            const statusMap: Record<string, string> = {
+              PENDIENTE: "Pendiente",
+              REVISADO: "Revisado",
+              ENTREVISTA: "Entrevista",
+              ACEPTADO: "Seleccionado",
+              RECHAZADO: "Rechazado",
+            };
             list.push({
               id: `${app.jobId}#${userId.value}`,
               jobId: app.jobId,
               candidateId: userId.value,
               name: job.nombreEmpresa || "Empresa",
               jobTitle: job.title,
-              status:
-                app.status === "ENTREVISTA" ? "Entrevista" : "Seleccionado",
+              status: statusMap[app.status] || app.status,
               lastMessage: "",
               time: new Date(app.appliedAt).toLocaleDateString(),
             });
@@ -339,19 +350,30 @@ const fetchConversations = async () => {
         ).catch(() => []);
 
         for (const app of apps) {
-          if (app.status === "ENTREVISTA" || app.status === "ACEPTADO") {
+          if (
+            app.status === "PENDIENTE" ||
+            app.status === "REVISADO" ||
+            app.status === "ENTREVISTA" ||
+            app.status === "ACEPTADO"
+          ) {
             const profile = await $fetch<any>(
               `${config.public.apiUrl}/profile/${app.candidateId}`,
             ).catch(() => ({}));
 
+            const statusMap: Record<string, string> = {
+              PENDIENTE: "Pendiente",
+              REVISADO: "Revisado",
+              ENTREVISTA: "Entrevista",
+              ACEPTADO: "Seleccionado",
+              RECHAZADO: "Rechazado",
+            };
             list.push({
               id: `${job.id}#${app.candidateId}`,
               jobId: job.id,
               candidateId: app.candidateId,
               name: profile.nombre || "Candidato sin nombre",
               jobTitle: job.title,
-              status:
-                app.status === "ENTREVISTA" ? "Entrevista" : "Seleccionado",
+              status: statusMap[app.status] || app.status,
               lastMessage: "",
               time: new Date(app.appliedAt).toLocaleDateString(),
             });
