@@ -62,9 +62,10 @@ onMounted(async () => {
     );
 
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
       {
         attribution: "",
+        maxZoom: 19,
       },
     ).addTo(map);
 
@@ -83,6 +84,18 @@ onMounted(async () => {
           );
         },
       );
+    }
+
+    // Render radius circle if radius query param is passed
+    if (route.query.radius) {
+      const radiusKm = parseFloat(route.query.radius as string);
+      L.circle([initialLat, initialLng], {
+        radius: radiusKm * 1000,
+        color: "#6366f1",
+        fillColor: "#6366f1",
+        fillOpacity: 0.15,
+        weight: 2,
+      }).addTo(map);
     }
 
     store.jobs.forEach((job) => {

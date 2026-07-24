@@ -324,32 +324,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch } from "vue";
+import { ref, computed, nextTick, watch, onMounted, onUnmounted } from "vue";
 
-// SEO
 useSeoMeta({
-  title: "Soporte Directo - JobNet",
-  description:
-    "Bandeja interactiva de soporte directo para moderadores de JobNet",
+  title: "Soporte y Disputas - Moderación JobNet",
+  description: "Bandeja interactiva de soporte directo y gestión de disputas para moderadores",
 });
 
-// State
+const config = useRuntimeConfig();
+const { data: session, status } = useAuth();
+
+const userId = computed(() => (session.value?.user as any)?.id || "moderator-1");
 const searchQuery = ref("");
 const selectedTicketId = ref<string | null>(null);
 const newMessageText = ref("");
 const chatContainer = ref<HTMLDivElement | null>(null);
 const isTyping = ref(false);
+const isLoading = ref(false);
 
-// Initial mock data to make it look active, premium, and fully functional
-const tickets = ref([
+const socket = ref<WebSocket | null>(null);
+const wsConnected = ref(false);
+
+const tickets = ref<any[]>([
   {
     id: "t1",
+    disputeId: "t1",
     userName: "Sofía Valenzuela",
     userRole: "CANDIDATO",
     online: true,
     subject: "Error de carga en CV",
     description:
-      "Hola, estoy intentando subir mi currículum profesional y la plataforma me dice que supera el tamaño de archivo. El PDF mide 3.2MB y el límite dice 5MB. Podrían asistirme para ver por qué falla?",
+      "Hola, estoy intentando subir mi currículum profesional y la plataforma me dice que supera el tamaño de archivo.",
     time: "10:42 AM",
     unread: true,
     lastMessage: "El PDF mide 3.2MB y el límite dice 5MB. Podrían asistirme?",
@@ -360,78 +365,80 @@ const tickets = ref([
         text: "Hola, buenas tardes. Tengo un problema al subir mi currículum en formato PDF.",
         time: "10:40 AM",
       },
-      {
-        id: "m2",
-        sender: "USER",
-        text: "El PDF mide 3.2MB y el límite dice 5MB. Podrían asistirme para ver por qué falla?",
-        time: "10:42 AM",
-      },
-    ],
-  },
-  {
-    id: "t2",
-    userName: "Roberto Gómez (InnoTech)",
-    userRole: "RECLUTADOR",
-    online: false,
-    subject: "Facturación y límites de vacantes",
-    description:
-      "Estimados, queremos publicar más de 5 vacantes activas esta semana debido a una gran campaña de reclutamiento. Cómo podemos ampliar el cupo de nuestra cuenta corporativa?",
-    time: "Ayer",
-    unread: false,
-    lastMessage: "Muchas gracias, quedo a la espera de su respuesta.",
-    messages: [
-      {
-        id: "m3",
-        sender: "USER",
-        text: "Queremos publicar más de 5 vacantes activas. ¿Cómo podemos ampliar el cupo de nuestra cuenta?",
-        time: "Ayer",
-      },
-      {
-        id: "m4",
-        sender: "MODERATOR",
-        text: "Hola Roberto. Para planes premium y ampliación de límites, puedes ir a la sección de Organizaciones o contactar a ventas corporativas. Te enviaré un enlace con la información detallada.",
-        time: "Ayer",
-      },
-      {
-        id: "m5",
-        sender: "USER",
-        text: "Muchas gracias, quedo a la espera de su respuesta.",
-        time: "Ayer",
-      },
-    ],
-  },
-  {
-    id: "t3",
-    userName: "Leticia Ruiz",
-    userRole: "CANDIDATO",
-    online: true,
-    subject: "Reporte de vacante sospechosa",
-    description:
-      "Hola. He encontrado una oferta de empleo llamada 'Asistente Remoto Urgente' que pide depósitos previos para comprar herramientas. Considero que infringe las políticas de la plataforma.",
-    time: "Hace 2 días",
-    unread: false,
-    lastMessage: "Considero que infringe las políticas de la plataforma.",
-    messages: [
-      {
-        id: "m6",
-        sender: "USER",
-        text: "He encontrado una oferta de empleo llamada 'Asistente Remoto Urgente' que pide depósitos previos.",
-        time: "Hace 2 días",
-      },
-      {
-        id: "m7",
-        sender: "USER",
-        text: "Considero que infringe las políticas de la plataforma.",
-        time: "Hace 2 días",
-      },
     ],
   },
 ]);
 
-// Computed
-const activeTicketsCount = computed(() => {
-  return tickets.value.length;
-});
+const fetchDisputes = async () => {
+  isLoading.value = true;
+  try {
+    const disputesData = await $fetch<any[]>(
+      `${config.public.apiUrl}/moderator/disputes`,
+    ).catch(() => []);
+
+    if (disputesData && disputesData.length > 0) {
+      const realTickets = disputesData.map((d) => ({
+        id: d.id,
+        disputeId: d.id,
+        userName: d.complainantName || "Usuario",
+        userRole: d.complainantRole || "CANDIDATO",
+        online: true,
+        subject: `Disputa: ${d.reason}`,
+        description: d.description || d.reason,
+        time: d.fechaCreacion ? new Date(d.fechaCreacion).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Reciente",
+        unread: d.estatus === "ABIERTA",
+        lastMessage: d.description || d.reason,
+        messages: [],
+      }));
+
+      tickets.value = [...realTickets, ...tickets.value];
+    }
+  } catch (err) {
+    console.error("Error fetching disputes:", err);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const connectWebSocket = () => {
+  const token = (session.value as any)?.idToken;
+  if (!token) return;
+  const wsUrl = `${config.public.wsUrl}?token=${token}`;
+  socket.value = new WebSocket(wsUrl);
+
+  socket.value.onopen = () => {
+    wsConnected.value = true;
+  };
+
+  socket.value.onmessage = (event) => {
+    try {
+      const payload = JSON.parse(event.data);
+      if (payload.action === "receiveDisputeMessage") {
+        const { disputeId, senderId, text, createdAt } = payload;
+        const target = tickets.value.find((t) => t.id === disputeId);
+        if (target) {
+          const timeStr = new Date(createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          target.messages.push({
+            id: `m-ws-${Date.now()}`,
+            sender: senderId === userId.value ? "MODERATOR" : "USER",
+            text,
+            time: timeStr,
+          });
+          target.lastMessage = text;
+          scrollToBottom();
+        }
+      }
+    } catch (e) {
+      console.error("Error handling dispute WS message:", e);
+    }
+  };
+
+  socket.value.onclose = () => {
+    wsConnected.value = false;
+  };
+};
+
+const activeTicketsCount = computed(() => tickets.value.length);
 
 const filteredTickets = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
@@ -448,14 +455,40 @@ const activeTicket = computed(() => {
   return tickets.value.find((t) => t.id === selectedTicketId.value) || null;
 });
 
-// Methods
-const selectTicket = (ticket: any) => {
+const selectTicket = async (ticket: any) => {
   selectedTicketId.value = ticket.id;
   ticket.unread = false;
+
+  if (ticket.disputeId && ticket.messages.length === 0) {
+    try {
+      const msgs = await $fetch<any[]>(
+        `${config.public.apiUrl}/disputes/${ticket.disputeId}/messages`,
+      ).catch(() => []);
+
+      ticket.messages = msgs.map((m) => ({
+        id: `m-${m.createdAt}`,
+        sender: m.senderId === userId.value ? "MODERATOR" : "USER",
+        text: m.text,
+        time: new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      }));
+    } catch (e) {
+      console.error("Error loading dispute messages:", e);
+    }
+  }
+
   scrollToBottom();
 };
 
-const resolveTicket = (ticketId: string) => {
+const resolveTicket = async (ticketId: string) => {
+  try {
+    await $fetch(`${config.public.apiUrl}/moderator/disputes/${ticketId}/resolve`, {
+      method: "POST",
+      body: { action: "resolve", notes: "Caso resuelto por moderador" },
+    }).catch(() => {});
+  } catch (e) {
+    console.error("Error resolving dispute:", e);
+  }
+
   tickets.value = tickets.value.filter((t) => t.id !== ticketId);
   selectedTicketId.value = null;
 };
@@ -467,7 +500,6 @@ const sendMessage = () => {
   const ticket = tickets.value.find((t) => t.id === selectedTicketId.value);
   if (!ticket) return;
 
-  // Add moderator message
   const now = new Date();
   const timeStr = now.toLocaleTimeString([], {
     hour: "2-digit",
@@ -482,42 +514,19 @@ const sendMessage = () => {
   });
 
   ticket.lastMessage = text;
+
+  if (socket.value && wsConnected.value && ticket.disputeId) {
+    socket.value.send(
+      JSON.stringify({
+        action: "sendMessage",
+        disputeId: ticket.disputeId,
+        text,
+      }),
+    );
+  }
+
   newMessageText.value = "";
   scrollToBottom();
-
-  // Simulate an automated responsive reply from the candidate/recruiter for premium feel!
-  simulateUserReply(ticket);
-};
-
-const simulateUserReply = (ticket: any) => {
-  isTyping.value = true;
-  setTimeout(() => {
-    isTyping.value = false;
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-    let replyText = "Entendido, muchas gracias por la atención brindada.";
-    if (ticket.id === "t1") {
-      replyText =
-        "Perfecto, acabo de revisar y era un problema con mi extensión. Ya se subió y puedo verlo en mi perfil. Agradezco mucho su rápida respuesta!";
-    } else if (ticket.id === "t3") {
-      replyText =
-        "Gracias por revisar el caso. Estaré al pendiente de la resolución para reportar cualquier otro incidente similar.";
-    }
-
-    ticket.messages.push({
-      id: `m-reply-${Date.now()}`,
-      sender: "USER",
-      text: replyText,
-      time: timeStr,
-    });
-
-    ticket.lastMessage = replyText;
-    scrollToBottom();
-  }, 2200);
 };
 
 const scrollToBottom = () => {
@@ -528,11 +537,21 @@ const scrollToBottom = () => {
   });
 };
 
-// Scroll to bottom when messages count changes
 watch(
   () => activeTicket.value?.messages.length,
   () => {
     scrollToBottom();
   },
 );
+
+onMounted(async () => {
+  await fetchDisputes();
+  connectWebSocket();
+});
+
+onUnmounted(() => {
+  if (socket.value) {
+    socket.value.close();
+  }
+});
 </script>

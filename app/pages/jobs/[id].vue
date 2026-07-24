@@ -1,58 +1,47 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
-    <!-- Breadcrumb -->
-    <div class="mb-6">
+    <!-- Top Breadcrumb -->
+    <div class="mb-6 flex items-center justify-between">
       <NuxtLink
         to="/feed"
-        class="inline-flex items-center gap-1 text-primary hover:text-primary-container text-xs font-bold transition"
+        class="inline-flex items-center gap-1.5 text-primary hover:text-primary-container text-xs font-bold transition px-3 py-1.5 bg-primary/10 rounded-xl"
       >
         <span class="material-symbols-outlined text-sm">arrow_back</span>
-        Volver al feed
+        Volver a vacantes
       </NuxtLink>
+
+      <button
+        v-if="job"
+        @click="showReportModal = true"
+        class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 text-xs font-bold transition px-3 py-1.5 bg-rose-500/10 rounded-xl border border-rose-500/20"
+      >
+        <span class="material-symbols-outlined text-sm">flag</span>
+        Reportar vacante
+      </button>
     </div>
 
     <!-- Skeleton Loading Detail Page -->
     <div
       v-if="loading"
-      class="space-y-6 animate-pulse"
+      class="bg-surface-container-lowest rounded-3xl border border-outline-variant/60 p-8 space-y-6 animate-pulse shadow-sm"
       role="status"
-      aria-label="Cargando detalles de la vacante"
     >
-      <!-- Header Skeleton -->
-      <div
-        class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 p-6 space-y-4"
-      >
-        <div class="flex items-center gap-3">
-          <div class="w-14 h-14 rounded-2xl bg-outline/10 animate-pulse"></div>
-          <div class="space-y-2 flex-grow">
-            <div class="h-6 w-1/2 bg-outline/20 rounded animate-pulse"></div>
-            <div class="h-4 w-1/4 bg-outline/10 rounded animate-pulse"></div>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="h-6 w-16 bg-outline/20 rounded-full animate-pulse"></div>
-          <div class="h-6 w-20 bg-outline/20 rounded-full animate-pulse"></div>
-          <div class="h-6 w-24 bg-outline/20 rounded-full animate-pulse"></div>
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-outline/10 animate-pulse"></div>
+        <div class="space-y-2 flex-grow">
+          <div class="h-6 w-1/2 bg-outline/20 rounded animate-pulse"></div>
+          <div class="h-4 w-1/4 bg-outline/10 rounded animate-pulse"></div>
         </div>
       </div>
-
-      <!-- Description Skeleton -->
-      <div
-        class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 p-6 space-y-4"
-      >
-        <div class="h-5 w-32 bg-outline/20 rounded animate-pulse"></div>
-        <div class="space-y-2">
-          <div class="h-4 w-full bg-outline/10 rounded animate-pulse"></div>
-          <div class="h-4 w-5/6 bg-outline/10 rounded animate-pulse"></div>
-          <div class="h-4 w-4/5 bg-outline/10 rounded animate-pulse"></div>
-        </div>
-      </div>
+      <div class="h-4 w-full bg-outline/10 rounded animate-pulse"></div>
+      <div class="h-4 w-5/6 bg-outline/10 rounded animate-pulse"></div>
+      <div class="h-48 bg-outline/10 rounded-2xl animate-pulse"></div>
     </div>
 
     <!-- Vacancy Not Found State -->
     <div
       v-else-if="!job"
-      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm px-6"
+      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest border border-outline-variant/60 rounded-3xl shadow-sm px-6"
     >
       <div
         class="w-16 h-16 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mb-4"
@@ -63,8 +52,7 @@
         Vacante no encontrada
       </h2>
       <p class="text-on-surface-variant text-xs max-w-sm mb-6">
-        La oferta de empleo que estás buscando no existe, ha sido desactivada o
-        el enlace es incorrecto.
+        La oferta de empleo que estás buscando no existe, ha sido desactivada o el enlace es incorrecto.
       </p>
       <NuxtLink
         to="/feed"
@@ -74,388 +62,264 @@
       </NuxtLink>
     </div>
 
-    <!-- Vacancy Real Details -->
-    <div v-else class="space-y-6">
-      <!-- Alert if under evaluation (RF-23) -->
-      <div
-        v-if="job.estado === 'EVALUACION'"
-        class="bg-amber-500/10 border border-amber-500/20 text-amber-800 p-4 rounded-2xl flex items-start gap-3 text-xs leading-relaxed shadow-sm text-left"
-      >
-        <span class="material-symbols-outlined text-amber-600 mt-0.5"
-          >warning</span
-        >
-        <div>
-          <p class="font-bold text-slate-900 mb-0.5">Vacante bajo evaluación</p>
-          <p class="text-on-surface-variant">
-            Esta oferta de empleo ha sido pausada temporalmente por moderadores
-            para validar reportes de fraude o información inexacta. No se
-            permiten nuevas postulaciones en este momento.
-          </p>
-        </div>
-      </div>
+    <!-- UNIFIED MASTER DETAIL CARD -->
+    <div
+      v-else
+      class="bg-surface-container-lowest border border-outline-variant/60 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-8"
+    >
+      <!-- Top Decorative Accent Bar -->
+      <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-secondary to-emerald-500"></div>
 
-      <!-- 1. Header Card -->
-      <div
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm relative overflow-hidden"
-      >
-        <div
-          class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary to-secondary"
-        ></div>
-        <div
-          class="flex flex-col md:flex-row md:items-start md:justify-between gap-6"
-        >
-          <div class="flex items-start gap-4">
-            <div
-              class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 text-xl font-bold shadow-inner"
-            >
-              {{ job.company ? job.company.charAt(0).toUpperCase() : "J" }}
-            </div>
-            <div>
-              <h1
-                class="text-xl md:text-2xl font-extrabold text-on-background mb-1"
-              >
+      <!-- 1. Header Section -->
+      <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 pt-2">
+        <div class="flex items-start gap-4">
+          <div
+            class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-primary to-primary-container text-white flex items-center justify-center flex-shrink-0 text-2xl font-bold shadow-md shadow-primary/20"
+          >
+            {{ job.company ? job.company.charAt(0).toUpperCase() : "J" }}
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap mb-1">
+              <h1 class="text-2xl md:text-3xl font-extrabold text-on-background tracking-tight">
                 {{ job.title }}
               </h1>
-              <p
-                class="text-sm text-primary font-bold hover:underline cursor-pointer flex items-center gap-1"
+              <span
+                v-if="job.estado === 'EVALUACION'"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 border border-amber-500/20"
               >
-                {{ job.company }}
-                <span
-                  class="material-symbols-outlined text-xs text-secondary fill-1"
-                  title="Organización validada"
-                  >verified</span
-                >
-              </p>
+                Bajo Evaluación
+              </span>
             </div>
-          </div>
-          <!-- Action Buttons / Apply Trigger -->
-          <div
-            class="flex flex-col sm:flex-row items-stretch md:items-center gap-2 flex-shrink-0"
-          >
-            <!-- Disable postulations if job is under evaluation -->
-            <button
-              v-if="job.estado === 'EVALUACION'"
-              disabled
-              class="bg-amber-50 border border-amber-200 text-amber-700 font-bold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm cursor-not-allowed"
-            >
-              <span class="material-symbols-outlined text-base">warning</span>
-              Bajo Evaluación
-            </button>
-            <button
-              v-else-if="hasApplied"
-              disabled
-              class="bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
-            >
-              <span class="material-symbols-outlined text-base">task_alt</span>
-              Postulado con éxito
-            </button>
-            <button
-              v-else
-              @click="scrollToApply"
-              class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-5 py-3 rounded-xl transition shadow-md shadow-primary/10 flex items-center justify-center gap-1 active:scale-95 duration-100 flex-grow md:flex-grow-0"
-            >
-              <span class="material-symbols-outlined text-base">send</span>
-              Postularme ahora
-            </button>
-            <button
-              @click="showReportModal = true"
-              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant hover:text-rose-600 font-bold text-xs px-4 py-3 rounded-xl transition flex items-center justify-center gap-1 active:scale-95 duration-100"
-              title="Reportar vacante sospechosa"
-            >
-              <span class="material-symbols-outlined text-base">flag</span>
-              Reportar
-            </button>
-          </div>
-        </div>
 
-        <div
-          class="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-outline-variant/20"
-        >
-          <span
-            class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-secondary/10 text-secondary border border-secondary/20 uppercase tracking-wide"
-          >
-            Activo
-          </span>
-          <span
-            class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-primary/10 text-primary"
-            v-if="job.modalidad"
-          >
-            {{ job.modalidad }}
-          </span>
-          <span
-            class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-tertiary-container/30 text-on-surface-variant font-mono"
-            v-if="job.salario"
-          >
-            ${{ formatSalary(job.salario) }} MXN
-          </span>
-          <span
-            class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-700 font-mono"
-            v-if="job.experienciaAnos"
-          >
-            {{ job.experienciaAnos }} años exp.
-          </span>
-        </div>
-      </div>
-
-      <!-- 2. Vacancy Information Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Main Info Columns (2 Columns) -->
-        <div class="md:col-span-2 space-y-6">
-          <!-- Description Card -->
-          <div
-            class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4"
-          >
-            <h2
-              class="text-base font-bold text-on-background flex items-center gap-1.5"
-            >
-              <span class="material-symbols-outlined text-primary text-lg"
-                >description</span
-              >
-              Descripción del puesto
-            </h2>
-            <p
-              class="text-xs text-on-surface-variant leading-relaxed whitespace-pre-line"
-            >
-              {{
-                job.descripcion ||
-                "No se ha proporcionado una descripción detallada para esta vacante corporativa."
-              }}
+            <p class="text-sm text-primary font-bold hover:underline cursor-pointer flex items-center gap-1.5 mb-3">
+              {{ job.company }}
+              <span class="material-symbols-outlined text-sm text-secondary fill-1" title="Organización verificada">verified</span>
             </p>
-          </div>
 
-          <!-- Spec PDF Document Card -->
-          <div
-            v-if="job.pdfUrl"
-            class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4"
-          >
-            <h2
-              class="text-base font-bold text-on-background flex items-center gap-1.5"
-            >
-              <span class="material-symbols-outlined text-primary text-lg"
-                >picture_as_pdf</span
-              >
-              Documentación adicional
-            </h2>
-            <div
-              class="flex items-center justify-between p-4 bg-surface-container-low border border-outline-variant/40 rounded-xl"
-            >
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-rose-600 text-3xl"
-                  >picture_as_pdf</span
-                >
-                <div class="text-left">
-                  <p class="text-xs font-bold text-on-background">
-                    Descriptor de Puesto.pdf
-                  </p>
-                  <p class="text-[10px] text-on-surface-variant/80">
-                    Documento oficial de la vacante
-                  </p>
-                </div>
-              </div>
-              <a
-                :href="job.pdfUrl"
-                target="_blank"
-                download
-                class="flex items-center gap-1 px-4 py-2 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-xl transition shadow-sm"
-              >
-                <span class="material-symbols-outlined text-sm">download</span>
-                Descargar
-              </a>
-            </div>
-          </div>
-
-          <!-- Skills Card -->
-          <div
-            v-if="
-              job.habilidadesRequeridas && job.habilidadesRequeridas.length > 0
-            "
-            class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4"
-          >
-            <h2
-              class="text-base font-bold text-on-background flex items-center gap-1.5"
-            >
-              <span class="material-symbols-outlined text-primary text-lg"
-                >psychology</span
-              >
-              Habilidades y conocimientos requeridos
-            </h2>
+            <!-- Specs Badges -->
             <div class="flex flex-wrap gap-2">
               <span
-                v-for="skill in job.habilidadesRequeridas"
-                :key="skill"
-                class="bg-primary/5 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/10"
+                v-if="job.modalidad"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20"
               >
-                {{ skill }}
+                <span class="material-symbols-outlined text-sm">laptop</span>
+                {{ job.modalidad }}
               </span>
-            </div>
-          </div>
-
-          <!-- Sectores Card -->
-          <div
-            v-if="job.sectores && job.sectores.length > 0"
-            class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4"
-          >
-            <h2
-              class="text-base font-bold text-on-background flex items-center gap-1.5"
-            >
-              <span class="material-symbols-outlined text-secondary text-lg"
-                >business_center</span
-              >
-              Sectores de la industria
-            </h2>
-            <div class="flex flex-wrap gap-2">
               <span
-                v-for="sector in job.sectores"
-                :key="sector"
-                class="bg-secondary/5 text-secondary px-3 py-1 rounded-full text-xs font-bold border border-secondary/10"
+                v-if="job.salario"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20"
               >
-                {{ sector }}
+                <span class="material-symbols-outlined text-sm">payments</span>
+                ${{ formatSalary(job.salario) }} MXN
+              </span>
+              <span
+                v-if="job.sector"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-secondary/10 text-secondary border border-secondary/20"
+              >
+                <span class="material-symbols-outlined text-sm">domain</span>
+                {{ job.sector }}
               </span>
             </div>
           </div>
         </div>
 
-        <!-- Sidebar Widgets (1 Column) -->
-        <div class="space-y-6">
-          <!-- Location Map Widget -->
-          <div
-            class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4 flex flex-col justify-between"
-          >
-            <div>
-              <h3
-                class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-3 flex items-center gap-1"
-              >
-                <span class="material-symbols-outlined text-sm text-secondary"
-                  >location_on</span
-                >
-                Ubicación
-              </h3>
-              <p class="text-xs font-bold text-on-background mb-2">
-                {{ job.sector || "Ubicación Georeferenciada" }}
-              </p>
-              <p class="text-[10px] text-on-surface-variant/80 font-mono mb-4">
-                Lat: {{ job.lat }}, Lng: {{ job.lng }}
-              </p>
-            </div>
+        <!-- Apply Fast Button -->
+        <button
+          @click="scrollToApply"
+          class="px-6 py-3 bg-primary hover:bg-primary-container text-white font-bold text-xs rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 flex-shrink-0"
+        >
+          <span class="material-symbols-outlined text-base">send</span>
+          <span>Postularme Ahora</span>
+        </button>
+      </div>
 
-            <!-- Leaflet Map Container -->
-            <div
-              id="job-detail-leaflet-map"
-              class="h-48 rounded-xl overflow-hidden border border-outline-variant/60 mb-2 z-0"
-            ></div>
+      <hr class="border-outline-variant/30" />
 
-            <NuxtLink
-              :to="`/map?lat=${job.lat}&lng=${job.lng}`"
-              class="w-full bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-1"
+      <!-- 2. Job Description Section -->
+      <div class="space-y-3 text-left">
+        <h2 class="text-base font-bold text-on-background flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-xl">description</span>
+          Descripción del Puesto
+        </h2>
+        <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed whitespace-pre-line bg-surface-container-low/30 p-5 rounded-2xl border border-outline-variant/40">
+          {{ job.descripcion || "No se ha proporcionado una descripción detallada para esta vacante." }}
+        </p>
+      </div>
+
+      <!-- 3. Skills & Sectors Section -->
+      <div
+        v-if="(job.habilidadesRequeridas && job.habilidadesRequeridas.length > 0) || (job.sectores && job.sectores.length > 0)"
+        class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left"
+      >
+        <!-- Required Skills -->
+        <div v-if="job.habilidadesRequeridas && job.habilidadesRequeridas.length > 0" class="space-y-3">
+          <h3 class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-primary text-base">psychology</span>
+            Habilidades Requeridas
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            <span
+              v-for="skill in job.habilidadesRequeridas"
+              :key="skill"
+              class="bg-primary/10 text-primary px-3 py-1 rounded-xl text-xs font-bold border border-primary/20"
             >
-              <span class="material-symbols-outlined text-sm">map</span>
-              Ver en mapa general
-            </NuxtLink>
+              {{ skill }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Sectors -->
+        <div v-if="job.sectores && job.sectores.length > 0" class="space-y-3">
+          <h3 class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-secondary text-base">business_center</span>
+            Sectores Relacionados
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            <span
+              v-for="sec in job.sectores"
+              :key="sec"
+              class="bg-secondary/10 text-secondary px-3 py-1 rounded-xl text-xs font-bold border border-secondary/20"
+            >
+              {{ sec }}
+            </span>
           </div>
         </div>
       </div>
 
-      <!-- 3. Persisted Application Form -->
-      <div
-        id="apply-section"
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4"
-      >
-        <h2
-          class="text-base font-bold text-on-background flex items-center gap-1.5"
-        >
-          <span class="material-symbols-outlined text-primary text-lg"
-            >assignment_ind</span
+      <!-- 4. Additional Spec PDF Document (If Present) -->
+      <div v-if="job.pdfUrl" class="space-y-3 text-left">
+        <h3 class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-rose-600 text-base">picture_as_pdf</span>
+          Documentación Oficial
+        </h3>
+        <div class="flex items-center justify-between p-4 bg-rose-500/5 border border-rose-500/20 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-rose-600 text-3xl">picture_as_pdf</span>
+            <div>
+              <p class="text-xs font-bold text-on-background">Descriptor_de_Puesto.pdf</p>
+              <p class="text-[10px] text-on-surface-variant">Documento oficial adjunto por la empresa</p>
+            </div>
+          </div>
+          <a
+            :href="job.pdfUrl"
+            target="_blank"
+            download
+            class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center gap-1"
           >
-          Postulación e Interés Profesional
+            <span class="material-symbols-outlined text-sm">download</span>
+            Descargar
+          </a>
+        </div>
+      </div>
+
+      <hr class="border-outline-variant/30" />
+
+      <!-- 5. White Light Leaflet Location Map Section -->
+      <div class="space-y-3 text-left">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-bold text-on-background flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-xl">location_on</span>
+            Ubicación de la Oferta
+          </h2>
+          <NuxtLink
+            :to="`/map?lat=${job.lat || 19.4326}&lng=${job.lng || -99.1332}`"
+            class="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+          >
+            <span>Ver mapa interactivo</span>
+            <span class="material-symbols-outlined text-sm">open_in_new</span>
+          </NuxtLink>
+        </div>
+
+        <p class="text-xs text-on-surface-variant">
+          {{ job.sector || "Ubicación Georeferenciada" }} • Coordenadas:
+          <span class="font-mono text-on-background font-semibold">Lat {{ job.lat }}, Lng {{ job.lng }}</span>
+        </p>
+
+        <!-- Pure White Light Map Container -->
+        <div
+          id="job-detail-leaflet-map"
+          class="h-60 w-full rounded-2xl overflow-hidden border border-outline-variant/60 shadow-inner bg-slate-50 z-0"
+        ></div>
+      </div>
+
+      <hr class="border-outline-variant/30" />
+
+      <!-- 6. Application Form Section -->
+      <div id="apply-section" class="space-y-4 text-left">
+        <h2 class="text-base font-bold text-on-background flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-xl">assignment_ind</span>
+          Postularme a esta Vacante
         </h2>
 
+        <!-- Alert if evaluation -->
         <div
           v-if="job.estado === 'EVALUACION'"
-          class="p-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-xs leading-relaxed space-y-2 text-left"
+          class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-800 text-xs leading-relaxed space-y-1"
         >
-          <p class="font-bold flex items-center gap-1">
+          <p class="font-bold flex items-center gap-1.5">
             <span class="material-symbols-outlined text-base">warning</span>
-            Postulaciones pausadas temporalmente
+            Postulaciones pausadas
           </p>
-          <p>
-            Esta vacante se encuentra bajo revisión por el equipo de moderación.
-            No se permiten nuevas postulaciones hasta que se resuelva su
-            estatus.
-          </p>
+          <p>Esta vacante se encuentra en revisión por moderadores. No se permiten nuevas postulaciones por el momento.</p>
         </div>
 
+        <!-- Already Applied Card -->
         <div
           v-else-if="hasApplied"
-          class="p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-xs leading-relaxed space-y-2"
+          class="p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-800 text-xs leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         >
-          <p class="font-bold flex items-center gap-1">
-            <span class="material-symbols-outlined text-base"
-              >check_circle</span
-            >
-            ¡Ya te has postulado a esta vacante!
-          </p>
-          <p>
-            Tu CV y perfil profesional han sido enviados al equipo de
-            reclutamiento de <strong>{{ job.company }}</strong
-            >. Te mantendremos informado de cualquier avance mediante
-            notificaciones.
-          </p>
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-600 text-3xl">check_circle</span>
+            <div>
+              <p class="font-bold text-sm text-emerald-900">¡Ya estás postulado a esta vacante!</p>
+              <p class="text-emerald-800">Tu perfil y CV están siendo evaluados por <strong>{{ job.company }}</strong>.</p>
+            </div>
+          </div>
+          <NuxtLink
+            :to="`/messages?jobId=${jobId}&candidateId=${session?.user?.id || ''}`"
+            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm"
+          >
+            <span class="material-symbols-outlined text-sm">forum</span>
+            Ir al Chat
+          </NuxtLink>
         </div>
 
+        <!-- Application Options -->
         <div v-else class="space-y-4">
-          <!-- Easy Apply Option if Candidate has a CV in their Profile -->
+          <!-- Easy Apply Card -->
           <div
             v-if="profileCvUrl"
-            class="bg-primary/5 border border-primary/20 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            class="bg-primary/5 border border-primary/20 p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
           >
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-primary text-3xl"
-                >bolt</span
-              >
-              <div class="text-left">
-                <p class="text-xs font-bold text-on-background">
-                  Aplicar rápido con tu CV del perfil
-                </p>
-                <p
-                  class="text-[10px] text-on-surface-variant/85 truncate max-w-xs md:max-w-md"
-                >
-                  Archivo: {{ profileCvName }}
-                </p>
+            <div class="flex items-center gap-3.5">
+              <span class="material-symbols-outlined text-primary text-3xl">bolt</span>
+              <div>
+                <p class="text-xs font-bold text-on-background">Postulación Rápida (Easy Apply)</p>
+                <p class="text-[11px] text-on-surface-variant">Usar mi CV guardado: <strong>{{ profileCvName }}</strong></p>
               </div>
             </div>
             <button
               type="button"
               @click="submitEasyApplication"
               :disabled="isApplying"
-              class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95 duration-100 disabled:opacity-50 flex-shrink-0"
+              class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-5 py-3 rounded-xl transition flex items-center justify-center gap-1.5 shadow-md shadow-primary/20 active:scale-95 disabled:opacity-50 flex-shrink-0"
             >
-              <span
-                v-if="isApplying"
-                class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"
-              ></span>
-              <span class="material-symbols-outlined text-sm">bolt</span>
+              <span v-if="isApplying" class="animate-spin text-xs">⏳</span>
+              <span v-else class="material-symbols-outlined text-sm">bolt</span>
               Postulación Rápida
             </button>
           </div>
 
-          <div v-if="profileCvUrl" class="relative flex py-2 items-center">
+          <div v-if="profileCvUrl" class="relative flex py-1 items-center">
             <div class="flex-grow border-t border-outline-variant/30"></div>
-            <span
-              class="flex-shrink mx-4 text-[10px] text-on-surface-variant font-bold uppercase tracking-wider"
-              >O subir un nuevo CV</span
-            >
+            <span class="flex-shrink mx-4 text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">O subir un nuevo CV</span>
             <div class="flex-grow border-t border-outline-variant/30"></div>
           </div>
 
+          <!-- File Upload Form -->
           <form @submit.prevent="submitApplication" class="space-y-4">
-            <p class="text-xs text-on-surface-variant">
-              Sube tu currículum vitae en formato PDF para enviar tu postulación
-              de forma automática.
-            </p>
-
-            <!-- Upload CV Input Area -->
             <div
-              class="border-2 border-dashed border-outline-variant hover:border-primary rounded-2xl p-6 text-center cursor-pointer transition relative"
+              class="border-2 border-dashed border-outline-variant hover:border-primary rounded-2xl p-6 text-center cursor-pointer transition relative bg-surface-container-low/20"
             >
               <input
                 type="file"
@@ -465,60 +329,44 @@
                 id="cv-upload-input"
               />
               <div class="space-y-2">
-                <span class="material-symbols-outlined text-[40px] text-outline"
-                  >cloud_upload</span
-                >
+                <span class="material-symbols-outlined text-[40px] text-primary/60">cloud_upload</span>
                 <p class="text-xs font-bold text-on-background">
-                  {{
-                    selectedFile
-                      ? selectedFile.name
-                      : "Arrastra o haz clic para subir tu CV (PDF)"
-                  }}
+                  {{ selectedFile ? selectedFile.name : "Arrastra o haz clic para subir tu CV (PDF)" }}
                 </p>
-                <p class="text-[10px] text-on-surface-variant/80">
-                  Límite de tamaño: 5MB
-                </p>
+                <p class="text-[10px] text-on-surface-variant">Formato permitido: PDF (Máximo 5MB)</p>
               </div>
             </div>
 
-            <div class="flex justify-end pt-2">
+            <div class="flex justify-end">
               <button
                 type="submit"
                 :disabled="!selectedFile || isApplying"
-                class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 disabled:text-white/60 font-bold text-xs px-5 py-2.5 rounded-xl transition flex items-center gap-1 shadow-md shadow-primary/10"
+                class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-xs px-6 py-3 rounded-xl transition flex items-center gap-1.5 shadow-md shadow-primary/20"
               >
-                <span
-                  v-if="isApplying"
-                  class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"
-                ></span>
-                {{ isApplying ? "Enviando CV..." : "Enviar Postulación" }}
+                <span v-if="isApplying" class="animate-spin text-xs">⏳</span>
+                <span>{{ isApplying ? "Enviando CV..." : "Enviar mi Postulación" }}</span>
               </button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- 4. Comuni-red Pattern Threaded Comments Section -->
-      <div
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-6"
-      >
-        <h2
-          class="text-base font-bold text-on-background flex items-center gap-1.5 border-b border-outline-variant/30 pb-4"
-        >
-          <span class="material-symbols-outlined text-primary text-lg"
-            >forum</span
-          >
-          Comentarios y Preguntas ({{ totalComments }})
+      <hr class="border-outline-variant/30" />
+
+      <!-- 7. Public Q&A Section -->
+      <div class="space-y-6 text-left">
+        <h2 class="text-base font-bold text-on-background flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-xl">forum</span>
+          Preguntas y Comentarios ({{ totalComments }})
         </h2>
 
         <!-- Comment Input -->
         <form @submit.prevent="submitComment" class="flex flex-col gap-3">
           <textarea
             v-model="newCommentText"
-            placeholder="Pregunta o comenta algo sobre este puesto..."
+            placeholder="Pregunta algo al reclutador sobre esta vacante..."
             rows="3"
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl p-4 text-xs text-on-background outline-none transition placeholder-on-surface-variant/50 resize-none font-sans"
-            aria-label="Agregar un comentario público"
+            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-2xl p-4 text-xs text-on-background outline-none transition placeholder-on-surface-variant/50 resize-none font-sans"
           ></textarea>
           <div class="flex justify-end">
             <button
@@ -526,47 +374,35 @@
               :disabled="!newCommentText.trim() || isCreatingComment"
               class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm"
             >
-              Comentar
+              Publicar Pregunta
             </button>
           </div>
         </form>
 
         <!-- Comments Tree Render -->
-        <div
-          v-if="commentTree.length === 0"
-          class="text-center py-8 text-on-surface-variant/60 text-xs"
-        >
-          <span class="material-symbols-outlined text-[32px] text-outline mb-2"
-            >comments_disabled</span
-          >
-          <p>No hay preguntas todavía. Sé el primero en comentar.</p>
+        <div v-if="commentTree.length === 0" class="text-center py-6 text-on-surface-variant/60 text-xs">
+          <span class="material-symbols-outlined text-[32px] text-outline mb-1">comments_disabled</span>
+          <p>No hay preguntas aún. ¡Sé el primero en consultar!</p>
         </div>
 
-        <div v-else class="space-y-6">
+        <div v-else class="space-y-4">
           <div
             v-for="node in commentTree"
             :key="node.id"
-            class="p-4 bg-surface-container-lowest border border-outline-variant/40 rounded-xl space-y-3 relative group"
+            class="p-4 bg-surface-container-low/30 border border-outline-variant/40 rounded-2xl space-y-3 relative"
           >
             <!-- Comment Header -->
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div
-                  class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-inner"
-                >
+                <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-inner">
                   {{ node.user.username.charAt(0).toUpperCase() }}
                 </div>
                 <div>
-                  <h4 class="text-xs font-bold text-on-background">
-                    {{ node.user.username }}
-                  </h4>
-                  <span class="text-[10px] text-on-surface-variant/80">{{
-                    formatDate(node.createdAt)
-                  }}</span>
+                  <h4 class="text-xs font-bold text-on-background">{{ node.user.username }}</h4>
+                  <span class="text-[10px] text-on-surface-variant/80">{{ formatDate(node.createdAt) }}</span>
                 </div>
               </div>
 
-              <!-- Delete Action for comment author -->
               <button
                 v-if="canDeleteComment(node)"
                 @click="deleteComment(node.id)"
@@ -577,13 +413,9 @@
               </button>
             </div>
 
-            <!-- Content -->
-            <p class="text-xs text-on-surface-variant leading-relaxed">
-              {{ node.content }}
-            </p>
+            <p class="text-xs text-on-surface-variant leading-relaxed">{{ node.content }}</p>
 
-            <!-- Actions Bar -->
-            <div class="flex items-center gap-3 pt-2">
+            <div class="flex items-center gap-3 pt-1">
               <button
                 @click="toggleReplyForm(node.id)"
                 class="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
@@ -597,7 +429,7 @@
             <form
               v-if="replyingToCommentId === node.id"
               @submit.prevent="submitReply(node.id)"
-              class="mt-3 flex gap-2"
+              class="mt-2 flex gap-2"
             >
               <input
                 v-model="replyContentText"
@@ -608,54 +440,43 @@
               <button
                 type="submit"
                 :disabled="!replyContentText.trim() || isCreatingComment"
-                class="bg-secondary text-white font-bold text-xs px-4 py-2 rounded-xl hover:bg-[#005236] transition shadow-sm"
+                class="bg-secondary text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm"
               >
                 Responder
               </button>
             </form>
 
-            <!-- Nested Replies (Replies tree render) -->
+            <!-- Nested Replies -->
             <div
               v-if="node.children && node.children.length > 0"
-              class="ml-6 md:ml-8 mt-4 border-l-2 border-outline-variant/30 pl-4 space-y-4"
+              class="ml-6 md:ml-8 mt-3 border-l-2 border-outline-variant/30 pl-4 space-y-3"
             >
               <div
                 v-for="reply in node.children"
                 :key="reply.id"
-                class="p-3 bg-surface-container-low/40 border border-outline-variant/20 rounded-xl space-y-2 relative"
+                class="p-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl space-y-2"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <div
-                      class="w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[10px] shadow-sm"
-                    >
+                    <div class="w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[10px]">
                       {{ reply.user.username.charAt(0).toUpperCase() }}
                     </div>
                     <div>
-                      <h5 class="text-[11px] font-bold text-on-background">
-                        {{ reply.user.username }}
-                      </h5>
-                      <span class="text-[9px] text-on-surface-variant/80">{{
-                        formatDate(reply.createdAt)
-                      }}</span>
+                      <h5 class="text-[11px] font-bold text-on-background">{{ reply.user.username }}</h5>
+                      <span class="text-[9px] text-on-surface-variant">{{ formatDate(reply.createdAt) }}</span>
                     </div>
                   </div>
 
-                  <!-- Delete Action for reply author -->
                   <button
                     v-if="canDeleteComment(reply)"
                     @click="deleteComment(reply.id)"
                     class="text-rose-600 hover:bg-rose-50 p-1 rounded-md transition"
                     title="Eliminar respuesta"
                   >
-                    <span class="material-symbols-outlined text-xs"
-                      >delete</span
-                    >
+                    <span class="material-symbols-outlined text-xs">delete</span>
                   </button>
                 </div>
-                <p class="text-xs text-on-surface-variant leading-relaxed">
-                  {{ reply.content }}
-                </p>
+                <p class="text-xs text-on-surface-variant leading-relaxed">{{ reply.content }}</p>
               </div>
             </div>
           </div>
@@ -912,6 +733,16 @@ const route = useRoute();
 const router = useRouter();
 const jobsStore = useJobsStore();
 const { data: session, status } = useAuth();
+
+useHead({
+  link: [
+    {
+      rel: "stylesheet",
+      href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+      crossorigin: "",
+    },
+  ],
+});
 
 const jobId = route.params.id as string;
 const loading = ref(true);
@@ -1260,9 +1091,10 @@ onMounted(async () => {
       }).setView([job.value.lat || 19.4326, job.value.lng || -99.1332], 13);
 
       L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-          attribution: "",
+          attribution: "&copy; OpenStreetMap contributors",
+          maxZoom: 19,
         },
       ).addTo(map);
 

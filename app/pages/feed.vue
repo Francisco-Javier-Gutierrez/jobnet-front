@@ -51,6 +51,45 @@
 
       <!-- Filter Controls -->
       <div v-if="showFilters" class="flex flex-col gap-4">
+        <!-- Geo-Radius Area Filter Bar -->
+        <div class="p-3 bg-primary/5 border border-primary/20 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-xl">near_me</span>
+            <div>
+              <p class="text-xs font-bold text-on-background">Área Geográfica y Radio de Búsqueda</p>
+              <p class="text-[10px] text-on-surface-variant">
+                <span v-if="isGeoActive">📍 Ubicación detectada (Lat {{ userLat.toFixed(2) }}, Lng {{ userLng.toFixed(2) }})</span>
+                <span v-else>Ubicación predeterminada</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <!-- Radius Select -->
+            <select
+              v-model="filterRadiusKm"
+              class="bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-1.5 text-xs text-on-background outline-none transition font-bold"
+            >
+              <option value="">Todas las distancias</option>
+              <option value="5">Radio de 5 km</option>
+              <option value="10">Radio de 10 km</option>
+              <option value="25">Radio de 25 km</option>
+              <option value="50">Radio de 50 km</option>
+              <option value="100">Radio de 100 km</option>
+            </select>
+
+            <button
+              type="button"
+              @click="requestGeoLocation"
+              class="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold rounded-xl transition flex items-center gap-1"
+              title="Obtener mi posición GPS"
+            >
+              <span class="material-symbols-outlined text-sm">my_location</span>
+              <span>GPS</span>
+            </button>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <!-- Modality Filter -->
           <div class="flex flex-col gap-1.5">
@@ -330,22 +369,33 @@
 
         <!-- Footer -->
         <div
-          class="border-t border-outline-variant/30 pt-3 mt-2 flex items-center justify-between"
+          class="border-t border-outline-variant/30 pt-3 mt-2 flex items-center justify-between gap-2"
         >
-          <div class="text-[10px] text-on-surface-variant font-semibold">
-            <span v-if="job.lat && job.lng"
-              >Lat: {{ job.lat }}, Lng: {{ job.lng }}</span
-            >
-            <span v-else>Ubicación remota</span>
+          <div class="text-[10px] text-on-surface-variant font-bold flex items-center gap-1">
+            <span v-if="job.modalidad === 'Remoto'" class="text-primary font-bold">💻 Empleo Remoto</span>
+            <span v-else-if="job.lat && job.lng" class="text-emerald-700 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+              📍 A {{ getDistanceKm(userLat, userLng, job.lat, job.lng) }} km de ti
+            </span>
+            <span v-else>Ubicación general</span>
           </div>
-          <NuxtLink
-            :to="`/map?lat=${job.lat}&lng=${job.lng}`"
-            @click.stop
-            class="text-primary hover:text-primary-container text-xs font-bold transition flex items-center gap-0.5"
-          >
-            Ver mapa
-            <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </NuxtLink>
+          <div class="flex items-center gap-2">
+            <NuxtLink
+              v-if="job.lat && job.lng"
+              :to="`/map?lat=${job.lat}&lng=${job.lng}`"
+              @click.stop
+              class="text-on-surface-variant hover:text-primary text-xs font-semibold transition flex items-center gap-0.5"
+              title="Ver ubicación en el mapa"
+            >
+              <span class="material-symbols-outlined text-sm">map</span>
+            </NuxtLink>
+            <NuxtLink
+              :to="`/jobs/${job.id}`"
+              class="px-3.5 py-1.5 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95"
+            >
+              <span>Ver y Postularme</span>
+              <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>
@@ -371,6 +421,12 @@ const router = useRouter();
 // Search state
 const searchQuery = ref("");
 
+// Geo-location & Radius state
+const userLat = ref(19.4326); // Default CDMX
+const userLng = ref(-99.1332);
+const isGeoActive = ref(false);
+const filterRadiusKm = ref("");
+
 // Filter state
 const showFilters = ref(false);
 const filterModality = ref("");
@@ -379,6 +435,37 @@ const filterLocation = ref("");
 const filterSkills = ref<string[]>([]);
 const skillSearchInput = ref("");
 const showSkillDropdown = ref(false);
+
+// Haversine formula to compute distance in KM between 2 lat/lng points
+const getDistanceKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
+  const R = 6371; // Earth radius in KM
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c * 10) / 10;
+};
+
+const requestGeoLocation = () => {
+  if (process.client && navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        userLat.value = pos.coords.latitude;
+        userLng.value = pos.coords.longitude;
+        isGeoActive.value = true;
+      },
+      (err) => {
+        console.warn("Geolocation request failed:", err.message);
+      }
+    );
+  }
+};
 
 // Format salary as readable string
 const formatSalary = (amount: number): string => {
@@ -415,6 +502,7 @@ const activeFilterCount = computed(() => {
   if (filterModality.value) count++;
   if (filterSector.value) count++;
   if (filterLocation.value) count++;
+  if (filterRadiusKm.value) count++;
   count += filterSkills.value.length;
   return count;
 });
@@ -423,6 +511,7 @@ const clearFilters = () => {
   filterModality.value = "";
   filterSector.value = "";
   filterLocation.value = "";
+  filterRadiusKm.value = "";
   filterSkills.value = [];
   skillSearchInput.value = "";
 };
@@ -441,6 +530,17 @@ const filteredJobs = computed(() => {
       return (
         title.includes(query) || company.includes(query) || desc.includes(query)
       );
+    });
+  }
+
+  // Radius filter
+  if (filterRadiusKm.value) {
+    const maxRadius = parseFloat(filterRadiusKm.value);
+    results = results.filter((job: Job) => {
+      if (job.modalidad === "Remoto") return true;
+      if (!job.lat || !job.lng) return false;
+      const dist = getDistanceKm(userLat.value, userLng.value, job.lat, job.lng);
+      return dist <= maxRadius;
     });
   }
 

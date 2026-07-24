@@ -118,34 +118,41 @@
         class="lg:col-span-7 flex flex-col h-full bg-surface-container-lowest"
       >
         <template v-if="activeChat">
-          <!-- Chat Header -->
+          <!-- Header for active chat -->
           <div
-            class="p-4 border-b border-outline-variant/60 bg-surface-container-low/25 flex items-center justify-between"
+            class="p-4 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20"
           >
             <div class="flex items-center gap-3">
               <div
-                class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm"
+                class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs"
               >
                 {{ activeChat.name.charAt(0).toUpperCase() }}
               </div>
               <div>
-                <h3 class="text-xs font-bold text-on-background">
+                <h2 class="text-xs font-bold text-on-background">
                   {{ activeChat.name }}
-                </h3>
-                <p class="text-[11px] text-primary font-semibold">
-                  {{ activeChat.jobTitle }}
+                </h2>
+                <p class="text-[11px] text-on-surface-variant">
+                  {{ activeChat.jobTitle }} •
+                  <span class="text-primary font-semibold">{{
+                    activeChat.status
+                  }}</span>
                 </p>
               </div>
             </div>
-            <!-- Status pill -->
-            <span
-              class="px-3 py-1 rounded-full text-[9px] font-bold tracking-wider uppercase bg-secondary/15 text-secondary border border-secondary/20"
+
+            <!-- Header actions: Dispute / Report button -->
+            <button
+              @click="openDisputeModal"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 text-xs font-semibold border border-rose-500/20 transition"
+              title="Abrir un reclamo o disputa con moderación"
             >
-              {{ activeChat.status }}
-            </span>
+              <span class="material-symbols-outlined text-sm">flag</span>
+              <span>Abrir Reclamo</span>
+            </button>
           </div>
 
-          <!-- Messages Body -->
+          <!-- Chat messages area -->
           <div
             ref="messageContainer"
             class="flex-grow p-4 overflow-y-auto max-h-[400px] flex flex-col gap-4 bg-slate-50/50"
@@ -189,7 +196,36 @@
                     : 'bg-surface-container-low border border-outline-variant/30 rounded-tl-none text-on-surface',
                 ]"
               >
-                <p class="whitespace-pre-wrap">{{ msg.text }}</p>
+                <p v-if="msg.text" class="whitespace-pre-wrap">{{ msg.text }}</p>
+
+                <!-- Attachment Rendering -->
+                <div v-if="msg.attachmentUrl" class="mt-2">
+                  <div
+                    v-if="msg.attachmentType === 'image' || isImageUrl(msg.attachmentUrl)"
+                    class="rounded-xl overflow-hidden border border-white/20 max-w-[220px]"
+                  >
+                    <img
+                      :src="msg.attachmentUrl"
+                      alt="Adjunto"
+                      class="w-full h-auto object-cover max-h-[180px] cursor-pointer hover:opacity-90 transition"
+                      @click="openImagePreview(msg.attachmentUrl)"
+                    />
+                  </div>
+                  <a
+                    v-else
+                    :href="msg.attachmentUrl"
+                    target="_blank"
+                    rel="noopener"
+                    class="flex items-center gap-2 p-2.5 rounded-xl bg-black/10 hover:bg-black/20 text-current transition font-medium border border-white/10"
+                  >
+                    <span class="material-symbols-outlined text-base">description</span>
+                    <span class="truncate max-w-[150px] text-[11px]">{{
+                      msg.attachmentName || "Documento Adjunto"
+                    }}</span>
+                    <span class="material-symbols-outlined text-xs ml-auto">download</span>
+                  </a>
+                </div>
+
                 <span
                   :class="[
                     'block text-[9px] mt-1.5 text-right',
@@ -204,10 +240,30 @@
             </div>
           </div>
 
-          <!-- Message input -->
+          <!-- Message input bar -->
           <div
             class="p-4 border-t border-outline-variant/60 bg-surface-container-low/25 flex items-center gap-3"
           >
+            <!-- Hidden File Input -->
+            <input
+              type="file"
+              ref="fileInput"
+              class="hidden"
+              accept="image/*,.pdf,.doc,.docx,.txt"
+              @change="handleFileUpload"
+            />
+
+            <!-- Attachment Button -->
+            <button
+              @click="triggerFileInput"
+              :disabled="wsStatus !== 'connected' || isUploading"
+              class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant flex items-center justify-center transition disabled:opacity-50"
+              title="Adjuntar CV o documento (PDF/Imagen)"
+            >
+              <span v-if="isUploading" class="animate-spin text-sm">⏳</span>
+              <span v-else class="material-symbols-outlined text-lg">attach_file</span>
+            </button>
+
             <input
               v-model="newMessage"
               @keyup.enter="handleSend"
@@ -218,7 +274,7 @@
             />
             <button
               @click="handleSend"
-              :disabled="wsStatus !== 'connected' || !newMessage.value?.trim()"
+              :disabled="wsStatus !== 'connected' || (!newMessage.trim() && !pendingAttachment)"
               class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50"
             >
               <span class="material-symbols-outlined text-lg">send</span>
@@ -246,6 +302,76 @@
         </template>
       </div>
     </div>
+
+    <!-- Dispute / Reclamo Modal -->
+    <div
+      v-if="showDisputeModal"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+    >
+      <div
+        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4"
+      >
+        <div class="flex items-center justify-between border-b border-outline-variant/40 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-rose-600 text-xl">flag</span>
+            <h3 class="text-base font-bold text-on-background">Abrir Reclamo o Disputa</h3>
+          </div>
+          <button
+            @click="showDisputeModal = false"
+            class="text-on-surface-variant hover:text-on-background transition"
+          >
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
+
+        <p class="text-xs text-on-surface-variant leading-relaxed">
+          Si experimentas problemas con la postulación a <strong>{{ activeChat?.jobTitle }}</strong> (falta de respuesta, irregularidades, discriminación o modificación de términos), abre un reclamo. Un moderador auditará la disputa en tiempo real.
+        </p>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-on-background mb-1">Motivo principal</label>
+            <select
+              v-model="disputeForm.reason"
+              class="w-full bg-surface border border-outline-variant/60 rounded-xl px-3 py-2 text-xs text-on-background outline-none focus:border-primary"
+            >
+              <option value="Sin respuesta / Abandono de vacante">Sin respuesta / Abandono de vacante</option>
+              <option value="Modificación unilateral de condiciones de empleo">Modificación unilateral de condiciones</option>
+              <option value="Solicitud indebida de dinero o datos sensibles">Solicitud indebida de dinero / datos</option>
+              <option value="Discriminación o conducta inapropiada">Discriminación o conducta inapropiada</option>
+              <option value="Otro motivo de discrepancia">Otro motivo</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-on-background mb-1">Descripción detallada</label>
+            <textarea
+              v-model="disputeForm.description"
+              rows="3"
+              placeholder="Explica detalladamente la situación y proporciona contexto adicional..."
+              class="w-full bg-surface border border-outline-variant/60 rounded-xl p-3 text-xs text-on-background outline-none focus:border-primary"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button
+            @click="showDisputeModal = false"
+            class="px-4 py-2 rounded-xl text-xs font-semibold border border-outline-variant text-on-surface-variant hover:bg-surface-container-high transition"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="submitDispute"
+            :disabled="isSubmittingDispute || !disputeForm.description.trim()"
+            class="px-5 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition disabled:opacity-50 flex items-center gap-1.5"
+          >
+            <span v-if="isSubmittingDispute" class="animate-spin text-xs">⏳</span>
+            <span>Enviar Reclamo a Moderación</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -261,6 +387,17 @@ useSeoMeta({
 const route = useRoute();
 const config = useRuntimeConfig();
 const { data: session, status } = useAuth();
+
+const fileInput = ref<HTMLInputElement | null>(null);
+const isUploading = ref(false);
+const pendingAttachment = ref<{ url: string; type: string; name: string } | null>(null);
+
+const showDisputeModal = ref(false);
+const isSubmittingDispute = ref(false);
+const disputeForm = ref({
+  reason: "Sin respuesta / Abandono de vacante",
+  description: "",
+});
 
 const userId = computed(() => (session.value?.user as any)?.id || "");
 const userRole = computed(
@@ -497,10 +634,108 @@ const triggerReconnect = () => {
   }, 5000); // Wait 5 seconds to reconnect
 };
 
+// Trigger Hidden File Dialog
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
+
+// Handle File Selection and S3 Presigned Upload
+const handleFileUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (!target.files || target.files.length === 0) return;
+
+  const file = target.files[0];
+  isUploading.value = true;
+
+  try {
+    const res = await $fetch<any>(
+      `${config.public.apiUrl}/upload-url?filename=${encodeURIComponent(file.name)}&folder=chat&userId=${userId.value}`,
+    );
+
+    if (!res.uploadUrl || !res.publicUrl) {
+      throw new Error("No presigned upload URL generated");
+    }
+
+    // Upload directly to S3 Bucket
+    await $fetch(res.uploadUrl, {
+      method: "PUT",
+      body: file,
+      headers: {
+        "Content-Type": file.type || "application/octet-stream",
+      },
+    });
+
+    const isImg = file.type.startsWith("image/");
+    pendingAttachment.value = {
+      url: res.publicUrl,
+      type: isImg ? "image" : "file",
+      name: file.name,
+    };
+
+    // Auto-send attachment message
+    await handleSend();
+  } catch (err) {
+    console.error("Error uploading file to S3:", err);
+    alert("Error al subir archivo. Verifica tu conexión o formato.");
+  } finally {
+    isUploading.value = false;
+    if (fileInput.value) fileInput.value.value = "";
+  }
+};
+
+const isImageUrl = (url: string) => {
+  if (!url) return false;
+  return /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url);
+};
+
+const openImagePreview = (url: string) => {
+  window.open(url, "_blank");
+};
+
+// Open Dispute Modal
+const openDisputeModal = () => {
+  if (!activeChat.value) return;
+  disputeForm.value.reason = "Sin respuesta / Abandono de vacante";
+  disputeForm.value.description = "";
+  showDisputeModal.value = true;
+};
+
+// Submit Dispute to Moderation
+const submitDispute = async () => {
+  if (!activeChat.value || !disputeForm.value.description.trim()) return;
+  isSubmittingDispute.value = true;
+
+  try {
+    const payload = {
+      jobId: activeChat.value.jobId,
+      jobTitle: activeChat.value.jobTitle,
+      candidateId: activeChat.value.candidateId,
+      complainantId: userId.value,
+      complainantRole: userRole.value || "CANDIDATO",
+      complainantName: session.value?.user?.name || "Usuario",
+      reason: disputeForm.value.reason,
+      description: disputeForm.value.description,
+    };
+
+    await $fetch(`${config.public.apiUrl}/moderator/disputes`, {
+      method: "POST",
+      body: payload,
+    });
+
+    alert("Reclamo creado exitosamente. Un moderador revisará la disputa en tiempo real.");
+    showDisputeModal.value = false;
+  } catch (err) {
+    console.error("Error submitting dispute:", err);
+    alert("Error al enviar el reclamo. Intenta nuevamente.");
+  } finally {
+    isSubmittingDispute.value = false;
+  }
+};
+
 // Handle sending message via WebSocket
 const handleSend = async () => {
   if (
-    !newMessage.value.trim() ||
+    (!newMessage.value.trim() && !pendingAttachment.value) ||
     !activeChat.value ||
     wsStatus.value !== "connected"
   )
@@ -508,16 +743,25 @@ const handleSend = async () => {
 
   const text = newMessage.value;
   const timestamp = new Date().toISOString();
+  const attachment = pendingAttachment.value;
 
-  // Optimistically push to local message logs
-  messages.value.push({
+  const msgPayload: any = {
     senderId: userId.value,
     text,
     createdAt: timestamp,
-  });
+  };
+
+  if (attachment) {
+    msgPayload.attachmentUrl = attachment.url;
+    msgPayload.attachmentType = attachment.type;
+    msgPayload.attachmentName = attachment.name;
+  }
+
+  // Optimistically push to local message logs
+  messages.value.push(msgPayload);
 
   // Update last message preview
-  activeChat.value.lastMessage = text;
+  activeChat.value.lastMessage = text || attachment?.name || "Archivo adjunto";
   activeChat.value.time = formatTime(timestamp);
 
   // Send message through WebSocket
@@ -527,10 +771,14 @@ const handleSend = async () => {
       jobId: activeChat.value.jobId,
       candidateId: activeChat.value.candidateId,
       text,
+      attachmentUrl: attachment?.url,
+      attachmentType: attachment?.type,
+      attachmentName: attachment?.name,
     }),
   );
 
   newMessage.value = "";
+  pendingAttachment.value = null;
   await scrollToBottom();
 };
 
