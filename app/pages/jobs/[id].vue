@@ -564,55 +564,57 @@
           </button>
         </div>
       </form>
-    <!-- Modal de Perfil Desactualizado (Falta CV) -->
+    </div>
+  </div>
+
+  <!-- Modal de Perfil Desactualizado (Falta CV) -->
+  <div
+    v-if="showMissingCvModal"
+    class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+  >
     <div
-      v-if="showMissingCvModal"
-      class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+      class="bg-white border border-outline-variant/60 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-6 text-left"
     >
-      <div
-        class="bg-white border border-outline-variant/60 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-6 text-left"
-      >
-        <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
-          <div class="flex items-center gap-2 text-amber-600">
-            <span class="material-symbols-outlined text-2xl">warning</span>
-            <h3 class="text-base font-extrabold text-on-background">
-              Perfil desactualizado
-            </h3>
-          </div>
-          <button
-            @click="showMissingCvModal = false"
-            class="text-on-surface-variant hover:bg-surface-container rounded-lg p-1.5 transition"
-          >
-            <span class="material-symbols-outlined text-sm">close</span>
-          </button>
+      <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
+        <div class="flex items-center gap-2 text-amber-600">
+          <span class="material-symbols-outlined text-2xl">warning</span>
+          <h3 class="text-base font-extrabold text-on-background">
+            Perfil desactualizado
+          </h3>
         </div>
+        <button
+          @click="showMissingCvModal = false"
+          class="text-on-surface-variant hover:bg-surface-container rounded-lg p-1.5 transition"
+        >
+          <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+      </div>
 
-        <div class="space-y-3">
-          <p class="text-xs text-on-surface-variant leading-relaxed">
-            Para realizar una <strong class="text-on-background">Postulación en 1-Clic (Easy Apply)</strong>, es requisito indispensable tener tu <strong>Currículum Vitae (PDF)</strong> cargado en tu perfil digital.
-          </p>
-          <p class="text-xs text-on-surface-variant leading-relaxed bg-amber-50 border border-amber-200 p-3.5 rounded-2xl text-amber-900 font-semibold">
-            💡 Al subir tu CV en tu perfil una sola vez, podrás postularte de forma instantánea a cualquier vacante sin necesidad de volver a cargar archivos.
-          </p>
-        </div>
+      <div class="space-y-3">
+        <p class="text-xs text-on-surface-variant leading-relaxed">
+          Para realizar una <strong class="text-on-background">Postulación en 1-Clic (Easy Apply)</strong>, es requisito indispensable tener tu <strong>Currículum Vitae (PDF)</strong> cargado en tu perfil digital.
+        </p>
+        <p class="text-xs text-on-surface-variant leading-relaxed bg-amber-50 border border-amber-200 p-3.5 rounded-2xl text-amber-900 font-semibold">
+          💡 Al subir tu CV en tu perfil una sola vez, podrás postularte de forma instantánea a cualquier vacante sin necesidad de volver a cargar archivos.
+        </p>
+      </div>
 
-        <div class="flex flex-col gap-2.5 pt-2">
-          <NuxtLink
-            to="/profile"
-            class="w-full bg-primary hover:bg-primary-container text-white font-bold text-xs py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-md shadow-primary/20 text-center"
-          >
-            <span class="material-symbols-outlined text-sm">badge</span>
-            <span>Ir a mi Perfil a subir mi CV</span>
-          </NuxtLink>
+      <div class="flex flex-col gap-2.5 pt-2">
+        <NuxtLink
+          to="/profile"
+          class="w-full bg-primary hover:bg-primary-container text-white font-bold text-xs py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-md shadow-primary/20 text-center"
+        >
+          <span class="material-symbols-outlined text-sm">badge</span>
+          <span>Ir a mi Perfil a subir mi CV</span>
+        </NuxtLink>
 
-          <button
-            type="button"
-            @click="showMissingCvModal = false"
-            class="w-full bg-surface border border-outline-variant hover:bg-surface-container text-on-surface-variant font-semibold text-xs py-3 rounded-2xl transition"
-          >
-            Cancelar
-          </button>
-        </div>
+        <button
+          type="button"
+          @click="showMissingCvModal = false"
+          class="w-full bg-surface border border-outline-variant hover:bg-surface-container text-on-surface-variant font-semibold text-xs py-3 rounded-2xl transition"
+        >
+          Cancelar
+        </button>
       </div>
     </div>
   </div>
