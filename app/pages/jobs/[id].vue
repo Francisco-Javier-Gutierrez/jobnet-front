@@ -125,11 +125,14 @@
 
         <!-- Apply Fast Button -->
         <button
-          @click="scrollToApply"
-          class="px-6 py-3 bg-primary hover:bg-primary-container text-white font-bold text-xs rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 flex-shrink-0"
+          @click="handleEasyApplyClick"
+          :disabled="hasApplied || isApplying"
+          class="px-6 py-3 bg-primary hover:bg-primary-container text-white font-bold text-xs rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 flex-shrink-0 disabled:opacity-80"
         >
-          <span class="material-symbols-outlined text-base">send</span>
-          <span>Postularme Ahora</span>
+          <span v-if="isApplying" class="animate-spin text-sm">⏳</span>
+          <span v-else-if="hasApplied" class="material-symbols-outlined text-base">check_circle</span>
+          <span v-else class="material-symbols-outlined text-base">bolt</span>
+          <span>{{ hasApplied ? "Postulado con Éxito" : "Postulación en 1-Clic" }}</span>
         </button>
       </div>
 
@@ -247,8 +250,8 @@
       <!-- 6. Application Form Section -->
       <div id="apply-section" class="space-y-4 text-left">
         <h2 class="text-base font-bold text-on-background flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-xl">assignment_ind</span>
-          Postularme a esta Vacante
+          <span class="material-symbols-outlined text-primary text-xl">bolt</span>
+          Postulación en 1-Clic (Easy Apply)
         </h2>
 
         <!-- Alert if evaluation -->
@@ -266,88 +269,67 @@
         <!-- Already Applied Card -->
         <div
           v-else-if="hasApplied"
-          class="p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-800 text-xs leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+          class="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-3xl text-emerald-800 text-xs leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm"
         >
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-emerald-600 text-3xl">check_circle</span>
+          <div class="flex items-center gap-3.5">
+            <span class="material-symbols-outlined text-emerald-600 text-4xl">check_circle</span>
             <div>
-              <p class="font-bold text-sm text-emerald-900">¡Ya estás postulado a esta vacante!</p>
-              <p class="text-emerald-800">Tu perfil y CV están siendo evaluados por <strong>{{ job.company }}</strong>.</p>
+              <p class="font-bold text-sm text-emerald-950">¡Ya estás postulado a esta vacante!</p>
+              <p class="text-emerald-800">Tu información profesional y el CV almacenado en tu perfil han sido transmitidos a <strong>{{ job.company }}</strong>.</p>
             </div>
           </div>
           <NuxtLink
             :to="`/messages?jobId=${jobId}&candidateId=${session?.user?.id || ''}`"
-            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm"
+            class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-md flex-shrink-0"
           >
             <span class="material-symbols-outlined text-sm">forum</span>
-            Ir al Chat
+            Ir al Chat Privado
           </NuxtLink>
         </div>
 
-        <!-- Application Options -->
-        <div v-else class="space-y-4">
-          <!-- Easy Apply Card -->
-          <div
-            v-if="profileCvUrl"
-            class="bg-primary/5 border border-primary/20 p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-          >
-            <div class="flex items-center gap-3.5">
-              <span class="material-symbols-outlined text-primary text-3xl">bolt</span>
-              <div>
-                <p class="text-xs font-bold text-on-background">Postulación Rápida (Easy Apply)</p>
-                <p class="text-[11px] text-on-surface-variant">Usar mi CV guardado: <strong>{{ profileCvName }}</strong></p>
+        <!-- Easy Apply Primary Card -->
+        <div
+          v-else
+          class="bg-gradient-to-br from-primary/10 via-surface-container-low to-emerald-500/5 border border-primary/20 p-6 rounded-3xl space-y-4 shadow-sm"
+        >
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-2xl">bolt</span>
+                <h3 class="text-sm font-extrabold text-on-background">Postulación Instantánea en 1-Clic</h3>
               </div>
+              <p class="text-xs text-on-surface-variant leading-relaxed">
+                Envía un mensaje estandarizado a {{ job.company }} adjuntando el CV PDF que ya tienes cargado en tu perfil digital, sin necesidad de subir archivos repetidos.
+              </p>
             </div>
+
+            <!-- CV Status Badge -->
+            <div v-if="profileCvUrl" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 rounded-xl text-xs font-bold whitespace-nowrap self-start sm:self-center">
+              <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+              <span>CV listo: {{ profileCvName }}</span>
+            </div>
+            <div v-else class="flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500/10 text-amber-800 border border-amber-500/20 rounded-xl text-xs font-bold whitespace-nowrap self-start sm:self-center">
+              <span class="material-symbols-outlined text-sm">warning</span>
+              <span>Sin CV en Perfil</span>
+            </div>
+          </div>
+
+          <div class="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant/20">
+            <p class="text-[11px] text-on-surface-variant/80 italic">
+              ⚡ Al hacer clic, se extraerán tus datos profesionales para el reclutador.
+            </p>
+
             <button
               type="button"
-              @click="submitEasyApplication"
+              @click="handleEasyApplyClick"
               :disabled="isApplying"
-              class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-5 py-3 rounded-xl transition flex items-center justify-center gap-1.5 shadow-md shadow-primary/20 active:scale-95 disabled:opacity-50 flex-shrink-0"
+              class="w-full sm:w-auto bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50"
             >
               <span v-if="isApplying" class="animate-spin text-xs">⏳</span>
               <span v-else class="material-symbols-outlined text-sm">bolt</span>
-              Postulación Rápida
+              <span>{{ isApplying ? "Enviando Postulación..." : "Postularme en 1-Clic" }}</span>
             </button>
           </div>
-
-          <div v-if="profileCvUrl" class="relative flex py-1 items-center">
-            <div class="flex-grow border-t border-outline-variant/30"></div>
-            <span class="flex-shrink mx-4 text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">O subir un nuevo CV</span>
-            <div class="flex-grow border-t border-outline-variant/30"></div>
-          </div>
-
-          <!-- File Upload Form -->
-          <form @submit.prevent="submitApplication" class="space-y-4">
-            <div
-              class="border-2 border-dashed border-outline-variant hover:border-primary rounded-2xl p-6 text-center cursor-pointer transition relative bg-surface-container-low/20"
-            >
-              <input
-                type="file"
-                accept=".pdf"
-                @change="handleFileChange"
-                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                id="cv-upload-input"
-              />
-              <div class="space-y-2">
-                <span class="material-symbols-outlined text-[40px] text-primary/60">cloud_upload</span>
-                <p class="text-xs font-bold text-on-background">
-                  {{ selectedFile ? selectedFile.name : "Arrastra o haz clic para subir tu CV (PDF)" }}
-                </p>
-                <p class="text-[10px] text-on-surface-variant">Formato permitido: PDF (Máximo 5MB)</p>
-              </div>
-            </div>
-
-            <div class="flex justify-end">
-              <button
-                type="submit"
-                :disabled="!selectedFile || isApplying"
-                class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-xs px-6 py-3 rounded-xl transition flex items-center gap-1.5 shadow-md shadow-primary/20"
-              >
-                <span v-if="isApplying" class="animate-spin text-xs">⏳</span>
-                <span>{{ isApplying ? "Enviando CV..." : "Enviar mi Postulación" }}</span>
-              </button>
-            </div>
-          </form>
         </div>
       </div>
 
@@ -582,6 +564,56 @@
           </button>
         </div>
       </form>
+    <!-- Modal de Perfil Desactualizado (Falta CV) -->
+    <div
+      v-if="showMissingCvModal"
+      class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+    >
+      <div
+        class="bg-white border border-outline-variant/60 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-6 text-left"
+      >
+        <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
+          <div class="flex items-center gap-2 text-amber-600">
+            <span class="material-symbols-outlined text-2xl">warning</span>
+            <h3 class="text-base font-extrabold text-on-background">
+              Perfil desactualizado
+            </h3>
+          </div>
+          <button
+            @click="showMissingCvModal = false"
+            class="text-on-surface-variant hover:bg-surface-container rounded-lg p-1.5 transition"
+          >
+            <span class="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <p class="text-xs text-on-surface-variant leading-relaxed">
+            Para realizar una <strong class="text-on-background">Postulación en 1-Clic (Easy Apply)</strong>, es requisito indispensable tener tu <strong>Currículum Vitae (PDF)</strong> cargado en tu perfil digital.
+          </p>
+          <p class="text-xs text-on-surface-variant leading-relaxed bg-amber-50 border border-amber-200 p-3.5 rounded-2xl text-amber-900 font-semibold">
+            💡 Al subir tu CV en tu perfil una sola vez, podrás postularte de forma instantánea a cualquier vacante sin necesidad de volver a cargar archivos.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-2.5 pt-2">
+          <NuxtLink
+            to="/profile"
+            class="w-full bg-primary hover:bg-primary-container text-white font-bold text-xs py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-md shadow-primary/20 text-center"
+          >
+            <span class="material-symbols-outlined text-sm">badge</span>
+            <span>Ir a mi Perfil a subir mi CV</span>
+          </NuxtLink>
+
+          <button
+            type="button"
+            @click="showMissingCvModal = false"
+            class="w-full bg-surface border border-outline-variant hover:bg-surface-container text-on-surface-variant font-semibold text-xs py-3 rounded-2xl transition"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -599,6 +631,7 @@ const config = useRuntimeConfig();
 
 const profileCvUrl = ref("");
 const profileCvName = ref("");
+const showMissingCvModal = ref(false);
 
 const fetchCandidateProfile = async () => {
   if (status.value !== "authenticated" || !session.value?.user?.id) return;
@@ -613,17 +646,45 @@ const fetchCandidateProfile = async () => {
       `${config.public.apiUrl}/profile/${session.value.user.id}`,
       { headers }
     );
-    if (profile && profile.cvUrl) {
-      profileCvUrl.value = profile.cvUrl;
-      profileCvName.value = profile.cvFileName || "mi-curriculum.pdf";
+    const foundCv =
+      profile?.cvUrl ||
+      profile?.documentosProfesionales?.cvUrl ||
+      profile?.cvPath ||
+      profile?.curriculumUrl ||
+      "";
+
+    if (profile && foundCv) {
+      profileCvUrl.value = foundCv;
+      profileCvName.value =
+        profile.cvFileName ||
+        profile.documentosProfesionales?.cvFileName ||
+        "Mi_Curriculum_Vitae.pdf";
+    } else {
+      profileCvUrl.value = "";
+      profileCvName.value = "";
     }
   } catch (e) {
     console.error("Error fetching candidate profile for easy apply:", e);
   }
 };
 
+const handleEasyApplyClick = () => {
+  if (status.value !== "authenticated") {
+    navigateTo("/login?redirect=" + encodeURIComponent(route.fullPath));
+    return;
+  }
+  if (!profileCvUrl.value) {
+    showMissingCvModal.value = true;
+    return;
+  }
+  submitEasyApplication();
+};
+
 const submitEasyApplication = async () => {
-  if (!profileCvUrl.value) return;
+  if (!profileCvUrl.value) {
+    showMissingCvModal.value = true;
+    return;
+  }
   isApplying.value = true;
 
   try {
@@ -635,13 +696,17 @@ const submitEasyApplication = async () => {
     }
 
     const candidateId = session.value?.user?.id || "mock-candidate-id";
+    const candidateName = session.value?.user?.name || "Candidato";
+    const standardizedCoverLetter = `Hola, mi nombre es ${candidateName}. Me complace presentar mi postulación a la vacante '${job.value?.title || "Oferta de Empleo"}' en ${job.value?.company || "la empresa"} mediante la función de Postulación en 1-Clic (Easy Apply). Adjunto mi Currículum Vitae cargado en mi perfil digital.`;
 
     await $fetch(`${config.public.apiUrl}/jobs/${jobId}/apply`, {
       method: "POST",
       headers,
       body: {
         candidateId,
-        coverLetter: `CV adjunto: ${profileCvUrl.value}`,
+        coverLetter: standardizedCoverLetter,
+        cvUrl: profileCvUrl.value,
+        cvFileName: profileCvName.value,
       },
     });
 
@@ -650,7 +715,7 @@ const submitEasyApplication = async () => {
       localStorage.setItem(`job-applied-${jobId}`, "true");
     }
 
-    // Redirect to the chat conversation
+    // Redirect to the private chat conversation
     navigateTo(`/messages?jobId=${jobId}&candidateId=${candidateId}`);
   } catch (e: any) {
     console.error("Error submitting easy application:", e);
