@@ -45,6 +45,15 @@
       {{ successMsg }}
     </div>
 
+    <!-- RF-47 Recruitment Chat Informative Banner -->
+    <div class="mb-6 bg-sky-500/10 border border-sky-500/20 p-4 rounded-2xl flex items-start gap-3 text-xs text-sky-900 shadow-sm">
+      <span class="material-symbols-outlined text-sky-600 text-xl flex-shrink-0">info</span>
+      <div>
+        <p class="font-bold text-sky-950">Mensajería Privada en Tiempo Real (RF-47)</p>
+        <p class="text-sky-800">El canal de chat privado e integrado con cada aspirante se desbloquea automáticamente cuando avanzas su postulación al estatus <strong>"Seleccionado"</strong> o <strong>"Entrevista"</strong>.</p>
+      </div>
+    </div>
+
     <!-- Kanban Board Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Column component -->
@@ -122,14 +131,23 @@
                 <!-- Chat link if selected/interview -->
                 <nuxt-link
                   v-if="
-                    item.status === 'ENTREVISTA' || item.status === 'ACEPTADO'
+                    ['SELECCIONADO', 'ENTREVISTA', 'ACEPTADO', 'CONTRATADO'].includes(item.status)
                   "
                   :to="`/messages?jobId=${item.jobId}&candidateId=${item.id}`"
-                  class="w-6 h-6 rounded-md bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 flex items-center justify-center transition"
-                  title="Abrir Chat de Mensajería"
+                  class="w-6 h-6 rounded-md bg-sky-500 text-white hover:bg-sky-600 flex items-center justify-center transition shadow-sm"
+                  title="💬 Chat Privado Activo (Haz clic para conversar con el aspirante)"
                 >
                   <span class="material-symbols-outlined text-xs">forum</span>
                 </nuxt-link>
+
+                <!-- Locked chat indicator when pending evaluation -->
+                <span
+                  v-else
+                  class="w-6 h-6 rounded-md bg-surface border border-outline-variant/40 text-on-surface-variant/40 flex items-center justify-center cursor-help"
+                  title="🔒 Chat bloqueado: Se desbloquea automáticamente al mover el candidato a 'Seleccionado' (RF-47)"
+                >
+                  <span class="material-symbols-outlined text-xs">lock</span>
+                </span>
 
                 <!-- Move back button -->
                 <button
