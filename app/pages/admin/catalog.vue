@@ -1,10 +1,12 @@
 <template>
-  <div class="max-w-4xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-4xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-on-background mb-2">
         Catálogo Maestro
       </h1>
-      <p class="text-on-surface-variant text-sm">
+      <p class="text-on-surface-variant dark:text-slate-300 text-sm">
         Gestiona y expande de forma global la lista maestra de habilidades
         técnicas sugeridas y sectores industriales.
       </p>
@@ -29,7 +31,7 @@
     <!-- Stats row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
       <div
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-sm flex items-center gap-4"
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-5 shadow-sm flex items-center gap-4"
       >
         <div
           class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary"
@@ -38,7 +40,7 @@
         </div>
         <div>
           <span
-            class="text-xs text-on-surface-variant font-bold uppercase tracking-wider"
+            class="text-xs text-on-surface-variant dark:text-slate-300 font-bold uppercase tracking-wider"
             >Habilidades Técnicas</span
           >
           <h2 class="text-2xl font-bold text-on-background">
@@ -47,7 +49,7 @@
         </div>
       </div>
       <div
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-sm flex items-center gap-4"
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-5 shadow-sm flex items-center gap-4"
       >
         <div
           class="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary"
@@ -56,7 +58,7 @@
         </div>
         <div>
           <span
-            class="text-xs text-on-surface-variant font-bold uppercase tracking-wider"
+            class="text-xs text-on-surface-variant dark:text-slate-300 font-bold uppercase tracking-wider"
             >Sectores Laborales</span
           >
           <h2 class="text-2xl font-bold text-on-background">
@@ -68,7 +70,7 @@
 
     <!-- RF-10: Expansión del Catálogo (Agregar Nuevo Elemento) -->
     <div
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm mb-8"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 shadow-sm mb-8"
     >
       <h3
         class="text-sm font-bold text-on-background mb-4 flex items-center gap-2"
@@ -84,7 +86,7 @@
       >
         <div class="flex-grow flex flex-col gap-1.5 w-full">
           <label
-            class="text-xs font-bold text-on-surface-variant"
+            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
             for="new-item-name"
             >Nombre del Elemento</label
           >
@@ -97,20 +99,23 @@
             class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
           />
         </div>
-        <div class="flex flex-col gap-1.5 w-full sm:w-48">
-          <label
-            class="text-xs font-bold text-on-surface-variant"
-            for="new-item-category"
-            >Categoría</label
-          >
-          <select
+        <div class="w-full sm:w-56">
+          <AppSelect
             v-model="newItemCategory"
-            id="new-item-category"
-            class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23777587%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.5rem_center] bg-[length:1.5em_1.5em] pr-10"
-          >
-            <option value="Habilidad">Habilidad Técnica</option>
-            <option value="Sector">Sector Laboral</option>
-          </select>
+            label="Categoría"
+            :options="[
+              {
+                value: 'Habilidad',
+                label: 'Habilidad Técnica',
+                icon: 'psychology',
+              },
+              {
+                value: 'Sector',
+                label: 'Sector Laboral',
+                icon: 'business_center',
+              },
+            ]"
+          />
         </div>
         <button
           type="submit"
@@ -132,7 +137,7 @@
         :class="
           activeCategoryTab === 'Habilidad'
             ? 'text-primary border-b-2 border-primary font-bold'
-            : 'text-on-surface-variant hover:text-primary'
+            : 'text-on-surface-variant dark:text-slate-300 hover:text-primary'
         "
         class="pb-3 px-4 text-sm font-semibold transition"
       >
@@ -146,7 +151,7 @@
         :class="
           activeCategoryTab === 'Sector'
             ? 'text-primary border-b-2 border-primary font-bold'
-            : 'text-on-surface-variant hover:text-primary'
+            : 'text-on-surface-variant dark:text-slate-300 hover:text-primary'
         "
         class="pb-3 px-4 text-sm font-semibold transition"
       >
@@ -156,12 +161,12 @@
 
     <!-- RF-9 & RF-11: Listado, Paginación y Modificación -->
     <div
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
     >
       <table class="w-full text-left border-collapse">
         <thead>
           <tr
-            class="bg-surface-container-low/30 border-b border-outline-variant/60 text-xs text-on-surface-variant uppercase tracking-wider font-bold"
+            class="bg-surface-container-low/30 border-b border-outline-variant/60 text-xs text-on-surface-variant dark:text-slate-300 uppercase tracking-wider font-bold"
           >
             <th class="py-3.5 px-6">Nombre de la Habilidad o Sector</th>
             <th class="py-3.5 px-6 hidden sm:table-cell">Categoría</th>
@@ -199,7 +204,7 @@
             <tr v-if="paginatedItems.length === 0">
               <td
                 colspan="4"
-                class="py-8 text-center text-on-surface-variant text-xs"
+                class="py-8 text-center text-on-surface-variant dark:text-slate-300 text-xs"
               >
                 No hay elementos registrados en esta categoría.
               </td>
@@ -242,7 +247,7 @@
 
               <!-- Registration Date -->
               <td
-                class="py-4 px-6 text-on-surface-variant text-xs hidden md:table-cell font-mono"
+                class="py-4 px-6 text-on-surface-variant dark:text-slate-300 text-xs hidden md:table-cell font-mono"
               >
                 {{ formatDate(item.createdAt) }}
               </td>
@@ -263,7 +268,7 @@
                   </button>
                   <button
                     @click="cancelEdit"
-                    class="bg-surface border border-outline-variant hover:bg-surface-container-high text-on-surface-variant transition px-3 py-1.5 rounded-lg text-xs font-semibold"
+                    class="bg-surface border border-outline-variant hover:bg-surface-container-high text-on-surface-variant dark:text-slate-300 transition px-3 py-1.5 rounded-lg text-xs font-semibold"
                     title="Cancelar edición"
                   >
                     Cancelar
@@ -298,7 +303,7 @@
         v-if="totalPages > 1"
         class="p-4 border-t border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20"
       >
-        <span class="text-xs text-on-surface-variant">
+        <span class="text-xs text-on-surface-variant dark:text-slate-300">
           Mostrando {{ pageStartIndex + 1 }}-{{
             Math.min(pageEndIndex, filteredItems.length)
           }}
@@ -308,7 +313,7 @@
           <button
             @click="currentPage = Math.max(1, currentPage - 1)"
             :disabled="currentPage === 1"
-            class="p-1.5 rounded-lg border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant disabled:opacity-50 transition"
+            class="p-1.5 rounded-lg border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant dark:text-slate-300 disabled:opacity-50 transition"
           >
             <span class="material-symbols-outlined text-sm flex items-center"
               >chevron_left</span
@@ -321,7 +326,7 @@
             :class="
               currentPage === p
                 ? 'bg-primary text-white border-primary'
-                : 'border-outline-variant/60 text-on-surface-variant hover:bg-surface-container-high'
+                : 'border-outline-variant/60 text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-high'
             "
             class="w-8 h-8 rounded-lg border font-bold text-xs flex items-center justify-center transition"
           >
@@ -330,7 +335,7 @@
           <button
             @click="currentPage = Math.min(totalPages, currentPage + 1)"
             :disabled="currentPage === totalPages"
-            class="p-1.5 rounded-lg border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant disabled:opacity-50 transition"
+            class="p-1.5 rounded-lg border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant dark:text-slate-300 disabled:opacity-50 transition"
           >
             <span class="material-symbols-outlined text-sm flex items-center"
               >chevron_right</span
@@ -343,8 +348,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-
 import { useCatalogStore, type CatalogItem } from "~/stores/catalog";
 
 useSeoMeta({

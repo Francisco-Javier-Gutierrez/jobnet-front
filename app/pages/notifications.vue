@@ -1,10 +1,12 @@
 <template>
-  <div class="max-w-xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <!-- Header -->
     <div class="mb-6 flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-on-background">Notificaciones</h1>
-        <p class="text-xs text-on-surface-variant">
+        <p class="text-xs text-on-surface-variant dark:text-slate-300">
           Mantente al tanto de tus ofertas, comentarios y comunidad.
         </p>
       </div>
@@ -22,7 +24,7 @@
       <div
         v-for="i in 4"
         :key="i"
-        class="p-4 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl flex gap-3 h-20 items-center"
+        class="p-4 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl flex gap-3 h-20 items-center"
       >
         <div class="w-10 h-10 rounded-full bg-outline/20"></div>
         <div class="flex-grow space-y-2">
@@ -35,7 +37,7 @@
     <!-- Empty State -->
     <div
       v-else-if="notifications.length === 0"
-      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm px-6"
+      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl shadow-sm px-6"
     >
       <div
         class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4"
@@ -47,7 +49,7 @@
       <h2 class="text-base font-bold text-on-background mb-1">
         Sin notificaciones
       </h2>
-      <p class="text-xs text-on-surface-variant max-w-xs">
+      <p class="text-xs text-on-surface-variant dark:text-slate-300 max-w-xs">
         Te avisaremos cuando recibas ofertas, respuestas a tus preguntas o
         interacciones con tus publicaciones.
       </p>
@@ -62,7 +64,7 @@
           'p-4 rounded-2xl border transition duration-200 flex gap-3 items-start',
           notif.unread
             ? 'bg-primary/5 border-primary/20 shadow-sm'
-            : 'bg-surface-container-lowest border-outline-variant/40',
+            : 'bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border-outline-variant/40',
         ]"
       >
         <!-- Icon / Avatar -->
@@ -85,15 +87,26 @@
               {{ notif.title }}
             </h4>
             <span
-              class="text-[9px] text-on-surface-variant font-mono flex-shrink-0"
+              class="text-[9px] text-on-surface-variant dark:text-slate-300 font-mono flex-shrink-0"
               >{{ notif.time }}</span
             >
           </div>
-          <p class="text-xs text-on-surface-variant mt-0.5 leading-relaxed">
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-300 mt-0.5 leading-relaxed"
+          >
             {{ notif.message }}
           </p>
-          <div v-if="notif.unread" class="mt-2">
+          <div class="mt-2.5 flex items-center gap-3">
             <button
+              v-if="notif.type === 'SUSPENSION_NOTICE'"
+              @click="joinAppealAction(notif)"
+              class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-sm">forum</span>
+              Apelar Decisión
+            </button>
+            <button
+              v-if="notif.unread"
               @click="markAsRead(notif.id)"
               class="text-[10px] text-primary font-extrabold hover:underline"
             >
@@ -107,8 +120,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-
 useSeoMeta({
   title: "Notificaciones - JobNet",
   description:
@@ -117,11 +128,20 @@ useSeoMeta({
 
 interface NotificationItem {
   id: string;
-  type: "like" | "comment" | "application" | "system";
+  type:
+    | "like"
+    | "comment"
+    | "application"
+    | "system"
+    | "SUSPENSION_NOTICE"
+    | "SUSPENSION_CANCELLED"
+    | "SUSPENSION_CONFIRMED";
   title: string;
   message: string;
   time: string;
   unread: boolean;
+  actionType?: string;
+  companyId?: string;
 }
 
 const loading = ref(true);
@@ -135,6 +155,12 @@ const getIconName = (type: NotificationItem["type"]) => {
       return "forum";
     case "application":
       return "work";
+    case "SUSPENSION_NOTICE":
+      return "warning";
+    case "SUSPENSION_CANCELLED":
+      return "task_alt";
+    case "SUSPENSION_CONFIRMED":
+      return "block";
     default:
       return "info";
   }
@@ -143,26 +169,38 @@ const getIconName = (type: NotificationItem["type"]) => {
 const getIconBgClass = (type: NotificationItem["type"]) => {
   switch (type) {
     case "like":
-      return "bg-rose-50 border border-rose-100";
+      return "bg-rose-50 border border-rose-100 dark:bg-rose-950/40 dark:border-rose-900";
     case "comment":
-      return "bg-emerald-50 border border-emerald-100";
+      return "bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/40 dark:border-emerald-900";
     case "application":
-      return "bg-blue-50 border border-blue-100";
+      return "bg-blue-50 border border-blue-100 dark:bg-blue-950/40 dark:border-blue-900";
+    case "SUSPENSION_NOTICE":
+      return "bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-800";
+    case "SUSPENSION_CANCELLED":
+      return "bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-800";
+    case "SUSPENSION_CONFIRMED":
+      return "bg-rose-50 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-800";
     default:
-      return "bg-slate-50 border border-slate-100";
+      return "bg-slate-50 border border-slate-100 dark:bg-slate-900 dark:border-slate-800";
   }
 };
 
 const getIconTextClass = (type: NotificationItem["type"]) => {
   switch (type) {
     case "like":
-      return "text-rose-600";
+      return "text-rose-600 dark:text-rose-400";
     case "comment":
-      return "text-emerald-600";
+      return "text-emerald-600 dark:text-emerald-400";
     case "application":
-      return "text-blue-600";
+      return "text-blue-600 dark:text-blue-400";
+    case "SUSPENSION_NOTICE":
+      return "text-amber-600 dark:text-amber-400";
+    case "SUSPENSION_CANCELLED":
+      return "text-emerald-600 dark:text-emerald-400";
+    case "SUSPENSION_CONFIRMED":
+      return "text-rose-600 dark:text-rose-400";
     default:
-      return "text-slate-600";
+      return "text-slate-600 dark:text-slate-400";
   }
 };
 
@@ -238,6 +276,29 @@ const markAllAsRead = () => {
     n.unread = false;
   });
   saveNotifications();
+};
+
+const config = useRuntimeConfig();
+const { data: authSession } = useAuth();
+const router = useRouter();
+
+const joinAppealAction = async (notif: NotificationItem) => {
+  const companyId = notif.companyId || (authSession.value?.user as any)?.id;
+  if (!companyId) return;
+
+  try {
+    await $fetch(
+      `${config.public.apiUrl}/moderator/organizations/${companyId}/join-appeal`,
+      {
+        method: "POST",
+      },
+    );
+    alert("Te has unido al chat de apelación. Un moderador revisará tu caso.");
+    router.push("/support");
+  } catch (e: any) {
+    console.error("Error joining appeal:", e);
+    router.push("/support");
+  }
 };
 
 onMounted(() => {

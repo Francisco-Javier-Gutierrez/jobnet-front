@@ -1,175 +1,202 @@
 <template>
-  <div
-    class="min-h-screen bg-background text-on-background flex items-center justify-center p-4"
-  >
+  <div class="w-full max-w-md" role="main">
     <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(53,37,205,0.06),transparent_40%)] pointer-events-none"
-      aria-hidden="true"
-    ></div>
-
-    <div class="w-full max-w-md relative z-10" role="main">
-      <div
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm p-8 flex flex-col gap-6"
-      >
-        <div class="text-center flex flex-col items-center">
+      class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl shadow-sm p-6 sm:p-8 flex flex-col gap-6"
+    >
+      <div class="text-center flex flex-col items-center">
+        <NuxtLink
+          to="/"
+          class="inline-block mb-3"
+          aria-label="Volver al inicio"
+        >
+          <img
+            src="/logo.svg"
+            alt="Logotipo de JobNet"
+            class="h-20 sm:h-24 w-auto filter brightness-100 dark:brightness-0 dark:invert transition-all hover:scale-105"
+          />
+        </NuxtLink>
+        <h1
+          class="text-xl sm:text-2xl font-bold tracking-tight text-on-background dark:text-slate-100 mt-1"
+        >
+          Nueva contraseña
+        </h1>
+        <div class="mt-2 w-full text-left">
           <NuxtLink
-            to="/"
-            class="inline-block mb-4"
-            aria-label="Volver al inicio"
+            to="/login"
+            class="font-semibold text-primary hover:underline transition text-sm inline-flex items-center gap-1"
+            aria-label="Volver a la pantalla de inicio de sesión"
           >
-            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-24 w-auto" />
+            <span class="material-symbols-outlined text-sm" aria-hidden="true"
+              >arrow_back</span
+            >
+            Volver al inicio de sesión
           </NuxtLink>
-          <h1 class="text-2xl font-bold tracking-tight text-on-background">
-            Nueva contraseña
-          </h1>
-          <div class="mt-3 w-full text-left">
-            <NuxtLink
-              to="/login"
-              class="font-semibold text-primary hover:underline transition text-sm inline-flex items-center gap-1"
-              aria-label="Volver a la pantalla de inicio de sesión"
-            >
-              <span class="material-symbols-outlined text-sm" aria-hidden="true"
-                >arrow_back</span
-              >
-              Volver al inicio de sesión
-            </NuxtLink>
-          </div>
+        </div>
+      </div>
+
+      <form @submit.prevent="handleReset" class="space-y-5">
+        <div
+          v-if="errorMessage"
+          id="reset-error"
+          role="alert"
+          aria-live="assertive"
+          class="bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-3 rounded-lg text-sm flex items-start gap-2"
+        >
+          <span
+            class="material-symbols-outlined text-sm mt-0.5"
+            aria-hidden="true"
+            >error</span
+          >
+          <span>{{ errorMessage }}</span>
         </div>
 
-        <form @submit.prevent="handleReset" class="space-y-5">
-          <div
-            v-if="errorMessage"
-            id="reset-error"
-            role="alert"
-            aria-live="assertive"
-            class="bg-rose-500/10 border border-rose-500/20 text-rose-600 p-3 rounded-lg text-sm flex items-start gap-2"
+        <div
+          v-if="successMessage"
+          id="reset-success"
+          role="status"
+          aria-live="polite"
+          class="bg-secondary/10 border border-secondary/20 text-secondary dark:text-emerald-400 p-3 rounded-lg text-sm flex items-start gap-2"
+        >
+          <span
+            class="material-symbols-outlined text-sm mt-0.5"
+            aria-hidden="true"
+            >check_circle</span
           >
-            <span
-              class="material-symbols-outlined text-sm mt-0.5"
-              aria-hidden="true"
-              >error</span
-            >
-            <span>{{ errorMessage }}</span>
-          </div>
+          <span>{{ successMessage }}</span>
+        </div>
 
-          <div
-            v-if="successMessage"
-            id="reset-success"
-            role="status"
-            aria-live="polite"
-            class="bg-secondary/10 border border-secondary/20 text-secondary p-3 rounded-lg text-sm flex items-start gap-2"
+        <div>
+          <label
+            class="block text-xs font-semibold tracking-wider text-on-surface-variant dark:text-slate-300 mb-2"
+            for="code"
           >
-            <span
-              class="material-symbols-outlined text-sm mt-0.5"
-              aria-hidden="true"
-              >check_circle</span
-            >
-            <span>{{ successMessage }}</span>
-          </div>
+            Ingrese el código de confirmación
+          </label>
+          <input
+            id="code"
+            v-model="code"
+            type="text"
+            required
+            aria-required="true"
+            :aria-invalid="!!errorMessage"
+            :aria-describedby="
+              errorMessage
+                ? 'reset-error'
+                : successMessage
+                  ? 'reset-success'
+                  : undefined
+            "
+            class="w-full bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background dark:text-slate-100 outline-none transition-colors"
+          />
+        </div>
 
-          <div>
-            <label
-              class="block text-xs font-semibold tracking-wider text-on-surface-variant mb-2"
-              for="code"
-            >
-              Ingrese el código de confirmación
-            </label>
-            <input
-              id="code"
-              v-model="code"
-              type="text"
-              required
-              aria-required="true"
-              :aria-invalid="!!errorMessage"
-              :aria-describedby="
-                errorMessage
-                  ? 'reset-error'
-                  : successMessage
-                    ? 'reset-success'
-                    : undefined
-              "
-              class="w-full bg-[#F1F5F9] border border-[#F1F5F9] hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background outline-none transition-colors"
-            />
-          </div>
-
-          <div>
-            <label
-              class="block text-xs font-semibold tracking-wider text-on-surface-variant mb-2"
-              for="password"
-            >
-              Ingrese su nueva contraseña
-            </label>
-            <input
-              id="password"
-              v-model="newPassword"
-              type="password"
-              required
-              aria-required="true"
-              :aria-invalid="!!errorMessage"
-              class="w-full bg-[#F1F5F9] border border-[#F1F5F9] hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background outline-none transition-colors"
-            />
-          </div>
-
-          <div>
-            <label
-              class="block text-xs font-semibold tracking-wider text-on-surface-variant mb-2"
-              for="confirm_password"
-            >
-              Ingrese nuevamente su contraseña
-            </label>
-            <input
-              id="confirm_password"
-              v-model="confirmPassword"
-              type="password"
-              required
-              aria-required="true"
-              :aria-invalid="!!errorMessage"
-              class="w-full bg-[#F1F5F9] border border-[#F1F5F9] hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background outline-none transition-colors"
-            />
-          </div>
-
-          <button
-            type="submit"
-            :disabled="loading"
-            :aria-busy="loading"
-            class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm hover:shadow"
+        <div>
+          <label
+            class="block text-xs font-semibold tracking-wider text-on-surface-variant dark:text-slate-300 mb-2"
+            for="password"
           >
-            <span
-              v-if="loading"
-              class="material-symbols-outlined animate-spin text-lg"
-              aria-hidden="true"
-              >progress_activity</span
-            >
-            <span v-else>Actualizar</span>
-          </button>
-        </form>
+            Ingrese su nueva contraseña
+          </label>
+          <input
+            id="password"
+            v-model="newPassword"
+            type="password"
+            required
+            aria-required="true"
+            :aria-invalid="!!errorMessage"
+            class="w-full bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background dark:text-slate-100 outline-none transition-colors"
+          />
+        </div>
 
-        <div class="mt-6 text-center">
-          <p class="text-sm text-on-surface-variant">
-            ¿No recibiste el código?
-            <button
-              type="button"
-              @click="handleResend"
-              :disabled="resendLoading"
-              :aria-busy="resendLoading"
-              aria-label="Reenviar el código de restablecimiento por correo"
-              class="font-semibold text-primary hover:underline transition ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {{ resendLoading ? "Reenviando..." : "Reenviar" }}
-            </button>
+        <div>
+          <label
+            class="block text-xs font-semibold tracking-wider text-on-surface-variant dark:text-slate-300 mb-2"
+            for="confirm_password"
+          >
+            Ingrese nuevamente su contraseña
+          </label>
+          <input
+            id="confirm_password"
+            v-model="confirmPassword"
+            type="password"
+            required
+            aria-required="true"
+            :aria-invalid="!!errorMessage"
+            class="w-full bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background dark:text-slate-100 outline-none transition-colors"
+          />
+        </div>
+
+        <!-- Password Requirements Box -->
+        <div
+          class="select-none pointer-events-none rounded-xl border border-outline-variant/60 dark:border-slate-800 bg-[#F1F5F9] dark:bg-slate-800/80 p-3 text-on-surface-variant dark:text-slate-300"
+          aria-live="polite"
+        >
+          <p
+            class="mb-2 text-sm font-semibold text-on-surface dark:text-slate-100"
+          >
+            Requisitos de contraseña
           </p>
+          <div class="flex flex-col gap-1">
+            <label
+              v-for="rule in passwordRuleItems"
+              :key="rule.key"
+              class="flex items-center gap-2 text-xs"
+              :class="
+                rule.valid
+                  ? 'text-secondary dark:text-emerald-400 font-medium'
+                  : 'text-on-surface-variant dark:text-slate-400'
+              "
+            >
+              <input
+                type="checkbox"
+                disabled
+                :checked="rule.valid"
+                class="h-4 w-4 rounded border-outline-variant/60 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary accent-secondary"
+                aria-hidden="true"
+              />
+              <span>{{ rule.label }}</span>
+            </label>
+          </div>
         </div>
+
+        <button
+          type="submit"
+          :disabled="loading"
+          :aria-busy="loading"
+          class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm hover:shadow"
+        >
+          <span
+            v-if="loading"
+            class="material-symbols-outlined animate-spin text-lg"
+            aria-hidden="true"
+            >progress_activity</span
+          >
+          <span v-else>Actualizar</span>
+        </button>
+      </form>
+
+      <div class="mt-4 text-center">
+        <p class="text-sm text-on-surface-variant dark:text-slate-300">
+          ¿No recibiste el código?
+          <button
+            type="button"
+            @click="handleResend"
+            :disabled="resendLoading"
+            :aria-busy="resendLoading"
+            aria-label="Reenviar el código de restablecimiento por correo"
+            class="font-semibold text-primary hover:underline transition ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ resendLoading ? "Reenviando..." : "Reenviar" }}
+          </button>
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-
 definePageMeta({
-  layout: false,
+  layout: "auth",
 });
 
 useSeoMeta({
@@ -184,6 +211,38 @@ const email = ref((route.query.email as string) || "");
 const code = ref("");
 const newPassword = ref("");
 const confirmPassword = ref("");
+
+const passwordRules = computed(() => ({
+  length: newPassword.value.length >= 8,
+  uppercase: /[A-Z]/.test(newPassword.value),
+  lowercase: /[a-z]/.test(newPassword.value),
+  number: /\d/.test(newPassword.value),
+  special: /[@$!%*?&._-]/.test(newPassword.value),
+}));
+
+const passwordRuleItems = computed(() => [
+  {
+    key: "length",
+    label: "Al menos 8 caracteres",
+    valid: passwordRules.value.length,
+  },
+  {
+    key: "uppercase",
+    label: "Una letra mayúscula",
+    valid: passwordRules.value.uppercase,
+  },
+  {
+    key: "lowercase",
+    label: "Una letra minúscula",
+    valid: passwordRules.value.lowercase,
+  },
+  { key: "number", label: "Un número", valid: passwordRules.value.number },
+  {
+    key: "special",
+    label: "Un carácter especial (@$!%*?&._-)",
+    valid: passwordRules.value.special,
+  },
+]);
 
 const loading = ref(false);
 const resendLoading = ref(false);

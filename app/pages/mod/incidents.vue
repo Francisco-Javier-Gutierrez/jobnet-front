@@ -1,12 +1,17 @@
 <template>
-  <div class="max-w-5xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
-    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <div
+    class="max-w-5xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
+    <div
+      class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div>
         <h1 class="text-2xl font-bold text-on-background mb-1">
           Bandeja de Incidencias (Moderador)
         </h1>
-        <p class="text-on-surface-variant text-sm">
-          Audita y revisa los reportes de publicaciones de empleo e incidencias generadas en JobNet.
+        <p class="text-on-surface-variant dark:text-slate-300 text-sm">
+          Audita y revisa los reportes de publicaciones de empleo e incidencias
+          generadas en JobNet.
         </p>
       </div>
 
@@ -16,11 +21,11 @@
           class="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-bold rounded-xl transition flex items-center gap-1.5"
         >
           <span class="material-symbols-outlined text-sm">policy</span>
-          <span>Tabla de Auditoría (RF-73)</span>
+          <span>Tabla de Auditoría</span>
         </NuxtLink>
         <NuxtLink
           to="/mod/support"
-          class="px-4 py-2 bg-surface border border-outline-variant hover:border-primary text-on-surface-variant hover:text-primary text-xs font-bold rounded-xl transition flex items-center gap-1.5"
+          class="px-4 py-2 bg-surface border border-outline-variant hover:border-primary text-on-surface-variant dark:text-slate-300 hover:text-primary text-xs font-bold rounded-xl transition flex items-center gap-1.5"
         >
           <span class="material-symbols-outlined text-sm">forum</span>
           <span>Centro de Disputas</span>
@@ -30,7 +35,7 @@
 
     <!-- Incident list card -->
     <div
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
     >
       <div
         class="p-6 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20"
@@ -66,7 +71,7 @@
       <!-- Empty State -->
       <div
         v-else-if="incidents.length === 0"
-        class="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant"
+        class="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant dark:text-slate-300"
       >
         <span class="material-symbols-outlined text-[48px] text-primary/40 mb-3"
           >gavel</span
@@ -74,7 +79,7 @@
         <p class="text-sm font-semibold text-on-surface">
           Sin incidencias activas
         </p>
-        <p class="text-xs text-on-surface-variant mt-1">
+        <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
           No hay reportes de vacantes pendientes de revisión en la plataforma.
         </p>
       </div>
@@ -94,11 +99,11 @@
                 {{ inc.severity }}
               </span>
               <span
-                class="text-[10px] bg-outline-variant/40 text-on-surface-variant px-2 py-0.5 rounded font-bold uppercase"
+                class="text-[10px] bg-outline-variant/40 text-on-surface-variant dark:text-slate-300 px-2 py-0.5 rounded font-bold uppercase"
                 >{{ inc.infraccion }}</span
               >
               <span
-                class="text-xs text-on-surface-variant"
+                class="text-xs text-on-surface-variant dark:text-slate-300"
                 v-if="inc.fechaCreacion"
               >
                 {{ new Date(inc.fechaCreacion).toLocaleDateString() }}
@@ -110,7 +115,9 @@
             <p class="text-xs text-primary font-semibold mb-2">
               Reportado por: {{ inc.reporter }}
             </p>
-            <p class="text-xs text-on-surface-variant leading-relaxed mb-3">
+            <p
+              class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed mb-3"
+            >
               {{ inc.reason }}
             </p>
             <div v-if="inc.jobId">
@@ -178,8 +185,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-
 useSeoMeta({
   title: "Bandeja de Incidencias - JobNet",
   description:

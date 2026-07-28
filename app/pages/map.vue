@@ -25,8 +25,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router";
 import { useJobsStore } from "../stores/jobs";
 
 const route = useRoute();

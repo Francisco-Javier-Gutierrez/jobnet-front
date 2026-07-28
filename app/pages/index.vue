@@ -1,16 +1,29 @@
 <template>
-  <div class="bg-background min-h-screen flex flex-col font-sans">
+  <div
+    class="bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200 flex flex-col font-sans"
+  >
     <!-- Main Container -->
-    <main class="flex-grow max-w-lg mx-auto w-full px-4 py-8 space-y-6" role="main">
+    <main
+      class="flex-grow max-w-lg mx-auto w-full px-4 py-8 space-y-6"
+      role="main"
+    >
       <!-- Quick Vacancy Discovery Banner -->
-      <div class="bg-gradient-to-r from-primary/10 via-surface-container-lowest to-secondary/10 border border-primary/20 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+      <div
+        class="bg-gradient-to-r from-primary/10 via-surface-container-lowest to-secondary/10 border border-primary/20 rounded-2xl p-4 flex items-center justify-between shadow-sm"
+      >
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+          <div
+            class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold"
+          >
             <span class="material-symbols-outlined text-xl">work</span>
           </div>
           <div class="text-left">
-            <h3 class="text-xs font-bold text-on-background">Bolsa de Vacantes</h3>
-            <p class="text-[11px] text-on-surface-variant">Explora las ofertas activas y postúlate</p>
+            <h3 class="text-xs font-bold text-on-background">
+              Bolsa de Vacantes
+            </h3>
+            <p class="text-[11px] text-on-surface-variant dark:text-slate-300">
+              Explora las ofertas activas y postúlate
+            </p>
           </div>
         </div>
         <NuxtLink
@@ -29,7 +42,7 @@
           <div
             v-for="i in 3"
             :key="i"
-            class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm animate-pulse p-4"
+            class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm animate-pulse p-4"
           >
             <!-- Header Skeleton -->
             <div class="flex items-center gap-3 mb-4">
@@ -78,7 +91,7 @@
         <!-- Empty Feed State -->
         <template v-else>
           <div
-            class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm px-6"
+            class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl shadow-sm px-6"
           >
             <div
               class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6"
@@ -90,7 +103,9 @@
             <h2 class="text-xl font-bold text-on-background mb-2">
               No hay publicaciones en la comunidad
             </h2>
-            <p class="text-on-surface-variant text-sm max-w-sm mb-6">
+            <p
+              class="text-on-surface-variant dark:text-slate-300 text-sm max-w-sm mb-6"
+            >
               Aún no se han compartido publicaciones en el feed. ¡Sé el primero
               en compartir algo interesante con la comunidad!
             </p>
@@ -107,7 +122,7 @@
     >
       <!-- Bottom Sheet Panel -->
       <div
-        class="bg-surface-container-lowest border border-outline-variant/60 w-full max-w-lg rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh]"
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 w-full max-w-lg rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh]"
         :class="isDragging ? '' : 'transition-transform duration-300'"
         :style="{
           transform:
@@ -149,7 +164,7 @@
           </h3>
           <button
             @click="closeBottomSheet"
-            class="text-on-surface-variant hover:bg-surface-container-high p-1.5 rounded-full transition"
+            class="text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-high p-1.5 rounded-full transition"
           >
             <span class="material-symbols-outlined text-lg">close</span>
           </button>
@@ -170,7 +185,7 @@
 
           <!-- Comments List -->
           <div
-            class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/30 space-y-4"
+            class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-2xl p-4 border border-outline-variant/30 space-y-4"
           >
             <h4
               class="text-xs font-bold text-on-background flex items-center gap-1 pb-2 border-b border-outline-variant/20"
@@ -189,10 +204,15 @@
               <div class="flex justify-end">
                 <button
                   type="submit"
-                  :disabled="!newCommentText.trim()"
-                  class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-[10px] px-4 py-2 rounded-lg transition"
+                  :disabled="!newCommentText.trim() || isSubmittingComment"
+                  class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-[10px] px-4 py-2 rounded-lg transition flex items-center gap-1.5"
                 >
-                  Comentar
+                  <span v-if="isSubmittingComment" class="animate-spin text-xs"
+                    >⌛</span
+                  >
+                  <span>{{
+                    isSubmittingComment ? "Enviando..." : "Comentar"
+                  }}</span>
                 </button>
               </div>
             </form>
@@ -200,7 +220,7 @@
             <!-- Threaded tree list -->
             <div
               v-if="commentTree.length === 0"
-              class="text-center py-6 text-on-surface-variant/60 text-xs"
+              class="text-center py-6 text-on-surface-variant dark:text-slate-300/60 text-xs"
             >
               <span
                 class="material-symbols-outlined text-[28px] text-outline mb-1"
@@ -226,9 +246,10 @@
                       <h5 class="text-[11px] font-bold text-on-background">
                         {{ node.user || "Usuario" }}
                       </h5>
-                      <span class="text-[9px] text-on-surface-variant/75">{{
-                        node.timeAgo || "Hace un momento"
-                      }}</span>
+                      <span
+                        class="text-[9px] text-on-surface-variant dark:text-slate-300/75"
+                        >{{ node.timeAgo || "Hace un momento" }}</span
+                      >
                     </div>
                   </div>
                   <button
@@ -242,9 +263,10 @@
                   </button>
                 </div>
                 <p
-                  class="text-xs text-on-surface-variant leading-relaxed"
+                  class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
                   :class="{
-                    'italic text-on-surface-variant/60': node.isDeleted,
+                    'italic text-on-surface-variant dark:text-slate-300/60':
+                      node.isDeleted,
                   }"
                 >
                   {{ node.text }}
@@ -275,10 +297,12 @@
                   />
                   <button
                     type="submit"
-                    :disabled="!replyText.trim()"
-                    class="bg-secondary text-white font-bold text-[10px] px-3 py-1.5 rounded-lg hover:bg-[#005236] transition"
+                    :disabled="!replyText.trim() || isSubmittingReply"
+                    class="bg-secondary text-white disabled:bg-secondary/40 font-bold text-[10px] px-3 py-1.5 rounded-lg hover:bg-[#005236] transition flex items-center gap-1"
                   >
-                    Responder
+                    <span>{{
+                      isSubmittingReply ? "Enviando..." : "Responder"
+                    }}</span>
                   </button>
                 </form>
 
@@ -308,9 +332,10 @@
                           <h6 class="text-[10px] font-bold text-on-background">
                             {{ reply.user || "Usuario" }}
                           </h6>
-                          <span class="text-[8px] text-on-surface-variant/75">{{
-                            reply.timeAgo || "Hace un momento"
-                          }}</span>
+                          <span
+                            class="text-[8px] text-on-surface-variant dark:text-slate-300/75"
+                            >{{ reply.timeAgo || "Hace un momento" }}</span
+                          >
                         </div>
                       </div>
                       <button
@@ -324,9 +349,10 @@
                       </button>
                     </div>
                     <p
-                      class="text-xs text-on-surface-variant leading-relaxed"
+                      class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
                       :class="{
-                        'italic text-on-surface-variant/60': reply.isDeleted,
+                        'italic text-on-surface-variant dark:text-slate-300/60':
+                          reply.isDeleted,
                       }"
                     >
                       {{ reply.text }}
@@ -346,7 +372,7 @@
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300"
     >
       <div
-        class="bg-surface-container-lowest border border-outline-variant/60 w-full max-w-md mx-4 p-6 rounded-2xl shadow-2xl text-center space-y-5 transform transition-all scale-100"
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 w-full max-w-md mx-4 p-6 rounded-2xl shadow-2xl text-center space-y-5 transform transition-all scale-100"
       >
         <div
           class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner"
@@ -355,7 +381,9 @@
         </div>
         <div class="space-y-2">
           <h3 class="text-lg font-bold text-on-background">Acción Protegida</h3>
-          <p class="text-xs text-on-surface-variant leading-relaxed">
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+          >
             Para dar me gusta, guardar en marcadores o interactuar con
             publicaciones, necesitas contar con una cuenta profesional en
             JobNet.
@@ -364,7 +392,7 @@
         <div class="grid grid-cols-2 gap-3 pt-2">
           <button
             @click="showAuthModal = false"
-            class="bg-slate-100 hover:bg-slate-200 text-on-surface-variant font-bold text-xs py-2.5 px-4 rounded-xl transition"
+            class="bg-slate-100 hover:bg-slate-200 text-on-surface-variant dark:text-slate-300 font-bold text-xs py-2.5 px-4 rounded-xl transition"
           >
             Cancelar
           </button>
@@ -375,7 +403,7 @@
             Iniciar Sesión
           </button>
         </div>
-        <p class="text-[10px] text-on-surface-variant/70">
+        <p class="text-[10px] text-on-surface-variant dark:text-slate-300/70">
           ¿Aún no tienes cuenta?
           <NuxtLink
             to="/register"
@@ -389,8 +417,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, onBeforeUnmount } from "vue";
-import { useRouter } from "vue-router";
 import { useUploadStore } from "~/stores/upload";
 import PostCard from "~/components/PostCard.vue";
 
@@ -406,6 +432,8 @@ const { data: session, status } = useAuth();
 // Loading indicator
 const postsLoading = ref(true);
 const isPublishing = ref(false);
+const isSubmittingComment = ref(false);
+const isSubmittingReply = ref(false);
 const showAuthModal = ref(false);
 
 // State for post creation files
@@ -867,9 +895,15 @@ const submitComment = async () => {
     showAuthModal.value = true;
     return;
   }
-  if (!newCommentText.value.trim() || !selectedPost.value) return;
+  if (
+    !newCommentText.value.trim() ||
+    !selectedPost.value ||
+    isSubmittingComment.value
+  )
+    return;
   const username = session.value?.user?.name || "Usuario Anónimo";
 
+  isSubmittingComment.value = true;
   try {
     const created = await $fetch<any>(
       `/api/posts/${selectedPost.value.uniqueId}/comment`,
@@ -883,8 +917,11 @@ const submitComment = async () => {
       },
     );
 
-    if (!selectedPost.value.comments) selectedPost.value.comments = [];
-    selectedPost.value.comments.push(created);
+    const updatedComments = [...(selectedPost.value.comments || []), created];
+    selectedPost.value = {
+      ...selectedPost.value,
+      comments: updatedComments,
+    };
     newCommentText.value = "";
 
     // Sync with postsList to update feed card comment counter
@@ -892,13 +929,14 @@ const submitComment = async () => {
       (p: any) => p.uniqueId === selectedPost.value.uniqueId,
     );
     if (postInList) {
-      if (!postInList.comments) postInList.comments = [];
-      postInList.comments.push(created);
+      postInList.comments = updatedComments;
     }
     buildFeed();
   } catch (e) {
     console.error("Error submitting comment:", e);
     alert("Error al guardar el comentario.");
+  } finally {
+    isSubmittingComment.value = false;
   }
 };
 
@@ -922,9 +960,11 @@ const submitReply = async (parentId: string) => {
     showAuthModal.value = true;
     return;
   }
-  if (!replyText.value.trim() || !selectedPost.value) return;
+  if (!replyText.value.trim() || !selectedPost.value || isSubmittingReply.value)
+    return;
   const username = session.value?.user?.name || "Usuario Anónimo";
 
+  isSubmittingReply.value = true;
   try {
     const created = await $fetch<any>(
       `/api/posts/${selectedPost.value.uniqueId}/comment`,
@@ -938,8 +978,11 @@ const submitReply = async (parentId: string) => {
       },
     );
 
-    if (!selectedPost.value.comments) selectedPost.value.comments = [];
-    selectedPost.value.comments.push(created);
+    const updatedComments = [...(selectedPost.value.comments || []), created];
+    selectedPost.value = {
+      ...selectedPost.value,
+      comments: updatedComments,
+    };
     replyText.value = "";
     replyingToId.value = null;
 
@@ -948,13 +991,14 @@ const submitReply = async (parentId: string) => {
       (p: any) => p.uniqueId === selectedPost.value.uniqueId,
     );
     if (postInList) {
-      if (!postInList.comments) postInList.comments = [];
-      postInList.comments.push(created);
+      postInList.comments = updatedComments;
     }
     buildFeed();
   } catch (e) {
     console.error("Error submitting reply:", e);
     alert("Error al guardar la respuesta.");
+  } finally {
+    isSubmittingReply.value = false;
   }
 };
 
@@ -971,7 +1015,7 @@ const deleteComment = async (id: string) => {
   if (!selectedPost.value?.comments) return;
 
   try {
-    await $fetch(
+    const res = await $fetch<any>(
       `/api/posts/${selectedPost.value.uniqueId}/comment/${encodeURIComponent(id)}`,
       {
         method: "DELETE",
@@ -981,56 +1025,68 @@ const deleteComment = async (id: string) => {
     const targetIndex = selectedPost.value.comments.findIndex(
       (c: any) => String(c.id) === String(id),
     );
+
+    let nextComments = [...selectedPost.value.comments];
+
     if (targetIndex !== -1) {
-      const target = selectedPost.value.comments[targetIndex];
+      const target = nextComments[targetIndex];
       const isLevel2 = !!target.parentId;
 
-      if (isLevel2) {
-        // Hard delete reply from local array
-        selectedPost.value.comments.splice(targetIndex, 1);
-
-        // If parent was soft-deleted and this was its last child, delete parent entirely
+      if (res?.action === "SOFT_DELETED_PARENT" || res?.isDeleted) {
+        nextComments[targetIndex] = {
+          ...target,
+          text: "Comentario no disponible",
+          user: "Eliminado",
+          isDeleted: true,
+        };
+      } else if (isLevel2) {
+        nextComments.splice(targetIndex, 1);
         const parentId = target.parentId;
-        const parent = selectedPost.value.comments.find(
+        const parentIndex = nextComments.findIndex(
           (c: any) => String(c.id) === String(parentId),
         );
-        if (parent && parent.isDeleted) {
-          const parentHasOtherChildren = selectedPost.value.comments.some(
+        if (parentIndex !== -1 && nextComments[parentIndex].isDeleted) {
+          const parentHasOtherChildren = nextComments.some(
             (c: any) =>
               String(c.parentId) === String(parentId) && c.id !== target.id,
           );
           if (!parentHasOtherChildren) {
-            selectedPost.value.comments = selectedPost.value.comments.filter(
-              (c: any) => String(c.id) !== String(parentId),
-            );
+            nextComments.splice(parentIndex, 1);
           }
         }
       } else {
-        // Level 1 main comment
-        const hasChildren = selectedPost.value.comments.some(
+        const hasChildren = nextComments.some(
           (c: any) => String(c.parentId) === String(id),
         );
         if (hasChildren) {
-          // Soft delete to preserve nested tree
-          target.text = "Comentario no disponible";
-          target.user = "Eliminado";
-          target.isDeleted = true;
+          nextComments[targetIndex] = {
+            ...target,
+            text: "Comentario no disponible",
+            user: "Eliminado",
+            isDeleted: true,
+          };
         } else {
-          // Hard delete since there are no children
-          selectedPost.value.comments.splice(targetIndex, 1);
+          nextComments.splice(targetIndex, 1);
         }
       }
-
-      // Re-assign array reference to trigger Vue computed tree reactivity immediately
-      selectedPost.value.comments = [...selectedPost.value.comments];
+    } else {
+      nextComments = nextComments.filter(
+        (c: any) => String(c.id) !== String(id),
+      );
     }
+
+    // Assign new object reference to trigger Vue 3 reactivity immediately
+    selectedPost.value = {
+      ...selectedPost.value,
+      comments: nextComments,
+    };
 
     // Sync with postsList to preserve local modifications in feed mapping
     const postInList = postsList.value.find(
       (p: any) => p.uniqueId === selectedPost.value.uniqueId,
     );
     if (postInList) {
-      postInList.comments = selectedPost.value.comments;
+      postInList.comments = nextComments;
     }
     buildFeed();
   } catch (e) {

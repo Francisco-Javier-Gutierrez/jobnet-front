@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-background: #f9f9ff;
+  --color-on-background: #111c2d;
+  --color-surface: #f9f9ff;
+  --color-on-surface: #111c2d;
+  --color-on-surface-variant: #464555;
+  --color-surface-container: #e7eeff;
+  --color-surface-container-low: #f0f3ff;
+  --color-surface-container-high: #dee8ff;
+  --color-surface-container-highest: #d8e3fb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-variant: #d8e3fb;
+  --color-surface-bright: #f9f9ff;
+  --color-surface-dim: #cfdaf2;
+  --color-outline: #777587;
+  --color-outline-variant: #c7c4d8;
+  --color-inverse-surface: #263143;
+  --color-inverse-on-surface: #ecf1ff;
+}
+
+.dark,
+[data-theme="dark"] {
+  --color-background: #090d16;
+  --color-on-background: #f1f5f9;
+  --color-surface: #0f172a;
+  --color-on-surface: #f8fafc;
+  --color-on-surface-variant: #cbd5e1;
+  --color-surface-container: #1e293b;
+  --color-surface-container-low: #0f172a;
+  --color-surface-container-high: #334155;
+  --color-surface-container-highest: #475569;
+  --color-surface-container-lowest: #0f172a;
+  --color-surface-variant: #1e293b;
+  --color-surface-bright: #1e293b;
+  --color-surface-dim: #090d16;
+  --color-outline: #94a3b8;
+  --color-outline-variant: #334155;
+  --color-inverse-surface: #f8fafc;
+  --color-inverse-on-surface: #0f172a;
+}
+
+/* Global Form Control Theme Overrides */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not(
+    [type="button"]
+  ),
+textarea,
+select {
+  background-color: var(--color-surface-container-lowest);
+  color: var(--color-on-background);
+  border-color: var(--color-outline-variant);
+}
+
+.dark
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not(
+    [type="button"]
+  ),
+.dark textarea,
+.dark select {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+.dark select option {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Browser Autofill Overrides (Remove ugly yellow/blue background & shadow) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--color-on-background) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--color-surface-container-lowest) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill:active,
+.dark select:-webkit-autofill,
+.dark select:-webkit-autofill:hover,
+.dark select:-webkit-autofill:focus,
+.dark select:-webkit-autofill:active {
+  -webkit-text-fill-color: #f8fafc !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1e293b inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #f8fafc !important;
+}

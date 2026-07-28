@@ -1,10 +1,12 @@
 <template>
-  <div class="max-w-5xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-5xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-on-background mb-2">
         Aprobación de Habilidades (Moderador)
       </h1>
-      <p class="text-on-surface-variant text-sm">
+      <p class="text-on-surface-variant dark:text-slate-300 text-sm">
         Gestiona la cola de sugerencias de nuevas habilidades propuestas por
         candidates y reclutadores.
       </p>
@@ -12,7 +14,7 @@
 
     <!-- Skills queue card -->
     <div
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
     >
       <div
         class="p-6 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20"
@@ -46,13 +48,13 @@
       <!-- Empty State -->
       <div
         v-else-if="suggestions.length === 0"
-        class="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant"
+        class="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant dark:text-slate-300"
       >
         <span class="material-symbols-outlined text-[48px] text-primary/40 mb-3"
           >tag</span
         >
         <p class="text-sm font-semibold text-on-surface">Cola limpia</p>
-        <p class="text-xs text-on-surface-variant mt-1">
+        <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
           No hay sugerencias de habilidades técnicas sugeridas por los usuarios.
         </p>
       </div>
@@ -68,7 +70,7 @@
             <h3 class="text-sm font-bold text-on-background mb-1">
               {{ sug.name }}
             </h3>
-            <p class="text-xs text-on-surface-variant">
+            <p class="text-xs text-on-surface-variant dark:text-slate-300">
               Sugerida el: {{ new Date(sug.createdAt).toLocaleDateString() }}
             </p>
           </div>
@@ -83,7 +85,7 @@
             </button>
             <button
               @click="resolve(sug.id, false)"
-              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant hover:text-rose-600 font-semibold text-xs px-3.5 py-2 rounded-lg transition active:scale-95 duration-100"
+              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant dark:text-slate-300 hover:text-rose-600 font-semibold text-xs px-3.5 py-2 rounded-lg transition active:scale-95 duration-100"
             >
               Rechazar
             </button>
@@ -113,14 +115,16 @@
           </h3>
           <button
             @click="showWarningModal = false"
-            class="text-on-surface-variant hover:bg-surface-container rounded-lg p-1 transition flex items-center justify-center"
+            class="text-on-surface-variant dark:text-slate-300 hover:bg-surface-container rounded-lg p-1 transition flex items-center justify-center"
           >
             <span class="material-symbols-outlined text-sm">close</span>
           </button>
         </div>
 
         <div class="space-y-2">
-          <p class="text-xs text-on-surface-variant leading-relaxed">
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+          >
             Se ha detectado una coincidencia léxica alta. La habilidad sugerida
             <strong class="text-on-background"
               >"{{ selectedSuggestion?.name }}"</strong
@@ -129,7 +133,7 @@
             <strong class="text-primary">"{{ existingSkillName }}"</strong>.
           </p>
           <p
-            class="text-xs text-on-surface-variant leading-relaxed font-semibold"
+            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed font-semibold"
           >
             Selecciona la acción para resolver esta sugerencia:
           </p>
@@ -152,7 +156,7 @@
           </button>
           <button
             @click="showWarningModal = false"
-            class="w-full bg-surface text-on-surface-variant hover:underline font-semibold text-xs py-2 rounded-xl transition"
+            class="w-full bg-surface text-on-surface-variant dark:text-slate-300 hover:underline font-semibold text-xs py-2 rounded-xl transition"
           >
             Cancelar
           </button>
@@ -163,8 +167,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-
 useSeoMeta({
   title: "Aprobación de Habilidades - JobNet",
   description: "Bandeja de moderación para nuevas habilidades técnicas",

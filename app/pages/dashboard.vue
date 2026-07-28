@@ -1,5 +1,7 @@
 <template>
-  <div class="max-w-6xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-6xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <div
       class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
     >
@@ -7,7 +9,7 @@
         <h1 class="text-2xl font-bold text-on-background mb-2">
           Tablero de Reclutamiento
         </h1>
-        <p class="text-on-surface-variant text-sm">
+        <p class="text-on-surface-variant dark:text-slate-300 text-sm">
           Resumen de actividad, vacantes abiertas y postulaciones recientes.
         </p>
       </div>
@@ -25,11 +27,11 @@
       <div
         v-for="stat in stats"
         :key="stat.title"
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition duration-200"
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition duration-200"
       >
         <div class="flex items-center justify-between mb-4">
           <span
-            class="text-on-surface-variant text-xs font-bold uppercase tracking-wider"
+            class="text-on-surface-variant dark:text-slate-300 text-xs font-bold uppercase tracking-wider"
             >{{ stat.title }}</span
           >
           <span
@@ -52,7 +54,7 @@
       <!-- Left Column: Active Vacancies List (2 Cols) -->
       <div class="lg:col-span-2 flex flex-col gap-6">
         <div
-          class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm"
+          class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 shadow-sm"
         >
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-base font-bold text-on-background">
@@ -85,7 +87,7 @@
               class="material-symbols-outlined text-[36px] text-outline mb-2"
               >work_outline</span
             >
-            <p class="text-on-surface-variant text-sm">
+            <p class="text-on-surface-variant dark:text-slate-300 text-sm">
               No tienes vacantes publicadas.
             </p>
           </div>
@@ -101,7 +103,7 @@
                   {{ job.title }}
                 </h3>
                 <div
-                  class="flex items-center gap-3 text-xs text-on-surface-variant"
+                  class="flex items-center gap-3 text-xs text-on-surface-variant dark:text-slate-300"
                 >
                   <span>{{ job.type }}</span>
                   <span>·</span>
@@ -124,7 +126,7 @@
       <!-- Right Column: Recent Applicants (1 Col) -->
       <div class="flex flex-col gap-6">
         <div
-          class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm"
+          class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 shadow-sm"
         >
           <h2 class="text-base font-bold text-on-background mb-6">
             Postulaciones Recientes
@@ -147,7 +149,9 @@
                 >
                   {{ candidate.name }}
                 </h3>
-                <p class="text-[10px] text-on-surface-variant truncate mb-0.5">
+                <p
+                  class="text-[10px] text-on-surface-variant dark:text-slate-300 truncate mb-0.5"
+                >
                   {{ candidate.job }}
                 </p>
                 <span class="text-[9px] text-primary font-semibold">{{
@@ -163,9 +167,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-
 useSeoMeta({
   title: "Dashboard de Reclutamiento - JobNet",
   description:

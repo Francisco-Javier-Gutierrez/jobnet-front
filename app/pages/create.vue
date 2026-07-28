@@ -1,9 +1,11 @@
 <template>
-  <div class="max-w-xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <!-- Header -->
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-on-background mb-2">Crear Nuevo</h1>
-      <p class="text-on-surface-variant text-sm">
+      <p class="text-on-surface-variant dark:text-slate-300 text-sm">
         Comparte contenido con la comunidad profesional o registra una vacante
         en JobNet.
       </p>
@@ -21,7 +23,7 @@
         <!-- Option 1: Post -->
         <button
           @click="selectCreationType('post')"
-          class="flex flex-col items-center justify-center p-6 bg-surface-container-lowest border border-outline-variant/60 hover:border-primary rounded-2xl text-center group transition active:scale-[0.98] duration-150 shadow-sm"
+          class="flex flex-col items-center justify-center p-6 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 hover:border-primary rounded-2xl text-center group transition active:scale-[0.98] duration-150 shadow-sm"
         >
           <div
             class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition"
@@ -31,7 +33,9 @@
           <span class="text-sm font-bold text-on-background mb-1"
             >Publicación de Comunidad</span
           >
-          <span class="text-xs text-on-surface-variant leading-relaxed">
+          <span
+            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+          >
             Comparte fotos, archivos PDF, novedades y noticias con la comunidad.
           </span>
         </button>
@@ -39,7 +43,7 @@
         <!-- Option 2: Vacancy -->
         <button
           @click="selectCreationType('vacancy')"
-          class="flex flex-col items-center justify-center p-6 bg-surface-container-lowest border border-outline-variant/60 hover:border-primary rounded-2xl text-center group transition active:scale-[0.98] duration-150 shadow-sm"
+          class="flex flex-col items-center justify-center p-6 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 hover:border-primary rounded-2xl text-center group transition active:scale-[0.98] duration-150 shadow-sm"
         >
           <div
             class="w-12 h-12 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition"
@@ -51,7 +55,9 @@
           <span class="text-sm font-bold text-on-background mb-1"
             >Oferta de Empleo (Vacante)</span
           >
-          <span class="text-xs text-on-surface-variant leading-relaxed">
+          <span
+            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+          >
             Publica una nueva oferta laboral con geolocalización y habilidades
             requeridas.
           </span>
@@ -76,7 +82,7 @@
     <!-- Creator Form Container (Visible for candidates/moderators/admins OR when company selects 'post') -->
     <div
       v-if="userRole !== 'company' || selectedCreationType === 'post'"
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-6"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-6"
     >
       <!-- Title -->
       <div
@@ -147,7 +153,7 @@
         <button
           @click="clearAttachment"
           type="button"
-          class="text-on-surface-variant hover:text-rose-600 p-1 transition flex items-center justify-center"
+          class="text-on-surface-variant dark:text-slate-300 hover:text-rose-600 p-1 transition flex items-center justify-center"
           title="Quitar PDF"
         >
           <span class="material-symbols-outlined text-sm">close</span>
@@ -163,7 +169,7 @@
           <button
             @click="triggerImageSelect"
             type="button"
-            class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/5 rounded-xl transition flex items-center gap-1"
+            class="p-2 text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-primary/5 rounded-xl transition flex items-center gap-1"
             title="Añadir Imagen"
           >
             <span class="material-symbols-outlined text-[20px]">image</span>
@@ -181,7 +187,7 @@
           <button
             @click="triggerPdfSelect"
             type="button"
-            class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/5 rounded-xl transition flex items-center gap-1"
+            class="p-2 text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-primary/5 rounded-xl transition flex items-center gap-1"
             title="Añadir Documento PDF"
           >
             <span class="material-symbols-outlined text-[20px]"
@@ -221,8 +227,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
 import { useUploadStore } from "~/stores/upload";
 
 useSeoMeta({
@@ -374,13 +378,13 @@ const publishPost = async () => {
 
   const author = session.value?.user?.name || "Usuario JobNet";
   let role = "Candidato";
-  const userType = (session.value?.user as any)?.tipoUsuario;
-  if (userType === "EMPRESA") {
+  const userType = (
+    (session.value?.user as any)?.tipoUsuario || ""
+  ).toUpperCase();
+  if (userType === "EMPRESA" || userType === "ORGANIZACION") {
     role = "Empresa";
-  } else if (userType === "ADMIN") {
-    role = "Admin";
-  } else if (userType === "MODERATOR") {
-    role = "Moderador";
+  } else {
+    role = "Candidato";
   }
 
   const newPostPayload = {

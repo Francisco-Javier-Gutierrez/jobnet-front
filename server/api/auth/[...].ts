@@ -1,11 +1,14 @@
 import _CognitoProvider from "next-auth/providers/cognito";
 import _CredentialsProvider from "next-auth/providers/credentials";
 
-// @ts-expect-error - Vite ESM interop
-const CognitoProvider = _CognitoProvider.default || _CognitoProvider;
-// @ts-expect-error - Vite ESM interop
-const CredentialsProvider =
-  _CredentialsProvider.default || _CredentialsProvider;
+const CognitoProvider: any =
+  typeof _CognitoProvider === "function"
+    ? _CognitoProvider
+    : (_CognitoProvider as any)?.default || _CognitoProvider;
+const CredentialsProvider: any =
+  typeof _CredentialsProvider === "function"
+    ? _CredentialsProvider
+    : (_CredentialsProvider as any)?.default || _CredentialsProvider;
 import { NuxtAuthHandler } from "#auth";
 import crypto from "crypto";
 import { translateCognitoError } from "../../utils/cognito";
@@ -25,9 +28,11 @@ function calculateSecretHash(
 export default NuxtAuthHandler({
   providers: [
     CognitoProvider({
-      clientId: process.env.COGNITO_CLIENT_ID || "",
+      clientId: process.env.COGNITO_CLIENT_ID || "4ef8k4tofjj4ounvo8nf7d9pep",
       clientSecret: process.env.COGNITO_CLIENT_SECRET || "",
-      issuer: process.env.COGNITO_ISSUER || "",
+      issuer:
+        process.env.COGNITO_ISSUER ||
+        "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_trquL61F2",
     }),
     CredentialsProvider({
       id: "credentials",
@@ -44,9 +49,12 @@ export default NuxtAuthHandler({
           throw new Error("Email es requerido");
         }
 
-        const clientId = process.env.COGNITO_CLIENT_ID || "";
+        const clientId =
+          process.env.COGNITO_CLIENT_ID || "4ef8k4tofjj4ounvo8nf7d9pep";
         const clientSecret = process.env.COGNITO_CLIENT_SECRET || "";
-        const issuer = process.env.COGNITO_ISSUER || "";
+        const issuer =
+          process.env.COGNITO_ISSUER ||
+          "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_trquL61F2";
         const region =
           process.env.COGNITO_REGION || issuer.split(".")[1] || "us-east-1";
 
@@ -217,8 +225,17 @@ export default NuxtAuthHandler({
           );
           const userId = payload.sub;
 
+          // Detect assigned Cognito Groups in token
+          const groups: string[] = payload["cognito:groups"] || [];
+          let cognitoRole = "";
+          if (groups.includes("ADMIN")) cognitoRole = "ADMIN";
+          else if (groups.includes("MODERATOR")) cognitoRole = "MODERATOR";
+          else if (groups.includes("ORGANIZACION"))
+            cognitoRole = "ORGANIZACION";
+          else if (groups.includes("CANDIDATO")) cognitoRole = "CANDIDATO";
+
           const config = useRuntimeConfig();
-          const profile = await $fetch<any>(
+          const profile: any = await $fetch(
             `${config.public.apiUrl}/profile/${userId}`,
           ).catch(() => null);
 
@@ -249,6 +266,22 @@ export default NuxtAuthHandler({
                   },
                 }).catch(() => null);
               }
+            }
+
+            // Automatic reconciliation: If user was a blank user (PENDIENTE) and Admin assigned Cognito Group, sync DynamoDB!
+            if (
+              cognitoRole &&
+              (profile.tipoUsuario === "PENDIENTE" ||
+                profile.estadoCuenta === "PENDIENTE_ROL" ||
+                profile.tipoUsuario !== cognitoRole)
+            ) {
+              await $fetch(`${config.public.apiUrl}/profile/${userId}`, {
+                method: "POST",
+                body: {
+                  tipoUsuario: cognitoRole,
+                  estadoCuenta: "ACTIVO",
+                },
+              }).catch(() => null);
             }
           }
         } catch (e: any) {
@@ -301,8 +334,8 @@ export default NuxtAuthHandler({
             }
 
             const groups = payload["cognito:groups"] || [];
-            if (groups.includes("EMPRESA")) {
-              token.tipoUsuario = "EMPRESA";
+            if (groups.includes("ORGANIZACION")) {
+              token.tipoUsuario = "ORGANIZACION";
             } else if (groups.includes("ADMIN")) {
               token.tipoUsuario = "ADMIN";
             } else if (groups.includes("MODERATOR")) {
@@ -343,5 +376,67 @@ export default NuxtAuthHandler({
     signIn: "/login",
     error: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  jwt: {
+    secret:
+      process.env.NEXTAUTH_SECRET ||
+      process.env.NUXT_AUTH_SECRET ||
+      "jobnet-super-secret-key-prod-2026",
+    async encode({ token, secret }) {
+      if (!token) return "";
+      const hkdfModule = await import("@panva/hkdf");
+      const hkdfFn: any =
+        (hkdfModule as any).hkdf ||
+        (hkdfModule as any).default?.hkdf ||
+        hkdfModule.default;
+      const joseModule = await import("jose");
+      const EncryptJWT = joseModule.EncryptJWT;
+
+      const keySecret =
+        (secret as string) || "jobnet-super-secret-key-prod-2026";
+      const encryptionSecret = await hkdfFn(
+        "sha256",
+        keySecret,
+        "",
+        "NextAuth.js Generated Encryption Key",
+        32,
+      );
+
+      return await new EncryptJWT({ ...token })
+        .setProtectedHeader({ alg: "dir", enc: "A256GCM" })
+        .setIssuedAt()
+        .setExpirationTime("30d")
+        .encrypt(encryptionSecret);
+    },
+    async decode({ token, secret }) {
+      if (!token) return null;
+      const hkdfModule = await import("@panva/hkdf");
+      const hkdfFn: any =
+        (hkdfModule as any).hkdf ||
+        (hkdfModule as any).default?.hkdf ||
+        hkdfModule.default;
+      const joseModule = await import("jose");
+      const jwtDecrypt = joseModule.jwtDecrypt;
+
+      const keySecret =
+        (secret as string) || "jobnet-super-secret-key-prod-2026";
+      const encryptionSecret = await hkdfFn(
+        "sha256",
+        keySecret,
+        "",
+        "NextAuth.js Generated Encryption Key",
+        32,
+      );
+
+      try {
+        const { payload } = await jwtDecrypt(token, encryptionSecret);
+        return payload as any;
+      } catch (e) {
+        return null;
+      }
+    },
+  },
+  secret:
+    process.env.NEXTAUTH_SECRET ||
+    process.env.NUXT_AUTH_SECRET ||
+    "jobnet-super-secret-key-prod-2026",
 });

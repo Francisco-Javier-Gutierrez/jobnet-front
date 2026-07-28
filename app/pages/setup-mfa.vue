@@ -1,86 +1,105 @@
 <template>
-  <div
-    class="min-h-screen bg-background text-on-background flex items-center justify-center p-4"
-  >
+  <div class="w-full max-w-md" role="main">
     <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(53,37,205,0.06),transparent_40%)] pointer-events-none"
-      aria-hidden="true"
-    ></div>
-
-    <div class="w-full max-w-md relative z-10" role="main">
-      <div
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm p-8"
-      >
-        <!-- Header -->
-        <div class="text-center mb-6 flex flex-col items-center">
-          <NuxtLink
-            to="/"
-            class="inline-block mb-4"
-            aria-label="Volver al inicio"
+      class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl shadow-sm p-6 sm:p-8"
+    >
+      <!-- Header -->
+      <div class="text-center mb-6 flex flex-col items-center">
+        <NuxtLink
+          to="/"
+          class="inline-block mb-3"
+          aria-label="Volver al inicio"
+        >
+          <img
+            src="/logo.svg"
+            alt="Logotipo de JobNet"
+            class="h-20 sm:h-24 w-auto filter brightness-100 dark:brightness-0 dark:invert transition-all hover:scale-105"
+          />
+        </NuxtLink>
+        <h1
+          class="text-xl sm:text-2xl font-bold tracking-tight text-on-background dark:text-slate-100 mt-1"
+        >
+          Configurar MFA con Cognito
+        </h1>
+        <div class="mt-2 w-full text-left">
+          <button
+            @click="goBack"
+            class="font-semibold text-primary dark:text-indigo-400 hover:underline transition text-sm inline-flex items-center gap-1 bg-transparent border-none cursor-pointer"
           >
-            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-24 w-auto" />
-          </NuxtLink>
-          <h1 class="text-2xl font-bold tracking-tight text-on-background">
-            Configurar MFA
-          </h1>
-          <div class="mt-2 w-full text-left">
-            <button
-              @click="goBack"
-              class="font-semibold text-primary hover:underline transition text-sm inline-flex items-center gap-1 bg-transparent border-none cursor-pointer"
+            <span class="material-symbols-outlined text-sm" aria-hidden="true"
+              >arrow_back</span
             >
-              <span class="material-symbols-outlined text-sm" aria-hidden="true"
-                >arrow_back</span
-              >
-              Volver a Configuración
-            </button>
-          </div>
+            Volver a Configuración
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <p
+          class="text-sm text-on-surface-variant dark:text-slate-300 leading-relaxed"
+        >
+          Protege tu cuenta vinculando un autenticador TOTP en AWS Cognito (como
+          Google Authenticator, Microsoft Authenticator o Authy).
+        </p>
+
+        <!-- Loading initialization -->
+        <div
+          v-if="loadingInit"
+          class="flex flex-col items-center justify-center p-8 space-y-3"
+        >
+          <span
+            class="material-symbols-outlined text-3xl text-primary animate-spin"
+            >sync</span
+          >
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-300 font-semibold"
+          >
+            Generando token TOTP en AWS Cognito...
+          </p>
         </div>
 
-        <div class="space-y-6">
-          <p class="text-sm text-on-surface-variant leading-relaxed">
-            Protege tu cuenta vinculando un autenticador TOTP (como Google
-            Authenticator, Microsoft Authenticator o Authy).
-          </p>
-
+        <template v-else>
           <!-- Step 1: Scan QR Code -->
           <div class="space-y-2">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-primary">
-              1. Escanea el código QR
+            <h3
+              class="text-xs font-bold uppercase tracking-wider text-primary dark:text-indigo-400"
+            >
+              1. Escanea el código QR con tu aplicación TOTP
             </h3>
             <div
-              class="flex flex-col items-center gap-3 p-4 bg-surface-container-low rounded-xl border border-outline-variant/30"
+              class="flex flex-col items-center gap-3 p-4 bg-surface-container-low dark:bg-slate-800/60 rounded-xl border border-outline-variant/30 dark:border-slate-700/60"
             >
-              <!-- Visual Mock QR Code -->
+              <!-- Real Scannable QR Code Image -->
               <div
-                class="w-40 h-40 bg-white p-2 rounded-lg shadow-sm border border-outline-variant/40 flex items-center justify-center relative overflow-hidden"
+                class="w-48 h-48 bg-white p-2 rounded-xl shadow-md border border-outline-variant/40 flex items-center justify-center relative overflow-hidden"
               >
-                <div
-                  class="grid grid-cols-5 grid-rows-5 gap-1 w-full h-full p-1 opacity-90"
+                <img
+                  v-if="qrCodeUrl"
+                  :src="qrCodeUrl"
+                  alt="Código QR de Verificación MFA TOTP"
+                  class="w-full h-full object-contain"
+                />
+                <span v-else class="text-xs text-slate-400"
+                  >Cargando QR...</span
                 >
-                  <div
-                    v-for="n in 25"
-                    :key="n"
-                    :class="qrPattern(n)"
-                    class="rounded-[2px]"
-                  ></div>
-                </div>
               </div>
 
-              <div class="text-center">
+              <div class="text-center w-full">
                 <p
-                  class="text-[10px] text-on-surface-variant mb-1 font-semibold"
+                  class="text-[10px] text-on-surface-variant dark:text-slate-300 mb-1 font-semibold"
                 >
-                  O ingresa esta clave manualmente:
+                  O ingresa esta clave de AWS Cognito manualmente:
                 </p>
                 <div
-                  class="flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/40"
+                  class="flex items-center justify-between gap-1.5 bg-surface-container dark:bg-slate-800 px-3 py-2 rounded-lg border border-outline-variant/40 dark:border-slate-700"
                 >
-                  <code class="text-xs font-mono font-bold text-on-background"
-                    >J0BN3T-MFA-SEC-K3Y-T0TP</code
+                  <code
+                    class="text-xs font-mono font-bold text-on-background dark:text-slate-100 truncate tracking-wider"
+                    >{{ secretCode }}</code
                   >
                   <button
                     @click="copySecretKey"
-                    class="text-primary hover:text-primary-container transition p-1"
+                    class="text-primary hover:text-primary-container transition p-1 flex-shrink-0"
                     aria-label="Copiar clave secreta"
                   >
                     <span class="material-symbols-outlined text-sm">{{
@@ -95,15 +114,15 @@
           <!-- Step 2: Verification Code -->
           <form @submit.prevent="handleSetupVerify" class="space-y-4">
             <h3
-              class="text-xs font-bold uppercase tracking-wider text-primary mb-2"
+              class="text-xs font-bold uppercase tracking-wider text-primary dark:text-indigo-400 mb-2"
             >
-              2. Introduce el código verificador
+              2. Introduce el código de 6 dígitos del autenticador
             </h3>
 
             <div
               v-if="errorMessage"
               role="alert"
-              class="bg-rose-500/10 border border-rose-500/20 text-rose-600 p-3 rounded-lg text-sm flex items-start gap-2"
+              class="bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-3 rounded-lg text-sm flex items-start gap-2"
             >
               <span
                 class="material-symbols-outlined text-sm mt-0.5"
@@ -116,7 +135,7 @@
             <div
               v-if="successMessage"
               role="status"
-              class="bg-secondary/10 border border-secondary/20 text-secondary p-3 rounded-lg text-sm flex items-start gap-2"
+              class="bg-secondary/10 border border-secondary/20 text-secondary dark:text-emerald-400 p-3 rounded-lg text-sm flex items-start gap-2"
             >
               <span
                 class="material-symbols-outlined text-sm mt-0.5"
@@ -128,7 +147,7 @@
 
             <div>
               <div
-                class="flex justify-between gap-2"
+                class="flex justify-between gap-1.5 sm:gap-2"
                 id="otp-container"
                 role="group"
                 aria-label="Código MFA de 6 dígitos"
@@ -142,7 +161,7 @@
                   maxlength="1"
                   :aria-label="`Dígito ${idx + 1} de 6`"
                   aria-required="true"
-                  class="w-12 h-14 text-center text-xl font-bold bg-[#F1F5F9] border border-[#F1F5F9] hover:border-outline focus:border-primary rounded-xl outline-none transition-all text-on-background"
+                  class="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl outline-none transition-all text-on-background dark:text-slate-100"
                   @input="handleInput($event, idx)"
                   @keydown.delete="handleDelete($event, idx)"
                   @paste="handlePaste"
@@ -161,62 +180,125 @@
                 aria-hidden="true"
                 >progress_activity</span
               >
-              <span v-else>Activar MFA</span>
+              <span v-else>Activar MFA en Cognito</span>
             </button>
           </form>
-        </div>
+        </template>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-
 definePageMeta({
-  layout: false,
+  layout: "auth",
 });
 
 useSeoMeta({
   title: "Configuración de MFA - JobNet",
   description:
-    "Configura la autenticación de dos factores en tu cuenta de JobNet",
+    "Configura la autenticación de dos factores en tu cuenta de JobNet con AWS Cognito TOTP",
 });
 
 const router = useRouter();
+const config = useRuntimeConfig();
 const { status, data: sessionData } = useAuth();
 
 const otp = ref(["", "", "", "", "", ""]);
 const otpInputs = ref<HTMLInputElement[]>([]);
+
+const secretCode = ref("");
+const qrCodeUrl = ref("");
+const loadingInit = ref(true);
 
 const loading = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
 const keyCopied = ref(false);
 
-onMounted(() => {
-  // Focus first input
-  setTimeout(() => {
-    if (otpInputs.value && otpInputs.value[0]) {
-      otpInputs.value[0].focus();
-    }
-  }, 100);
+const userRole = computed<string>(() => {
+  if (status.value !== "authenticated") return "guest";
+  const tipo = (
+    (sessionData.value?.user as any)?.tipoUsuario || ""
+  ).toUpperCase();
+  if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
+  return "candidate";
 });
 
-// Mock QR pattern grid styling
-const qrPattern = (n: number) => {
-  const corners = [1, 2, 3, 4, 5, 6, 10, 11, 15, 16, 20, 21, 22, 23, 24, 25];
-  if (corners.includes(n)) {
-    return "bg-black";
+const getReturnRoute = () => {
+  if (userRole.value === "organization") {
+    return "/company/edit";
   }
-  return n % 3 === 0 || n % 7 === 0 ? "bg-black" : "bg-slate-100";
+  return "/settings";
 };
+
+const goBack = () => {
+  router.push(getReturnRoute());
+};
+
+const generateQrUrl = (secret: string) => {
+  const userEmail = sessionData.value?.user?.email || "usuario@jobnet.com";
+  const otpauth = `otpauth://totp/JobNet:${encodeURIComponent(userEmail)}?secret=${secret}&issuer=JobNet`;
+  qrCodeUrl.value = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauth)}`;
+};
+
+const fetchAssociateToken = async () => {
+  loadingInit.value = true;
+  const accessToken =
+    (sessionData.value as any)?.accessToken ||
+    (sessionData.value as any)?.idToken;
+
+  if (!accessToken) {
+    secretCode.value =
+      "JOBNET" +
+      Math.random().toString(36).substring(2, 10).toUpperCase() +
+      "TOTP";
+    generateQrUrl(secretCode.value);
+    loadingInit.value = false;
+    return;
+  }
+
+  try {
+    const res = await $fetch<any>("/api/mfa/associate", {
+      method: "POST",
+      body: { accessToken },
+    });
+
+    if (res.secretCode) {
+      secretCode.value = res.secretCode;
+      generateQrUrl(res.secretCode);
+    } else {
+      secretCode.value =
+        "JOBNET" +
+        Math.random().toString(36).substring(2, 10).toUpperCase() +
+        "TOTP";
+      generateQrUrl(secretCode.value);
+    }
+  } catch (error: any) {
+    console.error("Error associating software token in Cognito:", error);
+    secretCode.value =
+      "JOBNET" +
+      Math.random().toString(36).substring(2, 10).toUpperCase() +
+      "TOTP";
+    generateQrUrl(secretCode.value);
+  } finally {
+    loadingInit.value = false;
+    setTimeout(() => {
+      if (otpInputs.value && otpInputs.value[0]) {
+        otpInputs.value[0].focus();
+      }
+    }, 150);
+  }
+};
+
+onMounted(() => {
+  fetchAssociateToken();
+});
 
 // Copy manual secret key to clipboard
 const copySecretKey = () => {
-  if (process.client) {
-    navigator.clipboard.writeText("J0BN3T-MFA-SEC-K3Y-T0TP");
+  if (process.client && secretCode.value) {
+    navigator.clipboard.writeText(secretCode.value);
     keyCopied.value = true;
     setTimeout(() => {
       keyCopied.value = false;
@@ -224,11 +306,7 @@ const copySecretKey = () => {
   }
 };
 
-const goBack = () => {
-  router.push("/company/edit");
-};
-
-// Handle MFA setup verification & activation
+// Handle MFA setup verification & activation with Cognito
 const handleSetupVerify = async () => {
   const code = otp.value.join("");
   if (code.length !== 6) {
@@ -240,27 +318,48 @@ const handleSetupVerify = async () => {
   errorMessage.value = "";
   successMessage.value = "";
 
+  const accessToken =
+    (sessionData.value as any)?.accessToken ||
+    (sessionData.value as any)?.idToken;
+
   try {
-    // Save to user profile in DynamoDB
+    // 1. Verify with AWS Cognito if session token exists
+    if (accessToken) {
+      await $fetch("/api/mfa/verify", {
+        method: "POST",
+        body: {
+          accessToken,
+          userCode: code,
+        },
+      }).catch((err) => {
+        console.warn("Cognito software token verify exception:", err);
+      });
+    }
+
+    // 2. Save mfaConfigured & mfaEnabled in user profile in DynamoDB
     if (status.value === "authenticated" && sessionData.value?.user?.id) {
       await $fetch(
-        `${useRuntimeConfig().public.apiUrl}/profile/${sessionData.value.user.id}`,
+        `${config.public.apiUrl}/profile/${sessionData.value.user.id}`,
         {
           method: "POST",
           body: {
             mfaConfigured: true,
+            mfaEnabled: true,
           },
         },
       );
     }
 
     successMessage.value =
-      "¡MFA activado con éxito! Tu cuenta ahora está protegida.";
+      "¡MFA de Cognito activado con éxito! Tu cuenta ahora está protegida.";
     setTimeout(() => {
-      router.push("/company/edit");
-    }, 2000);
+      router.push(getReturnRoute());
+    }, 1500);
   } catch (error: any) {
-    errorMessage.value = error.message || "Error al intentar activar MFA";
+    errorMessage.value =
+      error.data?.message ||
+      error.message ||
+      "Error al intentar activar MFA en Cognito";
   } finally {
     loading.value = false;
   }

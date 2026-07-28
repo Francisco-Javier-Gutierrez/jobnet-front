@@ -1,10 +1,12 @@
 <template>
-  <div class="max-w-5xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-5xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-on-background mb-2">
         Verificaciones Corporativas (Moderador)
       </h1>
-      <p class="text-on-surface-variant text-sm">
+      <p class="text-on-surface-variant dark:text-slate-300 text-sm">
         Evalúa y aprueba las constancias de situación fiscal para otorgar la
         insignia de verificación a las organizaciones.
       </p>
@@ -12,7 +14,7 @@
 
     <!-- Verifications queue -->
     <div
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
     >
       <div
         class="p-6 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20"
@@ -52,13 +54,13 @@
       <!-- Empty State -->
       <div
         v-else-if="requests.length === 0"
-        class="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant"
+        class="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant dark:text-slate-300"
       >
         <span class="material-symbols-outlined text-[48px] text-primary/40 mb-3"
           >verified_user</span
         >
         <p class="text-sm font-semibold text-on-surface">Cola limpia</p>
-        <p class="text-xs text-on-surface-variant mt-1">
+        <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
           No hay solicitudes de verificación de empresas pendientes de revisión.
         </p>
       </div>
@@ -74,13 +76,13 @@
             <h3 class="text-sm font-bold text-on-background mb-1">
               Empresa: {{ req.companyName }}
             </h3>
-            <p class="text-xs text-on-surface-variant mb-1">
+            <p class="text-xs text-on-surface-variant dark:text-slate-300 mb-1">
               RFC:
               <span class="font-mono text-on-background font-semibold">{{
                 req.taxId
               }}</span>
             </p>
-            <p class="text-xs text-on-surface-variant mb-3">
+            <p class="text-xs text-on-surface-variant dark:text-slate-300 mb-3">
               Email: {{ req.email }}
             </p>
             <div class="flex flex-col gap-2">
@@ -122,7 +124,7 @@
             </button>
             <button
               @click="handleAction(req.companyId, false)"
-              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant hover:text-rose-600 font-semibold text-xs px-4 py-2.5 rounded-lg transition active:scale-95 duration-100"
+              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant dark:text-slate-300 hover:text-rose-600 font-semibold text-xs px-4 py-2.5 rounded-lg transition active:scale-95 duration-100"
             >
               Rechazar
             </button>
@@ -134,8 +136,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-
 useSeoMeta({
   title: "Verificaciones Corporativas - JobNet",
   description:

@@ -1,5 +1,7 @@
 <template>
-  <div class="max-w-5xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-5xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <div
       class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
     >
@@ -7,7 +9,7 @@
         <h1 class="text-2xl font-bold text-on-background mb-2">
           Mis Vacantes Publicadas
         </h1>
-        <p class="text-on-surface-variant text-sm">
+        <p class="text-on-surface-variant dark:text-slate-300 text-sm">
           Gestiona y monitorea todas tus ofertas de empleo activas en la
           plataforma.
         </p>
@@ -23,7 +25,7 @@
 
     <!-- Vacancies List -->
     <div
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
     >
       <!-- Loading State (Skeleton) -->
       <div
@@ -57,7 +59,9 @@
         <h2 class="text-lg font-bold text-on-background mb-2">
           Aún no tienes vacantes activas
         </h2>
-        <p class="text-on-surface-variant text-xs max-w-sm mx-auto mb-6">
+        <p
+          class="text-on-surface-variant dark:text-slate-300 text-xs max-w-sm mx-auto mb-6"
+        >
           Comienza a captar talento publicando tu primera vacante en minutos. Es
           fácil y rápido.
         </p>
@@ -100,7 +104,7 @@
               </span>
             </div>
             <div
-              class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-on-surface-variant"
+              class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-on-surface-variant dark:text-slate-300"
             >
               <span class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-sm text-outline"
@@ -145,7 +149,7 @@
             </NuxtLink>
             <button
               v-if="job.estado !== 'EVALUACION'"
-              class="bg-surface border border-outline-variant hover:border-primary text-on-surface-variant hover:text-primary font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
+              class="bg-surface border border-outline-variant hover:border-primary text-on-surface-variant dark:text-slate-300 hover:text-primary font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
             >
               Editar
             </button>
@@ -174,14 +178,16 @@
         </h3>
         <button
           @click="isAppealModalOpen = false"
-          class="text-on-surface-variant hover:bg-surface-container rounded-lg p-1 transition flex items-center justify-center"
+          class="text-on-surface-variant dark:text-slate-300 hover:bg-surface-container rounded-lg p-1 transition flex items-center justify-center"
         >
           <span class="material-symbols-outlined text-sm">close</span>
         </button>
       </div>
 
       <form @submit.prevent="submitAppeal" class="space-y-4 text-left">
-        <p class="text-xs text-on-surface-variant leading-relaxed">
+        <p
+          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+        >
           Ingresa los argumentos y la justificación para solicitar la
           reactivación de esta vacante. El equipo de moderación analizará las
           pruebas provistas.
@@ -189,7 +195,7 @@
 
         <div class="space-y-2 flex flex-col">
           <label
-            class="text-xs font-bold text-on-surface-variant"
+            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
             for="appeal-text"
             >Mensaje de Apelación y Evidencia</label
           >
@@ -209,7 +215,7 @@
           <button
             type="button"
             @click="isAppealModalOpen = false"
-            class="bg-surface border border-outline-variant hover:bg-surface-container text-on-surface-variant font-semibold text-xs px-4 py-2.5 rounded-xl transition"
+            class="bg-surface border border-outline-variant hover:bg-surface-container text-on-surface-variant dark:text-slate-300 font-semibold text-xs px-4 py-2.5 rounded-xl transition"
           >
             Cancelar
           </button>
@@ -227,9 +233,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-
 useSeoMeta({
   title: "Mis Vacantes - JobNet",
   description: "Lista completa de vacantes creadas por la empresa",

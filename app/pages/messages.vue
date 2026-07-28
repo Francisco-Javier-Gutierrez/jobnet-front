@@ -4,10 +4,12 @@
   >
     <div class="mb-6 flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-bold text-on-background mb-2">
+        <h1
+          class="text-2xl font-bold text-on-background dark:text-slate-100 mb-2"
+        >
           Mensajes y Postulaciones
         </h1>
-        <p class="text-on-surface-variant text-sm">
+        <p class="text-on-surface-variant dark:text-slate-300 text-sm">
           Gestiona tus comunicaciones con reclutadores y el estado de tus
           candidaturas en tiempo real.
         </p>
@@ -24,7 +26,9 @@
                 : 'bg-rose-500',
           ]"
         ></span>
-        <span class="text-xs font-bold text-on-surface-variant">
+        <span
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
+        >
           {{
             wsStatus === "connected"
               ? "En línea"
@@ -38,7 +42,7 @@
 
     <!-- Main Chat/ATS Workspace Grid -->
     <div
-      class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl flex-grow overflow-hidden min-h-[550px] shadow-sm animate-fadeIn"
+      class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl flex-grow overflow-hidden min-h-[550px] shadow-sm animate-fadeIn"
     >
       <!-- Left Panel: Chat List (5 Cols) -->
       <div
@@ -48,14 +52,14 @@
         <div class="p-4 border-b border-outline-variant/60">
           <div class="relative">
             <span
-              class="absolute left-3 top-2.5 material-symbols-outlined text-on-surface-variant text-lg"
+              class="absolute left-3 top-2.5 material-symbols-outlined text-on-surface-variant dark:text-slate-300 text-lg"
               >search</span
             >
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Buscar conversaciones..."
-              class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-background outline-none transition"
+              class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-background dark:text-slate-100 outline-none transition"
             />
           </div>
         </div>
@@ -66,14 +70,14 @@
         >
           <div
             v-if="isLoadingChats"
-            class="p-8 text-center text-xs text-on-surface-variant/80"
+            class="p-8 text-center text-xs text-on-surface-variant dark:text-slate-300/80"
           >
             <span class="inline-block animate-spin mr-2">⏳</span> Cargando tus
             conversaciones...
           </div>
           <div
             v-else-if="filteredChats.length === 0"
-            class="p-8 text-center text-xs text-on-surface-variant"
+            class="p-8 text-center text-xs text-on-surface-variant dark:text-slate-300"
           >
             No tienes chats activos por el momento.
           </div>
@@ -95,17 +99,22 @@
             </div>
             <div class="flex-grow min-w-0">
               <div class="flex items-center justify-between mb-1">
-                <h3 class="text-xs font-bold text-on-background truncate">
+                <h3
+                  class="text-xs font-bold text-on-background dark:text-slate-100 truncate"
+                >
                   {{ chat.name }}
                 </h3>
-                <span class="text-[10px] text-on-surface-variant/80">{{
-                  chat.time
-                }}</span>
+                <span
+                  class="text-[10px] text-on-surface-variant dark:text-slate-300/80"
+                  >{{ chat.time }}</span
+                >
               </div>
               <p class="text-[11px] text-primary font-semibold truncate mb-1">
                 {{ chat.jobTitle }}
               </p>
-              <p class="text-xs text-on-surface-variant truncate">
+              <p
+                class="text-xs text-on-surface-variant dark:text-slate-300 truncate"
+              >
                 {{ chat.lastMessage || "Sin mensajes aún" }}
               </p>
             </div>
@@ -115,7 +124,7 @@
 
       <!-- Right Panel: Chat Detail (7 Cols) -->
       <div
-        class="lg:col-span-7 flex flex-col h-full bg-surface-container-lowest"
+        class="lg:col-span-7 flex flex-col h-full bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800"
       >
         <template v-if="activeChat">
           <!-- Header for active chat -->
@@ -129,10 +138,14 @@
                 {{ activeChat.name.charAt(0).toUpperCase() }}
               </div>
               <div>
-                <h2 class="text-xs font-bold text-on-background">
+                <h2
+                  class="text-xs font-bold text-on-background dark:text-slate-100"
+                >
                   {{ activeChat.name }}
                 </h2>
-                <p class="text-[11px] text-on-surface-variant">
+                <p
+                  class="text-[11px] text-on-surface-variant dark:text-slate-300"
+                >
                   {{ activeChat.jobTitle }} •
                   <span class="text-primary font-semibold">{{
                     activeChat.status
@@ -196,12 +209,17 @@
                     : 'bg-surface-container-low border border-outline-variant/30 rounded-tl-none text-on-surface',
                 ]"
               >
-                <p v-if="msg.text" class="whitespace-pre-wrap">{{ msg.text }}</p>
+                <p v-if="msg.text" class="whitespace-pre-wrap">
+                  {{ msg.text }}
+                </p>
 
                 <!-- Attachment Rendering -->
                 <div v-if="msg.attachmentUrl" class="mt-2">
                   <div
-                    v-if="msg.attachmentType === 'image' || isImageUrl(msg.attachmentUrl)"
+                    v-if="
+                      msg.attachmentType === 'image' ||
+                      isImageUrl(msg.attachmentUrl)
+                    "
                     class="rounded-xl overflow-hidden border border-white/20 max-w-[220px]"
                   >
                     <img
@@ -218,11 +236,15 @@
                     rel="noopener"
                     class="flex items-center gap-2 p-2.5 rounded-xl bg-black/10 hover:bg-black/20 text-current transition font-medium border border-white/10"
                   >
-                    <span class="material-symbols-outlined text-base">description</span>
+                    <span class="material-symbols-outlined text-base"
+                      >description</span
+                    >
                     <span class="truncate max-w-[150px] text-[11px]">{{
                       msg.attachmentName || "Documento Adjunto"
                     }}</span>
-                    <span class="material-symbols-outlined text-xs ml-auto">download</span>
+                    <span class="material-symbols-outlined text-xs ml-auto"
+                      >download</span
+                    >
                   </a>
                 </div>
 
@@ -231,7 +253,7 @@
                     'block text-[9px] mt-1.5 text-right',
                     msg.senderId === userId
                       ? 'text-white/80'
-                      : 'text-on-surface-variant/80',
+                      : 'text-on-surface-variant dark:text-slate-300/80',
                   ]"
                 >
                   {{ formatTime(msg.createdAt) }}
@@ -257,11 +279,13 @@
             <button
               @click="triggerFileInput"
               :disabled="wsStatus !== 'connected' || isUploading"
-              class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant flex items-center justify-center transition disabled:opacity-50"
+              class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50"
               title="Adjuntar CV o documento (PDF/Imagen)"
             >
               <span v-if="isUploading" class="animate-spin text-sm">⏳</span>
-              <span v-else class="material-symbols-outlined text-lg">attach_file</span>
+              <span v-else class="material-symbols-outlined text-lg"
+                >attach_file</span
+              >
             </button>
 
             <input
@@ -269,12 +293,15 @@
               @keyup.enter="handleSend"
               type="text"
               placeholder="Escribe un mensaje..."
-              class="flex-grow bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-xs text-on-background outline-none transition"
+              class="flex-grow bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-xs text-on-background dark:text-slate-100 outline-none transition"
               :disabled="wsStatus !== 'connected'"
             />
             <button
               @click="handleSend"
-              :disabled="wsStatus !== 'connected' || (!newMessage.trim() && !pendingAttachment)"
+              :disabled="
+                wsStatus !== 'connected' ||
+                (!newMessage.trim() && !pendingAttachment)
+              "
               class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50"
             >
               <span class="material-symbols-outlined text-lg">send</span>
@@ -285,16 +312,16 @@
         <!-- Welcome detail view when no chat active -->
         <template v-else>
           <div
-            class="flex-grow flex flex-col items-center justify-center p-8 text-center text-on-surface-variant"
+            class="flex-grow flex flex-col items-center justify-center p-8 text-center text-on-surface-variant dark:text-slate-300"
           >
             <span
               class="material-symbols-outlined text-[48px] text-outline mb-4"
               >forum</span
             >
-            <p class="text-sm font-bold text-on-background">
+            <p class="text-sm font-bold text-on-background dark:text-slate-100">
               Selecciona una conversación
             </p>
-            <p class="text-xs text-on-surface-variant mt-1">
+            <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
               Elige una postulación de la lista de la izquierda para ver el chat
               de seguimiento.
             </p>
@@ -309,47 +336,75 @@
       class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
     >
       <div
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4"
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4"
       >
-        <div class="flex items-center justify-between border-b border-outline-variant/40 pb-3">
+        <div
+          class="flex items-center justify-between border-b border-outline-variant/40 pb-3"
+        >
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-rose-600 text-xl">flag</span>
-            <h3 class="text-base font-bold text-on-background">Abrir Reclamo o Disputa</h3>
+            <span class="material-symbols-outlined text-rose-600 text-xl"
+              >flag</span
+            >
+            <h3
+              class="text-base font-bold text-on-background dark:text-slate-100"
+            >
+              Abrir Reclamo o Disputa
+            </h3>
           </div>
           <button
             @click="showDisputeModal = false"
-            class="text-on-surface-variant hover:text-on-background transition"
+            class="text-on-surface-variant dark:text-slate-300 hover:text-on-background dark:text-slate-100 transition"
           >
             <span class="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
-        <p class="text-xs text-on-surface-variant leading-relaxed">
-          Si experimentas problemas con la postulación a <strong>{{ activeChat?.jobTitle }}</strong> (falta de respuesta, irregularidades, discriminación o modificación de términos), abre un reclamo. Un moderador auditará la disputa en tiempo real.
+        <p
+          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+        >
+          Si experimentas problemas con la postulación a
+          <strong>{{ activeChat?.jobTitle }}</strong> (falta de respuesta,
+          irregularidades, discriminación o modificación de términos), abre un
+          reclamo. Un moderador auditará la disputa en tiempo real.
         </p>
 
         <div class="space-y-3">
           <div>
-            <label class="block text-xs font-bold text-on-background mb-1">Motivo principal</label>
-            <select
+            <AppSelect
               v-model="disputeForm.reason"
-              class="w-full bg-surface border border-outline-variant/60 rounded-xl px-3 py-2 text-xs text-on-background outline-none focus:border-primary"
-            >
-              <option value="Sin respuesta / Abandono de vacante">Sin respuesta / Abandono de vacante</option>
-              <option value="Modificación unilateral de condiciones de empleo">Modificación unilateral de condiciones</option>
-              <option value="Solicitud indebida de dinero o datos sensibles">Solicitud indebida de dinero / datos</option>
-              <option value="Discriminación o conducta inapropiada">Discriminación o conducta inapropiada</option>
-              <option value="Otro motivo de discrepancia">Otro motivo</option>
-            </select>
+              label="Motivo principal"
+              :options="[
+                {
+                  value: 'Sin respuesta / Abandono de vacante',
+                  label: 'Sin respuesta / Abandono de vacante',
+                },
+                {
+                  value: 'Modificación unilateral de condiciones de empleo',
+                  label: 'Modificación unilateral de condiciones',
+                },
+                {
+                  value: 'Solicitud indebida de dinero o datos sensibles',
+                  label: 'Solicitud indebida de dinero / datos',
+                },
+                {
+                  value: 'Discriminación o conducta inapropiada',
+                  label: 'Discriminación o conducta inapropiada',
+                },
+                { value: 'Otro motivo de discrepancia', label: 'Otro motivo' },
+              ]"
+            />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-on-background mb-1">Descripción detallada</label>
+            <label
+              class="block text-xs font-bold text-on-background dark:text-slate-100 mb-1"
+              >Descripción detallada</label
+            >
             <textarea
               v-model="disputeForm.description"
               rows="3"
               placeholder="Explica detalladamente la situación y proporciona contexto adicional..."
-              class="w-full bg-surface border border-outline-variant/60 rounded-xl p-3 text-xs text-on-background outline-none focus:border-primary"
+              class="w-full bg-surface border border-outline-variant/60 rounded-xl p-3 text-xs text-on-background dark:text-slate-100 outline-none focus:border-primary"
             ></textarea>
           </div>
         </div>
@@ -357,7 +412,7 @@
         <div class="flex justify-end gap-3 pt-2">
           <button
             @click="showDisputeModal = false"
-            class="px-4 py-2 rounded-xl text-xs font-semibold border border-outline-variant text-on-surface-variant hover:bg-surface-container-high transition"
+            class="px-4 py-2 rounded-xl text-xs font-semibold border border-outline-variant text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-high transition"
           >
             Cancelar
           </button>
@@ -366,7 +421,9 @@
             :disabled="isSubmittingDispute || !disputeForm.description.trim()"
             class="px-5 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition disabled:opacity-50 flex items-center gap-1.5"
           >
-            <span v-if="isSubmittingDispute" class="animate-spin text-xs">⏳</span>
+            <span v-if="isSubmittingDispute" class="animate-spin text-xs"
+              >⏳</span
+            >
             <span>Enviar Reclamo a Moderación</span>
           </button>
         </div>
@@ -376,9 +433,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
-import { useRoute } from "vue-router";
-
 useSeoMeta({
   title: "Mensajes y Postulaciones - JobNet",
   description: "Bandeja de chat interactiva en tiempo real de JobNet",
@@ -390,7 +444,11 @@ const { data: session, status } = useAuth();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
-const pendingAttachment = ref<{ url: string; type: string; name: string } | null>(null);
+const pendingAttachment = ref<{
+  url: string;
+  type: string;
+  name: string;
+} | null>(null);
 
 const showDisputeModal = ref(false);
 const isSubmittingDispute = ref(false);
@@ -722,7 +780,9 @@ const submitDispute = async () => {
       body: payload,
     });
 
-    alert("Reclamo creado exitosamente. Un moderador revisará la disputa en tiempo real.");
+    alert(
+      "Reclamo creado exitosamente. Un moderador revisará la disputa en tiempo real.",
+    );
     showDisputeModal.value = false;
   } catch (err) {
     console.error("Error submitting dispute:", err);
