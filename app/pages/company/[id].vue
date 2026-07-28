@@ -35,21 +35,22 @@
     v-else
     class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16"
   >
-    <!-- Header / Banner Section -->
+    <!-- Header / Banner Section with Proportional Height -->
     <section
-      class="relative bg-gradient-to-br from-primary to-tertiary-container h-48 md:h-64 rounded-b-xl md:rounded-xl overflow-hidden shadow-md mb-16"
+      class="relative bg-gradient-to-r from-indigo-700 via-indigo-600 to-indigo-800 h-40 md:h-52 rounded-2xl shadow-md mb-24 md:mb-28"
     >
-      <!-- Decorative Pattern -->
+      <!-- Subtle Decorative Overlay -->
       <div
-        class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,theme(colors.white)_1px,transparent_0)] bg-[size:20px_20px]"
+        class="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_1px_1px,theme(colors.white)_1px,transparent_0)] bg-[size:20px_20px] rounded-2xl"
       ></div>
-      <!-- Logo Overlap -->
+
+      <!-- Corporate Logo Overlap -->
       <div
-        class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-24 h-24 bg-white rounded-xl shadow-lg border-4 border-surface-bright flex items-center justify-center p-2 z-10"
+        class="absolute -bottom-20 md:-bottom-24 left-1/2 -translate-x-1/2 w-48 h-48 md:w-60 md:h-60 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border-4 border-surface dark:border-slate-800 flex items-center justify-center p-3 md:p-3.5 z-20 group transition-transform duration-300 hover:scale-105"
       >
         <img
-          alt="Company Logo"
-          class="w-full h-full object-contain rounded-lg"
+          alt="Logotipo Corporativo"
+          class="w-full h-full object-contain rounded-2xl"
           :src="company.logo"
         />
       </div>
@@ -60,7 +61,7 @@
       class="px-margin-mobile flex flex-col items-center text-center mt-2 mb-8"
     >
       <h1
-        class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mt-4 mb-2 flex items-center gap-2"
+        class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mt-2 mb-2 flex items-center gap-2"
       >
         {{ company.name }}
       </h1>
@@ -72,12 +73,12 @@
           >verified</span
         >
         <span
-          class="font-label-sm text-label-sm font-semibold text-on-surface-variant"
+          class="font-label-sm text-label-sm font-semibold text-on-surface-variant dark:text-slate-300"
           >Empresa Verificada</span
         >
       </div>
       <p
-        class="font-body-md text-body-md text-on-surface-variant mb-6 max-w-lg"
+        class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 mb-6 max-w-lg"
       >
         {{ company.sector }}
       </p>
@@ -94,11 +95,20 @@
           {{ company.websiteDisplay }}
         </a>
         <div
-          class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant border border-outline-variant px-4 py-2 rounded-lg w-full justify-center"
+          class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant dark:text-slate-300 border border-outline-variant px-4 py-2 rounded-lg w-full justify-center"
         >
           <span class="material-symbols-outlined text-[20px]">location_on</span>
           {{ company.location }}
         </div>
+        <button
+          v-if="!isOwner"
+          @click="showReportCompanyModal = true"
+          class="flex items-center gap-2 font-label-md text-label-md text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors px-4 py-2 rounded-lg w-full justify-center font-bold"
+          title="Reportar esta empresa"
+        >
+          <span class="material-symbols-outlined text-[20px]">flag</span>
+          Reportar empresa
+        </button>
       </div>
 
       <!-- Owner Management Actions -->
@@ -113,107 +123,361 @@
           <span class="material-symbols-outlined text-[20px]">edit</span>
           Editar Perfil
         </NuxtLink>
-        <button
+        <NuxtLink
+          to="/create-vacancy"
           class="flex-1 border border-primary text-primary hover:bg-surface-container font-label-md text-label-md px-4 py-2.5 rounded-lg transition-colors active:scale-95 duration-100 flex items-center justify-center gap-2"
         >
           <span class="material-symbols-outlined text-[20px]">add</span>
           Nueva Vacante
+        </NuxtLink>
+      </div>
+    </section>
+
+    <!-- RF-34: About Us, Misión, Visión & Beneficios Section -->
+    <section class="px-margin-mobile mb-10 space-y-6">
+      <div
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 p-6 rounded-2xl shadow-sm border border-outline-variant/50 space-y-6"
+      >
+        <div>
+          <h2
+            class="font-headline-sm text-headline-sm text-on-surface mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2"
+          >
+            <span class="material-symbols-outlined text-primary">domain</span>
+            Acerca de nosotros
+          </h2>
+          <p
+            class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 leading-relaxed"
+          >
+            {{ company.about }}
+          </p>
+        </div>
+
+        <!-- Misión y Visión Grid -->
+        <div
+          v-if="company.mision || company.vision"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          <div
+            v-if="company.mision"
+            class="bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 p-4 rounded-xl space-y-2"
+          >
+            <h3
+              class="font-bold text-xs text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5 uppercase tracking-wider"
+            >
+              <span class="material-symbols-outlined text-base text-indigo-600"
+                >flag</span
+              >
+              Misión Corporativa
+            </h3>
+            <p
+              class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+            >
+              {{ company.mision }}
+            </p>
+          </div>
+
+          <div
+            v-if="company.vision"
+            class="bg-purple-50/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 p-4 rounded-xl space-y-2"
+          >
+            <h3
+              class="font-bold text-xs text-purple-700 dark:text-purple-300 flex items-center gap-1.5 uppercase tracking-wider"
+            >
+              <span class="material-symbols-outlined text-base text-purple-600"
+                >visibility</span
+              >
+              Visión Corporativa
+            </h3>
+            <p
+              class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+            >
+              {{ company.vision }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Beneficios y Cultura Laboral -->
+        <div
+          v-if="company.beneficios"
+          class="bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 p-4 rounded-xl space-y-2"
+        >
+          <h3
+            class="font-bold text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 uppercase tracking-wider"
+          >
+            <span class="material-symbols-outlined text-base text-emerald-600"
+              >card_giftcard</span
+            >
+            Beneficios y Cultura Laboral
+          </h3>
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed whitespace-pre-line"
+          >
+            {{ company.beneficios }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Documentos Corporativos Relevantes (ISO, NOMs, Certificados) -->
+      <div
+        v-if="company.documents && company.documents.length > 0"
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 p-6 rounded-2xl shadow-sm border border-outline-variant/50 space-y-4"
+      >
+        <h2
+          class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-2"
+        >
+          <span
+            class="material-symbols-outlined text-rose-600 dark:text-rose-400"
+            >verified</span
+          >
+          Documentos Corporativos Relevantes
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div
+            v-for="doc in company.documents"
+            :key="doc.id || doc.url"
+            class="bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/50 dark:border-slate-800 p-4 rounded-xl flex items-center justify-between gap-3 shadow-sm"
+          >
+            <div class="flex items-center gap-3 min-w-0">
+              <div
+                class="w-10 h-10 rounded-xl bg-indigo-600/10 text-indigo-600 flex items-center justify-center flex-shrink-0"
+              >
+                <span class="material-symbols-outlined text-xl"
+                  >workspace_premium</span
+                >
+              </div>
+              <div class="min-w-0">
+                <span
+                  class="text-[10px] font-bold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800"
+                >
+                  {{ doc.tipo || "Certificación" }}
+                </span>
+                <p class="text-xs font-bold text-on-background truncate mt-1">
+                  {{ doc.nombre || "Documento.pdf" }}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                @click="previewCompanyDoc(doc)"
+                class="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm active:scale-95"
+              >
+                <span class="material-symbols-outlined text-sm"
+                  >visibility</span
+                >
+                Ver
+              </button>
+              <a
+                :href="doc.url"
+                download
+                target="_blank"
+                class="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm active:scale-95"
+              >
+                <span class="material-symbols-outlined text-sm">download</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabs Section: [Vacantes abiertas] / [Mis publicaciones] / [Guardados] -->
+    <section
+      class="px-margin-mobile mb-8 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 p-6 rounded-2xl border border-outline-variant/60 shadow-sm space-y-6"
+    >
+      <div
+        class="flex items-center gap-3 border-b border-outline-variant/30 pb-4 overflow-x-auto"
+      >
+        <button
+          type="button"
+          @click="companyTab = 'vacancies'"
+          :class="[
+            companyTab === 'vacancies'
+              ? 'bg-primary text-white shadow-sm font-bold'
+              : 'bg-surface-container text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container-high',
+          ]"
+          class="px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-2 active:scale-95 flex-shrink-0"
+        >
+          <span class="material-symbols-outlined text-base">work_history</span>
+          <span>Vacantes abiertas ({{ company.vacancies.length }})</span>
+        </button>
+
+        <button
+          type="button"
+          @click="companyTab = 'posts'"
+          :class="[
+            companyTab === 'posts'
+              ? 'bg-primary text-white shadow-sm font-bold'
+              : 'bg-surface-container text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container-high',
+          ]"
+          class="px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-2 active:scale-95 flex-shrink-0"
+        >
+          <span class="material-symbols-outlined text-base">article</span>
+          <span>Mis publicaciones ({{ companyPosts.length }})</span>
+        </button>
+
+        <button
+          type="button"
+          @click="companyTab = 'bookmarks'"
+          :class="[
+            companyTab === 'bookmarks'
+              ? 'bg-primary text-white shadow-sm font-bold'
+              : 'bg-surface-container text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container-high',
+          ]"
+          class="px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-2 active:scale-95 flex-shrink-0"
+        >
+          <span class="material-symbols-outlined text-base">bookmark</span>
+          <span>Guardados ({{ companyBookmarkedPosts.length }})</span>
         </button>
       </div>
-    </section>
 
-    <!-- About Us Section -->
-    <section class="px-margin-mobile mb-10">
-      <div
-        class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container-low"
-      >
-        <h2 class="font-headline-sm text-headline-sm text-on-surface mb-4">
-          Acerca de nosotros
-        </h2>
-        <p
-          class="font-body-md text-body-md text-on-surface-variant leading-relaxed"
+      <!-- Tab 1: Vacantes Abiertas -->
+      <div v-if="companyTab === 'vacancies'" class="space-y-4">
+        <div
+          v-if="company.vacancies.length === 0"
+          class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 italic"
         >
-          {{ company.about }}
-        </p>
-      </div>
-    </section>
-
-    <!-- Open Vacancies Section -->
-    <section class="px-margin-mobile mb-8">
-      <h2
-        class="font-headline-sm text-headline-sm text-on-surface mb-6 flex items-center gap-2"
-      >
-        <span class="material-symbols-outlined text-primary">work_history</span>
-        Vacantes Abiertas ({{ company.vacancies.length }})
-      </h2>
-      <div class="flex flex-col gap-4">
-        <!-- Job Card -->
-        <article
-          v-for="job in company.vacancies"
-          :key="job.id"
-          class="bg-surface-container-lowest p-5 rounded-xl shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05)] border border-surface-variant hover:shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1)] transition-shadow duration-300"
-        >
-          <div class="flex justify-between items-start mb-3">
-            <h3
-              class="font-headline-sm text-headline-sm text-on-surface leading-tight"
-            >
-              {{ job.title }}
-            </h3>
-            <button
-              class="text-outline hover:text-primary transition-colors active:scale-95 p-1 rounded-full hover:bg-surface-container"
-              aria-label="Guardar vacante"
-            >
-              <span class="material-symbols-outlined">bookmark_border</span>
-            </button>
-          </div>
-          <div class="flex flex-wrap gap-2 mb-4">
-            <span
-              class="inline-flex items-center gap-1 font-label-sm text-label-sm bg-surface-container text-on-surface-variant px-2.5 py-1 rounded-full"
-            >
-              <span class="material-symbols-outlined text-[14px]"
-                >home_work</span
-              >
-              {{ job.type }}
-            </span>
-            <span
-              class="inline-flex items-center gap-1 font-label-sm text-label-sm bg-surface-container text-on-surface-variant px-2.5 py-1 rounded-full"
-            >
-              <span class="material-symbols-outlined text-[14px]"
-                >schedule</span
-              >
-              {{ job.schedule }}
-            </span>
-          </div>
-          <div
-            class="flex items-center justify-between mt-auto pt-4 border-t border-surface-variant"
+          No hay vacantes abiertas registradas actualmente.
+        </div>
+        <div v-else class="flex flex-col gap-4">
+          <article
+            v-for="job in company.vacancies"
+            :key="job.id"
+            class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 p-5 rounded-xl shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05)] border border-surface-variant hover:shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1)] transition-shadow duration-300"
           >
-            <div
-              class="font-label-md text-label-md text-secondary flex items-center gap-1"
-            >
-              <span class="material-symbols-outlined text-[18px]"
-                >payments</span
+            <div class="flex justify-between items-start mb-3">
+              <h3
+                class="font-headline-sm text-headline-sm text-on-surface leading-tight"
               >
-              {{ job.salary }}
+                {{ job.title }}
+              </h3>
+              <button
+                class="text-outline hover:text-primary transition-colors active:scale-95 p-1 rounded-full hover:bg-surface-container"
+                aria-label="Guardar vacante"
+              >
+                <span class="material-symbols-outlined">bookmark_border</span>
+              </button>
             </div>
-            <NuxtLink
-              :to="`/jobs`"
-              class="bg-primary hover:bg-tertiary-container text-white font-label-md text-label-md px-4 py-2 rounded-lg transition-colors active:scale-95 duration-100 flex items-center gap-2 shadow-sm"
-            >
-              Ver vacante
-              <span class="material-symbols-outlined text-[18px]"
-                >arrow_forward</span
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span
+                class="inline-flex items-center gap-1 font-label-sm text-label-sm bg-surface-container text-on-surface-variant dark:text-slate-300 px-2.5 py-1 rounded-full"
               >
-            </NuxtLink>
-          </div>
-        </article>
+                <span class="material-symbols-outlined text-[14px]"
+                  >home_work</span
+                >
+                {{ job.type }}
+              </span>
+              <span
+                class="inline-flex items-center gap-1 font-label-sm text-label-sm bg-surface-container text-on-surface-variant dark:text-slate-300 px-2.5 py-1 rounded-full"
+              >
+                <span class="material-symbols-outlined text-[14px]"
+                  >schedule</span
+                >
+                {{ job.schedule }}
+              </span>
+            </div>
+            <div
+              class="flex items-center justify-between mt-auto pt-4 border-t border-surface-variant"
+            >
+              <div
+                class="font-label-md text-label-md text-secondary flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-[18px]"
+                  >payments</span
+                >
+                {{ job.salary }}
+              </div>
+              <NuxtLink
+                to="/jobs"
+                class="bg-primary hover:bg-tertiary-container text-white font-label-md text-label-md px-4 py-2 rounded-lg transition-colors active:scale-95 duration-100 flex items-center gap-2 shadow-sm"
+              >
+                Ver vacante
+                <span class="material-symbols-outlined text-[18px]"
+                  >arrow_forward</span
+                >
+              </NuxtLink>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Tab 2: Mis publicaciones -->
+      <div v-if="companyTab === 'posts'" class="space-y-4">
+        <div
+          v-if="loadingCompanyPosts"
+          class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 animate-pulse"
+        >
+          Cargando publicaciones...
+        </div>
+        <div
+          v-else-if="companyPosts.length === 0"
+          class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 italic"
+        >
+          No hay publicaciones de la organización para mostrar.
+        </div>
+        <div v-else class="grid grid-cols-1 gap-4">
+          <PostCard
+            v-for="post in companyPosts"
+            :key="post.uniqueId"
+            :post="post"
+            :current-user-id="authData?.user?.id || ''"
+            @navigate="(id) => $router.push(`/posts/${id}`)"
+            @like="toggleLike"
+            @bookmark="toggleBookmark"
+          />
+        </div>
+      </div>
+
+      <!-- Tab 3: Guardados -->
+      <div v-if="companyTab === 'bookmarks'" class="space-y-4">
+        <div
+          v-if="loadingCompanyPosts"
+          class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 animate-pulse"
+        >
+          Cargando publicaciones guardadas...
+        </div>
+        <div
+          v-else-if="companyBookmarkedPosts.length === 0"
+          class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 italic"
+        >
+          No tienes publicaciones guardadas.
+        </div>
+        <div v-else class="grid grid-cols-1 gap-4">
+          <PostCard
+            v-for="post in companyBookmarkedPosts"
+            :key="post.uniqueId"
+            :post="post"
+            :current-user-id="authData?.user?.id || ''"
+            @navigate="(id) => $router.push(`/posts/${id}`)"
+            @like="toggleLike"
+            @bookmark="toggleBookmark"
+          />
+        </div>
       </div>
     </section>
+
+    <!-- Standardized Corporate Document Viewer -->
+    <AppDocumentViewer
+      v-model="isPdfModalOpen"
+      :url="activePreviewUrl"
+      :title="activePreviewName"
+    />
+
+    <!-- Report Company Modal -->
+    <ReportModal
+      :is-open="showReportCompanyModal"
+      target-type="EMPRESA"
+      :target-id="companyId"
+      :target-title="company.name"
+      @close="showReportCompanyModal = false"
+    />
   </main>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+const showReportCompanyModal = ref(false);
 
 const route = useRoute();
 const router = useRouter();
@@ -243,6 +507,16 @@ const { data: jobsData, pending: jobsPending } = useLazyAsyncData(
 
 const loading = computed(() => profilePending.value || jobsPending.value);
 
+const isPdfModalOpen = ref(false);
+const activePreviewUrl = ref("");
+const activePreviewName = ref("");
+
+const previewCompanyDoc = (doc: any) => {
+  activePreviewUrl.value = doc.url;
+  activePreviewName.value = doc.nombre || doc.tipo;
+  isPdfModalOpen.value = true;
+};
+
 const company = ref({
   id: companyId,
   name: "TechSolutions Inc.",
@@ -253,7 +527,11 @@ const company = ref({
   websiteDisplay: "techsolutions.com",
   location: "Ciudad de México, CDMX",
   about:
-    "Somos una empresa líder en innovación tecnológica, dedicada a construir soluciones de software escalables que transforman industrias. Fomentamos un entorno de trabajo colaborativo, diverso y enfocado en el crecimiento profesional de nuestro equipo.",
+    "Somos una empresa líder en innovación tecnológica, dedicada a construir soluciones de software escalables que transforman industrias.",
+  mision: "",
+  vision: "",
+  beneficios: "",
+  documents: [] as any[],
   vacancies: [] as any[],
 });
 
@@ -263,12 +541,20 @@ watch(
   () => {
     if (profileData.value) {
       const p = profileData.value as any;
-      company.value.name = p.nombre || p.name || "Sin Nombre";
+      company.value.name =
+        p.nombre || p.nombreComercial || p.name || "Sin Nombre";
       company.value.logo =
         p.fotoPerfil ||
         "https://lh3.googleusercontent.com/aida-public/AB6AXuDSzjpaT0Ede7QLy3zl1zft4f4V9csQyhGIsAyNHyyg4lmk54ha7yMkfDw5hbVoBOME8PTGFax9iKrHHZjAmqwMRA4i1UpqhgebzJGIkwq1DS6PKK1G5jxCNSxxPjHi_ezhM-ik2qaFtqa9JYp6ruPrCozHQM4UvsZpk2HUAg07aFTdAk58De2NTtSjHaO49ddhrtHPFA-trQm7WZbFMHwS-NZ7jyJ7ZrGaZD9yxWogET6EbwJ_H8Tk0g";
       company.value.sector = p.sector || "Sector no especificado";
-      company.value.about = p.biografia || "Sin descripción corporativa.";
+      company.value.about =
+        p.biografia || p.descripcion || "Sin descripción corporativa.";
+      company.value.mision = p.mision || "";
+      company.value.vision = p.vision || "";
+      company.value.beneficios = p.beneficios || p.culturaLaboral || "";
+      company.value.documents = Array.isArray(p.documentosCorporativos)
+        ? p.documentosCorporativos
+        : [];
       company.value.location =
         typeof p.ubicacion === "string"
           ? p.ubicacion
@@ -304,6 +590,126 @@ watch(
   },
   { immediate: true },
 );
+
+const { data: authData } = useAuth();
+const companyTab = ref<"vacancies" | "posts" | "bookmarks">("vacancies");
+const allCompanyPosts = ref<any[]>([]);
+const loadingCompanyPosts = ref(false);
+
+const companyPosts = computed(() => {
+  const companyName = company.value.name?.toLowerCase();
+  const authUser = authData.value?.user as any;
+  const currentAuthId = authUser?.id;
+  const currentAuthEmail = authUser?.email?.toLowerCase();
+
+  return allCompanyPosts.value.filter((p) => {
+    const postAuthorUuid = p.authorUuid || p.userId || p.userSub || p.idUsuario;
+    const postAuthorName = p.author?.toLowerCase();
+    const postEmail = p.email?.toLowerCase();
+
+    if (
+      postAuthorUuid &&
+      (postAuthorUuid === companyId ||
+        (currentAuthId && postAuthorUuid === currentAuthId))
+    ) {
+      return true;
+    }
+    if (companyName && postAuthorName && postAuthorName === companyName) {
+      return true;
+    }
+    if (currentAuthEmail && postEmail && postEmail === currentAuthEmail) {
+      return true;
+    }
+    return false;
+  });
+});
+
+const companyBookmarkedPosts = computed(() => {
+  const authUser = authData.value?.user as any;
+  const currentAuthId = authUser?.id || companyId;
+  const currentAuthEmail = authUser?.email?.toLowerCase();
+
+  return allCompanyPosts.value.filter((p) => {
+    const bookmarks = p.bookmarksList || p.bookmarkedBy || p.bookmarks || [];
+    if (!Array.isArray(bookmarks)) return false;
+
+    return (
+      bookmarks.includes(companyId) ||
+      (currentAuthId && bookmarks.includes(currentAuthId)) ||
+      (currentAuthEmail && bookmarks.includes(currentAuthEmail)) ||
+      p.isBookmarked === true ||
+      p.bookmarked === true
+    );
+  });
+});
+
+async function fetchCompanyPosts() {
+  loadingCompanyPosts.value = true;
+  try {
+    const res = await $fetch<any>("/api/posts");
+    const data = typeof res === "string" ? JSON.parse(res) : res;
+    const list = Array.isArray(data) ? data : data?.posts || data?.data || [];
+    allCompanyPosts.value = list;
+  } catch (e) {
+    console.error("Error loading company posts:", e);
+  } finally {
+    loadingCompanyPosts.value = false;
+  }
+}
+
+const toggleLike = async (postId: string) => {
+  const currentUserId = (authData.value?.user as any)?.id;
+  if (!currentUserId) return;
+
+  try {
+    const res = await $fetch<any>(`/api/posts/${postId}/like`, {
+      method: "POST",
+      body: { userId: currentUserId },
+    });
+
+    const target = allCompanyPosts.value.find((p) => p.uniqueId === postId);
+    if (target) {
+      if (res?.likesList) {
+        target.likesList = res.likesList;
+      } else {
+        if (!target.likesList) target.likesList = [];
+        const idx = target.likesList.indexOf(currentUserId);
+        if (idx !== -1) target.likesList.splice(idx, 1);
+        else target.likesList.push(currentUserId);
+      }
+    }
+  } catch (e) {
+    console.error("Error toggling like:", e);
+  }
+};
+
+const toggleBookmark = async (postId: string) => {
+  const currentUserId = (authData.value?.user as any)?.id;
+  if (!currentUserId) return;
+
+  try {
+    const res = await $fetch<any>(`/api/posts/${postId}/bookmark`, {
+      method: "POST",
+      body: { userId: currentUserId },
+    });
+
+    const target = allCompanyPosts.value.find((p) => p.uniqueId === postId);
+    if (target) {
+      if (res?.bookmarksList) {
+        target.bookmarksList = res.bookmarksList;
+      } else {
+        if (!target.bookmarksList) target.bookmarksList = [];
+        const idx = target.bookmarksList.indexOf(currentUserId);
+        if (idx !== -1) target.bookmarksList.splice(idx, 1);
+        else target.bookmarksList.push(currentUserId);
+      }
+    }
+  } catch (e) {
+    console.error("Error toggling bookmark:", e);
+  }
+};
+
+fetchCompanyPosts();
 
 useSeoMeta({
   title: `${company.value.name} - Perfil de Empresa`,

@@ -48,7 +48,7 @@ describe("Cognito Utils", () => {
       delete process.env.COGNITO_REGION;
 
       const config = getCognitoConfig();
-      expect(config.clientId).toBe("");
+      expect(config.clientId).toBe("4ef8k4tofjj4ounvo8nf7d9pep");
       expect(config.clientSecret).toBe("");
       expect(config.region).toBe("us-east-1");
     });

@@ -4,7 +4,8 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      tipoUsuario: "CANDIDATO" | "EMPRESA" | "ADMIN" | "MODERADOR";
+      tipoUsuario:
+        "CANDIDATO" | "ORGANIZACION" | "ADMIN" | "MODERADOR" | "MODERATOR";
       nombre: string;
       idToken?: string;
     } & DefaultSession["user"];
@@ -12,7 +13,8 @@ declare module "next-auth" {
 
   interface User {
     id: string;
-    tipoUsuario: "CANDIDATO" | "EMPRESA" | "ADMIN" | "MODERADOR";
+    tipoUsuario:
+      "CANDIDATO" | "ORGANIZACION" | "ADMIN" | "MODERADOR" | "MODERATOR";
     nombre: string;
     idToken?: string;
   }
@@ -21,7 +23,8 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     id: string;
-    tipoUsuario: "CANDIDATO" | "EMPRESA" | "ADMIN" | "MODERADOR";
+    tipoUsuario:
+      "CANDIDATO" | "ORGANIZACION" | "ADMIN" | "MODERADOR" | "MODERATOR";
     nombre: string;
     idToken?: string;
   }

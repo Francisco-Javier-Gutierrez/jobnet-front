@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     { Name: "custom:role", Value: role },
   ];
 
-  if (role === "candidate") {
+  if (role === "candidate" || role === "blank" || role === "unassigned") {
     userAttributes.push({ Name: "name", Value: fullname || "" });
   } else if (role === "company") {
     userAttributes.push({ Name: "name", Value: companyName || "" });
@@ -36,6 +36,11 @@ export default defineEventHandler(async (event) => {
     Username: email,
     Password: password,
     UserAttributes: userAttributes,
+    ClientMetadata: {
+      tipoUsuario: role,
+      role: role,
+      nombre: fullname || companyName || "",
+    },
   };
 
   if (clientSecret) {

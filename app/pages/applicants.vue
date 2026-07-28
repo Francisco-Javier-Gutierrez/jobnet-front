@@ -1,10 +1,12 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-7xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-on-background mb-2">
         Bandeja de Reclutamiento (ATS)
       </h1>
-      <p class="text-on-surface-variant text-sm">
+      <p class="text-on-surface-variant dark:text-slate-300 text-sm">
         Organiza a tus candidatos a lo largo del proceso de selección de forma
         ágil y visual.
       </p>
@@ -14,25 +16,23 @@
     <div class="mb-6 flex flex-wrap gap-4 items-center justify-between">
       <div class="flex items-center gap-3">
         <label
-          class="text-xs font-bold text-on-surface-variant"
-          for="job-select"
-          >Filtrar por Vacante:</label
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
         >
-        <select
-          id="job-select"
-          v-model="selectedJobId"
-          @change="fetchApplicants"
-          class="bg-surface-container-lowest border border-outline-variant/60 hover:border-primary text-xs text-on-background rounded-lg px-3 py-2 outline-none transition"
-        >
-          <option value="">Selecciona una vacante...</option>
-          <option v-for="job in myJobs" :key="job.id" :value="job.id">
-            {{ job.title }}
-          </option>
-        </select>
+          Filtrar por Vacante:
+        </label>
+        <div class="w-64">
+          <AppSelect
+            v-model="selectedJobId"
+            @change="fetchApplicants"
+            :options="jobSelectOptions"
+            placeholder="Selecciona una vacante..."
+          />
+        </div>
       </div>
 
       <!-- Quick counts -->
-      <span class="text-xs text-on-surface-variant font-bold"
+      <span
+        class="text-xs text-on-surface-variant dark:text-slate-300 font-bold"
         >Total de Postulaciones: {{ totalCandidates }}</span
       >
     </div>
@@ -46,11 +46,19 @@
     </div>
 
     <!-- RF-47 Recruitment Chat Informative Banner -->
-    <div class="mb-6 bg-sky-500/10 border border-sky-500/20 p-4 rounded-2xl flex items-start gap-3 text-xs text-sky-900 shadow-sm">
-      <span class="material-symbols-outlined text-sky-600 text-xl flex-shrink-0">info</span>
+    <div
+      class="mb-6 bg-sky-500/10 border border-sky-500/20 p-4 rounded-2xl flex items-start gap-3 text-xs text-sky-900 shadow-sm"
+    >
+      <span class="material-symbols-outlined text-sky-600 text-xl flex-shrink-0"
+        >info</span
+      >
       <div>
-        <p class="font-bold text-sky-950">Mensajería Privada en Tiempo Real (RF-47)</p>
-        <p class="text-sky-800">El canal de chat privado e integrado con cada aspirante se desbloquea automáticamente cuando avanzas su postulación al estatus <strong>"Seleccionado"</strong> o <strong>"Entrevista"</strong>.</p>
+        <p class="font-bold text-sky-950">Mensajería Privada en Tiempo Real</p>
+        <p class="text-sky-800">
+          El canal de chat privado e integrado con cada aspirante se desbloquea
+          automáticamente cuando avanzas su postulación al estatus
+          <strong>"Seleccionado"</strong> o <strong>"Entrevista"</strong>.
+        </p>
       </div>
     </div>
 
@@ -82,7 +90,7 @@
           <div
             v-for="item in column.items"
             :key="item.id"
-            class="bg-surface-container-lowest border border-outline-variant/60 hover:border-primary p-4 rounded-xl cursor-pointer transition shadow-sm"
+            class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 hover:border-primary p-4 rounded-xl cursor-pointer transition shadow-sm"
           >
             <div class="flex justify-between items-start gap-2 mb-1">
               <h3 class="text-xs font-bold text-on-background">
@@ -101,7 +109,9 @@
               {{ item.job }}
             </p>
 
-            <div class="text-[10px] text-on-surface-variant mb-3">
+            <div
+              class="text-[10px] text-on-surface-variant dark:text-slate-300 mb-3"
+            >
               {{ item.email }}
             </div>
 
@@ -122,7 +132,9 @@
             <div
               class="flex items-center justify-between mt-3 pt-3 border-t border-outline-variant/40"
             >
-              <span class="text-[9px] text-on-surface-variant font-semibold">
+              <span
+                class="text-[9px] text-on-surface-variant dark:text-slate-300 font-semibold"
+              >
                 {{ item.time }}
               </span>
 
@@ -131,7 +143,12 @@
                 <!-- Chat link if selected/interview -->
                 <nuxt-link
                   v-if="
-                    ['SELECCIONADO', 'ENTREVISTA', 'ACEPTADO', 'CONTRATADO'].includes(item.status)
+                    [
+                      'SELECCIONADO',
+                      'ENTREVISTA',
+                      'ACEPTADO',
+                      'CONTRATADO',
+                    ].includes(item.status)
                   "
                   :to="`/messages?jobId=${item.jobId}&candidateId=${item.id}`"
                   class="w-6 h-6 rounded-md bg-sky-500 text-white hover:bg-sky-600 flex items-center justify-center transition shadow-sm"
@@ -143,8 +160,8 @@
                 <!-- Locked chat indicator when pending evaluation -->
                 <span
                   v-else
-                  class="w-6 h-6 rounded-md bg-surface border border-outline-variant/40 text-on-surface-variant/40 flex items-center justify-center cursor-help"
-                  title="🔒 Chat bloqueado: Se desbloquea automáticamente al mover el candidato a 'Seleccionado' (RF-47)"
+                  class="w-6 h-6 rounded-md bg-surface border border-outline-variant/40 text-on-surface-variant dark:text-slate-300/40 flex items-center justify-center cursor-help"
+                  title="🔒 Chat bloqueado: Se desbloquea automáticamente al mover el candidato a 'Seleccionado'"
                 >
                   <span class="material-symbols-outlined text-xs">lock</span>
                 </span>
@@ -153,7 +170,7 @@
                 <button
                   v-if="column.id !== 'applied'"
                   @click="moveCandidate(item, column.id, 'prev')"
-                  class="w-6 h-6 rounded-md bg-surface border border-outline-variant hover:border-primary text-on-surface-variant hover:text-primary flex items-center justify-center transition"
+                  class="w-6 h-6 rounded-md bg-surface border border-outline-variant hover:border-primary text-on-surface-variant dark:text-slate-300 hover:text-primary flex items-center justify-center transition"
                   title="Mover atrás"
                 >
                   <span class="material-symbols-outlined text-xs"
@@ -300,68 +317,16 @@
       </div>
     </div>
 
-    <!-- PDF Viewer Modal -->
-    <div
-      v-if="isPdfViewerOpen"
-      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 max-w-4xl w-full h-[85vh] flex flex-col shadow-xl"
-      >
-        <div
-          class="flex items-center justify-between pb-4 border-b border-outline-variant/40 mb-4"
-        >
-          <h3
-            class="text-sm font-bold text-on-background flex items-center gap-2"
-          >
-            <span class="material-symbols-outlined text-primary"
-              >picture_as_pdf</span
-            >
-            CV de {{ selectedPdfCandidateName }}
-          </h3>
-          <div class="flex items-center gap-2">
-            <a
-              :href="selectedPdfUrl"
-              download
-              target="_blank"
-              class="px-3 py-1.5 rounded-lg border border-outline-variant hover:border-primary text-on-surface-variant hover:text-primary text-xs font-bold transition flex items-center gap-1"
-            >
-              <span class="material-symbols-outlined text-[16px]"
-                >download</span
-              >
-              Descargar
-            </a>
-            <button
-              @click="isPdfViewerOpen = false"
-              class="text-on-surface-variant hover:text-error transition flex items-center gap-1 font-semibold text-xs"
-              aria-label="Cerrar visor PDF"
-            >
-              <span class="material-symbols-outlined text-sm">close</span>
-              Cerrar
-            </button>
-          </div>
-        </div>
-
-        <div
-          class="flex-grow w-full border border-outline-variant/30 rounded-xl overflow-hidden bg-surface relative"
-        >
-          <iframe
-            :src="selectedPdfUrl"
-            class="w-full h-full border-none"
-            title="Visor PDF Integrado"
-          ></iframe>
-        </div>
-      </div>
-    </div>
+    <!-- Standardized ATS Applicant Document Viewer -->
+    <AppDocumentViewer
+      v-model="isPdfViewerOpen"
+      :url="selectedPdfUrl"
+      :title="`CV de ${selectedPdfCandidateName}`"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
-
 useSeoMeta({
   title: "Bandeja ATS - JobNet",
   description:
@@ -374,7 +339,16 @@ const config = useRuntimeConfig();
 const { data: session, status } = useAuth();
 
 const selectedJobId = ref("");
-const myJobs = ref<any[]>([]);
+const myJobs = ref<Array<{ id: string; title: string }>>([]);
+
+const jobSelectOptions = computed(() => [
+  {
+    value: "",
+    label: "Todas las vacantes / Seleccionar...",
+    icon: "work_history",
+  },
+  ...myJobs.value.map((j) => ({ value: j.id, label: j.title, icon: "work" })),
+]);
 const candidates = ref<any[]>([]);
 const successMsg = ref("");
 

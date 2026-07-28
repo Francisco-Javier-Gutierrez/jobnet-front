@@ -7,9 +7,12 @@ export interface CognitoConfig {
 }
 
 export function getCognitoConfig(): CognitoConfig {
-  const clientId = process.env.COGNITO_CLIENT_ID || "";
+  const clientId =
+    process.env.COGNITO_CLIENT_ID || "4ef8k4tofjj4ounvo8nf7d9pep";
   const clientSecret = process.env.COGNITO_CLIENT_SECRET || "";
-  const issuer = process.env.COGNITO_ISSUER || "";
+  const issuer =
+    process.env.COGNITO_ISSUER ||
+    "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_trquL61F2";
   const region =
     process.env.COGNITO_REGION || issuer.split(".")[1] || "us-east-1";
 

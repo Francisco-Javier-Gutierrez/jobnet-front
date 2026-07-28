@@ -1,5 +1,7 @@
 <template>
-  <div class="max-w-2xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-2xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <!-- Breadcrumb / Back button -->
     <div class="mb-6">
       <NuxtLink
@@ -26,7 +28,7 @@
     <!-- COMMENTS SECTION -->
     <div
       v-if="post"
-      class="mt-6 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-6 text-left"
+      class="mt-6 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-6 text-left"
     >
       <h2
         class="text-base font-bold text-on-background flex items-center gap-1.5 border-b border-outline-variant/30 pb-4"
@@ -59,7 +61,7 @@
       <!-- Threaded Comments Tree -->
       <div
         v-if="commentTree.length === 0"
-        class="text-center py-8 text-on-surface-variant/60 text-xs"
+        class="text-center py-8 text-on-surface-variant dark:text-slate-300/60 text-xs"
       >
         <span class="material-symbols-outlined text-[32px] text-outline mb-2"
           >comments_disabled</span
@@ -74,7 +76,7 @@
         <div
           v-for="node in commentTree"
           :key="node.id"
-          class="p-4 bg-surface-container-lowest border border-outline-variant/40 rounded-xl space-y-3 relative group"
+          class="p-4 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/40 rounded-xl space-y-3 relative group"
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -87,9 +89,10 @@
                 <h4 class="text-xs font-bold text-on-background">
                   {{ node.user }}
                 </h4>
-                <span class="text-[10px] text-on-surface-variant/80">{{
-                  node.timeAgo || "Hace un momento"
-                }}</span>
+                <span
+                  class="text-[10px] text-on-surface-variant dark:text-slate-300/80"
+                  >{{ node.timeAgo || "Hace un momento" }}</span
+                >
               </div>
             </div>
             <button
@@ -102,7 +105,9 @@
             </button>
           </div>
 
-          <p class="text-xs text-on-surface-variant leading-relaxed">
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+          >
             {{ node.text }}
           </p>
 
@@ -159,9 +164,10 @@
                     <h5 class="text-[11px] font-bold text-on-background">
                       {{ reply.user }}
                     </h5>
-                    <span class="text-[9px] text-on-surface-variant/80">{{
-                      reply.timeAgo || "Hace un momento"
-                    }}</span>
+                    <span
+                      class="text-[9px] text-on-surface-variant dark:text-slate-300/80"
+                      >{{ reply.timeAgo || "Hace un momento" }}</span
+                    >
                   </div>
                 </div>
                 <button
@@ -173,7 +179,9 @@
                   <span class="material-symbols-outlined text-xs">delete</span>
                 </button>
               </div>
-              <p class="text-xs text-on-surface-variant leading-relaxed">
+              <p
+                class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+              >
                 {{ reply.text }}
               </p>
             </div>
@@ -188,7 +196,7 @@
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300"
     >
       <div
-        class="bg-surface-container-lowest border border-outline-variant/60 w-full max-w-md mx-4 p-6 rounded-2xl shadow-2xl text-center space-y-5 transform transition-all scale-100"
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 w-full max-w-md mx-4 p-6 rounded-2xl shadow-2xl text-center space-y-5 transform transition-all scale-100"
       >
         <div
           class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner"
@@ -197,7 +205,9 @@
         </div>
         <div class="space-y-2">
           <h3 class="text-lg font-bold text-on-background">Acción Protegida</h3>
-          <p class="text-xs text-on-surface-variant leading-relaxed">
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+          >
             Para dar me gusta, guardar en marcadores o participar en la
             conversación respondiendo y comentando publicaciones, necesitas
             contar con una cuenta profesional en JobNet.
@@ -206,7 +216,7 @@
         <div class="grid grid-cols-2 gap-3 pt-2">
           <button
             @click="showAuthModal = false"
-            class="bg-slate-100 hover:bg-slate-200 text-on-surface-variant font-bold text-xs py-2.5 px-4 rounded-xl transition"
+            class="bg-slate-100 hover:bg-slate-200 text-on-surface-variant dark:text-slate-300 font-bold text-xs py-2.5 px-4 rounded-xl transition"
           >
             Cancelar
           </button>
@@ -217,7 +227,7 @@
             Iniciar Sesión
           </button>
         </div>
-        <p class="text-[10px] text-on-surface-variant/70">
+        <p class="text-[10px] text-on-surface-variant dark:text-slate-300/70">
           ¿Aún no tienes cuenta?
           <NuxtLink
             to="/register"
@@ -231,9 +241,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
-
 useSeoMeta({
   title: "Publicación - JobNet",
   description: "Detalle de publicación en la comunidad profesional.",
@@ -251,6 +258,8 @@ const showAuthModal = ref(false);
 const newCommentText = ref("");
 const replyingToId = ref<string | null>(null);
 const replyText = ref("");
+const isSubmittingComment = ref(false);
+const isSubmittingReply = ref(false);
 
 // Load post details from localStorage
 const loadPost = async () => {
@@ -426,9 +435,11 @@ const submitComment = async () => {
     showAuthModal.value = true;
     return;
   }
-  if (!newCommentText.value.trim() || !post.value) return;
+  if (!newCommentText.value.trim() || !post.value || isSubmittingComment.value)
+    return;
   const username = session.value?.user?.name || "Usuario Anónimo";
 
+  isSubmittingComment.value = true;
   try {
     const created = await $fetch<any>(
       `/api/posts/${post.value.uniqueId}/comment`,
@@ -442,12 +453,17 @@ const submitComment = async () => {
       },
     );
 
-    if (!post.value.comments) post.value.comments = [];
-    post.value.comments.push(created);
+    const updatedComments = [...(post.value.comments || []), created];
+    post.value = {
+      ...post.value,
+      comments: updatedComments,
+    };
     newCommentText.value = "";
   } catch (e) {
     console.error("Error submitting comment:", e);
     alert("Error al guardar el comentario.");
+  } finally {
+    isSubmittingComment.value = false;
   }
 };
 
@@ -471,9 +487,10 @@ const submitReply = async (parentId: string) => {
     showAuthModal.value = true;
     return;
   }
-  if (!replyText.value.trim() || !post.value) return;
+  if (!replyText.value.trim() || !post.value || isSubmittingReply.value) return;
   const username = session.value?.user?.name || "Usuario Anónimo";
 
+  isSubmittingReply.value = true;
   try {
     const created = await $fetch<any>(
       `/api/posts/${post.value.uniqueId}/comment`,
@@ -487,56 +504,99 @@ const submitReply = async (parentId: string) => {
       },
     );
 
-    if (!post.value.comments) post.value.comments = [];
-    post.value.comments.push(created);
+    const updatedComments = [...(post.value.comments || []), created];
+    post.value = {
+      ...post.value,
+      comments: updatedComments,
+    };
     replyText.value = "";
     replyingToId.value = null;
   } catch (e) {
     console.error("Error submitting reply:", e);
     alert("Error al guardar la respuesta.");
+  } finally {
+    isSubmittingReply.value = false;
   }
 };
 
 // Deletion authority check
 const canDeleteComment = (node: any) => {
   if (status.value !== "authenticated") return false;
-  // If user is author of comment
   if (node.user === session.value?.user?.name) return true;
-  // If user is admin/moderator
   const role = (session.value?.user as any)?.tipoUsuario?.toUpperCase();
   return role === "ADMIN" || role === "MODERATOR";
 };
 
-// Recursively delete comment and its descendants
+// Delete comment (prunes entirely if alone/reply, or placeholder if it has children)
 const deleteComment = async (id: string) => {
   if (!post.value?.comments) return;
 
   try {
-    await $fetch(
+    const res = await $fetch<any>(
       `/api/posts/${post.value.uniqueId}/comment/${encodeURIComponent(id)}`,
       {
         method: "DELETE",
       },
     );
 
-    const toRemove = new Set<string>([String(id)]);
-    let queue = [String(id)];
+    const targetIndex = post.value.comments.findIndex(
+      (c: any) => String(c.id) === String(id),
+    );
 
-    // BFS to capture children nodes recursively (to clean up locally)
-    while (queue.length > 0) {
-      const currentId = queue.shift()!;
-      post.value.comments.forEach((c: any) => {
-        if (String(c.parentId) === currentId) {
-          toRemove.add(String(c.id));
-          queue.push(String(c.id));
+    let nextComments = [...post.value.comments];
+
+    if (targetIndex !== -1) {
+      const target = nextComments[targetIndex];
+      const isLevel2 = !!target.parentId;
+
+      if (res?.action === "SOFT_DELETED_PARENT" || res?.isDeleted) {
+        nextComments[targetIndex] = {
+          ...target,
+          text: "Comentario no disponible",
+          user: "Eliminado",
+          isDeleted: true,
+        };
+      } else if (isLevel2) {
+        nextComments.splice(targetIndex, 1);
+        const parentId = target.parentId;
+        const parentIndex = nextComments.findIndex(
+          (c: any) => String(c.id) === String(parentId),
+        );
+        if (parentIndex !== -1 && nextComments[parentIndex].isDeleted) {
+          const parentHasOtherChildren = nextComments.some(
+            (c: any) =>
+              String(c.parentId) === String(parentId) && c.id !== target.id,
+          );
+          if (!parentHasOtherChildren) {
+            nextComments.splice(parentIndex, 1);
+          }
         }
-      });
+      } else {
+        const hasChildren = nextComments.some(
+          (c: any) => String(c.parentId) === String(id),
+        );
+        if (hasChildren) {
+          nextComments[targetIndex] = {
+            ...target,
+            text: "Comentario no disponible",
+            user: "Eliminado",
+            isDeleted: true,
+          };
+        } else {
+          nextComments.splice(targetIndex, 1);
+        }
+      }
+    } else {
+      nextComments = nextComments.filter(
+        (c: any) => String(c.id) !== String(id),
+      );
     }
 
-    // Filter out captured comments
-    post.value.comments = post.value.comments.filter(
-      (c: any) => !toRemove.has(String(c.id)),
-    );
+    // Re-assign object reference to trigger Vue 3 reactivity immediately
+    post.value = {
+      ...post.value,
+      comments: nextComments,
+    };
   } catch (e) {
     console.error("Error deleting comment:", e);
     alert("Error al eliminar el comentario del servidor.");

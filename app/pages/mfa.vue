@@ -1,144 +1,138 @@
 <template>
-  <div
-    class="min-h-screen bg-background text-on-background flex items-center justify-center p-4"
-  >
+  <div class="w-full max-w-md" role="main">
     <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(53,37,205,0.06),transparent_40%)] pointer-events-none"
-      aria-hidden="true"
-    ></div>
-
-    <div class="w-full max-w-md relative z-10" role="main">
-      <div
-        class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm p-8"
-      >
-        <div class="text-center mb-8 flex flex-col items-center">
+      class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl shadow-sm p-6 sm:p-8"
+    >
+      <div class="text-center mb-6 flex flex-col items-center">
+        <NuxtLink
+          to="/"
+          class="inline-block mb-3"
+          aria-label="Volver al inicio"
+        >
+          <img
+            src="/logo.svg"
+            alt="Logotipo de JobNet"
+            class="h-20 sm:h-24 w-auto filter brightness-100 dark:brightness-0 dark:invert transition-all hover:scale-105"
+          />
+        </NuxtLink>
+        <h1
+          class="text-xl sm:text-2xl font-bold tracking-tight text-on-background dark:text-slate-100 mt-1"
+        >
+          Autenticación de dos factores
+        </h1>
+        <div class="mt-2 w-full text-left">
           <NuxtLink
-            to="/"
-            class="inline-block mb-4"
-            aria-label="Volver al inicio"
+            to="/login"
+            class="font-semibold text-primary hover:underline transition text-sm inline-flex items-center gap-1"
+            aria-label="Volver a la pantalla de inicio de sesión"
           >
-            <img src="/logo.svg" alt="Logotipo de JobNet" class="h-24 w-auto" />
+            <span class="material-symbols-outlined text-sm" aria-hidden="true"
+              >arrow_back</span
+            >
+            Volver al inicio de sesión
           </NuxtLink>
-          <h1 class="text-2xl font-bold tracking-tight text-on-background">
-            Autenticación de dos factores
-          </h1>
-          <div class="mt-3 w-full text-left">
-            <NuxtLink
-              to="/login"
-              class="font-semibold text-primary hover:underline transition text-sm inline-flex items-center gap-1"
-              aria-label="Volver a la pantalla de inicio de sesión"
-            >
-              <span class="material-symbols-outlined text-sm" aria-hidden="true"
-                >arrow_back</span
-              >
-              Volver al inicio de sesión
-            </NuxtLink>
+        </div>
+      </div>
+
+      <form @submit.prevent="handleVerify" class="space-y-5">
+        <div
+          v-if="errorMessage"
+          id="mfa-error"
+          role="alert"
+          aria-live="assertive"
+          class="bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-3 rounded-lg text-sm flex items-start gap-2"
+        >
+          <span
+            class="material-symbols-outlined text-sm mt-0.5"
+            aria-hidden="true"
+            >error</span
+          >
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <div
+          v-if="successMessage"
+          id="mfa-success"
+          role="status"
+          aria-live="polite"
+          class="bg-secondary/10 border border-secondary/20 text-secondary dark:text-emerald-400 p-3 rounded-lg text-sm flex items-start gap-2"
+        >
+          <span
+            class="material-symbols-outlined text-sm mt-0.5"
+            aria-hidden="true"
+            >check_circle</span
+          >
+          <span>{{ successMessage }}</span>
+        </div>
+        <div>
+          <p
+            class="block text-xs font-semibold tracking-wider text-on-surface-variant dark:text-slate-300 mb-2"
+          >
+            Ingrese su código MFA
+          </p>
+          <div
+            class="flex justify-between gap-1.5 sm:gap-2"
+            id="otp-container"
+            role="group"
+            aria-label="Código MFA de 6 dígitos"
+          >
+            <input
+              v-for="(digit, idx) in otp"
+              :key="idx"
+              ref="otpInputs"
+              v-model="otp[idx]"
+              type="text"
+              maxlength="1"
+              :aria-label="`Dígito ${idx + 1} de 6`"
+              aria-required="true"
+              :aria-invalid="!!errorMessage"
+              :aria-describedby="
+                errorMessage
+                  ? 'mfa-error'
+                  : successMessage
+                    ? 'mfa-success'
+                    : undefined
+              "
+              class="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl outline-none transition-all text-on-background dark:text-slate-100"
+              @input="handleInput($event, idx)"
+              @keydown.delete="handleDelete($event, idx)"
+              @paste="handlePaste"
+            />
           </div>
         </div>
 
-        <form @submit.prevent="handleVerify" class="space-y-6">
-          <div
-            v-if="errorMessage"
-            id="mfa-error"
-            role="alert"
-            aria-live="assertive"
-            class="bg-rose-500/10 border border-rose-500/20 text-rose-600 p-3 rounded-lg text-sm flex items-start gap-2"
+        <button
+          type="submit"
+          :disabled="loading"
+          :aria-busy="loading"
+          class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm hover:shadow"
+        >
+          <span
+            v-if="loading"
+            class="material-symbols-outlined animate-spin text-lg"
+            aria-hidden="true"
+            >progress_activity</span
           >
-            <span
-              class="material-symbols-outlined text-sm mt-0.5"
-              aria-hidden="true"
-              >error</span
-            >
-            <span>{{ errorMessage }}</span>
-          </div>
+          <span v-else>Verificar</span>
+        </button>
+      </form>
 
-          <div
-            v-if="successMessage"
-            id="mfa-success"
-            role="status"
-            aria-live="polite"
-            class="bg-secondary/10 border border-secondary/20 text-secondary p-3 rounded-lg text-sm flex items-start gap-2"
-          >
-            <span
-              class="material-symbols-outlined text-sm mt-0.5"
-              aria-hidden="true"
-              >check_circle</span
-            >
-            <span>{{ successMessage }}</span>
-          </div>
-          <div>
-            <p
-              class="block text-xs font-semibold tracking-wider text-on-surface-variant mb-2"
-            >
-              Ingrese su código MFA
-            </p>
-            <div
-              class="flex justify-between gap-2"
-              id="otp-container"
-              role="group"
-              aria-label="Código MFA de 6 dígitos"
-            >
-              <input
-                v-for="(digit, idx) in otp"
-                :key="idx"
-                ref="otpInputs"
-                v-model="otp[idx]"
-                type="text"
-                maxlength="1"
-                :aria-label="`Dígito ${idx + 1} de 6`"
-                aria-required="true"
-                :aria-invalid="!!errorMessage"
-                :aria-describedby="
-                  errorMessage
-                    ? 'mfa-error'
-                    : successMessage
-                      ? 'mfa-success'
-                      : undefined
-                "
-                class="w-12 h-14 text-center text-xl font-bold bg-[#F1F5F9] border border-[#F1F5F9] hover:border-outline focus:border-primary rounded-xl outline-none transition-all text-on-background"
-                @input="handleInput($event, idx)"
-                @keydown.delete="handleDelete($event, idx)"
-                @paste="handlePaste"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            :disabled="loading"
-            :aria-busy="loading"
-            class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm hover:shadow"
-          >
-            <span
-              v-if="loading"
-              class="material-symbols-outlined animate-spin text-lg"
-              aria-hidden="true"
-              >progress_activity</span
-            >
-            <span v-else>Verificar</span>
-          </button>
-        </form>
-
-        <div class="mt-6 text-center">
-          <a
-            href="#"
-            class="text-xs text-on-surface-variant hover:text-primary hover:underline transition"
-            aria-label="Contactar con el soporte técnico para resolver problemas con el token MFA"
-          >
-            ¿Problemas con tu token? Contactar soporte
-          </a>
-        </div>
+      <div class="mt-6 text-center">
+        <a
+          href="#"
+          class="text-xs text-on-surface-variant dark:text-slate-300 hover:text-primary hover:underline transition"
+          aria-label="Contactar con el soporte técnico para resolver problemas con el token MFA"
+        >
+          ¿Problemas con tu token? Contactar soporte
+        </a>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
-
 definePageMeta({
-  layout: false,
+  layout: "auth",
 });
 
 useSeoMeta({

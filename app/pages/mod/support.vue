@@ -1,6 +1,6 @@
 <template>
   <div
-    class="max-w-7xl mx-auto px-4 py-8 w-full bg-background min-h-screen flex flex-col"
+    class="max-w-7xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200 flex flex-col"
     role="main"
   >
     <!-- Header -->
@@ -11,7 +11,7 @@
         <h1 class="text-3xl font-bold tracking-tight text-on-background mb-2">
           Soporte Directo (Moderador)
         </h1>
-        <p class="text-on-surface-variant text-sm">
+        <p class="text-on-surface-variant dark:text-slate-300 text-sm">
           Resuelve disputas de reclutamiento y atiende dudas de candidatos y
           empresas en tiempo real.
         </p>
@@ -30,11 +30,11 @@
 
     <!-- Chat Workspace Container -->
     <div
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-sm overflow-hidden flex flex-col lg:flex-row h-[680px] w-full"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl shadow-sm overflow-hidden flex flex-col lg:flex-row h-[680px] w-full"
     >
       <!-- Left Sidebar: Active Tickets List -->
       <div
-        class="w-full lg:w-[350px] border-b lg:border-b-0 lg:border-r border-outline-variant/60 flex flex-col flex-shrink-0 bg-surface-container-lowest"
+        class="w-full lg:w-[350px] border-b lg:border-b-0 lg:border-r border-outline-variant/60 flex flex-col flex-shrink-0 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800"
         aria-label="Cola de tickets de soporte"
       >
         <!-- Search and count -->
@@ -46,7 +46,7 @@
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
               <span
-                class="material-symbols-outlined text-on-surface-variant/70 text-[18px]"
+                class="material-symbols-outlined text-on-surface-variant dark:text-slate-300/70 text-[18px]"
                 >search</span
               >
             </span>
@@ -58,7 +58,7 @@
             />
           </div>
           <div
-            class="flex justify-between items-center text-[11px] font-bold text-on-surface-variant"
+            class="flex justify-between items-center text-[11px] font-bold text-on-surface-variant dark:text-slate-300"
           >
             <span>TICKETS EN COLA</span>
             <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full"
@@ -105,7 +105,9 @@
                 <h3 class="text-xs font-bold text-on-background truncate">
                   {{ ticket.userName }}
                 </h3>
-                <span class="text-[9px] text-on-surface-variant font-medium">
+                <span
+                  class="text-[9px] text-on-surface-variant dark:text-slate-300 font-medium"
+                >
                   {{ ticket.time }}
                 </span>
               </div>
@@ -125,7 +127,9 @@
                   class="w-2 h-2 rounded-full bg-primary animate-pulse"
                 ></span>
               </div>
-              <p class="text-[11px] text-on-surface-variant truncate">
+              <p
+                class="text-[11px] text-on-surface-variant dark:text-slate-300 truncate"
+              >
                 {{ ticket.lastMessage || ticket.subject }}
               </p>
             </div>
@@ -139,7 +143,7 @@
         <div v-if="activeTicket" class="flex flex-col h-full">
           <!-- Chat Header -->
           <div
-            class="p-4 border-b border-outline-variant/60 bg-surface-container-lowest flex items-center justify-between shadow-sm"
+            class="p-4 border-b border-outline-variant/60 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 flex items-center justify-between shadow-sm"
           >
             <div class="flex items-center gap-3">
               <!-- Avatar -->
@@ -172,7 +176,9 @@
                     {{ activeTicket.userRole }}
                   </span>
                 </div>
-                <p class="text-[10px] text-on-surface-variant">
+                <p
+                  class="text-[10px] text-on-surface-variant dark:text-slate-300"
+                >
                   {{ activeTicket.online ? "Conectado ahora" : "Desconectado" }}
                   • Asunto: {{ activeTicket.subject }}
                 </p>
@@ -183,7 +189,7 @@
             <div class="flex items-center gap-2">
               <button
                 @click="resolveTicket(activeTicket.id)"
-                class="px-3 py-1.5 border border-outline-variant hover:border-primary text-xs font-bold text-on-surface-variant hover:text-primary rounded-xl transition flex items-center gap-1 bg-surface"
+                class="px-3 py-1.5 border border-outline-variant hover:border-primary text-xs font-bold text-on-surface-variant dark:text-slate-300 hover:text-primary rounded-xl transition flex items-center gap-1 bg-surface"
               >
                 <span class="material-symbols-outlined text-[16px]"
                   >check_circle</span
@@ -200,7 +206,7 @@
           >
             <!-- Subject Context Box -->
             <div
-              class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-3.5 max-w-xl mx-auto text-center"
+              class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-xl p-3.5 max-w-xl mx-auto text-center"
             >
               <span
                 class="material-symbols-outlined text-primary text-[24px] mb-1.5"
@@ -209,14 +215,16 @@
               <h4 class="text-xs font-bold text-on-background mb-1">
                 Contexto del Reporte
               </h4>
-              <p class="text-[11px] text-on-surface-variant">
+              <p
+                class="text-[11px] text-on-surface-variant dark:text-slate-300"
+              >
                 {{ activeTicket.description }}
               </p>
             </div>
 
             <div class="text-center">
               <span
-                class="text-[9px] font-bold text-on-surface-variant/80 uppercase tracking-widest bg-surface-container-low px-2 py-0.5 rounded border border-outline-variant/30"
+                class="text-[9px] font-bold text-on-surface-variant dark:text-slate-300/80 uppercase tracking-widest bg-surface-container-low px-2 py-0.5 rounded border border-outline-variant/30"
               >
                 Historial de Conversación
               </span>
@@ -234,13 +242,13 @@
                 :class="
                   msg.sender === 'MODERATOR'
                     ? 'bg-primary text-white rounded-tr-none'
-                    : 'bg-surface-container-lowest text-on-background border border-outline-variant/40 rounded-tl-none'
+                    : 'bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 text-on-background border border-outline-variant/40 rounded-tl-none'
                 "
               >
                 <p class="leading-relaxed">{{ msg.text }}</p>
               </div>
               <span
-                class="text-[9px] text-on-surface-variant mt-1.5 px-1 font-medium flex items-center gap-1"
+                class="text-[9px] text-on-surface-variant dark:text-slate-300 mt-1.5 px-1 font-medium flex items-center gap-1"
               >
                 {{ msg.time }}
                 <span
@@ -254,10 +262,10 @@
             <!-- Typing Simulation indicator -->
             <div
               v-if="isTyping"
-              class="flex items-center gap-2 text-on-surface-variant text-[11px] font-medium"
+              class="flex items-center gap-2 text-on-surface-variant dark:text-slate-300 text-[11px] font-medium"
             >
               <div
-                class="flex gap-1 items-center bg-surface-container-lowest border border-outline-variant/40 px-3.5 py-2.5 rounded-full rounded-tl-none"
+                class="flex gap-1 items-center bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/40 px-3.5 py-2.5 rounded-full rounded-tl-none"
               >
                 <span
                   class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce"
@@ -278,7 +286,7 @@
 
           <!-- Message Input Box -->
           <div
-            class="p-4 bg-surface-container-lowest border-t border-outline-variant/60 flex items-center gap-3"
+            class="p-4 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border-t border-outline-variant/60 flex items-center gap-3"
           >
             <input
               v-model="newMessageText"
@@ -313,7 +321,9 @@
           <h3 class="text-lg font-bold text-on-background mb-2">
             Selecciona un ticket de soporte
           </h3>
-          <p class="text-on-surface-variant text-xs max-w-sm">
+          <p
+            class="text-on-surface-variant dark:text-slate-300 text-xs max-w-sm"
+          >
             Elige a uno de los usuarios de la lista lateral para atender sus
             solicitudes en tiempo real y resolver sus dudas directamente.
           </p>
@@ -324,17 +334,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch, onMounted, onUnmounted } from "vue";
-
 useSeoMeta({
   title: "Soporte y Disputas - Moderación JobNet",
-  description: "Bandeja interactiva de soporte directo y gestión de disputas para moderadores",
+  description:
+    "Bandeja interactiva de soporte directo y gestión de disputas para moderadores",
 });
 
 const config = useRuntimeConfig();
 const { data: session, status } = useAuth();
 
-const userId = computed(() => (session.value?.user as any)?.id || "moderator-1");
+const userId = computed(
+  () => (session.value?.user as any)?.id || "moderator-1",
+);
 const searchQuery = ref("");
 const selectedTicketId = ref<string | null>(null);
 const newMessageText = ref("");
@@ -385,7 +396,12 @@ const fetchDisputes = async () => {
         online: true,
         subject: `Disputa: ${d.reason}`,
         description: d.description || d.reason,
-        time: d.fechaCreacion ? new Date(d.fechaCreacion).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Reciente",
+        time: d.fechaCreacion
+          ? new Date(d.fechaCreacion).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "Reciente",
         unread: d.estatus === "ABIERTA",
         lastMessage: d.description || d.reason,
         messages: [],
@@ -417,7 +433,10 @@ const connectWebSocket = () => {
         const { disputeId, senderId, text, createdAt } = payload;
         const target = tickets.value.find((t) => t.id === disputeId);
         if (target) {
-          const timeStr = new Date(createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const timeStr = new Date(createdAt || Date.now()).toLocaleTimeString(
+            [],
+            { hour: "2-digit", minute: "2-digit" },
+          );
           target.messages.push({
             id: `m-ws-${Date.now()}`,
             sender: senderId === userId.value ? "MODERATOR" : "USER",
@@ -469,7 +488,10 @@ const selectTicket = async (ticket: any) => {
         id: `m-${m.createdAt}`,
         sender: m.senderId === userId.value ? "MODERATOR" : "USER",
         text: m.text,
-        time: new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        time: new Date(m.createdAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       }));
     } catch (e) {
       console.error("Error loading dispute messages:", e);
@@ -481,10 +503,13 @@ const selectTicket = async (ticket: any) => {
 
 const resolveTicket = async (ticketId: string) => {
   try {
-    await $fetch(`${config.public.apiUrl}/moderator/disputes/${ticketId}/resolve`, {
-      method: "POST",
-      body: { action: "resolve", notes: "Caso resuelto por moderador" },
-    }).catch(() => {});
+    await $fetch(
+      `${config.public.apiUrl}/moderator/disputes/${ticketId}/resolve`,
+      {
+        method: "POST",
+        body: { action: "resolve", notes: "Caso resuelto por moderador" },
+      },
+    ).catch(() => {});
   } catch (e) {
     console.error("Error resolving dispute:", e);
   }

@@ -1,10 +1,12 @@
 <template>
-  <div class="max-w-2xl mx-auto px-4 py-8 w-full bg-background min-h-screen">
+  <div
+    class="max-w-2xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-on-background mb-2">
         Crear Nueva Vacante
       </h1>
-      <p class="text-on-surface-variant text-sm">
+      <p class="text-on-surface-variant dark:text-slate-300 text-sm">
         Registra una oferta de empleo y define sus coordenadas geográficas y
         habilidades del catálogo.
       </p>
@@ -48,11 +50,13 @@
 
     <form
       @submit.prevent="handleSubmit"
-      class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-6 shadow-sm"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-6 shadow-sm"
     >
       <!-- Job Title -->
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-bold text-on-surface-variant" for="title"
+        <label
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
+          for="title"
           >Título del Puesto (Obligatorio)</label
         >
         <input
@@ -67,25 +71,28 @@
 
       <!-- Mode & Description -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="flex flex-col gap-1.5">
-          <label
-            class="text-xs font-bold text-on-surface-variant"
-            for="modality"
-            >Modalidad de Trabajo (Obligatorio)</label
-          >
-          <select
+        <div>
+          <AppSelect
             v-model="modality"
-            id="modality"
-            class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23777587%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.5rem_center] bg-[length:1.5em_1.5em] pr-10"
-          >
-            <option value="Remoto">Remoto</option>
-            <option value="Híbrido">Híbrido</option>
-            <option value="Presencial">Presencial</option>
-          </select>
+            label="Modalidad de Trabajo (Obligatorio)"
+            :options="[
+              { value: 'Remoto', label: 'Remoto', icon: 'laptop' },
+              {
+                value: 'Híbrido',
+                label: 'Híbrido',
+                icon: 'domain_verification',
+              },
+              {
+                value: 'Presencial',
+                label: 'Presencial',
+                icon: 'location_city',
+              },
+            ]"
+          />
         </div>
         <div class="flex flex-col gap-1.5">
           <label
-            class="text-xs font-bold text-on-surface-variant"
+            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
             for="experience-years"
             >Experiencia Requerida (Opcional)</label
           >
@@ -103,7 +110,7 @@
       <!-- Description -->
       <div class="flex flex-col gap-1.5">
         <label
-          class="text-xs font-bold text-on-surface-variant"
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
           for="description"
           >Descripción Detallada de Actividades (Obligatorio)</label
         >
@@ -119,7 +126,8 @@
 
       <!-- Documento de Especificación (PDF) -->
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-bold text-on-surface-variant"
+        <label
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
           >Descriptor de Puesto o Especificaciones (PDF - Opcional)</label
         >
         <div class="flex gap-2 items-center">
@@ -151,7 +159,7 @@
             <button
               type="button"
               @click="clearVacancyFile"
-              class="text-on-surface-variant hover:text-rose-600 flex items-center transition"
+              class="text-on-surface-variant dark:text-slate-300 hover:text-rose-600 flex items-center transition"
             >
               <span class="material-symbols-outlined text-xs">close</span>
             </button>
@@ -162,7 +170,8 @@
       <!-- Ubicación Geográfica (Leaflet Map) -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <label class="text-xs font-bold text-on-surface-variant"
+          <label
+            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
             >Ubicación Geográfica (Obligatorio)</label
           >
           <button
@@ -174,7 +183,7 @@
             Usar ubicación actual
           </button>
         </div>
-        <p class="text-xs text-on-surface-variant">
+        <p class="text-xs text-on-surface-variant dark:text-slate-300">
           Haz clic en el mapa o arrastra el marcador para definir las
           coordenadas de la vacante.
         </p>
@@ -184,14 +193,18 @@
         ></div>
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1 text-[11px]">
-            <span class="font-bold text-on-surface-variant">Latitud</span>
+            <span class="font-bold text-on-surface-variant dark:text-slate-300"
+              >Latitud</span
+            >
             <span
               class="bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 font-mono font-semibold"
               >{{ lat.toFixed(6) }}</span
             >
           </div>
           <div class="flex flex-col gap-1 text-[11px]">
-            <span class="font-bold text-on-surface-variant">Longitud</span>
+            <span class="font-bold text-on-surface-variant dark:text-slate-300"
+              >Longitud</span
+            >
             <span
               class="bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 font-mono font-semibold"
               >{{ lng.toFixed(6) }}</span
@@ -212,7 +225,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="flex flex-col gap-1.5">
             <label
-              class="text-[10px] font-bold text-on-surface-variant"
+              class="text-[10px] font-bold text-on-surface-variant dark:text-slate-300"
               for="salary-min"
               >Monto Mínimo (MXN)</label
             >
@@ -227,7 +240,7 @@
           </div>
           <div class="flex flex-col gap-1.5">
             <label
-              class="text-[10px] font-bold text-on-surface-variant"
+              class="text-[10px] font-bold text-on-surface-variant dark:text-slate-300"
               for="salary-max"
               >Monto Máximo (MXN)</label
             >
@@ -245,7 +258,9 @@
 
       <!-- Aptitudes y Habilidades Opcionales -->
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-bold text-on-surface-variant" for="aptitudes"
+        <label
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
+          for="aptitudes"
           >Aptitudes y Competencias Blandas (Opcional)</label
         >
         <input
@@ -259,7 +274,8 @@
 
       <!-- Habilidades Requeridas (Catálogo Maestro Dinámico) -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-on-surface-variant"
+        <label
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
           >Selección de Habilidades Requeridas (Obligatorio)</label
         >
 
@@ -281,7 +297,7 @@
           </span>
           <span
             v-if="skills.length === 0"
-            class="text-xs text-on-surface-variant italic"
+            class="text-xs text-on-surface-variant dark:text-slate-300 italic"
           >
             Ninguna habilidad seleccionada aún. Selecciona del catálogo abajo.
           </span>
@@ -294,7 +310,7 @@
           <div class="flex gap-2">
             <div class="relative flex-grow">
               <span
-                class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm"
+                class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant dark:text-slate-300 text-sm"
                 >search</span
               >
               <input
@@ -351,7 +367,7 @@
             </button>
             <span
               v-if="filteredCatalogSkills.length === 0"
-              class="text-[11px] text-on-surface-variant italic py-1"
+              class="text-[11px] text-on-surface-variant dark:text-slate-300 italic py-1"
             >
               No se encontraron habilidades adicionales. Escribe para crear una
               nueva.
@@ -362,7 +378,8 @@
 
       <!-- Sectores de la Vacante (Catálogo Maestro Dinámico) -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-on-surface-variant"
+        <label
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
           >Sectores de la Industria (Obligatorio)</label
         >
 
@@ -384,7 +401,7 @@
           </span>
           <span
             v-if="sectors.length === 0"
-            class="text-xs text-on-surface-variant italic"
+            class="text-xs text-on-surface-variant dark:text-slate-300 italic"
           >
             Ningún sector seleccionado aún. Selecciona del catálogo abajo.
           </span>
@@ -397,7 +414,7 @@
           <div class="flex gap-2">
             <div class="relative flex-grow">
               <span
-                class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm"
+                class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant dark:text-slate-300 text-sm"
                 >search</span
               >
               <input
@@ -454,7 +471,7 @@
             </button>
             <span
               v-if="filteredCatalogSectors.length === 0"
-              class="text-[11px] text-on-surface-variant italic py-1"
+              class="text-[11px] text-on-surface-variant dark:text-slate-300 italic py-1"
             >
               No se encontraron sectores adicionales. Escribe para crear uno
               nuevo.
@@ -479,8 +496,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from "vue";
-import { useRouter } from "vue-router";
 import { useCatalogStore } from "~/stores/catalog";
 
 // Load Leaflet stylesheet in the head

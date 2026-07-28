@@ -27,11 +27,28 @@ export const useJobsStore = defineStore("jobs", {
     loading: false,
   }),
   actions: {
-    async fetchJobs() {
+    async fetchJobs(params?: {
+      q?: string;
+      modalidad?: string;
+      page?: number;
+      limit?: number;
+    }) {
       this.loading = true;
       try {
-        const data = await $fetch<any[]>("/api/jobs");
-        this.jobs = data;
+        const query: Record<string, any> = {};
+        if (params?.q) query.q = params.q;
+        if (params?.modalidad) query.modalidad = params.modalidad;
+        if (params?.page) query.page = params.page;
+        if (params?.limit) query.limit = params.limit;
+
+        const res = await $fetch<any>("/api/jobs", { query });
+        if (res && Array.isArray(res.data)) {
+          this.jobs = res.data;
+        } else if (Array.isArray(res)) {
+          this.jobs = res;
+        } else {
+          this.jobs = [];
+        }
       } catch (error) {
         this.jobs = [];
       } finally {

@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
-import { useRouter } from "vue-router";
-
 const { data, status } = useAuth();
 const router = useRouter();
 
@@ -31,13 +28,11 @@ const handleRedirect = () => {
       return;
     }
 
-    if (role === "CANDIDATO") {
-      router.replace(`/candidate/${id}`);
-    } else if (role === "EMPRESA") {
+    if (role === "EMPRESA") {
       router.replace(`/company/${id}`);
     } else {
-      // Admins/Moderators redirect to home for now
-      router.replace("/");
+      // CANDIDATO, ADMIN, MODERATOR redirect to candidate profile page
+      router.replace(`/candidate/${id}`);
     }
   }
 };
@@ -57,7 +52,9 @@ watch([status, data], () => {
       <div
         class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"
       ></div>
-      <p class="text-on-surface-variant font-medium text-sm">
+      <p
+        class="text-on-surface-variant dark:text-slate-300 font-medium text-sm"
+      >
         Cargando tu perfil...
       </p>
     </div>
