@@ -119,7 +119,7 @@
         </div>
         <button
           type="submit"
-          class="bg-primary hover:bg-primary-container text-white font-semibold text-sm px-6 h-11 rounded-xl transition flex items-center justify-center gap-1.5 w-full sm:w-auto shadow-sm active:scale-95 duration-100"
+          class="bg-primary hover:bg-primary-container text-white font-semibold text-sm px-6 h-11 rounded-xl transition flex items-center justify-center gap-1.5 w-full sm:w-auto shadow-sm active:scale-95 duration-100 cursor-pointer"
         >
           <span class="material-symbols-outlined text-lg">save</span>
           Guardar
@@ -127,36 +127,26 @@
       </form>
     </div>
 
-    <!-- Navigation Tab Categories -->
-    <div class="flex border-b border-outline-variant/60 mb-6 gap-2">
-      <button
-        @click="
-          activeCategoryTab = 'Habilidad';
-          currentPage = 1;
-        "
-        :class="
-          activeCategoryTab === 'Habilidad'
-            ? 'text-primary border-b-2 border-primary font-bold'
-            : 'text-on-surface-variant dark:text-slate-300 hover:text-primary'
-        "
-        class="pb-3 px-4 text-sm font-semibold transition"
-      >
-        Habilidades Técnicas
-      </button>
-      <button
-        @click="
-          activeCategoryTab = 'Sector';
-          currentPage = 1;
-        "
-        :class="
-          activeCategoryTab === 'Sector'
-            ? 'text-primary border-b-2 border-primary font-bold'
-            : 'text-on-surface-variant dark:text-slate-300 hover:text-primary'
-        "
-        class="pb-3 px-4 text-sm font-semibold transition"
-      >
-        Sectores Laborales
-      </button>
+    <!-- Navigation Tab Categories using AppTabs -->
+    <div class="mb-6">
+      <AppTabs
+        :tabs="[
+          {
+            id: 'Habilidad',
+            label: 'Habilidades Técnicas',
+            icon: 'psychology',
+            count: catalog.skills.length,
+          },
+          {
+            id: 'Sector',
+            label: 'Sectores Laborales',
+            icon: 'domain',
+            count: catalog.sectors.length,
+          },
+        ]"
+        v-model="activeCategoryTab"
+        @change="resetPage"
+      />
     </div>
 
     <!-- RF-9 & RF-11: Listado, Paginación y Modificación -->
@@ -202,11 +192,12 @@
 
           <template v-else>
             <tr v-if="paginatedItems.length === 0">
-              <td
-                colspan="4"
-                class="py-8 text-center text-on-surface-variant dark:text-slate-300 text-xs"
-              >
-                No hay elementos registrados en esta categoría.
+              <td colspan="4" class="p-0">
+                <AppEmptyState
+                  icon="inventory_2"
+                  title="Sin elementos registrados"
+                  description="No hay registros disponibles en esta categoría actualmente."
+                />
               </td>
             </tr>
             <tr
@@ -233,16 +224,20 @@
 
               <!-- Category -->
               <td class="py-4 px-6 hidden sm:table-cell">
-                <span
-                  :class="
+                <AppStatusBadge
+                  :status="item.category"
+                  :label="
                     item.category === 'Habilidad'
-                      ? 'bg-primary/10 text-primary'
-                      : 'bg-secondary/10 text-secondary'
+                      ? 'Habilidad Técnica'
+                      : 'Sector Laboral'
                   "
-                  class="px-2.5 py-0.5 rounded-full text-xs font-bold"
-                >
-                  {{ item.category }}
-                </span>
+                  :icon="
+                    item.category === 'Habilidad'
+                      ? 'psychology'
+                      : 'business_center'
+                  "
+                  :dot="false"
+                />
               </td>
 
               <!-- Registration Date -->
@@ -260,7 +255,7 @@
                 >
                   <button
                     @click="handleSaveEdit(item.id)"
-                    class="bg-secondary text-white hover:bg-[#005236] transition px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm"
+                    class="bg-secondary text-white hover:bg-[#005236] transition px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm cursor-pointer"
                     title="Guardar cambios"
                   >
                     <span class="material-symbols-outlined text-sm">done</span>
@@ -268,7 +263,7 @@
                   </button>
                   <button
                     @click="cancelEdit"
-                    class="bg-surface border border-outline-variant hover:bg-surface-container-high text-on-surface-variant dark:text-slate-300 transition px-3 py-1.5 rounded-lg text-xs font-semibold"
+                    class="bg-surface border border-outline-variant hover:bg-surface-container-high text-on-surface-variant dark:text-slate-300 transition px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer"
                     title="Cancelar edición"
                   >
                     Cancelar
@@ -277,14 +272,14 @@
                 <div v-else class="flex items-center justify-end gap-2">
                   <button
                     @click="startEdit(item)"
-                    class="text-primary hover:bg-primary/5 transition p-1.5 rounded-lg flex items-center"
+                    class="text-primary hover:bg-primary/5 transition p-1.5 rounded-lg flex items-center cursor-pointer"
                     title="Editar registro"
                   >
                     <span class="material-symbols-outlined text-sm">edit</span>
                   </button>
                   <button
-                    @click="handleDeleteItem(item.id)"
-                    class="text-rose-600 hover:bg-rose-50/50 transition p-1.5 rounded-lg flex items-center"
+                    @click="handleDeleteItem(item)"
+                    class="text-rose-600 hover:bg-rose-50/50 transition p-1.5 rounded-lg flex items-center cursor-pointer"
                     title="Eliminar registro"
                   >
                     <span class="material-symbols-outlined text-sm"
@@ -298,57 +293,39 @@
         </tbody>
       </table>
 
-      <!-- Pagination controls (20 items per page) -->
-      <div
-        v-if="totalPages > 1"
-        class="p-4 border-t border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20"
-      >
-        <span class="text-xs text-on-surface-variant dark:text-slate-300">
-          Mostrando {{ pageStartIndex + 1 }}-{{
-            Math.min(pageEndIndex, filteredItems.length)
-          }}
-          de {{ filteredItems.length }}
-        </span>
-        <div class="flex items-center gap-1">
-          <button
-            @click="currentPage = Math.max(1, currentPage - 1)"
-            :disabled="currentPage === 1"
-            class="p-1.5 rounded-lg border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant dark:text-slate-300 disabled:opacity-50 transition"
-          >
-            <span class="material-symbols-outlined text-sm flex items-center"
-              >chevron_left</span
-            >
-          </button>
-          <button
-            v-for="p in totalPages"
-            :key="p"
-            @click="currentPage = p"
-            :class="
-              currentPage === p
-                ? 'bg-primary text-white border-primary'
-                : 'border-outline-variant/60 text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-high'
-            "
-            class="w-8 h-8 rounded-lg border font-bold text-xs flex items-center justify-center transition"
-          >
-            {{ p }}
-          </button>
-          <button
-            @click="currentPage = Math.min(totalPages, currentPage + 1)"
-            :disabled="currentPage === totalPages"
-            class="p-1.5 rounded-lg border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant dark:text-slate-300 disabled:opacity-50 transition"
-          >
-            <span class="material-symbols-outlined text-sm flex items-center"
-              >chevron_right</span
-            >
-          </button>
-        </div>
+      <!-- Reusable AppPagination Component -->
+      <div class="px-4 border-t border-outline-variant/60">
+        <AppPagination
+          v-model:current-page="currentPage"
+          :total-pages="totalPages"
+          :total-items="filteredItems.length"
+          :start-index="startIndex"
+          :end-index="endIndex"
+        />
       </div>
     </div>
+
+    <!-- Reusable AppConfirmModal Component -->
+    <AppConfirmModal
+      v-model="isConfirmOpen"
+      :title="confirmTitle"
+      :message="confirmMessage"
+      variant="danger"
+      :is-loading="isConfirming"
+      @confirm="handleConfirm"
+      @cancel="closeConfirm"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
 import { useCatalogStore, type CatalogItem } from "~/stores/catalog";
+import AppStatusBadge from "~/components/common/AppStatusBadge.vue";
+import AppPagination from "~/components/common/AppPagination.vue";
+import AppEmptyState from "~/components/common/AppEmptyState.vue";
+import AppConfirmModal from "~/components/common/AppConfirmModal.vue";
+import AppTabs from "~/components/common/AppTabs.vue";
 
 useSeoMeta({
   title: "Catálogo Maestro - Administrador",
@@ -366,7 +343,7 @@ onMounted(async () => {
 });
 
 // Setup UI Tab state
-const activeCategoryTab = ref<"Habilidad" | "Sector">("Habilidad");
+const activeCategoryTab = ref<string>("Habilidad");
 
 // Form input fields
 const newItemName = ref("");
@@ -380,11 +357,7 @@ const editingName = ref("");
 const globalSuccess = ref("");
 const globalError = ref("");
 
-// Pagination state
-const currentPage = ref(1);
-const itemsPerPage = 20;
-
-// Filters items based on active tab category
+// Filter items based on active tab category
 const filteredItems = computed(() => {
   if (activeCategoryTab.value === "Habilidad") {
     return catalog.skills;
@@ -392,24 +365,26 @@ const filteredItems = computed(() => {
   return catalog.sectors;
 });
 
-// Total pages computation
-const totalPages = computed(() => {
-  return Math.ceil(filteredItems.value.length / itemsPerPage);
-});
+// Reusable usePagination Composable
+const {
+  currentPage,
+  totalPages,
+  paginatedItems,
+  startIndex,
+  endIndex,
+  resetPage,
+} = usePagination(filteredItems, { initialPageSize: 20 });
 
-// Indexes for displaying text
-const pageStartIndex = computed(() => {
-  return (currentPage.value - 1) * itemsPerPage;
-});
-
-const pageEndIndex = computed(() => {
-  return currentPage.value * itemsPerPage;
-});
-
-// Paginated items slicing
-const paginatedItems = computed(() => {
-  return filteredItems.value.slice(pageStartIndex.value, pageEndIndex.value);
-});
+// Reusable useConfirmDialog Composable
+const {
+  isOpen: isConfirmOpen,
+  isConfirming,
+  title: confirmTitle,
+  message: confirmMessage,
+  openConfirm,
+  closeConfirm,
+  handleConfirm,
+} = useConfirmDialog();
 
 // Format date helper
 const formatDate = (isoString: string) => {
@@ -437,7 +412,7 @@ const handleCreateItem = async () => {
     globalSuccess.value = `¡"${newItemName.value}" se agregó con éxito a ${newItemCategory.value === "Habilidad" ? "habilidades" : "sectores"}!`;
     activeCategoryTab.value = newItemCategory.value; // Switch to the category we just added to see it
     newItemName.value = "";
-    currentPage.value = 1; // Back to first page
+    resetPage();
   } else {
     globalError.value =
       result.error || "Ocurrió un error al registrar el elemento.";
@@ -471,26 +446,24 @@ const handleSaveEdit = async (id: string) => {
   }
 };
 
-// RF-11: Modificación - Eliminar Elemento
-const handleDeleteItem = async (id: string) => {
+// RF-11: Modificación - Eliminar Elemento usando AppConfirmModal
+const handleDeleteItem = (item: CatalogItem) => {
   globalSuccess.value = "";
   globalError.value = "";
 
-  if (
-    confirm(
-      "¿Estás seguro de que deseas eliminar este registro del catálogo global?",
-    )
-  ) {
-    const success = await catalog.deleteItem(id);
-    if (success) {
-      globalSuccess.value = "Registro eliminado del catálogo correctamente.";
-      // Adjust current page if we deleted the last item on the page
-      if (paginatedItems.value.length === 0 && currentPage.value > 1) {
-        currentPage.value--;
+  openConfirm({
+    title: "¿Eliminar Registro?",
+    message: `¿Estás seguro de que deseas eliminar "${item.name}" del catálogo global de ${item.category === "Habilidad" ? "habilidades" : "sectores"}?`,
+    confirmText: "Eliminar",
+    variant: "danger",
+    onConfirm: async () => {
+      const success = await catalog.deleteItem(item.id);
+      if (success) {
+        globalSuccess.value = "Registro eliminado del catálogo correctamente.";
+      } else {
+        globalError.value = "No se pudo encontrar el registro para eliminar.";
       }
-    } else {
-      globalError.value = "No se pudo encontrar el registro para eliminar.";
-    }
-  }
+    },
+  });
 };
 </script>

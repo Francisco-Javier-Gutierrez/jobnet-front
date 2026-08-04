@@ -18,8 +18,27 @@ export function useS3Upload() {
     uploadError.value = null;
 
     try {
+      // PDF limit: 10MB, Images/Others limit: 5MB
+      const isPdf =
+        file.type === "application/pdf" ||
+        file.type === "application/x-pdf" ||
+        file.name.toLowerCase().endsWith(".pdf");
+
+      const maxAllowedSize = isPdf ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
+      const limitMb = isPdf ? 10 : 5;
+
+      if (file.size > maxAllowedSize) {
+        const { showError } = useAppFeedback();
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        const fileTypeLabel = isPdf ? "documento PDF" : "archivo de imagen";
+        const msg = `El ${fileTypeLabel} "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de ${limitMb}MB.`;
+        showError("Límite de Tamaño Excedido", msg, null);
+        throw new Error(msg);
+      }
+
       const config = useRuntimeConfig();
       const apiBase =
+        config.public.apiUrl ||
         config.public.apiBase ||
         "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
 
@@ -55,7 +74,7 @@ export function useS3Upload() {
         throw new Error("Fallo al subir el archivo a S3");
       }
 
-      // Compute public URL
+      // Use the standard S3 HTTPS REST endpoint
       const filePublicUrl = url.split("?")[0];
       return { url: filePublicUrl, key };
     } catch (err: any) {

@@ -112,10 +112,13 @@
                 >
                 {{ job.location }}
               </span>
-              <span>·</span>
-              <span class="flex items-center gap-1 font-bold text-secondary">
+              <span v-if="formatSalaryDisplay(job)">·</span>
+              <span
+                v-if="formatSalaryDisplay(job)"
+                class="flex items-center gap-1 font-bold text-secondary"
+              >
                 <span class="material-symbols-outlined text-sm">payments</span>
-                {{ job.salary }}
+                {{ formatSalaryDisplay(job) }}
               </span>
               <span>·</span>
               <span
@@ -123,6 +126,19 @@
               >
                 <span class="material-symbols-outlined text-sm">schedule</span>
                 {{ job.type }}
+              </span>
+              <span>·</span>
+              <span
+                v-if="(job.vacantesDisponibles || 1) > 1"
+                class="flex items-center gap-1 bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-extrabold"
+              >
+                🔥 {{ job.vacantesDisponibles }} plazas abiertas
+              </span>
+              <span
+                v-else
+                class="flex items-center gap-1 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 px-2.5 py-0.5 rounded-full font-bold"
+              >
+                👥 1 plaza
               </span>
             </div>
           </div>
@@ -157,128 +173,40 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Modal de Apelación de Vacante -->
-  <div
-    v-if="isAppealModalOpen"
-    class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-  >
-    <div
-      class="bg-white border border-outline-variant/60 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
-    >
-      <div
-        class="flex items-center justify-between border-b border-outline-variant/30 pb-3"
-      >
-        <h3
-          class="text-base font-bold text-on-background flex items-center gap-1.5"
-        >
-          <span class="material-symbols-outlined text-indigo-600">gavel</span>
-          Apelar Sanción de Vacante
-        </h3>
-        <button
-          @click="isAppealModalOpen = false"
-          class="text-on-surface-variant dark:text-slate-300 hover:bg-surface-container rounded-lg p-1 transition flex items-center justify-center"
-        >
-          <span class="material-symbols-outlined text-sm">close</span>
-        </button>
-      </div>
-
-      <form @submit.prevent="submitAppeal" class="space-y-4 text-left">
-        <p
-          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
-        >
-          Ingresa los argumentos y la justificación para solicitar la
-          reactivación de esta vacante. El equipo de moderación analizará las
-          pruebas provistas.
-        </p>
-
-        <div class="space-y-2 flex flex-col">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
-            for="appeal-text"
-            >Mensaje de Apelación y Evidencia</label
-          >
-          <textarea
-            v-model="appealComments"
-            id="appeal-text"
-            placeholder="Explica detalladamente las correcciones realizadas o justificaciones de legitimidad..."
-            rows="5"
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl p-3 text-xs text-on-background outline-none transition resize-none"
-            required
-          ></textarea>
-        </div>
-
-        <div
-          class="flex justify-end gap-2 pt-2 border-t border-outline-variant/30"
-        >
-          <button
-            type="button"
-            @click="isAppealModalOpen = false"
-            class="bg-surface border border-outline-variant hover:bg-surface-container text-on-surface-variant dark:text-slate-300 font-semibold text-xs px-4 py-2.5 rounded-xl transition"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            :disabled="!appealComments.trim()"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm active:scale-95 duration-100 flex items-center gap-1.5"
-          >
-            Enviar Apelación
-          </button>
-        </div>
-      </form>
-    </div>
+    <AppAppealModal
+      :is-open="isAppealModalOpen"
+      :company-id="companyId"
+      reason="Apelación de vacante pausada para evaluación"
+      @close="isAppealModalOpen = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import AppAppealModal from "~/components/AppAppealModal.vue";
+
 useSeoMeta({
-  title: "Mis Vacantes - JobNet",
-  description: "Lista completa de vacantes creadas por la empresa",
+  title: "Mis Vacantes Publicadas - JobNet",
+  description:
+    "Administración y gestión de publicaciones de empleo para empresas en la plataforma JobNet",
 });
 
-const router = useRouter();
 const config = useRuntimeConfig();
 const { data: session, status } = useAuth();
+const router = useRouter();
+
+const companyId = computed(() => (session.value?.user as any)?.id || "");
 
 const loading = ref(true);
 const vacancies = ref<any[]>([]);
 
 // Appeal State Variables
 const isAppealModalOpen = ref(false);
-const appealComments = ref("");
 const selectedJobIdForAppeal = ref("");
 
 const openAppealModal = (jobId: string) => {
   selectedJobIdForAppeal.value = jobId;
-  appealComments.value = "";
   isAppealModalOpen.value = true;
-};
-
-const submitAppeal = async () => {
-  if (!appealComments.value.trim()) return;
-  try {
-    await $fetch(
-      `${config.public.apiUrl}/jobs/${selectedJobIdForAppeal.value}`,
-      {
-        method: "PUT",
-        body: {
-          estado: "APELADA",
-          apelacionComentarios: appealComments.value.trim(),
-        },
-      },
-    );
-
-    isAppealModalOpen.value = false;
-    await fetchVacancies();
-    alert(
-      "Apelación enviada con éxito. El equipo de moderación evaluará tu caso.",
-    );
-  } catch (e) {
-    console.error("Error submitting appeal:", e);
-    alert("Hubo un error al enviar la apelación.");
-  }
 };
 
 const fetchVacancies = async () => {
@@ -304,10 +232,11 @@ const fetchVacancies = async () => {
       estado: j.estado || "Activa",
       location:
         j.lat && j.lng ? `Lat: ${j.lat}, Lng: ${j.lng}` : "Ubicación remota",
-      salary:
-        typeof j.salario === "number"
-          ? `$${(j.salario / 1000).toFixed(0)}k MXN`
-          : j.salario || "No especificado",
+      salario: j.salario,
+      salarioMinimo: j.salarioMinimo,
+      salarioMaximo: j.salarioMaximo,
+      vacantesDisponibles: j.vacantesDisponibles || 1,
+      maxPostulantes: j.maxPostulantes || null,
     }));
   } catch (e) {
     console.error("Error loading vacancies list:", e);

@@ -21,39 +21,23 @@
 
       <!-- Search & Filters -->
       <div
-        class="flex flex-col sm:flex-row gap-3 w-full md:w-auto min-w-[340px]"
+        class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto min-w-[340px]"
       >
-        <form @submit.prevent="executeSearch" class="flex gap-2 flex-grow">
-          <div class="relative flex-grow">
-            <span
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
-              <span
-                class="material-symbols-outlined text-on-surface-variant dark:text-slate-300/70 text-[20px]"
-                >search</span
-              >
-            </span>
-            <input
+        <form
+          @submit.prevent="executeSearch"
+          class="flex gap-2 flex-grow w-full sm:w-auto"
+        >
+          <div class="flex-grow">
+            <AppSearchInput
               v-model="searchInput"
-              type="text"
               placeholder="Buscar por nombre comercial, razón social o sector..."
-              class="pl-10 pr-8 py-2.5 w-full bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-xl text-sm focus:outline-none focus:border-primary text-on-background shadow-sm"
-              aria-label="Buscar organizaciones por nombre o razón social"
+              @clear="clearSearch"
             />
-            <button
-              v-if="searchInput"
-              @click="clearSearch"
-              type="button"
-              class="absolute right-2.5 top-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold"
-              title="Limpiar búsqueda"
-            >
-              ✕
-            </button>
           </div>
           <button
             type="submit"
             :disabled="loading"
-            class="px-4 py-2.5 bg-primary hover:bg-primary-container text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50 flex-shrink-0"
+            class="px-4 py-2.5 bg-primary hover:bg-primary-container text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50 flex-shrink-0 cursor-pointer"
           >
             <span
               v-if="loading"
@@ -68,77 +52,38 @@
 
         <button
           @click="toggleVerifiedFilter"
-          class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm border font-medium transition duration-200 flex-shrink-0"
+          type="button"
+          class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition duration-200 flex-shrink-0 cursor-pointer w-full sm:w-auto"
           :class="
             onlyVerified
               ? 'bg-primary/10 border-primary text-primary shadow-sm'
               : 'border-outline-variant/60 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-high'
           "
         >
-          <span class="material-symbols-outlined text-[18px]">verified</span>
+          <span class="material-symbols-outlined text-base">verified</span>
           Verificadas
         </button>
       </div>
     </div>
 
-    <!-- Loading State (Skeleton) -->
-    <div
-      v-if="loading"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse"
-      role="status"
-      aria-label="Cargando organizaciones"
-      aria-live="polite"
-    >
-      <div
-        v-for="i in 6"
-        :key="i"
-        class="border border-outline-variant/60 rounded-2xl p-6 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 flex flex-col justify-between h-[250px]"
-      >
-        <div>
-          <div class="flex items-center gap-4 mb-4">
-            <div class="h-12 w-12 bg-outline/20 rounded-xl"></div>
-            <div class="flex-grow space-y-2">
-              <div class="h-5 w-2/3 bg-outline/20 rounded-md"></div>
-              <div class="h-4 w-1/2 bg-outline/20 rounded-md"></div>
-            </div>
-          </div>
-          <div class="space-y-2 mb-4">
-            <div class="h-4 w-full bg-outline/10 rounded"></div>
-            <div class="h-4 w-5/6 bg-outline/10 rounded"></div>
-          </div>
-        </div>
-        <div
-          class="border-t border-outline-variant/30 pt-4 flex justify-between items-center"
-        >
-          <div class="h-4 w-20 bg-outline/20 rounded"></div>
-          <div class="h-8 w-24 bg-outline/20 rounded-lg"></div>
-        </div>
-      </div>
+    <!-- Loading State (AppSkeletonLoader) -->
+    <div v-if="loading" class="my-6">
+      <AppSkeletonLoader type="card" :count="6" />
     </div>
 
-    <!-- Empty State -->
-    <div
-      v-else-if="filteredCompanies.length === 0"
-      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl shadow-sm px-6"
-      role="status"
-    >
-      <div
-        class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6"
-      >
-        <span class="material-symbols-outlined text-[40px] text-primary"
-          >domain</span
-        >
-      </div>
-      <h2 class="text-xl font-bold text-on-background mb-2">
-        No se encontraron organizaciones
-      </h2>
-      <p class="text-on-surface-variant dark:text-slate-300 text-sm max-w-sm">
-        No hay registros que coincidan con "{{ searchQuery }}". Intenta con otro
-        nombre comercial o razón social.
-      </p>
+    <!-- Empty State (AppEmptyState) -->
+    <div v-else-if="filteredCompanies.length === 0" class="my-8">
+      <AppEmptyState
+        icon="domain_disabled"
+        title="No se encontraron organizaciones"
+        :description="`No hay registros de empresas que coincidan con la búsqueda actual.`"
+        action-label="Limpiar Filtros"
+        action-icon="filter_alt_off"
+        @action="clearSearch"
+      />
     </div>
 
-    <!-- Companies Grid (RF-59 Grilla de Tarjetas) -->
+    <!-- Companies Grid -->
     <div v-else class="space-y-8">
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -181,14 +126,13 @@
                   >
                     {{ company.nombreComercial }}
                   </h2>
-                  <span
+                  <AppStatusBadge
                     v-if="company.verified"
-                    class="material-symbols-outlined text-secondary text-[16px] flex-shrink-0"
-                    title="Organización Verificada"
-                    aria-label="Verificada"
-                  >
-                    verified
-                  </span>
+                    status="VERIFICADA"
+                    size="sm"
+                    :dot="false"
+                    icon="verified"
+                  />
                 </div>
                 <p
                   v-if="
@@ -247,63 +191,28 @@
         </div>
       </div>
 
-      <!-- Pagination Controls -->
-      <div
-        v-if="filteredCompanies.length > itemsPerPage"
-        class="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant/40 pt-6"
-      >
-        <span
-          class="text-xs text-on-surface-variant dark:text-slate-400 font-medium"
-        >
-          Mostrando {{ startIndex + 1 }}-{{
-            Math.min(endIndex, filteredCompanies.length)
-          }}
-          de {{ filteredCompanies.length }} organizaciones
-        </span>
-
-        <div class="flex items-center gap-2">
-          <button
-            @click="currentPage--"
-            :disabled="currentPage === 1"
-            class="px-3 py-1.5 rounded-lg border border-outline-variant/60 text-xs font-semibold text-on-surface-variant dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-high transition flex items-center gap-1"
-          >
-            <span class="material-symbols-outlined text-[16px]"
-              >chevron_left</span
-            >
-            Anterior
-          </button>
-
-          <button
-            v-for="page in totalPages"
-            :key="page"
-            @click="currentPage = page"
-            :class="[
-              'w-8 h-8 rounded-lg text-xs font-bold transition flex items-center justify-center',
-              currentPage === page
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-high',
-            ]"
-          >
-            {{ page }}
-          </button>
-
-          <button
-            @click="currentPage++"
-            :disabled="currentPage === totalPages"
-            class="px-3 py-1.5 rounded-lg border border-outline-variant/60 text-xs font-semibold text-on-surface-variant dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-high transition flex items-center gap-1"
-          >
-            Siguiente
-            <span class="material-symbols-outlined text-[16px]"
-              >chevron_right</span
-            >
-          </button>
-        </div>
+      <!-- Pagination Controls (AppPagination) -->
+      <div class="border-t border-outline-variant/40 pt-4">
+        <AppPagination
+          v-model:current-page="currentPage"
+          :total-pages="totalPages"
+          :total-items="filteredCompanies.length"
+          :start-index="startIndex"
+          :end-index="endIndex"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, watch, onMounted } from "vue";
+import AppSearchInput from "~/components/common/AppSearchInput.vue";
+import AppSkeletonLoader from "~/components/common/AppSkeletonLoader.vue";
+import AppEmptyState from "~/components/common/AppEmptyState.vue";
+import AppStatusBadge from "~/components/common/AppStatusBadge.vue";
+import AppPagination from "~/components/common/AppPagination.vue";
+
 const router = useRouter();
 const loading = ref(true);
 const searchInput = ref("");
@@ -311,9 +220,6 @@ const activeSearchQuery = ref("");
 const searchQuery = ref("");
 const onlyVerified = ref(false);
 const rawProfiles = ref<any[]>([]);
-
-const currentPage = ref(1);
-const itemsPerPage = 6;
 
 // Seed data fallback to satisfy user rule and guarantee a rich functional directory
 const fallbackCompanies = [
@@ -425,9 +331,9 @@ const companiesList = computed(() => {
   return list;
 });
 
-// RF-59 Contextual Search Filter (filtering explicitly by nombre o razón social)
+// Search filter
 const filteredCompanies = computed(() => {
-  const query = searchQuery.value.toLowerCase().trim();
+  const query = searchInput.value.toLowerCase().trim();
   return companiesList.value.filter((c) => {
     const matchesSearch =
       !query ||
@@ -439,20 +345,18 @@ const filteredCompanies = computed(() => {
   });
 });
 
-// Reset pagination on search or filter change
-watch([searchQuery, onlyVerified], () => {
-  currentPage.value = 1;
-});
+// Reusable pagination composable
+const {
+  currentPage,
+  totalPages,
+  paginatedItems: paginatedCompanies,
+  startIndex,
+  endIndex,
+  resetPage,
+} = usePagination(filteredCompanies, { initialPageSize: 6 });
 
-const totalPages = computed(() =>
-  Math.max(1, Math.ceil(filteredCompanies.value.length / itemsPerPage)),
-);
-
-const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage);
-const endIndex = computed(() => startIndex.value + itemsPerPage);
-
-const paginatedCompanies = computed(() => {
-  return filteredCompanies.value.slice(startIndex.value, endIndex.value);
+watch([searchInput, onlyVerified], () => {
+  resetPage();
 });
 
 const toggleVerifiedFilter = () => {
@@ -461,14 +365,14 @@ const toggleVerifiedFilter = () => {
 
 const executeSearch = () => {
   activeSearchQuery.value = searchInput.value.trim();
-  currentPage.value = 1;
+  resetPage();
   fetchProfiles(activeSearchQuery.value);
 };
 
 const clearSearch = () => {
   searchInput.value = "";
   activeSearchQuery.value = "";
-  currentPage.value = 1;
+  resetPage();
   fetchProfiles("");
 };
 

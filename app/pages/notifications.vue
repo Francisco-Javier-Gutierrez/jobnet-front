@@ -3,20 +3,46 @@
     class="max-w-xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
   >
     <!-- Header -->
-    <div class="mb-6 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-on-background">Notificaciones</h1>
-        <p class="text-xs text-on-surface-variant dark:text-slate-300">
-          Mantente al tanto de tus ofertas, comentarios y comunidad.
-        </p>
+    <div class="mb-6">
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <h1 class="text-2xl font-bold text-on-background">Notificaciones</h1>
+          <p class="text-xs text-on-surface-variant dark:text-slate-300">
+            Mantente al tanto de tus ofertas, comentarios y comunidad.
+          </p>
+        </div>
+        <button
+          v-if="notifications.length > 0 && !loading"
+          @click="markAllAsRead"
+          class="text-xs text-primary font-bold hover:underline flex-shrink-0"
+        >
+          Marcar todas como leídas
+        </button>
       </div>
-      <button
-        v-if="notifications.length > 0 && !loading"
-        @click="markAllAsRead"
-        class="text-xs text-primary font-bold hover:underline"
+
+      <!-- Filter Dropdown & Counter -->
+      <div
+        v-if="!loading && notifications.length > 0"
+        class="mt-4 flex items-center justify-between gap-3"
       >
-        Marcar todas como leídas
-      </button>
+        <div class="w-48">
+          <AppSelect
+            v-model="filterState"
+            :options="filterOptions"
+            placeholder="Filtrar por..."
+          />
+        </div>
+        <span
+          class="text-xs font-semibold text-on-surface-variant dark:text-slate-400"
+        >
+          {{ filteredNotifications.length }}
+          {{
+            filteredNotifications.length === 1
+              ? "notificación"
+              : "notificaciones"
+          }}
+        </span>
+      </div>
     </div>
 
     <!-- Skeletons loading state -->
@@ -36,33 +62,44 @@
 
     <!-- Empty State -->
     <div
-      v-else-if="notifications.length === 0"
-      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl shadow-sm px-6"
+      v-else-if="filteredNotifications.length === 0"
+      class="flex flex-col items-center justify-center py-16 text-center bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl shadow-sm px-6"
     >
       <div
-        class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4"
+        class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3"
       >
-        <span class="material-symbols-outlined text-[32px]"
-          >notifications_off</span
-        >
+        <span class="material-symbols-outlined text-[28px]">
+          {{
+            filterState === "unread" ? "mark_email_read" : "notifications_off"
+          }}
+        </span>
       </div>
-      <h2 class="text-base font-bold text-on-background mb-1">
-        Sin notificaciones
+      <h2 class="text-sm font-bold text-on-background mb-1">
+        {{
+          filterState === "unread"
+            ? "Sin notificaciones no leídas"
+            : filterState === "read"
+              ? "Sin notificaciones leídas"
+              : "Sin notificaciones"
+        }}
       </h2>
       <p class="text-xs text-on-surface-variant dark:text-slate-300 max-w-xs">
-        Te avisaremos cuando recibas ofertas, respuestas a tus preguntas o
-        interacciones con tus publicaciones.
+        {{
+          filterState === "unread"
+            ? "¡Estás al día! No tienes notificaciones pendientes por leer."
+            : "No tienes notificaciones en esta categoría."
+        }}
       </p>
     </div>
 
     <!-- List of Notifications -->
     <div v-else class="space-y-3">
       <div
-        v-for="notif in notifications"
+        v-for="notif in filteredNotifications"
         :key="notif.id"
         :class="[
           'p-4 rounded-2xl border transition duration-200 flex gap-3 items-start',
-          notif.unread
+          !notif.read
             ? 'bg-primary/5 border-primary/20 shadow-sm'
             : 'bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border-outline-variant/40',
         ]"
@@ -88,7 +125,7 @@
             </h4>
             <span
               class="text-[9px] text-on-surface-variant dark:text-slate-300 font-mono flex-shrink-0"
-              >{{ notif.time }}</span
+              >{{ formatTime(notif.createdAt) }}</span
             >
           </div>
           <p
@@ -106,7 +143,7 @@
               Apelar Decisión
             </button>
             <button
-              v-if="notif.unread"
+              v-if="!notif.read"
               @click="markAsRead(notif.id)"
               class="text-[10px] text-primary font-extrabold hover:underline"
             >
@@ -117,13 +154,22 @@
       </div>
     </div>
   </div>
+
+  <AppAppealModal
+    :is-open="isAppealModalOpen"
+    :company-id="selectedCompanyId"
+    :reason="selectedReason"
+    @close="isAppealModalOpen = false"
+  />
 </template>
 
 <script setup lang="ts">
+import AppAppealModal from "~/components/AppAppealModal.vue";
+
 useSeoMeta({
   title: "Notificaciones - JobNet",
   description:
-    "Bandeja de notificaciones y alertas profesionales de la comunidad de JobNet",
+    "Bandeja de notificaciones persistentes y alertas de actividad en la plataforma JobNet",
 });
 
 interface NotificationItem {
@@ -138,14 +184,39 @@ interface NotificationItem {
     | "SUSPENSION_CONFIRMED";
   title: string;
   message: string;
-  time: string;
-  unread: boolean;
+  createdAt: string;
+  read: boolean;
+  actionRequired?: boolean;
   actionType?: string;
   companyId?: string;
+  reason?: string | null;
+  gracePeriodEnd?: string | null;
 }
 
 const loading = ref(true);
 const notifications = ref<NotificationItem[]>([]);
+const filterState = ref<"all" | "unread" | "read">("all");
+
+const filterOptions = [
+  { label: "Todas", value: "all", icon: "notifications" },
+  { label: "No leídas", value: "unread", icon: "mark_email_unread" },
+  { label: "Leídas", value: "read", icon: "drafts" },
+];
+
+const filteredNotifications = computed(() => {
+  if (filterState.value === "unread") {
+    return notifications.value.filter((n) => !n.read);
+  }
+  if (filterState.value === "read") {
+    return notifications.value.filter((n) => n.read);
+  }
+  return notifications.value;
+});
+const config = useRuntimeConfig();
+const { data: authSession } = useAuth();
+const router = useRouter();
+
+const userId = computed(() => (authSession.value?.user as any)?.id || null);
 
 const getIconName = (type: NotificationItem["type"]) => {
   switch (type) {
@@ -204,107 +275,99 @@ const getIconTextClass = (type: NotificationItem["type"]) => {
   }
 };
 
-const loadNotifications = () => {
-  if (process.client) {
-    const saved = localStorage.getItem("jobnet-notifications");
-    if (saved) {
-      notifications.value = JSON.parse(saved);
-    } else {
-      // Seed default premium notifications
-      notifications.value = [
-        {
-          id: "notif-1",
-          type: "application",
-          title: "Tu CV fue visualizado",
-          message:
-            "Un reclutador de Apex Solutions visualizó tu postulación para la vacante de Senior Frontend Engineer.",
-          time: "Hace 10m",
-          unread: true,
-        },
-        {
-          id: "notif-2",
-          type: "comment",
-          title: "Respuesta en tu pregunta",
-          message:
-            "Tech Solutions Team respondió a tu comentario sobre la vacante: 'Hola Sofía, sí, ofrecemos apoyo...'",
-          time: "Hace 2h",
-          unread: true,
-        },
-        {
-          id: "notif-3",
-          type: "like",
-          title: "Interacción con tu publicación",
-          message:
-            "A Alejandro Silva y 4 personas más les gustó tu publicación del muro de comunidad.",
-          time: "Ayer",
-          unread: false,
-        },
-        {
-          id: "notif-4",
-          type: "system",
-          title: "¡Bienvenido a JobNet!",
-          message:
-            "Configura tu perfil profesional para recibir sugerencias de vacantes acordes a tus habilidades.",
-          time: "Hace 3d",
-          unread: false,
-        },
-      ];
-      saveNotifications();
+const formatTime = (isoDate: string) => {
+  if (!isoDate) return "";
+  const now = new Date();
+  const date = new Date(isoDate);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "Ahora";
+  if (diffMin < 60) return `Hace ${diffMin}m`;
+  const diffHrs = Math.floor(diffMin / 60);
+  if (diffHrs < 24) return `Hace ${diffHrs}h`;
+  const diffDays = Math.floor(diffHrs / 24);
+  if (diffDays < 7) return `Hace ${diffDays}d`;
+  return date.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
+};
+
+const loadNotifications = async () => {
+  if (!userId.value) {
+    loading.value = false;
+    return;
+  }
+
+  try {
+    const res = await $fetch<NotificationItem[]>(
+      `${config.public.apiUrl}/profile/${userId.value}/notifications`,
+    );
+    notifications.value = Array.isArray(res) ? res : [];
+  } catch (e) {
+    console.error("Error loading notifications:", e);
+    notifications.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+const markAsRead = async (id: string) => {
+  const notif = notifications.value.find((n) => n.id === id);
+  if (notif) {
+    notif.read = true;
+  }
+
+  if (userId.value) {
+    try {
+      await $fetch(
+        `${config.public.apiUrl}/profile/${userId.value}/notifications/${id}/read`,
+        { method: "POST" },
+      );
+    } catch (e) {
+      console.error("Error marking notification as read:", e);
     }
   }
 };
 
-const saveNotifications = () => {
-  if (process.client) {
-    localStorage.setItem(
-      "jobnet-notifications",
-      JSON.stringify(notifications.value),
-    );
-  }
-};
-
-const markAsRead = (id: string) => {
-  const notif = notifications.value.find((n) => n.id === id);
-  if (notif) {
-    notif.unread = false;
-    saveNotifications();
-  }
-};
-
-const markAllAsRead = () => {
+const markAllAsRead = async () => {
   notifications.value.forEach((n) => {
-    n.unread = false;
+    n.read = true;
   });
-  saveNotifications();
+
+  if (userId.value) {
+    try {
+      await $fetch(
+        `${config.public.apiUrl}/profile/${userId.value}/notifications/read-all`,
+        { method: "POST" },
+      );
+    } catch (e) {
+      console.error("Error marking all notifications as read:", e);
+    }
+  }
 };
 
-const config = useRuntimeConfig();
-const { data: authSession } = useAuth();
-const router = useRouter();
+const isAppealModalOpen = ref(false);
+const selectedCompanyId = ref("");
+const selectedReason = ref("");
 
 const joinAppealAction = async (notif: NotificationItem) => {
-  const companyId = notif.companyId || (authSession.value?.user as any)?.id;
+  const companyId = notif.companyId || userId.value;
   if (!companyId) return;
+
+  selectedCompanyId.value = companyId;
+  selectedReason.value = notif.reason || notif.message || "";
 
   try {
     await $fetch(
       `${config.public.apiUrl}/moderator/organizations/${companyId}/join-appeal`,
-      {
-        method: "POST",
-      },
-    );
-    alert("Te has unido al chat de apelación. Un moderador revisará tu caso.");
-    router.push("/support");
+      { method: "POST" },
+    ).catch(() => {});
   } catch (e: any) {
     console.error("Error joining appeal:", e);
-    router.push("/support");
   }
+
+  isAppealModalOpen.value = true;
 };
 
 onMounted(() => {
   loadNotifications();
-  setTimeout(() => {
-    loading.value = false;
-  }, 400);
 });
 </script>

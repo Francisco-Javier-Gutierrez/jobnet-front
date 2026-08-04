@@ -7,9 +7,7 @@
       class="flex items-center gap-4 mt-4 p-4 bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 rounded-2xl shadow-sm"
     >
       <div
-        class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-outline-variant/80 shadow-md flex items-center justify-center relative group cursor-pointer flex-shrink-0 p-1.5"
-        @click="triggerLogoSelect"
-        title="Cambiar logotipo corporativo"
+        class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-outline-variant/80 shadow-md flex items-center justify-center relative group flex-shrink-0 p-1.5"
       >
         <img
           alt="Logotipo Corporativo"
@@ -19,13 +17,6 @@
             'https://lh3.googleusercontent.com/aida-public/AB6AXuBv7ieXvxtMvK4Bf5kvEuqFTPF59k2wFj0FOiA-v1xXN5VHCH9_ZcdYzKj6xGbyBIeLHVW5FuXPuhZ8ghouEp8A22nMpZV0iW6Zvg_YQ0avpohEqle9p-AR9bgPXdnJadM20BCP6_nuDkNCMnR9ywHb5fxRNfK1sAIL6bXl7qjeDQaRa5J--hkEcazv-m8Brqe_BbKSdIGlVhXvuRzLzSM3HSd57GyjW2Ueeh0XvBP7u4bT3o0EWgnO0Q'
           "
         />
-        <div
-          class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"
-        >
-          <span class="material-symbols-outlined text-white text-xl"
-            >add_a_photo</span
-          >
-        </div>
       </div>
 
       <div class="min-w-0 flex-grow">
@@ -77,25 +68,6 @@
       </nav>
     </div>
 
-    <!-- Status Messages -->
-    <div
-      v-if="successMessage"
-      class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 p-4 rounded-xl flex items-center gap-2 text-xs font-bold shadow-sm"
-    >
-      <span class="material-symbols-outlined text-emerald-600"
-        >check_circle</span
-      >
-      {{ successMessage }}
-    </div>
-
-    <div
-      v-if="errorMessage"
-      class="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 p-4 rounded-xl flex items-center gap-2 text-xs font-bold shadow-sm"
-    >
-      <span class="material-symbols-outlined text-rose-600">error</span>
-      {{ errorMessage }}
-    </div>
-
     <!-- Draft Restore Notification Banner -->
     <div
       v-if="hasDraft"
@@ -116,543 +88,53 @@
       </button>
     </div>
 
-    <!-- Tab 1: Identidad Visual (RF-33) -->
+    <!-- Tab 1: Identidad Visual -->
     <section v-show="activeTab === 'identidad'" class="flex flex-col gap-6">
-      <div
-        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-5 shadow-sm"
-      >
-        <h2
-          class="text-base font-bold text-on-background flex items-center gap-2 border-b border-outline-variant/40 pb-3"
-        >
-          <span class="material-symbols-outlined text-primary">palette</span>
-          Identidad Visual Corporativa
-        </h2>
-
-        <!-- Logo Upload Control -->
-        <div
-          class="flex items-center gap-5 p-5 bg-surface-container-low/40 rounded-2xl border border-outline-variant/40"
-        >
-          <div
-            class="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-outline-variant/80 shadow-md flex items-center justify-center relative group cursor-pointer flex-shrink-0 p-1.5"
-            @click="triggerLogoSelect"
-          >
-            <img
-              alt="Logo Corporativo"
-              class="w-full h-full object-contain rounded-xl"
-              :src="
-                fotoPerfil ||
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuBv7ieXvxtMvK4Bf5kvEuqFTPF59k2wFj0FOiA-v1xXN5VHCH9_ZcdYzKj6xGbyBIeLHVW5FuXPuhZ8ghouEp8A22nMpZV0iW6Zvg_YQ0avpohEqle9p-AR9bgPXdnJadM20BCP6_nuDkNCMnR9ywHb5fxRNfK1sAIL6bXl7qjeDQaRa5J--hkEcazv-m8Brqe_BbKSdIGlVhXvuRzLzSM3HSd57GyjW2Ueeh0XvBP7u4bT3o0EWgnO0Q'
-              "
-            />
-            <div
-              class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"
-            >
-              <span class="material-symbols-outlined text-white text-xl"
-                >add_a_photo</span
-              >
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-1 min-w-0">
-            <p class="text-xs font-bold text-on-background">
-              Logotipo Corporativo
-            </p>
-            <p class="text-[11px] text-on-surface-variant dark:text-slate-300">
-              Formatos soportados: PNG, JPG, WEBP, SVG (Máximo 5MB).
-            </p>
-            <div class="flex items-center gap-2 mt-1">
-              <button
-                type="button"
-                @click="triggerLogoSelect"
-                :disabled="uploadingLogo"
-                class="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs rounded-xl transition disabled:opacity-50 flex items-center gap-1 active:scale-95"
-              >
-                <span v-if="uploadingLogo" class="animate-spin text-xs"
-                  >⌛</span
-                >
-                <span>{{
-                  uploadingLogo ? "Subiendo..." : "Subir Nuevo Logotipo"
-                }}</span>
-              </button>
-            </div>
-            <input
-              type="file"
-              ref="logoFileInput"
-              @change="handleLogoUpload"
-              accept="image/*"
-              class="hidden"
-            />
-          </div>
-        </div>
-
-        <!-- Nombre Comercial -->
-        <div class="flex flex-col gap-1.5">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
-            for="nombre-comercial"
-          >
-            Nombre Comercial de la Organización *
-          </label>
-          <input
-            v-model="nombreComercial"
-            id="nombre-comercial"
-            type="text"
-            placeholder="Ej: TechSolutions Internacional"
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2.5 text-xs text-on-background outline-none transition"
-          />
-        </div>
-
-        <div>
-          <AppSelect
-            v-model="sector"
-            label="Sector Económico Principal"
-            :options="[
-              {
-                value: 'Tecnología y Software',
-                label: 'Tecnología y Software',
-                icon: 'computer',
-              },
-              {
-                value: 'Recursos Humanos',
-                label: 'Recursos Humanos y Reclutamiento',
-                icon: 'groups',
-              },
-              {
-                value: 'Finanzas y Banca',
-                label: 'Finanzas y Banca',
-                icon: 'account_balance',
-              },
-              {
-                value: 'Salud y Farmacéutica',
-                label: 'Salud y Farmacéutica',
-                icon: 'local_hospital',
-              },
-              {
-                value: 'Educación e Investigación',
-                label: 'Educación e Investigación',
-                icon: 'school',
-              },
-              {
-                value: 'Manufactura e Industria',
-                label: 'Manufactura e Industria',
-                icon: 'precision_manufacturing',
-              },
-              {
-                value: 'Comercio Electrónico y Retail',
-                label: 'Comercio Electrónico y Retail',
-                icon: 'shopping_cart',
-              },
-              { value: 'Otro', label: 'Otro Sector', icon: 'business' },
-            ]"
-          />
-        </div>
-
-        <!-- Ubicación en Mapa (Leaflet Map) -->
-        <div class="flex flex-col gap-2 mt-2">
-          <div class="flex items-center justify-between">
-            <label
-              class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
-            >
-              Ubicación Geográfica en Mapa
-            </label>
-            <button
-              type="button"
-              @click="useCurrentLocation"
-              class="text-xs font-bold text-primary hover:underline flex items-center gap-1 transition"
-            >
-              <span class="material-symbols-outlined text-sm">my_location</span>
-              Usar ubicación actual
-            </button>
-          </div>
-          <div
-            id="company-leaflet-map"
-            class="w-full h-48 rounded-xl border border-outline-variant/60 overflow-hidden bg-surface-container-low shadow-sm z-10"
-          ></div>
-        </div>
-      </div>
+      <CompanyIdentityTab
+        v-model:fotoPerfil="fotoPerfil"
+        v-model:nombreComercial="nombreComercial"
+        v-model:sector="sector"
+        v-model:latitude="latitude"
+        v-model:longitude="longitude"
+        v-model:locationName="locationName"
+        :companyId="companyId"
+      />
     </section>
 
-    <!-- Tab 2: Perfil Corporativo (RF-34) -->
+    <!-- Tab 2: Perfil Corporativo -->
     <section v-show="activeTab === 'perfil'" class="flex flex-col gap-6">
-      <div
-        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-5 shadow-sm"
-      >
-        <h2
-          class="text-base font-bold text-on-background flex items-center gap-2 border-b border-outline-variant/40 pb-3"
-        >
-          <span
-            class="material-symbols-outlined text-indigo-600 dark:text-indigo-400"
-            >business</span
-          >
-          Edición de Perfil Corporativo
-        </h2>
-
-        <!-- Descripción General -->
-        <div class="flex flex-col gap-1.5">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
-            for="descripcion"
-          >
-            Descripción General de la Empresa *
-          </label>
-          <textarea
-            v-model="descripcion"
-            id="descripcion"
-            rows="4"
-            placeholder="Escribe una visión global de tu organización, a qué se dedica, mercado meta e historia..."
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2.5 text-xs text-on-background outline-none transition resize-none"
-          ></textarea>
-        </div>
-
-        <!-- Misión -->
-        <div class="flex flex-col gap-1.5">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1"
-            for="mision"
-          >
-            <span class="material-symbols-outlined text-sm text-indigo-500"
-              >flag</span
-            >
-            Misión Corporativa
-          </label>
-          <textarea
-            v-model="mision"
-            id="mision"
-            rows="3"
-            placeholder="Define el propósito fundamental y razón de ser de la organización..."
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2.5 text-xs text-on-background outline-none transition resize-none"
-          ></textarea>
-        </div>
-
-        <!-- Visión -->
-        <div class="flex flex-col gap-1.5">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1"
-            for="vision"
-          >
-            <span class="material-symbols-outlined text-sm text-purple-500"
-              >visibility</span
-            >
-            Visión Corporativa
-          </label>
-          <textarea
-            v-model="vision"
-            id="vision"
-            rows="3"
-            placeholder="Describe las metas a futuro y hacia dónde aspira llegar la empresa..."
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2.5 text-xs text-on-background outline-none transition resize-none"
-          ></textarea>
-        </div>
-
-        <!-- Beneficios o Cultura Laboral -->
-        <div class="flex flex-col gap-1.5">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1"
-            for="beneficios"
-          >
-            <span class="material-symbols-outlined text-sm text-emerald-500"
-              >card_giftcard</span
-            >
-            Beneficios y Cultura Laboral
-          </label>
-          <textarea
-            v-model="beneficios"
-            id="beneficios"
-            rows="4"
-            placeholder="Detalla la cultura de trabajo, horario flexible, trabajo remoto, seguro médico, bonos o capacitación contínua..."
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2.5 text-xs text-on-background outline-none transition resize-none"
-          ></textarea>
-        </div>
-      </div>
+      <CompanyProfileTab
+        v-model:descripcion="descripcion"
+        v-model:mision="mision"
+        v-model:vision="vision"
+        v-model:beneficios="beneficios"
+      />
     </section>
 
-    <!-- Tab 3: Documentos Corporativos Relevantes ("Documentos Relevantes") -->
+    <!-- Tab 3: Documentos Corporativos -->
     <section v-show="activeTab === 'documentos'" class="flex flex-col gap-6">
-      <div
-        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-5 shadow-sm"
-      >
-        <h2
-          class="text-base font-bold text-on-background flex items-center gap-2 border-b border-outline-variant/40 pb-3"
-        >
-          <span
-            class="material-symbols-outlined text-rose-600 dark:text-rose-400"
-            >verified</span
-          >
-          Documentos Corporativos Relevantes (ISO, NOMs, Registro Mercantil)
-        </h2>
-        <p
-          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
-        >
-          Sube tus certificaciones de calidad ISO, constancias de cumplimiento
-          NOM, Registro Mercantil u otros documentos estratégicos que den
-          credibilidad a tu organización frente a candidatos y postulantes.
-        </p>
-
-        <!-- List of Already Uploaded Corporate Documents -->
-        <div v-if="documentosCorporativos.length > 0" class="space-y-3">
-          <p class="text-xs font-bold text-on-background">
-            Documentos Corporativos Registrados ({{
-              documentosCorporativos.length
-            }})
-          </p>
-
-          <div
-            v-for="(doc, idx) in documentosCorporativos"
-            :key="doc.id || idx"
-            class="bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/50 dark:border-slate-800 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3"
-          >
-            <div class="flex items-center gap-3 min-w-0">
-              <div
-                class="w-10 h-10 rounded-xl bg-indigo-600/10 text-indigo-600 flex items-center justify-center flex-shrink-0"
-              >
-                <span class="material-symbols-outlined text-xl"
-                  >workspace_premium</span
-                >
-              </div>
-              <div class="min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span
-                    class="text-[10px] font-bold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800"
-                  >
-                    {{ doc.tipo || "Certificación Corporativa" }}
-                  </span>
-                </div>
-                <p class="text-xs font-bold text-on-background truncate mt-1">
-                  {{ doc.nombre || "Documento_Corporativo.pdf" }}
-                </p>
-                <p class="text-[10px] text-slate-500 dark:text-slate-400">
-                  Subido: {{ doc.fechaCarga || "Recientemente" }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Controls: Visualizar & Eliminar -->
-            <div class="flex items-center gap-2">
-              <button
-                type="button"
-                @click="previewDoc(doc)"
-                class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm active:scale-95"
-              >
-                <span class="material-symbols-outlined text-sm"
-                  >visibility</span
-                >
-                Visualizar
-              </button>
-
-              <button
-                type="button"
-                @click="removeDoc(idx)"
-                class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-rose-500 text-rose-600 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm active:scale-95"
-              >
-                <span class="material-symbols-outlined text-sm">delete</span>
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mini-Form to Add New Corporate Document -->
-        <div
-          class="bg-surface-container-low/60 dark:bg-slate-800/60 border border-outline-variant/60 dark:border-slate-800 rounded-xl p-4 space-y-3"
-        >
-          <p
-            class="text-xs font-bold text-on-background flex items-center gap-1.5"
-          >
-            <span class="material-symbols-outlined text-sm text-indigo-500"
-              >post_add</span
-            >
-            Agregar Nuevo Documento Relevante
-          </p>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="flex flex-col gap-1">
-              <label
-                class="text-[11px] font-bold text-on-surface-variant dark:text-slate-300"
-              >
-                Naturaleza / Tipo de Documento *
-              </label>
-              <input
-                v-model="nuevoDocTipo"
-                type="text"
-                placeholder="Ej: Certificación ISO 9001, Cumplimiento NOM, Registro Mercantil, Brochure..."
-                class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <label
-                class="text-[11px] font-bold text-on-surface-variant dark:text-slate-300"
-              >
-                Nombre Personalizado del Archivo
-              </label>
-              <input
-                v-model="nuevoDocNombre"
-                type="text"
-                placeholder="Ej: Certificación ISO 9001:2015 Vigente"
-                class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
-              />
-            </div>
-          </div>
-
-          <!-- Drag & Drop Upload Zone strictly for PDF -->
-          <div
-            @click="$refs.docFileInput.click()"
-            @dragover.prevent="docDragOver = true"
-            @dragleave.prevent="docDragOver = false"
-            @drop.prevent="handleDocDrop"
-            :class="[
-              docDragOver
-                ? 'border-indigo-500 bg-indigo-500/5'
-                : 'border-outline-variant bg-surface-container-low/40 hover:border-indigo-400',
-            ]"
-            class="border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center cursor-pointer transition text-center"
-          >
-            <div v-if="uploadStore.uploading" class="w-full max-w-xs space-y-2">
-              <div
-                class="flex items-center justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400"
-              >
-                <span>{{ uploadStore.uploadProgress }}</span>
-              </div>
-              <div
-                class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden"
-              >
-                <div
-                  class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 animate-pulse w-full"
-                ></div>
-              </div>
-            </div>
-
-            <template v-else>
-              <span
-                class="material-symbols-outlined text-indigo-500 text-3xl mb-1"
-              >
-                cloud_upload
-              </span>
-              <span class="text-xs font-bold text-on-surface">
-                Selecciona o arrastra el documento PDF de la organización aquí
-              </span>
-              <span
-                class="text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5"
-              >
-                Formato estrictamente PDF (.pdf) — Tamaño máximo: 5MB
-              </span>
-            </template>
-
-            <input
-              type="file"
-              ref="docFileInput"
-              @change="handleDocSelect"
-              accept="application/pdf"
-              class="hidden"
-            />
-          </div>
-
-          <p
-            v-if="docError"
-            class="text-xs text-rose-600 font-semibold bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-lg border border-rose-200 dark:border-rose-800"
-          >
-            ⚠️ {{ docError }}
-          </p>
-        </div>
-      </div>
+      <CompanyDocumentsTab
+        v-model:documentosCorporativos="documentosCorporativos"
+        :companyId="companyId"
+        @previewDoc="previewDoc"
+      />
     </section>
 
     <!-- Tab 4: Marca y Redes -->
     <section v-show="activeTab === 'marca'" class="flex flex-col gap-6">
-      <div
-        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-4 shadow-sm"
-      >
-        <h2
-          class="text-base font-bold text-on-background flex items-center gap-2 border-b border-outline-variant/40 pb-3"
-        >
-          <span class="material-symbols-outlined text-primary">language</span>
-          Presencia de Marca y Redes Oficiales
-        </h2>
-
-        <div class="flex flex-col gap-1.5">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
-            for="sitio-web"
-          >
-            Sitio Web Oficial
-          </label>
-          <input
-            v-model="website"
-            id="sitio-web"
-            type="url"
-            placeholder="https://www.tuempresa.com"
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2.5 text-xs text-on-background outline-none transition"
-          />
-        </div>
-
-        <div class="flex flex-col gap-1.5">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
-            for="linkedin"
-          >
-            Perfil de LinkedIn Corporativo
-          </label>
-          <input
-            v-model="linkedin"
-            id="linkedin"
-            type="url"
-            placeholder="https://linkedin.com/company/tuempresa"
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2.5 text-xs text-on-background outline-none transition"
-          />
-        </div>
-      </div>
+      <CompanyBrandTab v-model:website="website" v-model:linkedin="linkedin" />
     </section>
 
-    <!-- Tab 5: Verificación Fiscal (Insignia) -->
+    <!-- Tab 5: Verificación Fiscal -->
     <section v-show="activeTab === 'verificacion'" class="flex flex-col gap-6">
-      <div
-        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-4 shadow-sm"
-      >
-        <h2
-          class="text-base font-bold text-on-background flex items-center gap-2 border-b border-outline-variant/40 pb-3"
-        >
-          <span class="material-symbols-outlined text-emerald-600"
-            >verified_user</span
-          >
-          Insignia de Verificación Corporativa
-        </h2>
-
-        <p
-          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
-        >
-          Sube tu Constancia de Situación Fiscal o RFC para certificar tu
-          empresa frente a los candidatos.
-        </p>
-
-        <div class="flex flex-col gap-1.5">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
-            for="tax-id"
-          >
-            RFC / Identificador Fiscal
-          </label>
-          <input
-            v-model="taxId"
-            id="tax-id"
-            type="text"
-            placeholder="Ej: ABC123456XYZ"
-            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2.5 text-xs text-on-background outline-none transition uppercase"
-          />
-        </div>
-
-        <button
-          @click="handleVerificationRequest"
-          :disabled="submittingVerification"
-          class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 active:scale-95"
-        >
-          <span class="material-symbols-outlined text-sm">verified</span>
-          {{
-            submittingVerification
-              ? "Enviando..."
-              : "Solicitar Verificación de Empresa"
-          }}
-        </button>
-      </div>
+      <CompanyVerificationTab
+        v-model:taxId="taxId"
+        v-model:documentoVerificacion="documentoVerificacion"
+        :estatusVerificacion="estatusVerificacion"
+        :companyId="companyId"
+        :submittingVerification="submittingVerification"
+        @verify="handleVerificationRequest"
+      />
     </section>
 
     <!-- Tab 6: Seguridad y MFA -->
@@ -686,7 +168,14 @@
 </template>
 
 <script setup lang="ts">
-import { useUploadStore } from "../../stores/upload";
+import { useAppFeedback } from "~/composables/useAppFeedback";
+
+// Component imports
+import CompanyIdentityTab from "~/components/company/settings/CompanyIdentityTab.vue";
+import CompanyProfileTab from "~/components/company/settings/CompanyProfileTab.vue";
+import CompanyDocumentsTab from "~/components/company/settings/CompanyDocumentsTab.vue";
+import CompanyBrandTab from "~/components/company/settings/CompanyBrandTab.vue";
+import CompanyVerificationTab from "~/components/company/settings/CompanyVerificationTab.vue";
 
 interface DocumentoCorporativo {
   id: string;
@@ -715,7 +204,7 @@ useHead({
 const router = useRouter();
 const config = useRuntimeConfig();
 const { data: sessionData, status } = useAuth();
-const uploadStore = useUploadStore();
+const { showSuccess, showError, showWarning } = useAppFeedback();
 
 const activeTab = ref("identidad");
 const mfaEnabled = ref(false);
@@ -729,52 +218,31 @@ const tabItems = [
   { id: "seguridad", label: "Seguridad y MFA", icon: "shield_lock" },
 ];
 
-// Form fields state for ORGANIZACION
 const companyId = ref("");
 const nombreComercial = ref("");
 const sector = ref("Tecnología y Software");
 const fotoPerfil = ref("");
-
-// RF-34 fields
 const descripcion = ref("");
 const mision = ref("");
 const vision = ref("");
 const beneficios = ref("");
-
-// Web & Tax
 const website = ref("");
 const linkedin = ref("");
 const taxId = ref("");
-
-// Map variables
-const latitude = ref(19.4326);
-const longitude = ref(-99.1332);
-let map: any = null;
-let marker: any = null;
-
-// Corporate Documents State ("Documentos Relevantes")
+const documentoVerificacion = ref("");
+const estatusVerificacion = ref("");
+const latitude = ref(19.2826);
+const longitude = ref(-99.6557);
+const locationName = ref("");
 const documentosCorporativos = ref<DocumentoCorporativo[]>([]);
-const nuevoDocTipo = ref("Certificación ISO");
-const nuevoDocNombre = ref("");
-const docDragOver = ref(false);
-const docError = ref("");
-const docFileInput = ref<HTMLInputElement | null>(null);
 
-// Modal state
 const isPdfModalOpen = ref(false);
 const activePreviewUrl = ref("");
 const activePreviewName = ref("");
-
-// Actions state
 const loading = ref(true);
 const saving = ref(false);
-const uploadingLogo = ref(false);
 const submittingVerification = ref(false);
-const successMessage = ref("");
-const errorMessage = ref("");
-const logoFileInput = ref<HTMLInputElement | null>(null);
 
-// Draft State
 const hasDraft = ref(false);
 let isRestoring = false;
 
@@ -782,14 +250,6 @@ const previewDoc = (doc: DocumentoCorporativo) => {
   activePreviewUrl.value = doc.url;
   activePreviewName.value = doc.nombre || doc.tipo;
   isPdfModalOpen.value = true;
-};
-
-const removeDoc = (index: number) => {
-  documentosCorporativos.value.splice(index, 1);
-};
-
-const triggerLogoSelect = () => {
-  logoFileInput.value?.click();
 };
 
 const saveDraft = () => {
@@ -811,6 +271,7 @@ const saveDraft = () => {
           beneficios: beneficios.value,
           latitude: latitude.value,
           longitude: longitude.value,
+          locationName: locationName.value,
           website: website.value,
           linkedin: linkedin.value,
           taxId: taxId.value,
@@ -841,8 +302,9 @@ const loadDraft = () => {
           mision.value = draft.mision || "";
           vision.value = draft.vision || "";
           beneficios.value = draft.beneficios || "";
-          latitude.value = draft.latitude || 19.4326;
-          longitude.value = draft.longitude || -99.1332;
+          if (draft.latitude) latitude.value = draft.latitude;
+          if (draft.longitude) longitude.value = draft.longitude;
+          if (draft.locationName) locationName.value = draft.locationName;
           website.value = draft.website || "";
           linkedin.value = draft.linkedin || "";
           taxId.value = draft.taxId || "";
@@ -885,95 +347,13 @@ watch(
   { deep: true },
 );
 
-const processDocFile = async (file: File) => {
-  docError.value = "";
-
-  const isPdfExtension = file.name.toLowerCase().endsWith(".pdf");
-  const isPdfMime = file.type === "application/pdf";
-
-  if (!isPdfExtension || (!isPdfMime && file.type !== "")) {
-    docError.value =
-      "Error: El archivo seleccionado no es un formato PDF válido. Cargue únicamente archivos .pdf";
-    return;
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    docError.value =
-      "Error: El archivo PDF supera el tamaño máximo permitido (5MB).";
-    return;
-  }
-
-  const userId = companyId.value || "company";
-  const result = await uploadStore.uploadFile(file, "corporate_docs", userId);
-
-  if (result.success) {
-    const docTitle = nuevoDocNombre.value.trim() || file.name;
-    const docEntry: DocumentoCorporativo = {
-      id: Date.now().toString(),
-      tipo: nuevoDocTipo.value || "Certificación Corporativa",
-      nombre: docTitle,
-      url: result.url,
-      fechaCarga: new Date().toLocaleDateString("es-ES"),
-    };
-
-    documentosCorporativos.value.push(docEntry);
-    nuevoDocNombre.value = "";
-    successMessage.value = `¡Documento "${docTitle}" (${docEntry.tipo}) cargado exitosamente!`;
-    setTimeout(() => {
-      successMessage.value = "";
-    }, 3500);
-  } else {
-    docError.value =
-      result.error || "Error al cargar el documento corporativo.";
-  }
-};
-
-const handleDocSelect = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (file) processDocFile(file);
-};
-
-const handleDocDrop = (event: DragEvent) => {
-  docDragOver.value = false;
-  const file = event.dataTransfer?.files?.[0];
-  if (file) processDocFile(file);
-};
-
-const handleLogoUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  uploadingLogo.value = true;
-  successMessage.value = "";
-  errorMessage.value = "";
-
-  const result = await uploadStore.uploadFile(file, "logos", companyId.value);
-
-  if (result.success) {
-    fotoPerfil.value = result.url;
-    successMessage.value = "¡Logotipo subido exitosamente!";
-    setTimeout(() => {
-      successMessage.value = "";
-    }, 3000);
-  } else {
-    errorMessage.value =
-      result.error || "Error al subir el logotipo corporativo.";
-  }
-
-  uploadingLogo.value = false;
-};
-
 const fetchCompanyProfile = async () => {
   if (status.value !== "authenticated" || !sessionData.value?.user?.id) {
     router.push("/login");
     return;
   }
-
   companyId.value = sessionData.value.user.id;
   loading.value = true;
-
   try {
     const profile = await $fetch<any>(
       `${config.public.apiUrl}/profile/${companyId.value}`,
@@ -986,25 +366,17 @@ const fetchCompanyProfile = async () => {
       vision.value = profile.vision || "";
       beneficios.value = profile.beneficios || profile.culturaLaboral || "";
       fotoPerfil.value = profile.fotoPerfil || "";
+      website.value = profile.website || profile.enlacesWeb?.website || "";
+      linkedin.value = profile.linkedin || profile.enlacesWeb?.linkedin || "";
       taxId.value = profile.taxId || "";
+      documentoVerificacion.value = profile.documentoVerificacion || "";
+      estatusVerificacion.value = profile.estatusVerificacion || "";
       mfaEnabled.value = Boolean(profile.mfaConfigured || profile.mfaEnabled);
       documentosCorporativos.value = profile.documentosCorporativos || [];
-
       if (profile.ubicacion) {
-        if (typeof profile.ubicacion === "object") {
-          latitude.value = parseFloat(profile.ubicacion.lat) || 19.4326;
-          longitude.value = parseFloat(profile.ubicacion.lng) || -99.1332;
-        }
-      }
-
-      if (map && marker) {
-        map.setView([latitude.value, longitude.value], 13);
-        marker.setLatLng([latitude.value, longitude.value]);
-      }
-
-      if (profile.enlacesWeb) {
-        website.value = profile.enlacesWeb.website || "";
-        linkedin.value = profile.enlacesWeb.linkedin || "";
+        if (profile.ubicacion.lat) latitude.value = profile.ubicacion.lat;
+        if (profile.ubicacion.lng) longitude.value = profile.ubicacion.lng;
+        if (profile.ubicacion.name) locationName.value = profile.ubicacion.name;
       }
     }
   } catch (error) {
@@ -1014,72 +386,14 @@ const fetchCompanyProfile = async () => {
   }
 };
 
-const useCurrentLocation = () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        latitude.value = Number(position.coords.latitude.toFixed(6));
-        longitude.value = Number(position.coords.longitude.toFixed(6));
-        if (map && marker) {
-          map.setView([latitude.value, longitude.value], 13);
-          marker.setLatLng([latitude.value, longitude.value]);
-        }
-      },
-      (error) => {
-        console.error("Error getting current location:", error);
-      },
-    );
-  }
-};
-
 onMounted(async () => {
   await fetchCompanyProfile();
   loadDraft();
-
-  if (process.client) {
-    const L = await import("leaflet");
-
-    map = L.map("company-leaflet-map", { attributionControl: false }).setView(
-      [latitude.value, longitude.value],
-      13,
-    );
-
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-      { attribution: "" },
-    ).addTo(map);
-
-    marker = L.marker([latitude.value, longitude.value], {
-      draggable: true,
-    }).addTo(map);
-
-    marker.on("dragend", () => {
-      const latLng = marker.getLatLng();
-      latitude.value = Number(latLng.lat.toFixed(6));
-      longitude.value = Number(latLng.lng.toFixed(6));
-    });
-
-    map.on("click", (e: any) => {
-      marker.setLatLng(e.latlng);
-      latitude.value = Number(e.latlng.lat.toFixed(6));
-      longitude.value = Number(e.latlng.lng.toFixed(6));
-    });
-  }
-});
-
-onUnmounted(() => {
-  if (map) {
-    map.remove();
-  }
 });
 
 const handleSave = async () => {
   if (!companyId.value) return;
-
   saving.value = true;
-  successMessage.value = "";
-  errorMessage.value = "";
-
   try {
     const response = await $fetch(
       `${config.public.apiUrl}/profile/${companyId.value}`,
@@ -1100,12 +414,10 @@ const handleSave = async () => {
           ubicacion: {
             lat: latitude.value,
             lng: longitude.value,
+            name: locationName.value,
           },
           taxId: taxId.value,
-          enlacesWeb: {
-            website: website.value,
-            linkedin: linkedin.value,
-          },
+          enlacesWeb: { website: website.value, linkedin: linkedin.value },
         },
       },
     );
@@ -1115,41 +427,60 @@ const handleSave = async () => {
         localStorage.removeItem("jobnet_draft_company_edit");
         hasDraft.value = false;
       }
-      successMessage.value =
-        "¡Perfil de la organización guardado con éxito! Redirigiendo a tu perfil público...";
+      showSuccess(
+        "Perfil Corporativo Guardado",
+        "Los datos de tu organización fueron actualizados correctamente.",
+        2500,
+      );
       setTimeout(() => {
-        successMessage.value = "";
         router.push(`/company/${companyId.value}`);
       }, 1500);
     }
   } catch (error: any) {
     console.error("Error saving company configuration:", error);
-    errorMessage.value = "Error al intentar guardar el perfil corporativo.";
+    showError(
+      "Error al Guardar Perfil Corporativo",
+      "Error al intentar guardar el perfil corporativo.",
+      null,
+    );
   } finally {
     saving.value = false;
   }
 };
 
 const handleVerificationRequest = async () => {
-  if (!taxId.value || !companyId.value) {
-    errorMessage.value = "Ingresa tu RFC para solicitar verificación.";
+  if (!taxId.value || !documentoVerificacion.value || !companyId.value) {
+    showWarning(
+      "Datos Incompletos",
+      "Ingresa tu RFC y el Documento de Verificación.",
+      4000,
+    );
     return;
   }
-
   submittingVerification.value = true;
   try {
     await $fetch(`${config.public.apiUrl}/profile/${companyId.value}`, {
       method: "POST",
       body: {
         taxId: taxId.value,
+        documentoVerificacion: documentoVerificacion.value,
+        estatusVerificacion: "En revisión",
         organizacionVerificada: false,
       },
     });
-
-    successMessage.value = "¡Solicitud de verificación enviada exitosamente!";
+    estatusVerificacion.value = "En revisión";
+    showSuccess(
+      "Solicitud Enviada",
+      "Tu solicitud de verificación fue enviada al equipo de moderación.",
+      3500,
+    );
   } catch (error: any) {
     console.error("Error requesting verification:", error);
-    errorMessage.value = "Ocurrió un error al solicitar la verificación.";
+    showError(
+      "Error en Solicitud",
+      error?.data?.error || "Ocurrió un error al solicitar la verificación.",
+      null,
+    );
   } finally {
     submittingVerification.value = false;
   }

@@ -241,6 +241,8 @@
 </template>
 
 <script setup lang="ts">
+import { useAppFeedback } from "~/composables/useAppFeedback";
+const { showError, showSuccess, showInfo } = useAppFeedback();
 useSeoMeta({
   title: "Publicación - JobNet",
   description: "Detalle de publicación en la comunidad profesional.",
@@ -280,8 +282,8 @@ const savePosts = (updatedList: any[]) => {
 
 const currentUserId = computed(() => {
   return (
-    session.value?.user?.email ||
     (session.value?.user as any)?.id ||
+    session.value?.user?.email ||
     "anonymous-user"
   );
 });
@@ -370,7 +372,7 @@ const updateGlobalPost = () => {
 const sharePost = () => {
   if (process.client) {
     navigator.clipboard.writeText(window.location.href);
-    alert("¡Enlace copiado al portapapeles!");
+    showSuccess("Éxito", "¡Enlace copiado al portapapeles!");
   }
 };
 
@@ -461,7 +463,7 @@ const submitComment = async () => {
     newCommentText.value = "";
   } catch (e) {
     console.error("Error submitting comment:", e);
-    alert("Error al guardar el comentario.");
+    showError("Error", "Error al guardar el comentario.");
   } finally {
     isSubmittingComment.value = false;
   }
@@ -513,7 +515,7 @@ const submitReply = async (parentId: string) => {
     replyingToId.value = null;
   } catch (e) {
     console.error("Error submitting reply:", e);
-    alert("Error al guardar la respuesta.");
+    showError("Error", "Error al guardar la respuesta.");
   } finally {
     isSubmittingReply.value = false;
   }
@@ -599,7 +601,7 @@ const deleteComment = async (id: string) => {
     };
   } catch (e) {
     console.error("Error deleting comment:", e);
-    alert("Error al eliminar el comentario del servidor.");
+    showError("Error", "Error al eliminar el comentario del servidor.");
   }
 };
 

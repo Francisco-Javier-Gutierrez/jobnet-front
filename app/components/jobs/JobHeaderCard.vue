@@ -51,8 +51,7 @@
               >payments</span
             >
             {{
-              job.salarioFormatted ||
-              (job.salario ? `$${job.salario} / mes` : "A convenir")
+              job.salarioFormatted || formatSalaryDisplay(job) || "A convenir"
             }}
           </span>
           <span

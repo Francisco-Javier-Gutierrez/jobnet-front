@@ -82,10 +82,11 @@ const { openProtectedModal } = useProtectedAction();
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
-  const tipo = ((data.value?.user as any)?.tipoUsuario || "").toUpperCase();
+  const user = data.value?.user as any;
+  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
   if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
   if (tipo === "ADMIN") return "admin";
-  if (tipo === "MODERATOR") return "moderator";
+  if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
   return "candidate";
 });
 
@@ -128,17 +129,17 @@ const footerItems = computed<FooterItem[]>(() => {
           protected: true,
         },
         {
-          to: "/admin/catalog",
-          icon: "layers",
-          label: "Catálogo Maestro",
-          shortLabel: "Catálogo",
+          to: "/mod/support",
+          icon: "forum",
+          label: "Soporte WS",
+          shortLabel: "Mensajes",
           protected: true,
         },
         {
-          to: "/admin/fraud",
-          icon: "find_in_page",
-          label: "Reportes de Fraude",
-          shortLabel: "Reportes",
+          to: "/notifications",
+          icon: "notifications",
+          label: "Notificaciones",
+          shortLabel: "Notif.",
           protected: true,
         },
       ];
@@ -199,10 +200,10 @@ const footerItems = computed<FooterItem[]>(() => {
           protected: true,
         },
         {
-          to: "/create-vacancy",
+          to: "/create",
           icon: "add",
-          label: "Publicar Vacante",
-          shortLabel: "Publicar",
+          label: "Crear Nuevo",
+          shortLabel: "Crear",
           protected: true,
         },
         {

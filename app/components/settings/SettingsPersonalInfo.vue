@@ -77,7 +77,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 gap-4">
       <div class="flex flex-col gap-1.5">
         <label
           class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
@@ -93,24 +93,6 @@
           id="name"
           type="text"
           class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
-        />
-      </div>
-      <div class="flex flex-col gap-1.5">
-        <label
-          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
-          for="location"
-        >
-          Ubicación
-        </label>
-        <input
-          :value="location"
-          @input="
-            $emit('update:location', ($event.target as HTMLInputElement).value)
-          "
-          id="location"
-          type="text"
-          class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
-          placeholder="Ej: Madrid, España"
         />
       </div>
     </div>
@@ -167,7 +149,11 @@ async function handlePhotoUpload(e: Event) {
   photoError.value = "";
 
   if (file.size > 5 * 1024 * 1024) {
-    photoError.value = "La imagen no debe superar los 5MB.";
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    const msg = `La imagen "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de 5MB.`;
+    photoError.value = msg;
+    const { showError } = useAppFeedback();
+    showError("Límite de Tamaño Excedido", msg, null);
     return;
   }
 

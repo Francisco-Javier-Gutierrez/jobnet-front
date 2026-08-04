@@ -99,14 +99,29 @@
       <!-- Textarea Input -->
       <div class="flex gap-3">
         <div
-          class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shadow-inner flex-shrink-0"
+          class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shadow-inner flex-shrink-0 overflow-hidden"
         >
-          {{
-            session?.user?.name
-              ? session.user.name.charAt(0).toUpperCase()
-              : "U"
-          }}
+          <img
+            v-if="
+              (session?.user as any)?.fotoPerfil ||
+              (session?.user as any)?.avatarUrl
+            "
+            :src="
+              (session?.user as any)?.fotoPerfil ||
+              (session?.user as any)?.avatarUrl
+            "
+            :alt="session?.user?.name || 'Avatar'"
+            class="w-full h-full object-cover"
+          />
+          <span v-else>
+            {{
+              session?.user?.name
+                ? session.user.name.charAt(0).toUpperCase()
+                : "U"
+            }}
+          </span>
         </div>
+
         <textarea
           v-model="newPostContent"
           placeholder="¿Qué quieres compartir con la comunidad hoy?"
@@ -238,21 +253,14 @@ useSeoMeta({
 const router = useRouter();
 const { data: session, status } = useAuth();
 
-// Determine user role from session
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
-  const tipo = (session.value?.user as any)?.tipoUsuario;
-  if (!tipo) return "guest";
-  switch (tipo.toUpperCase()) {
-    case "EMPRESA":
-      return "company";
-    case "ADMIN":
-      return "admin";
-    case "MODERATOR":
-      return "moderator";
-    default:
-      return "candidate";
-  }
+  const user = session.value?.user as any;
+  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
+  if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "company";
+  if (tipo === "ADMIN") return "admin";
+  if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
+  return "candidate";
 });
 
 // Company specific switcher: 'post' | 'vacancy'
@@ -266,6 +274,8 @@ const selectCreationType = (type: "post" | "vacancy") => {
     selectedCreationType.value = "post";
   }
 };
+
+const { showError, showWarning } = useAppFeedback();
 
 // State for post creation
 const isPublishing = ref(false);
@@ -286,6 +296,16 @@ const handleImageSelect = (e: Event) => {
   const target = e.target as HTMLInputElement;
   if (target.files && target.files.length > 0) {
     const file = target.files[0];
+    if (file.size > 5 * 1024 * 1024) {
+      target.value = "";
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      showError(
+        "Límite de Tamaño Excedido",
+        `La imagen "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de 5MB.`,
+        null,
+      );
+      return;
+    }
     selectedImageFile.value = file;
     previewImage.value = URL.createObjectURL(file);
 
@@ -304,8 +324,28 @@ const handlePdfSelect = (e: Event) => {
   const target = e.target as HTMLInputElement;
   if (target.files && target.files.length > 0) {
     const file = target.files[0];
-    if (file.type !== "application/pdf") {
-      alert("Por favor selecciona un archivo PDF.");
+    const isPdf =
+      file.type === "application/pdf" ||
+      file.type === "application/x-pdf" ||
+      file.name.toLowerCase().endsWith(".pdf");
+
+    if (!isPdf) {
+      target.value = "";
+      showWarning(
+        "Formato No Permitido",
+        "Por favor selecciona un archivo en formato PDF.",
+        4000,
+      );
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      target.value = "";
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      showError(
+        "Límite de Tamaño Excedido",
+        `El archivo PDF "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de 10MB.`,
+        null,
+      );
       return;
     }
     selectedPdfFile.value = file;
@@ -354,7 +394,7 @@ const publishPost = async () => {
     if (res.success) {
       mediaUrl = res.url;
     } else {
-      alert("Error al subir la imagen a AWS S3: " + res.error);
+      showError("Error", "Error al subir la imagen a AWS S3: " + res.error);
       isPublishing.value = false;
       return;
     }
@@ -370,13 +410,22 @@ const publishPost = async () => {
     if (res.success) {
       pdfUrl = res.url;
     } else {
-      alert("Error al subir el archivo PDF a AWS S3: " + res.error);
+      showError(
+        "Error",
+        "Error al subir el archivo PDF a AWS S3: " + res.error,
+      );
       isPublishing.value = false;
       return;
     }
   }
 
   const author = session.value?.user?.name || "Usuario JobNet";
+  const authorAvatar =
+    (session.value?.user as any)?.fotoPerfil ||
+    (session.value?.user as any)?.avatarUrl ||
+    (session.value?.user as any)?.avatar ||
+    undefined;
+
   let role = "Candidato";
   const userType = (
     (session.value?.user as any)?.tipoUsuario || ""
@@ -391,6 +440,8 @@ const publishPost = async () => {
     author,
     role,
     authorUuid: userId,
+    authorAvatar: authorAvatar || undefined,
+    fotoPerfil: authorAvatar || undefined,
     content: newPostContent.value.trim(),
     media: mediaUrl || undefined,
     pdfUrl: pdfUrl || undefined,
@@ -404,7 +455,7 @@ const publishPost = async () => {
     });
   } catch (e) {
     console.error("Error creating post on server:", e);
-    alert("Error al publicar en el servidor de AWS.");
+    showError("Error", "Error al publicar en el servidor de AWS.");
     isPublishing.value = false;
     return;
   }

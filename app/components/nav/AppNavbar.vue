@@ -38,6 +38,20 @@
     <!-- Right side: Profile & Actions -->
     <div class="flex items-center gap-2 flex-shrink-0">
       <template v-if="status === 'authenticated'">
+        <NuxtLink
+          to="/notifications"
+          class="text-on-surface-variant dark:text-slate-300 hover:text-primary transition p-2 flex items-center justify-center rounded-xl"
+          :class="[
+            isActive('/notifications')
+              ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-bold'
+              : '',
+          ]"
+          aria-label="Notificaciones"
+        >
+          <span class="material-symbols-outlined text-[22px]"
+            >notifications</span
+          >
+        </NuxtLink>
         <button
           @click="onSignOut"
           class="text-on-surface-variant dark:text-slate-300 hover:text-rose-600 transition p-2 flex items-center justify-center"
@@ -81,10 +95,11 @@ const { status, data, signOut } = useAuth();
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
-  const tipo = ((data.value?.user as any)?.tipoUsuario || "").toUpperCase();
+  const user = data.value?.user as any;
+  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
   if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
   if (tipo === "ADMIN") return "admin";
-  if (tipo === "MODERATOR") return "moderator";
+  if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
   return "candidate";
 });
 

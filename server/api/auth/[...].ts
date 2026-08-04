@@ -25,6 +25,56 @@ function calculateSecretHash(
     .digest("base64");
 }
 
+// Helper to refresh Cognito tokens using RefreshToken
+async function refreshCognitoToken(refreshToken: string, email?: string) {
+  const clientId =
+    process.env.COGNITO_CLIENT_ID || "4ef8k4tofjj4ounvo8nf7d9pep";
+  const clientSecret = process.env.COGNITO_CLIENT_SECRET || "";
+  const issuer =
+    process.env.COGNITO_ISSUER ||
+    "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_trquL61F2";
+  const region =
+    process.env.COGNITO_REGION || issuer.split(".")[1] || "us-east-1";
+
+  const authParameters: Record<string, string> = {
+    REFRESH_TOKEN: refreshToken,
+  };
+
+  if (clientSecret && email) {
+    authParameters.SECRET_HASH = calculateSecretHash(
+      email,
+      clientId,
+      clientSecret,
+    );
+  }
+
+  try {
+    const res = await fetch(`https://cognito-idp.${region}.amazonaws.com/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-amz-json-1.1",
+        "X-Amz-Target": "AWSCognitoIdentityProviderService.InitiateAuth",
+      },
+      body: JSON.stringify({
+        AuthFlow: "REFRESH_TOKEN_AUTH",
+        ClientId: clientId,
+        AuthParameters: authParameters,
+      }),
+    });
+
+    const data = await res.json();
+    if (data.AuthenticationResult) {
+      return {
+        idToken: data.AuthenticationResult.IdToken,
+        accessToken: data.AuthenticationResult.AccessToken,
+      };
+    }
+  } catch (err) {
+    console.error("Failed to refresh Cognito token:", err);
+  }
+  return null;
+}
+
 export default NuxtAuthHandler({
   providers: [
     CognitoProvider({
@@ -316,7 +366,15 @@ export default NuxtAuthHandler({
         token.accessToken = account.access_token;
       }
 
-      // If we have an idToken, decode it to extract Cognito sub (id), name and roles (groups)
+      if (user && !(user as any).error) {
+        token.email = user.email;
+        token.idToken = (user as any).idToken || token.idToken;
+        token.accessToken = (user as any).accessToken || token.accessToken;
+        token.refreshToken = (user as any).refreshToken || token.refreshToken;
+        token.name = user.name || token.name;
+      }
+
+      // If we have an idToken, decode it to extract Cognito sub (id), name, roles and check expiration
       if (token.idToken) {
         try {
           const payloadBase64 = (token.idToken as string).split(".")[1];
@@ -343,19 +401,37 @@ export default NuxtAuthHandler({
             } else {
               token.tipoUsuario = "CANDIDATO";
             }
+
+            // Check if Cognito idToken is expired or expiring in < 300 seconds
+            const nowInSeconds = Math.floor(Date.now() / 1000);
+            if (
+              payload.exp &&
+              payload.exp - nowInSeconds < 300 &&
+              token.refreshToken
+            ) {
+              console.log(
+                "Cognito idToken is expired or expiring soon. Refreshing via REFRESH_TOKEN_AUTH...",
+              );
+              const refreshed = await refreshCognitoToken(
+                token.refreshToken as string,
+                token.email as string,
+              );
+              if (refreshed?.idToken) {
+                token.idToken = refreshed.idToken;
+                if (refreshed.accessToken)
+                  token.accessToken = refreshed.accessToken;
+                console.log("Successfully refreshed Cognito idToken!");
+              }
+            }
           }
         } catch (e) {
-          console.error("Error decoding Cognito IdToken payload:", e);
+          console.error(
+            "Error decoding/refreshing Cognito IdToken payload:",
+            e,
+          );
         }
       }
 
-      if (user && !(user as any).error) {
-        token.email = user.email;
-        token.idToken = (user as any).idToken || token.idToken;
-        token.accessToken = (user as any).accessToken || token.accessToken;
-        token.refreshToken = (user as any).refreshToken;
-        token.name = user.name || token.name;
-      }
       return token;
     },
     async session({ session, token }) {
@@ -367,6 +443,7 @@ export default NuxtAuthHandler({
         // Expose id, name and role to the frontend useAuth() session user
         (session.user as any).id = token.id;
         (session.user as any).tipoUsuario = token.tipoUsuario;
+        (session.user as any).role = token.tipoUsuario;
         session.user.name = token.name;
       }
       return session;

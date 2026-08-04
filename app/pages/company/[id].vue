@@ -2,32 +2,138 @@
   <!-- Loading State -->
   <main
     v-if="loading"
-    class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16 space-y-6 animate-pulse"
+    class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16 animate-pulse"
   >
-    <!-- Banner Skeleton -->
-    <div
-      class="relative bg-outline/10 h-48 md:h-64 rounded-b-xl md:rounded-xl overflow-hidden mb-16"
+    <!-- Header / Banner Section Skeleton -->
+    <section
+      class="relative bg-surface-variant/40 dark:bg-slate-800/50 h-40 md:h-52 rounded-2xl mb-24 md:mb-28"
+    >
+      <!-- Corporate Logo Overlap Skeleton -->
+      <div
+        class="absolute -bottom-20 md:-bottom-24 left-1/2 -translate-x-1/2 w-48 h-48 md:w-60 md:h-60 bg-surface dark:bg-slate-900 rounded-3xl border-4 border-surface dark:border-slate-800 flex items-center justify-center p-3 md:p-3.5 z-20"
+      >
+        <div
+          class="w-full h-full bg-surface-variant/50 dark:bg-slate-800 rounded-2xl"
+        ></div>
+      </div>
+    </section>
+
+    <!-- Central Identity Card Skeleton -->
+    <section
+      class="px-margin-mobile flex flex-col items-center text-center mt-2 mb-8 space-y-4"
     >
       <div
-        class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-24 h-24 bg-surface rounded-xl border-4 border-outline/15 z-10 flex items-center justify-center p-2"
+        class="h-10 w-64 md:w-96 bg-surface-variant/50 dark:bg-slate-800 rounded-xl mb-2"
+      ></div>
+      <div
+        class="h-7 w-40 bg-surface-variant/40 dark:bg-slate-800/80 rounded-full mb-1"
+      ></div>
+      <div
+        class="h-5 w-48 bg-surface-variant/30 dark:bg-slate-800/60 rounded-md mb-2"
+      ></div>
+
+      <!-- Action Buttons Skeleton -->
+      <div
+        class="flex flex-col sm:flex-row justify-center gap-4 w-full max-w-md mt-2"
       >
-        <div class="w-full h-full bg-outline/20 rounded-lg"></div>
+        <div
+          class="h-10 w-full bg-surface-variant/40 dark:bg-slate-800/70 rounded-lg"
+        ></div>
+        <div
+          class="h-10 w-full bg-surface-variant/40 dark:bg-slate-800/70 rounded-lg"
+        ></div>
+        <div
+          class="h-10 w-full bg-surface-variant/40 dark:bg-slate-800/70 rounded-lg"
+        ></div>
       </div>
-    </div>
+    </section>
 
-    <!-- Company Identity Skeleton -->
-    <div class="flex flex-col items-center text-center mt-2 mb-8">
-      <div class="h-8 w-64 bg-outline/20 rounded-lg mb-2"></div>
-      <div class="h-6 w-36 bg-outline/20 rounded-full mb-4"></div>
-      <div class="h-4 w-48 bg-outline/20 rounded mb-6"></div>
+    <!-- About Us Skeleton -->
+    <section class="px-margin-mobile mb-10 space-y-6">
+      <div
+        class="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-outline-variant/30 space-y-6"
+      >
+        <div>
+          <div
+            class="h-8 w-48 bg-surface-variant/50 dark:bg-slate-800 rounded-lg mb-4"
+          ></div>
+          <div class="space-y-3">
+            <div
+              class="h-4 w-full bg-surface-variant/40 dark:bg-slate-800/70 rounded"
+            ></div>
+            <div
+              class="h-4 w-11/12 bg-surface-variant/40 dark:bg-slate-800/70 rounded"
+            ></div>
+            <div
+              class="h-4 w-4/5 bg-surface-variant/40 dark:bg-slate-800/70 rounded"
+            ></div>
+          </div>
+        </div>
 
-      <!-- About Skeleton -->
-      <div class="w-full max-w-lg space-y-2">
-        <div class="h-4 w-full bg-outline/10 rounded"></div>
-        <div class="h-4 w-5/6 bg-outline/10 rounded"></div>
-        <div class="h-4 w-2/3 bg-outline/10 rounded"></div>
+        <!-- Mision/Vision Grid Skeleton -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div
+            class="h-32 bg-surface-variant/30 dark:bg-slate-800/50 rounded-xl"
+          ></div>
+          <div
+            class="h-32 bg-surface-variant/30 dark:bg-slate-800/50 rounded-xl"
+          ></div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- Tabs and Content Skeleton -->
+    <section
+      class="px-margin-mobile mb-8 bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-2xl border border-outline-variant/30 shadow-sm space-y-6"
+    >
+      <!-- Tabs Skeleton -->
+      <div
+        class="flex items-center gap-3 border-b border-outline-variant/20 pb-4 overflow-x-auto hide-scrollbar"
+      >
+        <div
+          class="h-10 w-40 bg-surface-variant/50 dark:bg-slate-800 rounded-xl flex-shrink-0"
+        ></div>
+        <div
+          class="h-10 w-36 bg-surface-variant/30 dark:bg-slate-800/60 rounded-xl flex-shrink-0"
+        ></div>
+        <div
+          class="h-10 w-36 bg-surface-variant/30 dark:bg-slate-800/60 rounded-xl flex-shrink-0"
+        ></div>
+      </div>
+
+      <!-- Job Cards Skeleton -->
+      <div class="flex flex-col gap-4">
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="h-44 bg-surface-variant/20 dark:bg-slate-800/30 rounded-xl border border-surface-variant/30 p-5 flex flex-col justify-between"
+        >
+          <div>
+            <div
+              class="h-6 w-3/4 bg-surface-variant/40 dark:bg-slate-800/60 rounded-md mb-4"
+            ></div>
+            <div class="flex gap-2">
+              <div
+                class="h-6 w-24 bg-surface-variant/30 dark:bg-slate-800/50 rounded-full"
+              ></div>
+              <div
+                class="h-6 w-32 bg-surface-variant/30 dark:bg-slate-800/50 rounded-full"
+              ></div>
+            </div>
+          </div>
+          <div
+            class="flex justify-between items-center border-t border-surface-variant/30 pt-4 mt-4"
+          >
+            <div
+              class="h-5 w-28 bg-surface-variant/40 dark:bg-slate-800/60 rounded-md"
+            ></div>
+            <div
+              class="h-9 w-32 bg-surface-variant/50 dark:bg-slate-800/80 rounded-lg"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Real Content -->
@@ -283,7 +389,7 @@
       </div>
     </section>
 
-    <!-- Tabs Section: [Vacantes abiertas] / [Mis publicaciones] / [Guardados] -->
+    <!-- Tabs Section: [Vacantes abiertas] / [Publicaciones] / [Guardados] -->
     <section
       class="px-margin-mobile mb-8 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 p-6 rounded-2xl border border-outline-variant/60 shadow-sm space-y-6"
     >
@@ -315,7 +421,7 @@
           class="px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-2 active:scale-95 flex-shrink-0"
         >
           <span class="material-symbols-outlined text-base">article</span>
-          <span>Mis publicaciones ({{ companyPosts.length }})</span>
+          <span>Publicaciones ({{ companyPosts.length }})</span>
         </button>
 
         <button
@@ -403,7 +509,7 @@
         </div>
       </div>
 
-      <!-- Tab 2: Mis publicaciones -->
+      <!-- Tab 2: Publicaciones -->
       <div v-if="companyTab === 'posts'" class="space-y-4">
         <div
           v-if="loadingCompanyPosts"
@@ -496,16 +602,34 @@ const { data: profileData, pending: profilePending } = useLazyAsyncData(
       .catch(() => null),
 );
 
-// Fetch all jobs from the backend API to filter vacancies for this company
-const { data: jobsData, pending: jobsPending } = useLazyAsyncData(
-  `company-jobs-${companyId}`,
+// Fetch vacancies dynamically from deployed backend API
+const { data: vacanciesData, pending: vacanciesPending } = useLazyAsyncData(
+  `company-vacancies-${companyId}`,
   () =>
-    $fetch(`${config.public.apiUrl}/jobs`)
+    $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
       .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => []),
+      .catch(() => ({ data: [] })),
 );
 
-const loading = computed(() => profilePending.value || jobsPending.value);
+// Fetch posts dynamically from deployed backend API
+const { data: postsData, pending: postsPending } = useLazyAsyncData(
+  `company-posts-${companyId}`,
+  () =>
+    $fetch(`${config.public.apiUrl}/profile/${companyId}/posts`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => ({ data: [] })),
+);
+
+// Fetch bookmarks dynamically from deployed backend API
+const { data: bookmarksData, pending: bookmarksPending } = useLazyAsyncData(
+  `company-bookmarks-${companyId}`,
+  () =>
+    $fetch(`${config.public.apiUrl}/profile/${companyId}/bookmarks`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => ({ data: [] })),
+);
+
+const loading = computed(() => profilePending.value || vacanciesPending.value);
 
 const isPdfModalOpen = ref(false);
 const activePreviewUrl = ref("");
@@ -537,7 +661,7 @@ const company = ref({
 
 // If profile exists in DynamoDB, apply real details reactively
 watch(
-  [profileData, jobsData],
+  [profileData, vacanciesData],
   () => {
     if (profileData.value) {
       const p = profileData.value as any;
@@ -558,7 +682,8 @@ watch(
       company.value.location =
         typeof p.ubicacion === "string"
           ? p.ubicacion
-          : p.ubicacion?.city ||
+          : p.ubicacion?.name ||
+            p.ubicacion?.city ||
             p.ubicacion?.pais ||
             "Ubicación no especificada";
       company.value.verified =
@@ -572,20 +697,18 @@ watch(
           .replace("http://", "")
           .split("/")[0] || "Sitio web";
 
-      // Filter vacancies matching this company ID from DB
-      const rawJobs = (jobsData.value || []) as any[];
-      company.value.vacancies = rawJobs
-        .filter((j) => j.empresaUuid === companyId)
-        .map((j) => ({
-          id: j.id,
-          title: j.title || "Vacante",
-          type: j.modalidad || "Presencial",
-          schedule: "Tiempo Completo",
-          salary:
-            typeof j.salario === "number"
-              ? `$${(j.salario / 1000).toFixed(0)}k MXN`
-              : j.salario || "No especificado",
-        }));
+      // Map vacancies from new endpoint
+      const rawJobs = (vacanciesData.value?.data || []) as any[];
+      company.value.vacancies = rawJobs.map((j) => ({
+        id: j.id || j.uniqueId,
+        title: j.title || j.titulo || "Vacante",
+        type: j.type || j.modalidad || "Presencial",
+        schedule: j.schedule || "Tiempo Completo",
+        salary:
+          typeof j.salario === "number"
+            ? `$${(j.salario / 1000).toFixed(0)}k MXN`
+            : j.salario || "No especificado",
+      }));
     }
   },
   { immediate: true },
@@ -593,69 +716,35 @@ watch(
 
 const { data: authData } = useAuth();
 const companyTab = ref<"vacancies" | "posts" | "bookmarks">("vacancies");
+const loadingCompanyPosts = computed(
+  () => postsPending.value || bookmarksPending.value,
+);
+
 const allCompanyPosts = ref<any[]>([]);
-const loadingCompanyPosts = ref(false);
+const allCompanyBookmarkedPosts = ref<any[]>([]);
 
-const companyPosts = computed(() => {
-  const companyName = company.value.name?.toLowerCase();
-  const authUser = authData.value?.user as any;
-  const currentAuthId = authUser?.id;
-  const currentAuthEmail = authUser?.email?.toLowerCase();
-
-  return allCompanyPosts.value.filter((p) => {
-    const postAuthorUuid = p.authorUuid || p.userId || p.userSub || p.idUsuario;
-    const postAuthorName = p.author?.toLowerCase();
-    const postEmail = p.email?.toLowerCase();
-
-    if (
-      postAuthorUuid &&
-      (postAuthorUuid === companyId ||
-        (currentAuthId && postAuthorUuid === currentAuthId))
-    ) {
-      return true;
+watch(
+  postsData,
+  (val: any) => {
+    if (val?.data) {
+      allCompanyPosts.value = val.data;
     }
-    if (companyName && postAuthorName && postAuthorName === companyName) {
-      return true;
+  },
+  { immediate: true },
+);
+
+watch(
+  bookmarksData,
+  (val: any) => {
+    if (val?.data) {
+      allCompanyBookmarkedPosts.value = val.data;
     }
-    if (currentAuthEmail && postEmail && postEmail === currentAuthEmail) {
-      return true;
-    }
-    return false;
-  });
-});
+  },
+  { immediate: true },
+);
 
-const companyBookmarkedPosts = computed(() => {
-  const authUser = authData.value?.user as any;
-  const currentAuthId = authUser?.id || companyId;
-  const currentAuthEmail = authUser?.email?.toLowerCase();
-
-  return allCompanyPosts.value.filter((p) => {
-    const bookmarks = p.bookmarksList || p.bookmarkedBy || p.bookmarks || [];
-    if (!Array.isArray(bookmarks)) return false;
-
-    return (
-      bookmarks.includes(companyId) ||
-      (currentAuthId && bookmarks.includes(currentAuthId)) ||
-      (currentAuthEmail && bookmarks.includes(currentAuthEmail)) ||
-      p.isBookmarked === true ||
-      p.bookmarked === true
-    );
-  });
-});
-
-async function fetchCompanyPosts() {
-  loadingCompanyPosts.value = true;
-  try {
-    const res = await $fetch<any>("/api/posts");
-    const data = typeof res === "string" ? JSON.parse(res) : res;
-    const list = Array.isArray(data) ? data : data?.posts || data?.data || [];
-    allCompanyPosts.value = list;
-  } catch (e) {
-    console.error("Error loading company posts:", e);
-  } finally {
-    loadingCompanyPosts.value = false;
-  }
-}
+const companyPosts = computed(() => allCompanyPosts.value);
+const companyBookmarkedPosts = computed(() => allCompanyBookmarkedPosts.value);
 
 const toggleLike = async (postId: string) => {
   const currentUserId = (authData.value?.user as any)?.id;
@@ -667,17 +756,22 @@ const toggleLike = async (postId: string) => {
       body: { userId: currentUserId },
     });
 
-    const target = allCompanyPosts.value.find((p) => p.uniqueId === postId);
-    if (target) {
-      if (res?.likesList) {
-        target.likesList = res.likesList;
-      } else {
-        if (!target.likesList) target.likesList = [];
-        const idx = target.likesList.indexOf(currentUserId);
-        if (idx !== -1) target.likesList.splice(idx, 1);
-        else target.likesList.push(currentUserId);
+    const targetPost = allCompanyPosts.value.find((p) => p.uniqueId === postId);
+    const targetBookmark = allCompanyBookmarkedPosts.value.find(
+      (p) => p.uniqueId === postId,
+    );
+    [targetPost, targetBookmark].forEach((target) => {
+      if (target) {
+        if (res?.likesList) {
+          target.likesList = res.likesList;
+        } else {
+          if (!target.likesList) target.likesList = [];
+          const idx = target.likesList.indexOf(currentUserId);
+          if (idx !== -1) target.likesList.splice(idx, 1);
+          else target.likesList.push(currentUserId);
+        }
       }
-    }
+    });
   } catch (e) {
     console.error("Error toggling like:", e);
   }
@@ -693,23 +787,26 @@ const toggleBookmark = async (postId: string) => {
       body: { userId: currentUserId },
     });
 
-    const target = allCompanyPosts.value.find((p) => p.uniqueId === postId);
-    if (target) {
-      if (res?.bookmarksList) {
-        target.bookmarksList = res.bookmarksList;
-      } else {
-        if (!target.bookmarksList) target.bookmarksList = [];
-        const idx = target.bookmarksList.indexOf(currentUserId);
-        if (idx !== -1) target.bookmarksList.splice(idx, 1);
-        else target.bookmarksList.push(currentUserId);
+    const targetPost = allCompanyPosts.value.find((p) => p.uniqueId === postId);
+    const targetBookmark = allCompanyBookmarkedPosts.value.find(
+      (p) => p.uniqueId === postId,
+    );
+    [targetPost, targetBookmark].forEach((target) => {
+      if (target) {
+        if (res?.bookmarksList) {
+          target.bookmarksList = res.bookmarksList;
+        } else {
+          if (!target.bookmarksList) target.bookmarksList = [];
+          const idx = target.bookmarksList.indexOf(currentUserId);
+          if (idx !== -1) target.bookmarksList.splice(idx, 1);
+          else target.bookmarksList.push(currentUserId);
+        }
       }
-    }
+    });
   } catch (e) {
     console.error("Error toggling bookmark:", e);
   }
 };
-
-fetchCompanyPosts();
 
 useSeoMeta({
   title: `${company.value.name} - Perfil de Empresa`,

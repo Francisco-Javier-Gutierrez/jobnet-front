@@ -212,27 +212,51 @@ const formatTime = (iso: string) => {
 };
 
 const formatActionName = (action: string) => {
-  if (action === "SUSPENSION_AUTOMATICA_RF72") return "AUTO-SUSPENSIÓN";
-  if (action === "BORRADO_LOGICO_VACANTE") return "BORRADO LÓGICO";
-  if (action === "PAUSA_PREVENTIVA_VACANTE") return "PAUSA PREVENTIVA";
-  if (action.startsWith("RESOLUCION_DISPUTA")) return "RESOLUCIÓN DISPUTA";
-  return action;
+  if (!action) return "PROCESO DE SUSPENSIÓN";
+  const upper = action.toUpperCase();
+  if (
+    upper.includes("INICIO_PROCESO_SUSPENSION") ||
+    upper.includes("PROCESO_SUSPENSION") ||
+    upper.includes("RF7")
+  )
+    return "PROCESO DE SUSPENSIÓN";
+  if (upper.includes("SUSPENSION_AUTOMATICA")) return "AUTO-SUSPENSIÓN";
+  if (upper.includes("REVOCACION_SUSPENSION") || upper.includes("CANCEL"))
+    return "REVOCACIÓN SUSPENSIÓN";
+  if (upper.includes("SUSPENSION_DEFINITIVA") || upper.includes("CONFIRM"))
+    return "SUSPENSIÓN DEFINITIVA";
+  if (upper === "BORRADO_LOGICO_VACANTE") return "BORRADO LÓGICO";
+  if (upper === "PAUSA_PREVENTIVA_VACANTE") return "PAUSA PREVENTIVA";
+  if (upper.startsWith("RESOLUCION_DISPUTA")) return "RESOLUCIÓN DISPUTA";
+  return action.replace(/_/g, " ").replace(/RF\d+/gi, "").trim();
 };
 
 const getActionIcon = (action: string) => {
-  if (action === "SUSPENSION_AUTOMATICA_RF72") return "warning";
-  if (action === "BORRADO_LOGICO_VACANTE") return "delete_forever";
-  if (action === "PAUSA_PREVENTIVA_VACANTE") return "pause_circle";
-  return "gavel";
+  const upper = (action || "").toUpperCase();
+  if (
+    upper.includes("INICIO_PROCESO_SUSPENSION") ||
+    upper.includes("PROCESO_SUSPENSION") ||
+    upper.includes("RF7")
+  )
+    return "gavel";
+  if (upper.includes("SUSPENSION_AUTOMATICA")) return "warning";
+  if (upper === "BORRADO_LOGICO_VACANTE") return "delete_forever";
+  if (upper === "PAUSA_PREVENTIVA_VACANTE") return "pause_circle";
+  return "policy";
 };
 
 const getActionBadgeClass = (action: string) => {
-  if (action === "SUSPENSION_AUTOMATICA_RF72")
-    return "bg-rose-500/10 text-rose-600 border-rose-500/20";
-  if (action === "BORRADO_LOGICO_VACANTE")
-    return "bg-rose-500/10 text-rose-700 border-rose-500/30";
-  if (action === "PAUSA_PREVENTIVA_VACANTE")
-    return "bg-amber-500/10 text-amber-700 border-amber-500/20";
+  const upper = (action || "").toUpperCase();
+  if (
+    upper.includes("INICIO_PROCESO_SUSPENSION") ||
+    upper.includes("PROCESO_SUSPENSION") ||
+    upper.includes("RF7")
+  )
+    return "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20";
+  if (upper.includes("SUSPENSION_AUTOMATICA") || upper.includes("DEFINITIVA"))
+    return "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20";
+  if (upper.includes("REVOCACION"))
+    return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
   return "bg-primary/10 text-primary border-primary/20";
 };
 

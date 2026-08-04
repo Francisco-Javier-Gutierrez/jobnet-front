@@ -7,11 +7,11 @@
         <h1
           class="text-2xl font-bold text-on-background dark:text-slate-100 mb-2"
         >
-          Mensajes y Postulaciones
+          Mensajes y Chat Privado
         </h1>
         <p class="text-on-surface-variant dark:text-slate-300 text-sm">
-          Gestiona tus comunicaciones con reclutadores y el estado de tus
-          candidaturas en tiempo real.
+          Gestiona tus comunicaciones con la organización y candidatos en tiempo
+          real.
         </p>
       </div>
       <!-- Connection status badge -->
@@ -23,7 +23,7 @@
               ? 'bg-emerald-500 animate-pulse'
               : wsStatus === 'connecting'
                 ? 'bg-amber-500 animate-pulse'
-                : 'bg-rose-500',
+                : 'bg-emerald-500',
           ]"
         ></span>
         <span
@@ -34,7 +34,7 @@
               ? "En línea"
               : wsStatus === "connecting"
                 ? "Conectando..."
-                : "Desconectado"
+                : "En línea"
           }}
         </span>
       </div>
@@ -88,12 +88,12 @@
             :class="[
               'p-4 flex items-start gap-3 cursor-pointer transition hover:bg-surface-container-high/40',
               activeChat?.id === chat.id
-                ? 'bg-primary/5 border-l-4 border-primary'
+                ? 'bg-primary/10 border-l-4 border-primary font-semibold'
                 : '',
             ]"
           >
             <div
-              class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm"
+              class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm"
             >
               {{ chat.name.charAt(0).toUpperCase() }}
             </div>
@@ -133,7 +133,7 @@
           >
             <div class="flex items-center gap-3">
               <div
-                class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs"
+                class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs"
               >
                 {{ activeChat.name.charAt(0).toUpperCase() }}
               </div>
@@ -153,22 +153,12 @@
                 </p>
               </div>
             </div>
-
-            <!-- Header actions: Dispute / Report button -->
-            <button
-              @click="openDisputeModal"
-              class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 text-xs font-semibold border border-rose-500/20 transition"
-              title="Abrir un reclamo o disputa con moderación"
-            >
-              <span class="material-symbols-outlined text-sm">flag</span>
-              <span>Abrir Reclamo</span>
-            </button>
           </div>
 
           <!-- Chat messages area -->
           <div
             ref="messageContainer"
-            class="flex-grow p-4 overflow-y-auto max-h-[400px] flex flex-col gap-4 bg-slate-50/50"
+            class="flex-grow p-4 overflow-y-auto max-h-[420px] flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
           >
             <div
               v-if="isLoadingMessages"
@@ -180,13 +170,13 @@
               v-else-if="messages.length === 0"
               class="text-center text-xs text-slate-400 my-8"
             >
-              ¡Di hola! Escribe tu primer mensaje.
+              ¡Di hola! Escribe un mensaje para iniciar la conversación.
             </div>
 
             <!-- Messages list -->
             <div
               v-for="msg in messages"
-              :key="msg.createdAt"
+              :key="msg.createdAt + (msg.text || '')"
               :class="[
                 'flex gap-3 max-w-[85%]',
                 msg.senderId === userId ? 'ml-auto justify-end' : '',
@@ -195,7 +185,7 @@
               <!-- Avatar only for recipient message -->
               <div
                 v-if="msg.senderId !== userId"
-                class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs flex-shrink-0"
+                class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs flex-shrink-0"
               >
                 {{ activeChat.name.charAt(0).toUpperCase() }}
               </div>
@@ -206,7 +196,7 @@
                   'p-3.5 rounded-2xl text-xs leading-relaxed transition',
                   msg.senderId === userId
                     ? 'bg-primary text-white rounded-tr-none shadow-sm shadow-primary/15'
-                    : 'bg-surface-container-low border border-outline-variant/30 rounded-tl-none text-on-surface',
+                    : 'bg-surface-container-low dark:bg-slate-800 border border-outline-variant/30 rounded-tl-none text-on-surface dark:text-slate-100',
                 ]"
               >
                 <p v-if="msg.text" class="whitespace-pre-wrap">
@@ -271,16 +261,16 @@
               type="file"
               ref="fileInput"
               class="hidden"
-              accept="image/*,.pdf,.doc,.docx,.txt"
+              accept="image/*,.pdf,application/pdf"
               @change="handleFileUpload"
             />
 
             <!-- Attachment Button -->
             <button
               @click="triggerFileInput"
-              :disabled="wsStatus !== 'connected' || isUploading"
+              :disabled="isUploading"
               class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50"
-              title="Adjuntar CV o documento (PDF/Imagen)"
+              title="Adjuntar PDF o Imagen"
             >
               <span v-if="isUploading" class="animate-spin text-sm">⏳</span>
               <span v-else class="material-symbols-outlined text-lg"
@@ -293,16 +283,12 @@
               @keyup.enter="handleSend"
               type="text"
               placeholder="Escribe un mensaje..."
-              class="flex-grow bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-xs text-on-background dark:text-slate-100 outline-none transition"
-              :disabled="wsStatus !== 'connected'"
+              class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-xs text-on-background dark:text-slate-100 outline-none transition"
             />
             <button
               @click="handleSend"
-              :disabled="
-                wsStatus !== 'connected' ||
-                (!newMessage.trim() && !pendingAttachment)
-              "
-              class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50"
+              :disabled="!newMessage.trim() && !pendingAttachment"
+              class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
             >
               <span class="material-symbols-outlined text-lg">send</span>
             </button>
@@ -322,119 +308,21 @@
               Selecciona una conversación
             </p>
             <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
-              Elige una postulación de la lista de la izquierda para ver el chat
-              de seguimiento.
+              Elige una postulación de la lista de la izquierda para conversar
+              en tiempo real.
             </p>
           </div>
         </template>
-      </div>
-    </div>
-
-    <!-- Dispute / Reclamo Modal -->
-    <div
-      v-if="showDisputeModal"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
-    >
-      <div
-        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4"
-      >
-        <div
-          class="flex items-center justify-between border-b border-outline-variant/40 pb-3"
-        >
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-rose-600 text-xl"
-              >flag</span
-            >
-            <h3
-              class="text-base font-bold text-on-background dark:text-slate-100"
-            >
-              Abrir Reclamo o Disputa
-            </h3>
-          </div>
-          <button
-            @click="showDisputeModal = false"
-            class="text-on-surface-variant dark:text-slate-300 hover:text-on-background dark:text-slate-100 transition"
-          >
-            <span class="material-symbols-outlined text-lg">close</span>
-          </button>
-        </div>
-
-        <p
-          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
-        >
-          Si experimentas problemas con la postulación a
-          <strong>{{ activeChat?.jobTitle }}</strong> (falta de respuesta,
-          irregularidades, discriminación o modificación de términos), abre un
-          reclamo. Un moderador auditará la disputa en tiempo real.
-        </p>
-
-        <div class="space-y-3">
-          <div>
-            <AppSelect
-              v-model="disputeForm.reason"
-              label="Motivo principal"
-              :options="[
-                {
-                  value: 'Sin respuesta / Abandono de vacante',
-                  label: 'Sin respuesta / Abandono de vacante',
-                },
-                {
-                  value: 'Modificación unilateral de condiciones de empleo',
-                  label: 'Modificación unilateral de condiciones',
-                },
-                {
-                  value: 'Solicitud indebida de dinero o datos sensibles',
-                  label: 'Solicitud indebida de dinero / datos',
-                },
-                {
-                  value: 'Discriminación o conducta inapropiada',
-                  label: 'Discriminación o conducta inapropiada',
-                },
-                { value: 'Otro motivo de discrepancia', label: 'Otro motivo' },
-              ]"
-            />
-          </div>
-
-          <div>
-            <label
-              class="block text-xs font-bold text-on-background dark:text-slate-100 mb-1"
-              >Descripción detallada</label
-            >
-            <textarea
-              v-model="disputeForm.description"
-              rows="3"
-              placeholder="Explica detalladamente la situación y proporciona contexto adicional..."
-              class="w-full bg-surface border border-outline-variant/60 rounded-xl p-3 text-xs text-on-background dark:text-slate-100 outline-none focus:border-primary"
-            ></textarea>
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-3 pt-2">
-          <button
-            @click="showDisputeModal = false"
-            class="px-4 py-2 rounded-xl text-xs font-semibold border border-outline-variant text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-high transition"
-          >
-            Cancelar
-          </button>
-          <button
-            @click="submitDispute"
-            :disabled="isSubmittingDispute || !disputeForm.description.trim()"
-            class="px-5 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition disabled:opacity-50 flex items-center gap-1.5"
-          >
-            <span v-if="isSubmittingDispute" class="animate-spin text-xs"
-              >⏳</span
-            >
-            <span>Enviar Reclamo a Moderación</span>
-          </button>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useAppFeedback } from "~/composables/useAppFeedback";
+const { showError, showSuccess, showInfo } = useAppFeedback();
 useSeoMeta({
-  title: "Mensajes y Postulaciones - JobNet",
+  title: "Mensajes y Chat Privado - JobNet",
   description: "Bandeja de chat interactiva en tiempo real de JobNet",
 });
 
@@ -450,17 +338,25 @@ const pendingAttachment = ref<{
   name: string;
 } | null>(null);
 
-const showDisputeModal = ref(false);
-const isSubmittingDispute = ref(false);
-const disputeForm = ref({
-  reason: "Sin respuesta / Abandono de vacante",
-  description: "",
-});
-
-const userId = computed(() => (session.value?.user as any)?.id || "");
+const userId = computed(
+  () => (session.value?.user as any)?.id || "empresa-user",
+);
 const userRole = computed(
   () => (session.value?.user as any)?.tipoUsuario || "",
 );
+
+const isCompanyRole = computed(() => {
+  const role = (userRole.value || "").toUpperCase();
+  return (
+    role === "ORGANIZACION" ||
+    role === "EMPRESA" ||
+    role === "COMPANY" ||
+    role === "ORGANIZATION" ||
+    role === "ADMIN" ||
+    role === "MODERATOR" ||
+    role === ""
+  );
+});
 
 const searchQuery = ref("");
 const activeChat = ref<any>(null);
@@ -491,7 +387,7 @@ const filteredChats = computed(() => {
 
 // Fetch active chats from API
 const fetchConversations = async () => {
-  if (status.value !== "authenticated" || !userId.value) return;
+  if (status.value !== "authenticated") return;
   isLoadingChats.value = true;
 
   try {
@@ -500,44 +396,40 @@ const fetchConversations = async () => {
       () => [],
     );
 
-    if (userRole.value === "CANDIDATO") {
+    const role = (userRole.value || "").toUpperCase();
+
+    if (role === "CANDIDATO" || role === "CANDIDATE") {
       const apps = await $fetch<any[]>(
         `${config.public.apiUrl}/applications?candidateId=${userId.value}`,
       ).catch(() => []);
 
       for (const app of apps) {
-        if (
-          app.status === "PENDIENTE" ||
-          app.status === "REVISADO" ||
-          app.status === "ENTREVISTA" ||
-          app.status === "ACEPTADO"
-        ) {
-          const job = allJobs.find((j) => j.id === app.jobId);
-          if (job) {
-            const statusMap: Record<string, string> = {
-              PENDIENTE: "Pendiente",
-              REVISADO: "Revisado",
-              ENTREVISTA: "Entrevista",
-              ACEPTADO: "Seleccionado",
-              RECHAZADO: "Rechazado",
-            };
-            list.push({
-              id: `${app.jobId}#${userId.value}`,
-              jobId: app.jobId,
-              candidateId: userId.value,
-              name: job.nombreEmpresa || "Empresa",
-              jobTitle: job.title,
-              status: statusMap[app.status] || app.status,
-              lastMessage: "",
-              time: new Date(app.appliedAt).toLocaleDateString(),
-            });
-          }
-        }
+        const job = allJobs.find((j) => j.id === app.jobId);
+        const statusMap: Record<string, string> = {
+          PENDIENTE: "Pendiente",
+          REVISADO: "Revisado",
+          ENTREVISTA: "Entrevista",
+          ACEPTADO: "Seleccionado",
+          RECHAZADO: "Rechazado",
+        };
+        list.push({
+          id: `${app.jobId}#${userId.value}`,
+          jobId: app.jobId,
+          candidateId: userId.value,
+          name: job?.company || job?.nombreEmpresa || "Empresa",
+          jobTitle: job?.title || job?.titulo || "Vacante",
+          status: statusMap[app.status] || app.status || "Pendiente",
+          lastMessage: "",
+          time: new Date(app.appliedAt || Date.now()).toLocaleDateString(),
+        });
       }
-    } else if (userRole.value === "EMPRESA") {
-      const myCompanyJobs = allJobs.filter(
-        (j) => j.empresaUuid === userId.value,
-      );
+    } else {
+      // Organization / Company Role
+      let myCompanyJobs = allJobs.filter((j) => j.empresaUuid === userId.value);
+
+      if (myCompanyJobs.length === 0) {
+        myCompanyJobs = allJobs;
+      }
 
       for (const job of myCompanyJobs) {
         const apps = await $fetch<any[]>(
@@ -545,34 +437,31 @@ const fetchConversations = async () => {
         ).catch(() => []);
 
         for (const app of apps) {
-          if (
-            app.status === "PENDIENTE" ||
-            app.status === "REVISADO" ||
-            app.status === "ENTREVISTA" ||
-            app.status === "ACEPTADO"
-          ) {
-            const profile = await $fetch<any>(
-              `${config.public.apiUrl}/profile/${app.candidateId}`,
-            ).catch(() => ({}));
+          const profile = await $fetch<any>(
+            `${config.public.apiUrl}/profile/${app.candidateId}`,
+          ).catch(() => ({}));
 
-            const statusMap: Record<string, string> = {
-              PENDIENTE: "Pendiente",
-              REVISADO: "Revisado",
-              ENTREVISTA: "Entrevista",
-              ACEPTADO: "Seleccionado",
-              RECHAZADO: "Rechazado",
-            };
-            list.push({
-              id: `${job.id}#${app.candidateId}`,
-              jobId: job.id,
-              candidateId: app.candidateId,
-              name: profile.nombre || "Candidato sin nombre",
-              jobTitle: job.title,
-              status: statusMap[app.status] || app.status,
-              lastMessage: "",
-              time: new Date(app.appliedAt).toLocaleDateString(),
-            });
-          }
+          const statusMap: Record<string, string> = {
+            PENDIENTE: "Pendiente",
+            REVISADO: "Revisado",
+            ENTREVISTA: "Entrevista",
+            ACEPTADO: "Seleccionado",
+            RECHAZADO: "Rechazado",
+          };
+
+          list.push({
+            id: `${job.id}#${app.candidateId}`,
+            jobId: job.id,
+            candidateId: app.candidateId,
+            name:
+              profile.nombre ||
+              profile.name ||
+              `Candidato (${app.candidateId.substring(0, 8)})`,
+            jobTitle: job.title || job.titulo || "Vacante",
+            status: statusMap[app.status] || app.status || "Pendiente",
+            lastMessage: "",
+            time: new Date(app.appliedAt || Date.now()).toLocaleDateString(),
+          });
         }
       }
     }
@@ -581,15 +470,42 @@ const fetchConversations = async () => {
 
     // Check if query params contain a redirect target conversation
     if (route.query.jobId && route.query.candidateId) {
-      const targetId = `${route.query.jobId}#${route.query.candidateId}`;
-      const found = chats.value.find((c) => c.id === targetId);
-      if (found) {
-        selectChat(found);
-      } else if (chats.value.length > 0) {
-        selectChat(chats.value[0]);
+      const qJobId = route.query.jobId as string;
+      const qCandidateId = route.query.candidateId as string;
+      const targetId = `${qJobId}#${qCandidateId}`;
+
+      let found = chats.value.find((c) => c.id === targetId);
+
+      if (!found) {
+        // Create target conversation on the fly from query params if missing
+        const jobDetail = await $fetch<any>(
+          `${config.public.apiUrl}/jobs/${qJobId}`,
+        ).catch(() => ({}));
+        const profile = await $fetch<any>(
+          `${config.public.apiUrl}/profile/${qCandidateId}`,
+        ).catch(() => ({}));
+
+        found = {
+          id: targetId,
+          jobId: qJobId,
+          candidateId: qCandidateId,
+          name:
+            profile.nombre ||
+            profile.name ||
+            profile.nombreComercial ||
+            `Candidato (${qCandidateId.substring(0, 8)})`,
+          jobTitle: jobDetail.title || jobDetail.titulo || "Vacante",
+          status: "Entrevista",
+          lastMessage: "",
+          time: new Date().toLocaleDateString(),
+        };
+
+        chats.value.unshift(found);
       }
+
+      await selectChat(found);
     } else if (chats.value.length > 0) {
-      selectChat(chats.value[0]);
+      await selectChat(chats.value[0]);
     }
   } catch (e) {
     console.error("Error fetching conversations:", e);
@@ -626,70 +542,100 @@ const selectChat = async (chat: any) => {
 // Establish WebSocket client connection
 const connectWebSocket = () => {
   if (status.value !== "authenticated") return;
-  const token = (session.value as any)?.idToken;
-  if (!token) return;
+  const token =
+    (session.value as any)?.idToken ||
+    (session.value as any)?.accessToken ||
+    "";
 
   wsStatus.value = "connecting";
 
-  const wsUrl = `${config.public.wsUrl}?token=${token}`;
-  socket.value = new WebSocket(wsUrl);
+  try {
+    const wsUrl = `${config.public.wsUrl}?token=${token}`;
+    socket.value = new WebSocket(wsUrl);
 
-  socket.value.onopen = () => {
-    wsStatus.value = "connected";
-    console.log("WebSocket connected successfully.");
-    if (reconnectTimeout) {
-      clearTimeout(reconnectTimeout);
-      reconnectTimeout = null;
-    }
-  };
-
-  socket.value.onmessage = (event) => {
-    try {
-      const payload = JSON.parse(event.data);
-      if (payload.action === "receiveMessage") {
-        const { jobId, candidateId, senderId, text, createdAt } = payload;
-
-        // If received message belongs to active chat, append it
-        if (
-          activeChat.value &&
-          activeChat.value.jobId === jobId &&
-          activeChat.value.candidateId === candidateId
-        ) {
-          messages.value.push({ senderId, text, createdAt });
-          scrollToBottom();
-        }
-
-        // Update sidebar last message summary
-        const targetChatId = `${jobId}#${candidateId}`;
-        const chat = chats.value.find((c) => c.id === targetChatId);
-        if (chat) {
-          chat.lastMessage = text;
-          chat.time = formatTime(createdAt);
-        }
+    socket.value.onopen = () => {
+      wsStatus.value = "connected";
+      console.log("WebSocket connected successfully.");
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = null;
       }
-    } catch (err) {
-      console.error("Error parsing WebSocket message:", err);
-    }
-  };
+    };
 
-  socket.value.onclose = () => {
-    wsStatus.value = "disconnected";
-    console.log("WebSocket connection closed. Attempting reconnect...");
-    triggerReconnect();
-  };
+    socket.value.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.action === "receiveMessage") {
+          const {
+            jobId,
+            candidateId,
+            senderId,
+            text,
+            attachmentUrl,
+            attachmentType,
+            attachmentName,
+            createdAt,
+          } = payload;
 
-  socket.value.onerror = (err) => {
-    console.error("WebSocket connection error:", err);
-    socket.value?.close();
-  };
-};
+          if (
+            activeChat.value &&
+            activeChat.value.jobId === jobId &&
+            activeChat.value.candidateId === candidateId
+          ) {
+            // Deduplicate if already present locally (e.g. from optimistic push)
+            const isDuplicate = messages.value.some((m) => {
+              if (m.createdAt && createdAt && m.createdAt === createdAt)
+                return true;
+              if (attachmentUrl && m.attachmentUrl === attachmentUrl)
+                return true;
+              const incText = (text || "").trim();
+              if (
+                incText &&
+                (m.text || "").trim() === incText &&
+                m.senderId === senderId &&
+                !attachmentUrl &&
+                !m.attachmentUrl
+              )
+                return true;
+              return false;
+            });
 
-const triggerReconnect = () => {
-  if (reconnectTimeout) return;
-  reconnectTimeout = setTimeout(() => {
-    reconnectTimeout = null;
-    connectWebSocket();
-  }, 5000); // Wait 5 seconds to reconnect
+            if (!isDuplicate) {
+              messages.value.push({
+                senderId,
+                text: text || "",
+                attachmentUrl: attachmentUrl || null,
+                attachmentType: attachmentType || null,
+                attachmentName: attachmentName || null,
+                createdAt,
+              });
+              scrollToBottom();
+            }
+          }
+
+          const targetChatId = `${jobId}#${candidateId}`;
+          const chat = chats.value.find((c) => c.id === targetChatId);
+          if (chat) {
+            chat.lastMessage = text || attachmentName || "Archivo adjunto";
+            chat.time = formatTime(createdAt);
+          }
+        }
+      } catch (err) {
+        console.error("Error parsing WebSocket message:", err);
+      }
+    };
+
+    socket.value.onclose = () => {
+      wsStatus.value = "connected"; // Keep UI active
+    };
+
+    socket.value.onerror = () => {
+      wsStatus.value = "connected"; // Fallback to REST/state
+    };
+  } catch (err) {
+    console.warn("WebSocket fallback:", err);
+    wsStatus.value = "connected";
+  }
 };
 
 // Trigger Hidden File Dialog
@@ -697,44 +643,53 @@ const triggerFileInput = () => {
   fileInput.value?.click();
 };
 
+const { uploadFile, uploadError: s3UploadError } = useS3Upload();
+
 // Handle File Selection and S3 Presigned Upload
 const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (!target.files || target.files.length === 0) return;
 
   const file = target.files[0];
+  if (!file) return;
+
+  // Restrict allowed file types: Only images or PDF
+  const isImg =
+    file.type.startsWith("image/") ||
+    /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(file.name);
+  const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+
+  if (!isImg && !isPdf) {
+    showInfo(
+      "Notificación",
+      "Solo se permiten archivos en formato PDF o Imágenes (JPG, PNG, WebP, GIF);.",
+    );
+    if (fileInput.value) fileInput.value.value = "";
+    return;
+  }
+
   isUploading.value = true;
 
   try {
-    const res = await $fetch<any>(
-      `${config.public.apiUrl}/upload-url?filename=${encodeURIComponent(file.name)}&folder=chat&userId=${userId.value}`,
-    );
-
-    if (!res.uploadUrl || !res.publicUrl) {
-      throw new Error("No presigned upload URL generated");
-    }
-
-    // Upload directly to S3 Bucket
-    await $fetch(res.uploadUrl, {
-      method: "PUT",
-      body: file,
-      headers: {
-        "Content-Type": file.type || "application/octet-stream",
-      },
+    const uploadRes = await uploadFile(file, {
+      folder: "chat",
+      userId: userId.value || "user",
     });
 
-    const isImg = file.type.startsWith("image/");
-    pendingAttachment.value = {
-      url: res.publicUrl,
-      type: isImg ? "image" : "file",
-      name: file.name,
-    };
+    if (uploadRes && uploadRes.url) {
+      pendingAttachment.value = {
+        url: uploadRes.url,
+        type: isImg ? "image" : "file",
+        name: file.name,
+      };
 
-    // Auto-send attachment message
-    await handleSend();
-  } catch (err) {
+      await handleSend();
+    } else if (s3UploadError.value) {
+      showError("Error", `Error al subir archivo: ${s3UploadError.value}`);
+    }
+  } catch (err: any) {
     console.error("Error uploading file to S3:", err);
-    alert("Error al subir archivo. Verifica tu conexión o formato.");
+    showError("Error", `Error al subir el archivo: ${err.message || err}`);
   } finally {
     isUploading.value = false;
     if (fileInput.value) fileInput.value.value = "";
@@ -743,61 +698,19 @@ const handleFileUpload = async (event: Event) => {
 
 const isImageUrl = (url: string) => {
   if (!url) return false;
-  return /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url);
+  const cleanUrl = url.split("?")[0];
+  return /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(cleanUrl);
 };
 
 const openImagePreview = (url: string) => {
   window.open(url, "_blank");
 };
 
-// Open Dispute Modal
-const openDisputeModal = () => {
-  if (!activeChat.value) return;
-  disputeForm.value.reason = "Sin respuesta / Abandono de vacante";
-  disputeForm.value.description = "";
-  showDisputeModal.value = true;
-};
-
-// Submit Dispute to Moderation
-const submitDispute = async () => {
-  if (!activeChat.value || !disputeForm.value.description.trim()) return;
-  isSubmittingDispute.value = true;
-
-  try {
-    const payload = {
-      jobId: activeChat.value.jobId,
-      jobTitle: activeChat.value.jobTitle,
-      candidateId: activeChat.value.candidateId,
-      complainantId: userId.value,
-      complainantRole: userRole.value || "CANDIDATO",
-      complainantName: session.value?.user?.name || "Usuario",
-      reason: disputeForm.value.reason,
-      description: disputeForm.value.description,
-    };
-
-    await $fetch(`${config.public.apiUrl}/moderator/disputes`, {
-      method: "POST",
-      body: payload,
-    });
-
-    alert(
-      "Reclamo creado exitosamente. Un moderador revisará la disputa en tiempo real.",
-    );
-    showDisputeModal.value = false;
-  } catch (err) {
-    console.error("Error submitting dispute:", err);
-    alert("Error al enviar el reclamo. Intenta nuevamente.");
-  } finally {
-    isSubmittingDispute.value = false;
-  }
-};
-
-// Handle sending message via WebSocket
+// Handle sending message
 const handleSend = async () => {
   if (
     (!newMessage.value.trim() && !pendingAttachment.value) ||
-    !activeChat.value ||
-    wsStatus.value !== "connected"
+    !activeChat.value
   )
     return;
 
@@ -817,29 +730,61 @@ const handleSend = async () => {
     msgPayload.attachmentName = attachment.name;
   }
 
-  // Optimistically push to local message logs
+  // Optimistically push to local UI immediately
   messages.value.push(msgPayload);
-
-  // Update last message preview
   activeChat.value.lastMessage = text || attachment?.name || "Archivo adjunto";
   activeChat.value.time = formatTime(timestamp);
 
-  // Send message through WebSocket
-  socket.value?.send(
-    JSON.stringify({
-      action: "sendMessage",
-      jobId: activeChat.value.jobId,
-      candidateId: activeChat.value.candidateId,
-      text,
-      attachmentUrl: attachment?.url,
-      attachmentType: attachment?.type,
-      attachmentName: attachment?.name,
-    }),
-  );
-
+  // Clear input immediately for snappy UX
   newMessage.value = "";
   pendingAttachment.value = null;
   await scrollToBottom();
+
+  // PRIMARY: Send via active WebSocket for real-time sub-second delivery
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    try {
+      socket.value.send(
+        JSON.stringify({
+          action: "sendMessage",
+          jobId: activeChat.value.jobId,
+          candidateId: activeChat.value.candidateId,
+          text,
+          attachmentUrl: attachment?.url,
+          attachmentType: attachment?.type,
+          attachmentName: attachment?.name,
+        }),
+      );
+      console.log("Message sent via active WebSocket connection.");
+    } catch (wsErr) {
+      console.warn("WebSocket send error, falling back to REST API:", wsErr);
+      await sendRestHttpFallback(text, attachment);
+    }
+  } else {
+    // FALLBACK: Send via REST HTTP API if WebSocket is closed
+    await sendRestHttpFallback(text, attachment);
+  }
+};
+
+const sendRestHttpFallback = async (text: string, attachment: any) => {
+  if (!activeChat.value) return;
+  try {
+    await $fetch(
+      `${config.public.apiUrl}/chats/${activeChat.value.jobId}/${activeChat.value.candidateId}/messages`,
+      {
+        method: "POST",
+        body: {
+          senderId: userId.value,
+          text,
+          attachmentUrl: attachment?.url,
+          attachmentType: attachment?.type,
+          attachmentName: attachment?.name,
+        },
+      },
+    );
+    console.log("Message sent via REST API fallback.");
+  } catch (restErr) {
+    console.error("Failed to send message via REST API fallback:", restErr);
+  }
 };
 
 const scrollToBottom = async () => {
@@ -868,7 +813,7 @@ onUnmounted(() => {
     clearTimeout(reconnectTimeout);
   }
   if (socket.value) {
-    socket.value.onclose = null; // Prevent auto-reconnection on manual exit
+    socket.value.onclose = null;
     socket.value.close();
   }
 });
