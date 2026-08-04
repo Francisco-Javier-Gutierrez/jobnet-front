@@ -38,15 +38,67 @@
       class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
     >
       <div
-        class="p-6 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20"
+        class="p-6 border-b border-outline-variant/60 flex flex-col md:flex-row md:items-center justify-between bg-surface-container-low/20 gap-4"
       >
-        <h2 class="text-sm font-bold text-on-background">Denuncias en cola</h2>
-        <span
-          class="bg-primary/10 text-primary text-xs px-2.5 py-0.5 rounded-full font-bold"
-          >{{ incidents.length }} Pendiente{{
-            incidents.length !== 1 ? "s" : ""
-          }}</span
+        <div class="flex items-center gap-4">
+          <h2 class="text-sm font-bold text-on-background">
+            Denuncias en cola
+          </h2>
+          <span
+            class="bg-primary/10 text-primary text-xs px-2.5 py-0.5 rounded-full font-bold"
+            >{{ displayedIncidents.length }} Pendiente{{
+              displayedIncidents.length !== 1 ? "s" : ""
+            }}</span
+          >
+        </div>
+        <div
+          class="flex flex-wrap gap-1 bg-surface-container-lowest p-1 rounded-lg border border-outline-variant/50"
         >
+          <button
+            @click="activeTab = 'ALL'"
+            :class="[
+              'px-3 py-1.5 text-xs font-semibold rounded-md transition',
+              activeTab === 'ALL'
+                ? 'bg-primary text-white'
+                : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-low',
+            ]"
+          >
+            Todas
+          </button>
+          <button
+            @click="activeTab = 'VACANTE'"
+            :class="[
+              'px-3 py-1.5 text-xs font-semibold rounded-md transition',
+              activeTab === 'VACANTE'
+                ? 'bg-primary text-white'
+                : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-low',
+            ]"
+          >
+            Vacantes
+          </button>
+          <button
+            @click="activeTab = 'POST'"
+            :class="[
+              'px-3 py-1.5 text-xs font-semibold rounded-md transition',
+              activeTab === 'POST'
+                ? 'bg-primary text-white'
+                : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-low',
+            ]"
+          >
+            Publicaciones
+          </button>
+          <button
+            @click="activeTab = 'ORGANIZACION'"
+            :class="[
+              'px-3 py-1.5 text-xs font-semibold rounded-md transition',
+              activeTab === 'ORGANIZACION'
+                ? 'bg-primary text-white'
+                : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-low',
+            ]"
+          >
+            Empresas
+          </button>
+        </div>
       </div>
 
       <!-- Loading skeleton -->
@@ -70,7 +122,7 @@
 
       <!-- Empty State -->
       <div
-        v-else-if="incidents.length === 0"
+        v-else-if="displayedIncidents.length === 0"
         class="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant dark:text-slate-300"
       >
         <span class="material-symbols-outlined text-[48px] text-primary/40 mb-3"
@@ -80,14 +132,14 @@
           Sin incidencias activas
         </p>
         <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
-          No hay reportes de vacantes pendientes de revisión en la plataforma.
+          No hay reportes de vacantes u organizaciones pendientes de revisión.
         </p>
       </div>
 
       <!-- Incidents list -->
       <div v-else class="divide-y divide-outline-variant/30">
         <div
-          v-for="inc in incidents"
+          v-for="inc in displayedIncidents"
           :key="inc.id"
           class="p-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
         >
@@ -110,7 +162,15 @@
               </span>
             </div>
             <h3 class="text-sm font-bold text-on-background mb-1">
-              Publicación: {{ inc.jobTitle }}
+              {{
+                inc.targetType === "POST"
+                  ? "Publicación"
+                  : inc.targetType === "VACANTE"
+                    ? "Vacante"
+                    : inc.targetType === "ORGANIZACION"
+                      ? "Empresa"
+                      : "Contenido"
+              }}: {{ inc.targetTitle || inc.jobTitle }}
             </h3>
             <p class="text-xs text-primary font-semibold mb-2">
               Reportado por: {{ inc.reporter }}
@@ -137,44 +197,43 @@
             <!-- For reports in EVALUACION (under appeal) -->
             <template v-if="inc.estatus === 'EVALUACION'">
               <span
-                class="text-xs font-semibold bg-amber-50 text-amber-700 px-2 py-1 rounded border border-amber-200 uppercase tracking-wide mr-2"
-                >Evaluando</span
+                class="text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 px-2.5 py-1 rounded border border-amber-200 dark:border-amber-800 uppercase tracking-wide"
+                >En Apelación</span
               >
-              <button
-                @click="resolve(inc.id, 'approve')"
-                class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-3 py-2 rounded-lg transition active:scale-95 duration-100 shadow-sm"
-                title="Aceptar apelación y reactivar vacante"
+              <NuxtLink
+                to="/mod/appeals"
+                class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1"
               >
-                Aceptar Apelación
-              </button>
-              <button
-                @click="resolve(inc.id, 'reject')"
-                class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-3 py-2 rounded-lg transition active:scale-95 duration-100 shadow-sm"
-                title="Rechazar apelación y eliminar vacante"
-              >
-                Rechazar Apelación
-              </button>
+                <span class="material-symbols-outlined text-sm">forum</span>
+                Atender Apelación
+              </NuxtLink>
             </template>
 
             <!-- For raw reports PENDIENTE -->
             <template v-else>
               <button
                 @click="resolve(inc.id, 'approve')"
-                class="bg-surface border border-outline-variant hover:bg-surface-container text-on-surface font-semibold text-xs px-3.5 py-2 rounded-lg transition active:scale-95 duration-100 shadow-sm"
+                class="bg-surface border border-outline-variant/60 hover:bg-surface-container text-on-surface font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-sm"
               >
                 Ignorar
               </button>
               <button
+                v-if="inc.targetType !== 'POST'"
                 @click="resolve(inc.id, 'evaluate')"
-                class="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition active:scale-95 duration-100 shadow-sm"
+                class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1"
               >
+                <span class="material-symbols-outlined text-sm"
+                  >pause_circle</span
+                >
                 Pausar (Evaluar)
               </button>
               <button
+                v-else
                 @click="resolve(inc.id, 'reject')"
-                class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition active:scale-95 duration-100 shadow-sm"
+                class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1"
               >
-                Bloquear
+                <span class="material-symbols-outlined text-sm">delete</span>
+                Eliminar
               </button>
             </template>
           </div>
@@ -188,12 +247,47 @@
 useSeoMeta({
   title: "Bandeja de Incidencias - JobNet",
   description:
-    "Bandeja de incidencias y reportes para moderadores en la plataforma JobNet",
+    "Bandeja de incidencias y reportes para moderadores y administradores en la plataforma JobNet",
 });
 
 const config = useRuntimeConfig();
+const { data: session } = useAuth();
+
+const userRole = computed(() => {
+  const user = session.value?.user as any;
+  return (user?.tipoUsuario || user?.role || "").toUpperCase();
+});
+
 const incidents = ref<any[]>([]);
 const loading = ref(true);
+const activeTab = ref("ALL");
+
+const displayedIncidents = computed(() => {
+  let list = incidents.value;
+
+  if (userRole.value === "ADMIN") {
+    // Admin only sees Organizaciones and Vacantes (NO Posts)
+    list = list.filter(
+      (inc) =>
+        inc.targetType === "VACANTE" ||
+        inc.targetType === "ORGANIZACION" ||
+        inc.targetType === "EMPRESA" ||
+        inc.jobId ||
+        inc.companyId ||
+        (!inc.targetType && !inc.postId),
+    );
+  }
+
+  if (activeTab.value !== "ALL") {
+    list = list.filter(
+      (inc) =>
+        inc.targetType === activeTab.value ||
+        (activeTab.value === "ORGANIZACION" && inc.targetType === "EMPRESA"),
+    );
+  }
+
+  return list;
+});
 
 const fetchIncidents = async () => {
   loading.value = true;

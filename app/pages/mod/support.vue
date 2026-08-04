@@ -381,45 +381,13 @@ const tickets = ref<any[]>([
 ]);
 
 const fetchDisputes = async () => {
-  isLoading.value = true;
-  try {
-    const disputesData = await $fetch<any[]>(
-      `${config.public.apiUrl}/moderator/disputes`,
-    ).catch(() => []);
-
-    if (disputesData && disputesData.length > 0) {
-      const realTickets = disputesData.map((d) => ({
-        id: d.id,
-        disputeId: d.id,
-        userName: d.complainantName || "Usuario",
-        userRole: d.complainantRole || "CANDIDATO",
-        online: true,
-        subject: `Disputa: ${d.reason}`,
-        description: d.description || d.reason,
-        time: d.fechaCreacion
-          ? new Date(d.fechaCreacion).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          : "Reciente",
-        unread: d.estatus === "ABIERTA",
-        lastMessage: d.description || d.reason,
-        messages: [],
-      }));
-
-      tickets.value = [...realTickets, ...tickets.value];
-    }
-  } catch (err) {
-    console.error("Error fetching disputes:", err);
-  } finally {
-    isLoading.value = false;
-  }
+  isLoading.value = false;
 };
 
 const connectWebSocket = () => {
   const token = (session.value as any)?.idToken;
   if (!token) return;
-  const wsUrl = `${config.public.wsUrl}?token=${token}`;
+  const wsUrl = `${config.public.wsUrl}?token=${token}&role=MODERATOR`;
   socket.value = new WebSocket(wsUrl);
 
   socket.value.onopen = () => {

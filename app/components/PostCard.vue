@@ -13,11 +13,20 @@
       <!-- Avatar with click modal trigger -->
       <div
         @click.stop="showAvatarModal = true"
-        class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary-container flex items-center justify-center text-white text-sm font-bold shadow-sm flex-shrink-0 cursor-pointer hover:opacity-85 transition active:scale-95"
+        class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary-container flex items-center justify-center text-white text-sm font-bold shadow-sm flex-shrink-0 cursor-pointer hover:opacity-85 transition active:scale-95 overflow-hidden"
         title="Ver foto de perfil"
       >
-        {{ post.author ? post.author.charAt(0).toUpperCase() : "U" }}
+        <img
+          v-if="post.authorAvatar || post.fotoPerfil"
+          :src="post.authorAvatar || post.fotoPerfil"
+          :alt="post.author || 'Avatar'"
+          class="w-full h-full object-cover"
+        />
+        <span v-else>
+          {{ post.author ? post.author.charAt(0).toUpperCase() : "U" }}
+        </span>
       </div>
+
       <div class="flex-grow min-w-0">
         <div class="flex items-center gap-2">
           <!-- Author text with profile redirect click -->
@@ -204,10 +213,19 @@
             <span class="material-symbols-outlined text-xl">close</span>
           </button>
           <div
-            class="w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-gradient-to-tr from-primary to-secondary-container flex items-center justify-center text-white text-5xl sm:text-7xl font-bold shadow-2xl border-4 border-white/20"
+            class="w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-gradient-to-tr from-primary to-secondary-container flex items-center justify-center text-white text-5xl sm:text-7xl font-bold shadow-2xl border-4 border-white/20 overflow-hidden"
           >
-            {{ post.author ? post.author.charAt(0).toUpperCase() : "U" }}
+            <img
+              v-if="post.authorAvatar || post.fotoPerfil"
+              :src="post.authorAvatar || post.fotoPerfil"
+              :alt="post.author || 'Avatar'"
+              class="w-full h-full object-cover"
+            />
+            <span v-else>
+              {{ post.author ? post.author.charAt(0).toUpperCase() : "U" }}
+            </span>
           </div>
+
           <div>
             <h2
               class="text-xl sm:text-3xl font-bold text-on-background select-text"

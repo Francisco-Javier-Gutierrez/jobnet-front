@@ -1,117 +1,40 @@
 <template>
   <div
-    class="flex-grow flex flex-col min-h-[calc(100vh-4rem-65px)]"
+    class="flex-grow flex flex-col min-h-[calc(100vh-4rem-65px)] p-4 sm:p-6"
     role="main"
   >
-    <div class="h-[500px] sm:h-auto flex-grow relative" id="map-container">
-      <div
-        id="leaflet-map"
-        class="absolute inset-0 z-10"
-        role="application"
-        aria-label="Mapa interactivo de ofertas de empleo"
-      ></div>
-      <div
-        class="absolute top-4 right-4 z-20 bg-slate-950/90 border border-slate-800 p-4 rounded-xl max-w-sm backdrop-blur"
-        role="complementary"
-        aria-label="Información del filtro geográfico"
-      >
-        <h2 class="text-sm font-bold text-white mb-2">Filtro Geográfico</h2>
-        <p class="text-xs text-slate-400">
-          Haga clic en los marcadores para ver los detalles de los empleos.
-        </p>
+    <div class="max-w-6xl mx-auto w-full space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-extrabold text-on-background">
+            Mapa Interactivo de Empleos
+          </h1>
+          <p class="text-xs text-on-surface-variant dark:text-slate-400">
+            Explora ofertas geolocalizadas en el Sur del Estado de México
+            (Toluca hacia el sur).
+          </p>
+        </div>
       </div>
+
+      <AppLocationMap
+        v-model:lat="initialLat"
+        v-model:lng="initialLng"
+        label="Filtro Geográfico — Sur Estado de México"
+        height="550px"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useJobsStore } from "../stores/jobs";
+import { ref } from "vue";
+import AppLocationMap from "~/components/common/AppLocationMap.vue";
 
 const route = useRoute();
-const store = useJobsStore();
-let map: any = null;
-
-useHead({
-  link: [
-    {
-      rel: "stylesheet",
-      href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
-      crossorigin: "",
-    },
-  ],
-});
-
-onMounted(async () => {
-  if (process.client) {
-    const L = await import("leaflet");
-    await store.fetchJobs();
-
-    const initialLat = route.query.lat
-      ? parseFloat(route.query.lat as string)
-      : 19.4326;
-    const initialLng = route.query.lng
-      ? parseFloat(route.query.lng as string)
-      : -99.1332;
-    const zoom = route.query.lat ? 14 : 12;
-
-    map = L.map("leaflet-map", { attributionControl: false }).setView(
-      [initialLat, initialLng],
-      zoom,
-    );
-
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-      {
-        attribution: "",
-        maxZoom: 19,
-      },
-    ).addTo(map);
-
-    // Request user location to center the map if not specified in query params
-    if (!route.query.lat && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          map.setView([lat, lng], 12);
-        },
-        (error) => {
-          console.log(
-            "Geolocation permission denied or failed:",
-            error.message,
-          );
-        },
-      );
-    }
-
-    // Render radius circle if radius query param is passed
-    if (route.query.radius) {
-      const radiusKm = parseFloat(route.query.radius as string);
-      L.circle([initialLat, initialLng], {
-        radius: radiusKm * 1000,
-        color: "#6366f1",
-        fillColor: "#6366f1",
-        fillOpacity: 0.15,
-        weight: 2,
-      }).addTo(map);
-    }
-
-    store.jobs.forEach((job) => {
-      const marker = L.marker([job.lat, job.lng]).addTo(map);
-      marker.bindPopup(`
-        <div class="text-slate-900 font-sans p-1">
-          <h3 class="font-bold text-sm mb-1">${job.title}</h3>
-          <p class="text-xs text-slate-600 mb-2">${job.company}</p>
-          <a href="/jobs" class="inline-block text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition">Ver más detalles</a>
-        </div>
-      `);
-    });
-  }
-});
-
-onUnmounted(() => {
-  if (map) {
-    map.remove();
-  }
-});
+const initialLat = ref(
+  route.query.lat ? parseFloat(route.query.lat as string) : 19.2826,
+);
+const initialLng = ref(
+  route.query.lng ? parseFloat(route.query.lng as string) : -99.6557,
+);
 </script>

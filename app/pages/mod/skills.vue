@@ -4,33 +4,91 @@
   >
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-on-background mb-2">
-        Aprobación de Habilidades (Moderador)
+        Aprobación de Catálogo (Moderador)
       </h1>
       <p class="text-on-surface-variant dark:text-slate-300 text-sm">
-        Gestiona la cola de sugerencias de nuevas habilidades propuestas por
-        candidates y reclutadores.
+        Gestiona la cola de sugerencias de habilidades técnicas y sectores
+        industriales propuestos por los usuarios.
       </p>
     </div>
 
-    <!-- Skills queue card -->
+    <!-- Category Selector / Tab Switcher -->
+    <div
+      class="flex items-center gap-2 mb-6 bg-surface-container-low/60 dark:bg-slate-900 p-1.5 rounded-2xl border border-outline-variant/40 w-fit"
+    >
+      <button
+        type="button"
+        @click="activeCategory = 'ALL'"
+        :class="
+          activeCategory === 'ALL'
+            ? 'bg-primary text-white font-bold shadow-sm'
+            : 'text-on-surface-variant hover:text-on-background'
+        "
+        class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer"
+      >
+        <span class="material-symbols-outlined text-sm">list_alt</span>
+        <span>Todas ({{ allSuggestions.length }})</span>
+      </button>
+
+      <button
+        type="button"
+        @click="activeCategory = 'Habilidad'"
+        :class="
+          activeCategory === 'Habilidad'
+            ? 'bg-primary text-white font-bold shadow-sm'
+            : 'text-on-surface-variant hover:text-on-background'
+        "
+        class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer"
+      >
+        <span class="material-symbols-outlined text-sm">psychology</span>
+        <span>Habilidades ({{ skillSuggestionsCount }})</span>
+      </button>
+
+      <button
+        type="button"
+        @click="activeCategory = 'Sector'"
+        :class="
+          activeCategory === 'Sector'
+            ? 'bg-emerald-600 text-white font-bold shadow-sm'
+            : 'text-on-surface-variant hover:text-on-background'
+        "
+        class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer"
+      >
+        <span class="material-symbols-outlined text-sm">business_center</span>
+        <span>Sectores ({{ sectorSuggestionsCount }})</span>
+      </button>
+    </div>
+
+    <!-- Suggestions Queue Card -->
     <div
       class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
     >
       <div
         class="p-6 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20"
       >
-        <h2 class="text-sm font-bold text-on-background">
-          Habilidades Sugeridas
+        <h2
+          class="text-sm font-bold text-on-background flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-primary text-base"
+            >pending_actions</span
+          >
+          <span
+            >Sugerencias en Cola —
+            {{
+              activeCategory === "ALL" ? "Catálogo Completo" : activeCategory
+            }}</span
+          >
         </h2>
         <span
-          class="bg-secondary/10 text-secondary text-xs px-2.5 py-0.5 rounded-full font-bold"
-          >{{ suggestions.length }} Pendiente{{
-            suggestions.length !== 1 ? "s" : ""
-          }}</span
+          class="bg-secondary/10 text-secondary text-xs px-3 py-1 rounded-full font-bold"
         >
+          {{ filteredSuggestions.length }} Pendiente{{
+            filteredSuggestions.length !== 1 ? "s" : ""
+          }}
+        </span>
       </div>
 
-      <!-- Loading skeleton -->
+      <!-- Loading Skeleton -->
       <div v-if="loading" class="p-8 space-y-4">
         <div
           v-for="n in 3"
@@ -47,45 +105,86 @@
 
       <!-- Empty State -->
       <div
-        v-else-if="suggestions.length === 0"
+        v-else-if="filteredSuggestions.length === 0"
         class="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant dark:text-slate-300"
       >
         <span class="material-symbols-outlined text-[48px] text-primary/40 mb-3"
-          >tag</span
+          >check_circle</span
         >
         <p class="text-sm font-semibold text-on-surface">Cola limpia</p>
         <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
-          No hay sugerencias de habilidades técnicas sugeridas por los usuarios.
+          No hay sugerencias pendientes para
+          {{
+            activeCategory === "ALL"
+              ? "ninguna categoría"
+              : activeCategory.toLowerCase()
+          }}.
         </p>
       </div>
 
       <!-- Suggestions Table -->
       <div v-else class="divide-y divide-outline-variant/30">
         <div
-          v-for="sug in suggestions"
+          v-for="sug in filteredSuggestions"
           :key="sug.id"
-          class="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          class="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-surface-container-low/10 transition"
         >
-          <div class="min-w-0">
-            <h3 class="text-sm font-bold text-on-background mb-1">
-              {{ sug.name }}
-            </h3>
-            <p class="text-xs text-on-surface-variant dark:text-slate-300">
-              Sugerida el: {{ new Date(sug.createdAt).toLocaleDateString() }}
+          <div class="min-w-0 space-y-1.5">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-sm font-bold text-on-background">
+                {{ sug.name }}
+              </h3>
+              <span
+                :class="
+                  sug.category === 'Sector'
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                    : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'
+                "
+                class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border uppercase tracking-wider flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-[12px]">
+                  {{
+                    sug.category === "Sector" ? "business_center" : "psychology"
+                  }}
+                </span>
+                {{ sug.category }}
+              </span>
+
+              <!-- Direct Table Warning Badge for Pre-computed Similarity Match -->
+              <span
+                v-if="sug.hasDuplicate"
+                class="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"
+                :title="`Similar a '${sug.existingName}' en catálogo`"
+              >
+                <span class="material-symbols-outlined text-[12px]"
+                  >warning</span
+                >
+                <span>Posible duplicado: "{{ sug.existingName }}"</span>
+              </span>
+            </div>
+            <p class="text-xs text-on-surface-variant dark:text-slate-400">
+              Sugerido el:
+              {{
+                sug.createdAt
+                  ? new Date(sug.createdAt).toLocaleDateString()
+                  : "Recientemente"
+              }}
             </p>
           </div>
 
           <div class="flex items-center gap-2 flex-shrink-0">
             <button
-              @click="approveSkill(sug)"
-              class="bg-secondary hover:bg-[#005236] text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition active:scale-95 duration-100 shadow-sm flex items-center gap-1"
+              type="button"
+              @click="approveItem(sug)"
+              class="bg-secondary hover:bg-[#005236] text-white font-semibold text-xs px-4 py-2 rounded-xl transition active:scale-95 duration-100 shadow-sm flex items-center gap-1 cursor-pointer"
             >
               <span class="material-symbols-outlined text-sm">check</span>
               Aprobar
             </button>
             <button
-              @click="resolve(sug.id, false)"
-              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant dark:text-slate-300 hover:text-rose-600 font-semibold text-xs px-3.5 py-2 rounded-lg transition active:scale-95 duration-100"
+              type="button"
+              @click="rejectItem(sug.id)"
+              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant dark:text-slate-300 hover:text-rose-600 font-semibold text-xs px-4 py-2 rounded-xl transition active:scale-95 duration-100 cursor-pointer"
             >
               Rechazar
             </button>
@@ -94,92 +193,115 @@
       </div>
     </div>
 
-    <!-- Modal de Advertencia por Similitud / Duplicidad -->
-    <div
-      v-if="showWarningModal"
-      class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+    <!-- Modal de Advertencia por Similitud / 3 Opciones de Unificación -->
+    <AppModal
+      v-model="showWarningModal"
+      title="Posible duplicado detectado"
+      icon="warning"
+      icon-bg-class="bg-amber-500/10 text-amber-500"
+      max-width="md"
     >
-      <div
-        class="bg-white border border-outline-variant/60 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
-      >
-        <div
-          class="flex items-center justify-between border-b border-outline-variant/30 pb-3"
+      <div class="space-y-2">
+        <p
+          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
         >
-          <h3
-            class="text-base font-bold text-on-background flex items-center gap-1.5"
+          Se ha detectado que la sugerencia
+          <strong class="text-on-background"
+            >"{{ selectedSuggestion?.name }}"</strong
           >
-            <span class="material-symbols-outlined text-amber-500"
-              >warning</span
-            >
-            Posible habilidad duplicada
-          </h3>
-          <button
-            @click="showWarningModal = false"
-            class="text-on-surface-variant dark:text-slate-300 hover:bg-surface-container rounded-lg p-1 transition flex items-center justify-center"
-          >
-            <span class="material-symbols-outlined text-sm">close</span>
-          </button>
-        </div>
+          es muy similar al
+          {{
+            (selectedSuggestion?.category || "elemento").toLowerCase()
+          }}
+          existente en catálogo
+          <strong class="text-primary">"{{ existingItemName }}"</strong>.
+        </p>
+        <p
+          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed font-semibold"
+        >
+          ¿Qué acción deseas realizar con esta sugerencia?
+        </p>
+      </div>
 
-        <div class="space-y-2">
-          <p
-            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
-          >
-            Se ha detectado una coincidencia léxica alta. La habilidad sugerida
-            <strong class="text-on-background"
-              >"{{ selectedSuggestion?.name }}"</strong
-            >
-            es muy similar a la habilidad existente
-            <strong class="text-primary">"{{ existingSkillName }}"</strong>.
-          </p>
-          <p
-            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed font-semibold"
-          >
-            Selecciona la acción para resolver esta sugerencia:
-          </p>
-        </div>
-
-        <div class="flex flex-col gap-2 pt-2">
+      <template #footer>
+        <div class="flex flex-col gap-2.5 w-full">
+          <!-- Option 1: Keep existing catalog name -->
           <button
-            @click="resolveUnify(true)"
-            class="w-full bg-primary text-white font-bold text-xs py-3 rounded-xl hover:bg-primary-container transition flex items-center justify-center gap-2 shadow-sm"
+            type="button"
+            @click="handleResolveChoice('KEEP_EXISTING')"
+            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
           >
-            <span class="material-symbols-outlined text-sm">call_merge</span>
-            Unificar con "{{ existingSkillName }}" (Recomendado)
+            <span class="material-symbols-outlined text-sm">check_circle</span>
+            <span>Quedarme con "{{ existingItemName }}" (Recomendado)</span>
           </button>
+
+          <!-- Option 2: Keep suggested name (replace existing catalog name) -->
           <button
-            @click="resolveUnify(false)"
-            class="w-full bg-surface border border-outline-variant hover:bg-surface-container text-on-surface font-semibold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2"
+            type="button"
+            @click="handleResolveChoice('REPLACE_EXISTING')"
+            class="w-full bg-primary hover:bg-primary-container text-white font-bold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-sm">edit</span>
+            <span
+              >Quedarme con "{{ selectedSuggestion?.name }}" (Reemplazar
+              nombre)</span
+            >
+          </button>
+
+          <!-- Option 3: Add anyway as new independent catalog item -->
+          <button
+            type="button"
+            @click="handleResolveChoice('ADD_ANYWAY')"
+            class="w-full bg-surface border border-outline-variant hover:bg-surface-container text-on-surface font-semibold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
           >
             <span class="material-symbols-outlined text-sm">add</span>
-            Aprobar como nueva habilidad independiente
-          </button>
-          <button
-            @click="showWarningModal = false"
-            class="w-full bg-surface text-on-surface-variant dark:text-slate-300 hover:underline font-semibold text-xs py-2 rounded-xl transition"
-          >
-            Cancelar
+            <span
+              >Agregar de todas formas como nuevo
+              {{
+                (selectedSuggestion?.category || "elemento").toLowerCase()
+              }}</span
+            >
           </button>
         </div>
-      </div>
-    </div>
+      </template>
+    </AppModal>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
+import AppModal from "~/components/common/AppModal.vue";
+
 useSeoMeta({
-  title: "Aprobación de Habilidades - JobNet",
-  description: "Bandeja de moderación para nuevas habilidades técnicas",
+  title: "Aprobación de Catálogo (Habilidades y Sectores) - JobNet",
+  description:
+    "Bandeja de moderación para nuevas habilidades técnicas y sectores industriales sugeridos",
 });
 
 const config = useRuntimeConfig();
-const suggestions = ref<any[]>([]);
+const allSuggestions = ref<any[]>([]);
+const activeCategory = ref<"ALL" | "Habilidad" | "Sector">("ALL");
 const loading = ref(true);
 
 // Modal state
 const showWarningModal = ref(false);
 const selectedSuggestion = ref<any | null>(null);
-const existingSkillName = ref("");
+const existingItemName = ref("");
+
+const skillSuggestionsCount = computed(
+  () => allSuggestions.value.filter((s) => s.category === "Habilidad").length,
+);
+
+const sectorSuggestionsCount = computed(
+  () => allSuggestions.value.filter((s) => s.category === "Sector").length,
+);
+
+const filteredSuggestions = computed(() => {
+  if (activeCategory.value === "ALL") return allSuggestions.value;
+  return allSuggestions.value.filter(
+    (s) => s.category === activeCategory.value,
+  );
+});
 
 const fetchSuggestions = async () => {
   loading.value = true;
@@ -187,9 +309,9 @@ const fetchSuggestions = async () => {
     const data = await $fetch<any[]>(
       `${config.public.apiUrl}/moderator/skills/suggestions`,
     );
-    suggestions.value = data || [];
+    allSuggestions.value = data || [];
   } catch (e) {
-    console.error("Error loading skill suggestions:", e);
+    console.error("Error loading catalog suggestions:", e);
   } finally {
     loading.value = false;
   }
@@ -199,8 +321,16 @@ onMounted(() => {
   fetchSuggestions();
 });
 
-const approveSkill = async (sug: any) => {
+const approveItem = async (sug: any) => {
   selectedSuggestion.value = sug;
+
+  // If backend precomputed duplicate match on list fetch
+  if (sug.hasDuplicate && sug.existingName) {
+    existingItemName.value = sug.existingName;
+    showWarningModal.value = true;
+    return;
+  }
+
   try {
     const res = await $fetch<any>(
       `${config.public.apiUrl}/moderator/skills/suggestions/${sug.id}/resolve`,
@@ -213,57 +343,69 @@ const approveSkill = async (sug: any) => {
     );
 
     if (res.duplicate) {
-      existingSkillName.value = res.existingName;
+      existingItemName.value = res.existingName;
       showWarningModal.value = true;
     } else {
-      suggestions.value = suggestions.value.filter((s) => s.id !== sug.id);
+      allSuggestions.value = allSuggestions.value.filter(
+        (s) => s.id !== sug.id,
+      );
     }
   } catch (e) {
-    console.error("Error approving skill:", e);
+    console.error("Error approving catalog suggestion:", e);
   }
 };
 
-const resolveUnify = async (unify: boolean) => {
+const handleResolveChoice = async (
+  mode: "KEEP_EXISTING" | "REPLACE_EXISTING" | "ADD_ANYWAY",
+) => {
   if (!selectedSuggestion.value) return;
-  const unifyWith = unify
-    ? existingSkillName.value
-    : selectedSuggestion.value.name;
+
+  const payload: any = {
+    approve: true,
+  };
+
+  if (mode === "KEEP_EXISTING") {
+    payload.unifyWith = existingItemName.value;
+    payload.unifyMode = "KEEP_EXISTING";
+  } else if (mode === "REPLACE_EXISTING") {
+    payload.unifyWith = existingItemName.value;
+    payload.unifyMode = "REPLACE_EXISTING";
+  } else if (mode === "ADD_ANYWAY") {
+    payload.addAnyway = true;
+  }
 
   try {
     await $fetch(
       `${config.public.apiUrl}/moderator/skills/suggestions/${selectedSuggestion.value.id}/resolve`,
       {
         method: "POST",
-        body: {
-          approve: true,
-          unifyWith,
-        },
+        body: payload,
       },
     );
-    suggestions.value = suggestions.value.filter(
+    allSuggestions.value = allSuggestions.value.filter(
       (s) => s.id !== selectedSuggestion.value.id,
     );
     showWarningModal.value = false;
     selectedSuggestion.value = null;
   } catch (e) {
-    console.error("Error resolving unified skill:", e);
+    console.error("Error resolving catalog item choice:", e);
   }
 };
 
-const resolve = async (id: string, approve: boolean) => {
+const rejectItem = async (id: string) => {
   try {
     await $fetch(
       `${config.public.apiUrl}/moderator/skills/suggestions/${id}/resolve`,
       {
         method: "POST",
         body: {
-          approve,
+          approve: false,
         },
       },
     );
-    suggestions.value = suggestions.value.filter((s) => s.id !== id);
+    allSuggestions.value = allSuggestions.value.filter((s) => s.id !== id);
   } catch (e) {
-    console.error("Error rejecting skill suggestion:", e);
+    console.error("Error rejecting suggestion:", e);
   }
 };
 </script>

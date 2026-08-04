@@ -417,6 +417,8 @@
 </template>
 
 <script setup lang="ts">
+import { useAppFeedback } from "~/composables/useAppFeedback";
+const { showError, showSuccess, showInfo } = useAppFeedback();
 import { useUploadStore } from "~/stores/upload";
 import PostCard from "~/components/PostCard.vue";
 
@@ -453,8 +455,8 @@ const postsList = ref<any[]>([]);
 
 const currentUserId = computed(() => {
   return (
-    session.value?.user?.email ||
     (session.value?.user as any)?.id ||
+    session.value?.user?.email ||
     "anonymous-user"
   );
 });
@@ -500,7 +502,7 @@ const handlePdfSelect = (e: Event) => {
   if (target.files && target.files.length > 0) {
     const file = target.files[0];
     if (file.type !== "application/pdf") {
-      alert("Por favor selecciona un archivo PDF.");
+      showInfo("Notificación", "Por favor selecciona un archivo PDF.");
       return;
     }
     selectedPdfFile.value = file;
@@ -581,7 +583,7 @@ const publishPost = async () => {
     if (res.success) {
       mediaUrl = res.url;
     } else {
-      alert("Error al subir la imagen a S3: " + res.error);
+      showError("Error", "Error al subir la imagen a S3: " + res.error);
       isPublishing.value = false;
       return;
     }
@@ -593,7 +595,7 @@ const publishPost = async () => {
     if (res.success) {
       pdfUrl = res.url;
     } else {
-      alert("Error al subir el archivo PDF a S3: " + res.error);
+      showError("Error", "Error al subir el archivo PDF a S3: " + res.error);
       isPublishing.value = false;
       return;
     }
@@ -629,7 +631,7 @@ const publishPost = async () => {
     buildFeed();
   } catch (e) {
     console.error("Error publishing post:", e);
-    alert("Error al publicar la publicación en el servidor.");
+    showError("Error", "Error al publicar la publicación en el servidor.");
   } finally {
     // Reset fields
     newPostContent.value = "";
@@ -837,7 +839,8 @@ const navigateToPost = (postId: string) => {
 
 // Share post
 const sharePost = (item: any) => {
-  alert(
+  showSuccess(
+    "Éxito",
     `Enlace copiado al portapapeles: http://localhost:3000/feed/${item.uniqueId}`,
   );
 };
@@ -934,7 +937,7 @@ const submitComment = async () => {
     buildFeed();
   } catch (e) {
     console.error("Error submitting comment:", e);
-    alert("Error al guardar el comentario.");
+    showError("Error", "Error al guardar el comentario.");
   } finally {
     isSubmittingComment.value = false;
   }
@@ -996,7 +999,7 @@ const submitReply = async (parentId: string) => {
     buildFeed();
   } catch (e) {
     console.error("Error submitting reply:", e);
-    alert("Error al guardar la respuesta.");
+    showError("Error", "Error al guardar la respuesta.");
   } finally {
     isSubmittingReply.value = false;
   }
@@ -1091,7 +1094,7 @@ const deleteComment = async (id: string) => {
     buildFeed();
   } catch (e) {
     console.error("Error deleting comment:", e);
-    alert("Error al eliminar el comentario del servidor.");
+    showError("Error", "Error al eliminar el comentario del servidor.");
   }
 };
 

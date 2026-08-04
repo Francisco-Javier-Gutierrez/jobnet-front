@@ -1,5 +1,14 @@
 export default defineNuxtConfig({
+  components: [
+    {
+      path: "~/components",
+      pathPrefix: false,
+    },
+  ],
   compatibilityDate: "2025-07-15",
+  experimental: {
+    appManifest: false,
+  },
   devtools: { enabled: false },
   css: ["~/assets/css/main.css"],
   routeRules: {
@@ -13,6 +22,11 @@ export default defineNuxtConfig({
       "@panva/hkdf",
       "jose",
     ],
+  },
+  vite: {
+    optimizeDeps: {
+      include: ["leaflet"],
+    },
   },
   modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt", "@sidebase/nuxt-auth"],
   runtimeConfig: {

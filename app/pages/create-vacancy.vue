@@ -107,6 +107,43 @@
         </div>
       </div>
 
+      <!-- Plazas Disponibles & Tope Máximo de Postulaciones (Opcional) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label
+            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
+            for="vacantes-disponibles"
+            >Plazas Disponibles a Contratar (Obligatorio)</label
+          >
+          <input
+            v-model.number="vacantesDisponibles"
+            id="vacantes-disponibles"
+            type="number"
+            min="1"
+            required
+            placeholder="Número de puestos (Ej: 1, 3, 5)"
+            class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
+          />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label
+            class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1"
+            for="max-postulantes"
+          >
+            Límite Máximo de Postulaciones
+            <span class="text-[10px] text-outline font-normal">(Opcional)</span>
+          </label>
+          <input
+            v-model.number="maxPostulantes"
+            id="max-postulantes"
+            type="number"
+            min="1"
+            placeholder="Sin límite (o Ej: 50 postulantes)"
+            class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
+          />
+        </div>
+      </div>
+
       <!-- Description -->
       <div class="flex flex-col gap-1.5">
         <label
@@ -148,18 +185,29 @@
           />
           <div
             v-if="selectedVacancyFile"
-            class="flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-xl text-xs font-bold max-w-sm truncate"
+            class="flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-xl text-xs font-bold max-w-md flex-wrap"
           >
-            <span class="material-symbols-outlined text-sm text-rose-600"
+            <span
+              class="material-symbols-outlined text-sm text-rose-600 flex-shrink-0"
               >picture_as_pdf</span
             >
-            <span class="truncate max-w-[200px]">{{
+            <span class="truncate max-w-[160px] sm:max-w-[200px]">{{
               selectedVacancyFile.name
             }}</span>
             <button
               type="button"
+              @click="openVacancyPdfPreview"
+              class="px-2.5 py-1 bg-primary text-white rounded-lg text-[10px] font-bold hover:bg-primary-container transition cursor-pointer flex items-center gap-1 shadow-xs"
+              title="Vista previa del documento PDF"
+            >
+              <span class="material-symbols-outlined text-xs">visibility</span>
+              <span>Ver Previa</span>
+            </button>
+            <button
+              type="button"
               @click="clearVacancyFile"
-              class="text-on-surface-variant dark:text-slate-300 hover:text-rose-600 flex items-center transition"
+              class="text-on-surface-variant dark:text-slate-300 hover:text-rose-600 flex items-center transition cursor-pointer p-0.5"
+              title="Eliminar archivo"
             >
               <span class="material-symbols-outlined text-xs">close</span>
             </button>
@@ -167,51 +215,13 @@
         </div>
       </div>
 
-      <!-- Ubicación Geográfica (Leaflet Map) -->
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center justify-between">
-          <label
-            class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
-            >Ubicación Geográfica (Obligatorio)</label
-          >
-          <button
-            type="button"
-            @click="useCurrentLocation"
-            class="text-xs font-bold text-primary hover:underline flex items-center gap-1 transition"
-          >
-            <span class="material-symbols-outlined text-sm">my_location</span>
-            Usar ubicación actual
-          </button>
-        </div>
-        <p class="text-xs text-on-surface-variant dark:text-slate-300">
-          Haz clic en el mapa o arrastra el marcador para definir las
-          coordenadas de la vacante.
-        </p>
-        <div
-          id="vacancy-leaflet-map"
-          class="w-full h-60 rounded-xl border border-outline-variant/60 overflow-hidden bg-surface-container-low shadow-sm z-10"
-        ></div>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="flex flex-col gap-1 text-[11px]">
-            <span class="font-bold text-on-surface-variant dark:text-slate-300"
-              >Latitud</span
-            >
-            <span
-              class="bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 font-mono font-semibold"
-              >{{ lat.toFixed(6) }}</span
-            >
-          </div>
-          <div class="flex flex-col gap-1 text-[11px]">
-            <span class="font-bold text-on-surface-variant dark:text-slate-300"
-              >Longitud</span
-            >
-            <span
-              class="bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 font-mono font-semibold"
-              >{{ lng.toFixed(6) }}</span
-            >
-          </div>
-        </div>
-      </div>
+      <!-- Ubicación Geográfica (AppLocationMap Centrado) -->
+      <AppLocationMap
+        v-model:lat="lat"
+        v-model:lng="lng"
+        label="Ubicación Geográfica de la Vacante"
+        height="280px"
+      />
 
       <!-- Rango Salarial (Opcional) -->
       <div
@@ -328,7 +338,7 @@
               :disabled="!skillSearchQuery.trim()"
               class="bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary text-xs font-bold px-4 py-2 rounded-xl transition disabled:opacity-50"
             >
-              Crear y Agregar
+              Sugerir y Agregar
             </button>
           </div>
 
@@ -432,7 +442,7 @@
               :disabled="!sectorSearchQuery.trim()"
               class="bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary text-xs font-bold px-4 py-2 rounded-xl transition disabled:opacity-50"
             >
-              Crear y Agregar
+              Sugerir y Agregar
             </button>
           </div>
 
@@ -492,22 +502,23 @@
         {{ submitting ? "Publicando..." : "Publicar Vacante" }}
       </button>
     </form>
+
+    <!-- Standardized Vacancy Specification PDF Preview Modal -->
+    <AppPdfPreviewModal
+      v-model="showVacancyPdfModal"
+      :url="vacancyPdfPreviewUrl"
+      :file-name="selectedVacancyFile?.name || 'Especificacion_Vacante.pdf'"
+      title="Especificación de Puesto (PDF)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import AppLocationMap from "~/components/common/AppLocationMap.vue";
+import AppPdfPreviewModal from "~/components/common/AppPdfPreviewModal.vue";
 import { useCatalogStore } from "~/stores/catalog";
-
-// Load Leaflet stylesheet in the head
-useHead({
-  link: [
-    {
-      rel: "stylesheet",
-      href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
-      crossorigin: "",
-    },
-  ],
-});
+import { useUploadStore } from "~/stores/upload";
+import { useAppFeedback } from "~/composables/useAppFeedback";
 
 useSeoMeta({
   title: "Publicar Oferta de Empleo - JobNet",
@@ -528,13 +539,24 @@ const skills = ref<string[]>([]);
 const sectors = ref<string[]>([]);
 const aptitudes = ref("");
 const experienceYears = ref<number | null>(null);
+const vacantesDisponibles = ref<number>(1);
+const maxPostulantes = ref<number | null>(null);
 const salaryMin = ref<number | null>(null);
 const salaryMax = ref<number | null>(null);
 
-// PDF Spec Upload
-import { useUploadStore } from "~/stores/upload";
+const showVacancyPdfModal = ref(false);
+const vacancyPdfPreviewUrl = ref("");
+
 const selectedVacancyFile = ref<File | null>(null);
 const vacancyFileInput = ref<HTMLInputElement | null>(null);
+
+const openVacancyPdfPreview = () => {
+  if (!selectedVacancyFile.value) return;
+  vacancyPdfPreviewUrl.value = URL.createObjectURL(selectedVacancyFile.value);
+  showVacancyPdfModal.value = true;
+};
+
+const { showSuccess, showError, showWarning } = useAppFeedback();
 
 const triggerVacancyFileSelect = () => {
   vacancyFileInput.value?.click();
@@ -544,11 +566,33 @@ const handleVacancyFileSelect = (e: Event) => {
   const target = e.target as HTMLInputElement;
   if (target.files && target.files.length > 0) {
     const file = target.files[0];
-    if (file.type !== "application/pdf") {
-      alert("Por favor selecciona un archivo PDF.");
+    const isPdf =
+      file.type === "application/pdf" ||
+      file.type === "application/x-pdf" ||
+      file.name.toLowerCase().endsWith(".pdf");
+
+    if (!isPdf) {
+      target.value = "";
+      showWarning(
+        "Formato No Permitido",
+        "Por favor selecciona un archivo en formato PDF.",
+        4000,
+      );
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      target.value = "";
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      const msg = `El archivo PDF "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de 10MB.`;
+      showError("Límite de Tamaño Excedido", msg, null);
       return;
     }
     selectedVacancyFile.value = file;
+    showSuccess(
+      "Documento Adjuntado",
+      "El archivo PDF de especificaciones fue seleccionado correctamente.",
+      2500,
+    );
   }
 };
 
@@ -557,11 +601,9 @@ const clearVacancyFile = () => {
   if (vacancyFileInput.value) vacancyFileInput.value.value = "";
 };
 
-// Leaflet Map State
-const lat = ref(19.432608); // CDMX Default
-const lng = ref(-99.133209);
-let map: any = null;
-let marker: any = null;
+// Location State (Default: Toluca, Sur del Estado de México)
+const lat = ref(19.2826);
+const lng = ref(-99.6557);
 
 // Draft State
 const hasDraft = ref(false);
@@ -649,12 +691,8 @@ const discardDraft = () => {
     experienceYears.value = null;
     salaryMin.value = null;
     salaryMax.value = null;
-    lat.value = 19.432608;
-    lng.value = -99.133209;
-    if (map && marker) {
-      map.setView([lat.value, lng.value], 11);
-      marker.setLatLng([lat.value, lng.value]);
-    }
+    lat.value = 19.2826;
+    lng.value = -99.6557;
     isRestoring = false;
   }
 };
@@ -732,71 +770,10 @@ const fetchCompanyName = async () => {
   }
 };
 
-const useCurrentLocation = () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        lat.value = Number(position.coords.latitude.toFixed(6));
-        lng.value = Number(position.coords.longitude.toFixed(6));
-        if (map && marker) {
-          map.setView([lat.value, lng.value], 13);
-          marker.setLatLng([lat.value, lng.value]);
-        }
-      },
-      (error) => {
-        console.error("Error getting current location:", error);
-      },
-    );
-  } else {
-    console.error("Geolocation is not supported by this browser.");
-  }
-};
-
 onMounted(async () => {
   await fetchCompanyName();
   await catalogStore.fetchCatalog();
   loadDraft();
-
-  // Initialize Leaflet map on client side
-  if (process.client) {
-    const L = await import("leaflet");
-
-    map = L.map("vacancy-leaflet-map", { attributionControl: false }).setView(
-      [lat.value, lng.value],
-      11,
-    );
-
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-      {
-        attribution: "",
-      },
-    ).addTo(map);
-
-    marker = L.marker([lat.value, lng.value], {
-      draggable: true,
-    }).addTo(map);
-
-    // Sync coordinates when dragging
-    marker.on("dragend", () => {
-      const position = marker.getLatLng();
-      lat.value = Number(position.lat.toFixed(6));
-      lng.value = Number(position.lng.toFixed(6));
-    });
-
-    // Move marker when clicking on the map
-    map.on("click", (e: any) => {
-      marker.setLatLng(e.latlng);
-      lat.value = Number(e.latlng.lat.toFixed(6));
-      lng.value = Number(e.latlng.lng.toFixed(6));
-    });
-  }
-});
-
-onUnmounted(() => {
-  if (map) {
-    map.remove();
-  }
 });
 
 // Selection actions
@@ -829,7 +806,10 @@ const handleQuickAddSector = async () => {
   const queryName = sectorSearchQuery.value.trim();
   if (!queryName) return;
 
-  await catalogStore.addItem(queryName, "Sector");
+  // 1. Suggest sector to the global master catalog (moderator queue)
+  await catalogStore.suggestSector(queryName);
+
+  // 2. Add locally to active vacancy sectors list
   addSector(queryName);
   sectorSearchQuery.value = "";
 };
@@ -896,6 +876,8 @@ const handleSubmit = async () => {
       sectores: sectors.value,
       aptitudes: aptitudes.value,
       experienciaAnos: experienceYears.value || 0,
+      vacantesDisponibles: vacantesDisponibles.value || 1,
+      maxPostulantes: maxPostulantes.value || null,
       pdfUrl: specPdfUrl,
     };
 

@@ -393,42 +393,17 @@
                 <!-- Account Status Badge -->
                 <td class="px-6 py-4">
                   <div class="flex flex-col items-start gap-1">
-                    <!-- Activa -->
-                    <span
+                    <AppStatusBadge
                       v-if="getOrgStatusKey(org) === 'ACTIVO'"
-                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                    >
-                      <span
-                        class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
-                      ></span>
-                      <span>Activa</span>
-                    </span>
-
-                    <!-- En Revisión -->
-                    <span
+                      status="ACTIVA"
+                      size="sm"
+                    />
+                    <AppStatusBadge
                       v-else-if="getOrgStatusKey(org) === 'REVISION'"
-                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30"
-                    >
-                      <span class="material-symbols-outlined text-xs"
-                        >warning</span
-                      >
-                      <span>{{
-                        org.apelacionIniciada
-                          ? "En Revisión (💬 Apelando)"
-                          : "En Revisión (⏳ Gracia)"
-                      }}</span>
-                    </span>
-
-                    <!-- Suspendida -->
-                    <span
-                      v-else
-                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/10 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30"
-                    >
-                      <span class="material-symbols-outlined text-xs"
-                        >block</span
-                      >
-                      <span>Suspendida</span>
-                    </span>
+                      status="EN_REVISION"
+                      size="sm"
+                    />
+                    <AppStatusBadge v-else status="SUSPENDIDA" size="sm" />
 
                     <span
                       v-if="
@@ -501,65 +476,26 @@
         </table>
       </div>
 
-      <!-- Table Pagination footer -->
-      <div
-        v-if="totalPages > 1"
-        class="px-6 py-4 bg-slate-50/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between"
-      >
-        <span
-          class="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500"
-          >Mostrando página {{ currentPage }} de {{ totalPages }} ({{
-            filteredOrgs.length
-          }}
-          total)</span
-        >
-        <div class="flex items-center gap-1.5">
-          <button
-            @click="currentPage = Math.max(1, currentPage - 1)"
-            :disabled="currentPage === 1"
-            class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:bg-slate-800 text-slate-600 disabled:opacity-40 transition"
-          >
-            <span class="material-symbols-outlined text-sm flex items-center"
-              >chevron_left</span
-            >
-          </button>
-          <button
-            v-for="p in totalPages"
-            :key="p"
-            @click="currentPage = p"
-            :class="[
-              'w-8 h-8 rounded-lg border font-bold text-xs flex items-center justify-center transition',
-              currentPage === p
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'border-slate-200 dark:border-slate-800 text-slate-600 hover:bg-slate-100 dark:bg-slate-800',
-            ]"
-          >
-            {{ p }}
-          </button>
-          <button
-            @click="currentPage = Math.min(totalPages, currentPage + 1)"
-            :disabled="currentPage === totalPages"
-            class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:bg-slate-800 text-slate-600 disabled:opacity-40 transition"
-          >
-            <span class="material-symbols-outlined text-sm flex items-center"
-              >chevron_right</span
-            >
-          </button>
-        </div>
+      <div class="px-6 border-t border-slate-100 dark:border-slate-800">
+        <AppPagination
+          v-model:current-page="currentPage"
+          :total-pages="totalPages"
+          :total-items="filteredOrgs.length"
+        />
       </div>
     </div>
 
     <!-- RF-7 Sanction Modal Drawer -->
     <div
       v-if="isSanctionModalOpen"
-      class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4"
+      class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
     >
       <div
-        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-slate-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl animate-fade-in"
+        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in my-auto"
       >
         <!-- Header -->
         <div
-          class="px-6 py-4 bg-slate-50 dark:bg-slate-800/90 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between"
+          class="px-6 py-4 bg-slate-50 dark:bg-slate-800/90 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-shrink-0"
         >
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-amber-500">gavel</span>
@@ -576,7 +512,7 @@
         </div>
 
         <!-- Content -->
-        <div class="p-6 space-y-6">
+        <div class="p-6 space-y-6 overflow-y-auto flex-1">
           <!-- Stepper Overview of Sanction Status -->
           <div class="relative flex items-center justify-between mb-8">
             <div
@@ -610,20 +546,14 @@
             class="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 space-y-4"
           >
             <!-- Phase details -->
-            <div
-              v-if="
-                selectedOrg?.estatus === 'Activa' ||
-                selectedOrg?.estadoCuenta === 'ACTIVO' ||
-                (!selectedOrg?.estatus && !selectedOrg?.estadoCuenta)
-              "
-            >
+            <div v-if="getOrgStatusKey(selectedOrg) === 'ACTIVO'">
               <h4
                 class="text-xs font-bold text-emerald-600 flex items-center gap-1.5 mb-1.5"
               >
                 <span class="material-symbols-outlined text-sm"
                   >check_circle</span
                 >
-                Fase 1: Cuenta Activa sin Sanciones
+                Fase 1 — Cuenta activa
               </h4>
               <p
                 class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed"
@@ -638,118 +568,35 @@
               </p>
             </div>
 
-            <div
-              v-else-if="
-                selectedOrg?.estatus === 'En revisión' ||
-                selectedOrg?.estadoCuenta === 'REVISION'
-              "
-            >
+            <div v-else-if="getOrgStatusKey(selectedOrg) === 'REVISION'">
               <h4
                 class="text-xs font-bold text-amber-600 flex items-center gap-1.5 mb-1.5"
               >
                 <span class="material-symbols-outlined text-sm">warning</span>
-                Fase 2: Periodo de Apelación Activo (En Revisión)
+                Fase 2 — Periodo de apelación activo
               </h4>
               <p
-                class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed"
+                class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3"
               >
-                La empresa está en periodo de gracia. Puede enviar evidencia y
-                mensajes a través del chat directo de soporte a continuación
-                para evaluar la apelación.
+                La empresa está en periodo de gracia. Puede enviar
+                justificaciones y evidencia a través del canal de soporte.
               </p>
-
-              <!-- LIVE APPEAL CHAT -->
-              <div
-                class="mt-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3 shadow-sm"
+              <NuxtLink
+                to="/mod/support"
+                @click="isSanctionModalOpen = false"
+                class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-bold transition shadow-sm"
               >
-                <div
-                  class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2"
-                >
-                  <span
-                    class="text-xs font-bold text-indigo-600 flex items-center gap-1.5"
-                  >
-                    <span class="material-symbols-outlined text-sm">forum</span>
-                    Canal de Apelación Directo WS
-                  </span>
-                  <span
-                    class="text-[10px] text-amber-600 font-mono font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800"
-                  >
-                    Periodo de Gracia Activo
-                  </span>
-                </div>
-
-                <!-- Messages container -->
-                <div class="max-h-48 overflow-y-auto space-y-2 p-1 text-xs">
-                  <div
-                    v-if="loadingAppealMessages"
-                    class="text-center py-4 text-slate-400 animate-pulse"
-                  >
-                    Cargando historial de apelación...
-                  </div>
-                  <div
-                    v-else-if="appealMessages.length === 0"
-                    class="text-center py-4 text-slate-400 italic text-[11px]"
-                  >
-                    No hay mensajes de apelación registrados aún.
-                  </div>
-                  <div
-                    v-for="(msg, idx) in appealMessages"
-                    :key="idx"
-                    :class="[
-                      'p-2.5 rounded-xl text-xs max-w-[85%]',
-                      msg.senderId === 'ADMIN'
-                        ? 'ml-auto bg-indigo-600 text-white rounded-br-none'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-none border border-slate-200 dark:border-slate-700',
-                    ]"
-                  >
-                    <div class="text-[9px] font-bold opacity-75 mb-0.5">
-                      {{
-                        msg.senderId === "ADMIN"
-                          ? "Moderador / Admin"
-                          : selectedOrg?.nombre || "Empresa"
-                      }}
-                    </div>
-                    <p>{{ msg.text }}</p>
-                    <div
-                      class="text-[8px] opacity-60 text-right mt-1 font-mono"
-                    >
-                      {{ formatDate(msg.createdAt) }}
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Admin Reply Input -->
-                <div
-                  class="flex gap-2 pt-1 border-t border-slate-100 dark:border-slate-800"
-                >
-                  <input
-                    v-model="newAppealMessage"
-                    type="text"
-                    placeholder="Escribir respuesta a la empresa..."
-                    class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs outline-none focus:border-indigo-600 text-slate-800 dark:text-slate-200"
-                    @keyup.enter="sendAdminAppealMessage"
-                  />
-                  <button
-                    @click="sendAdminAppealMessage"
-                    class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1"
-                  >
-                    <span class="material-symbols-outlined text-sm">send</span>
-                  </button>
-                </div>
-              </div>
+                <span class="material-symbols-outlined text-sm">forum</span>
+                <span>Ver Canal de Apelación en Chat WS</span>
+              </NuxtLink>
             </div>
 
-            <div
-              v-else-if="
-                selectedOrg?.estatus === 'Suspendida' ||
-                selectedOrg?.estadoCuenta === 'SUSPENDIDA'
-              "
-            >
+            <div v-else-if="getOrgStatusKey(selectedOrg) === 'SUSPENDIDA'">
               <h4
                 class="text-xs font-bold text-rose-600 flex items-center gap-1.5 mb-1.5"
               >
                 <span class="material-symbols-outlined text-sm">cancel</span>
-                Fase 3: Cuenta Suspendida por Infracción
+                Fase 3 — Cuenta suspendida
               </h4>
               <p
                 class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed"
@@ -765,15 +612,11 @@
           <div class="flex flex-col gap-4">
             <!-- Phase 1: Action (Put in Review) -->
             <div
-              v-if="
-                selectedOrg?.estatus === 'Activa' ||
-                selectedOrg?.estadoCuenta === 'ACTIVO' ||
-                (!selectedOrg?.estatus && !selectedOrg?.estadoCuenta)
-              "
+              v-if="getOrgStatusKey(selectedOrg) === 'ACTIVO'"
               class="space-y-4"
             >
               <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">
-                Iniciar Suspensión (Fase 1: Notificación y Periodo de Gracia)
+                Iniciar proceso de suspensión
               </h4>
               <div
                 class="space-y-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800"
@@ -811,20 +654,17 @@
                 <span class="material-symbols-outlined text-[18px]"
                   >warning</span
                 >
-                Notificar Infracción e Iniciar Periodo de Gracia (Fase 1)
+                Notificar infracción e iniciar periodo de gracia
               </button>
             </div>
 
-            <!-- Phase 2: Action (Resolve Appeal - Phase 3) -->
+            <!-- Fase 2 — Emitir dictamen -->
             <div
-              v-else-if="
-                selectedOrg?.estatus === 'En revisión' ||
-                selectedOrg?.estadoCuenta === 'REVISION'
-              "
+              v-else-if="getOrgStatusKey(selectedOrg) === 'REVISION'"
               class="space-y-4"
             >
               <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">
-                Emitir Dictamen de Apelación (Fase 3)
+                Emitir dictamen de apelación
               </h4>
               <div class="flex flex-col sm:flex-row gap-3">
                 <button
@@ -848,13 +688,9 @@
               </div>
             </div>
 
-            <!-- Phase 3: Action (Reactivate / Lift suspension) -->
+            <!-- Fase 3 — Rehabilitación de cuenta -->
             <div
-              v-else-if="
-                selectedOrg?.estatus === 'Suspendida' ||
-                selectedOrg?.estadoCuenta === 'SUSPENDIDA' ||
-                selectedOrg?.estadoCuenta === 'SUSPENDIDA_TEMPORAL'
-              "
+              v-else-if="getOrgStatusKey(selectedOrg) === 'SUSPENDIDA'"
               class="space-y-4"
             >
               <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">
@@ -879,11 +715,11 @@
 
         <!-- Footer -->
         <div
-          class="px-6 py-4 bg-slate-50 border-t border-slate-100 dark:border-slate-800 flex justify-end"
+          class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex justify-end flex-shrink-0"
         >
           <button
             @click="isSanctionModalOpen = false"
-            class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 dark:text-slate-200 text-xs font-bold px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 transition shadow-sm"
+            class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 transition shadow-sm"
           >
             Cerrar Ventana
           </button>
@@ -894,6 +730,8 @@
 </template>
 
 <script setup lang="ts">
+import { useAppFeedback } from "~/composables/useAppFeedback";
+const { showError, showSuccess, showInfo } = useAppFeedback();
 useSeoMeta({
   title: "Control de Organizaciones - Administrador",
   description:
@@ -991,17 +829,19 @@ const orgs = computed(() => {
 
 const getOrgStatusKey = (org: any): "ACTIVO" | "REVISION" | "SUSPENDIDA" => {
   if (!org) return "ACTIVO";
-  const status = (org.estatus || org.estadoCuenta || "")
-    .toString()
+  const statusStr = [org.suspensionStatus, org.estatus, org.estadoCuenta]
+    .filter(Boolean)
+    .join(" ")
     .toUpperCase();
+
   if (
-    status.includes("REVISI") ||
-    status.includes("REVISION") ||
-    status.includes("IN_REVIEW")
+    statusStr.includes("REVISI") ||
+    statusStr.includes("REVISION") ||
+    statusStr.includes("IN_REVIEW")
   ) {
     return "REVISION";
   }
-  if (status.includes("SUSPEND") || status.includes("BLOQUEAD")) {
+  if (statusStr.includes("SUSPEND") || statusStr.includes("BLOQUEAD")) {
     return "SUSPENDIDA";
   }
   return "ACTIVO";
@@ -1142,7 +982,7 @@ const openSanctionModal = async (org: any) => {
   appealMessages.value = [];
 
   // Fetch appeal chat messages if organization is in review
-  if (org.estatus === "En revisión" || org.estadoCuenta === "REVISION") {
+  if (getOrgStatusKey(org) === "REVISION") {
     fetchAppealMessages(org.id);
   }
 };
@@ -1189,7 +1029,7 @@ const sendAdminAppealMessage = async () => {
   }
 };
 
-// RF-7 apply sanction status transitions (Fases 1, 2, 3)
+// Transiciones de estado de sanción
 const applySanction = async (
   actionType: "INITIATE" | "CANCEL" | "CONFIRM",
   reason?: string,
@@ -1199,7 +1039,7 @@ const applySanction = async (
 
   try {
     if (actionType === "INITIATE") {
-      // Fase 1: Iniciar proceso de suspensión (Estado: En revisión)
+      // Fase 1 — Iniciar suspensión
       await $fetch(
         `${config.public.apiUrl}/moderator/organizations/${org.id}/initiate-suspension`,
         {
@@ -1213,9 +1053,9 @@ const applySanction = async (
           },
         },
       );
-      successMsg.value = `Fase 1 completada: Notificación de infracción enviada a ${org.nombre} y cuenta en estado de Revisión (${graceDaysInput.value || 4} días de gracia).`;
+      successMsg.value = `Fase 1 completada: Notificación enviada a ${org.nombre}. Cuenta en revisión (${graceDaysInput.value || 4} días de gracia).`;
     } else if (actionType === "CANCEL") {
-      // Fase 3a: Dictamen Favorable / Revocar Suspensión
+      // Fase 3a — Revocar suspensión
       await $fetch(
         `${config.public.apiUrl}/moderator/organizations/${org.id}/cancel-suspension`,
         {
@@ -1226,9 +1066,9 @@ const applySanction = async (
           },
         },
       );
-      successMsg.value = `Fase 3 completada: Apelación aprobada. Suspensión revocada y cuenta restablecida a Activa para ${org.nombre}.`;
+      successMsg.value = `Apelación aprobada. Cuenta de ${org.nombre} restablecida.`;
     } else if (actionType === "CONFIRM") {
-      // Fase 3b: Dictamen Desfavorable / Suspensión Definitiva
+      // Fase 3b — Suspensión definitiva
       await $fetch(
         `${config.public.apiUrl}/moderator/organizations/${org.id}/confirm-suspension`,
         {
@@ -1240,7 +1080,7 @@ const applySanction = async (
           },
         },
       );
-      successMsg.value = `Fase 3 completada: Dictamen final desfavorable emitido. Cuenta de ${org.nombre} suspendida definitivamente y vacantes ocultadas.`;
+      successMsg.value = `Dictamen desfavorable emitido. Cuenta de ${org.nombre} suspendida.`;
     }
 
     isSanctionModalOpen.value = false;
@@ -1248,7 +1088,7 @@ const applySanction = async (
     await refresh();
   } catch (e: any) {
     console.error("Error applying sanction status:", e);
-    alert(`Error al procesar la acción: ${e.message || e}`);
+    showError("Error", `Error al procesar la acción: ${e.message || e}`);
   }
 };
 </script>

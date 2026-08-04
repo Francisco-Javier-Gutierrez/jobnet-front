@@ -26,23 +26,6 @@
       </button>
     </div>
 
-    <!-- Feedback messages -->
-    <div
-      v-if="successMessage"
-      class="mb-4 bg-secondary/10 border border-secondary/20 text-secondary p-4 rounded-xl flex items-center gap-2 text-sm font-semibold"
-    >
-      <span class="material-symbols-outlined text-lg">check_circle</span>
-      {{ successMessage }}
-    </div>
-
-    <div
-      v-if="errorMessage"
-      class="mb-4 bg-rose-500/10 border border-rose-500/20 text-rose-600 p-4 rounded-xl flex items-center gap-2 text-sm font-semibold"
-    >
-      <span class="material-symbols-outlined text-lg">error</span>
-      {{ errorMessage }}
-    </div>
-
     <!-- Draft Banner -->
     <div
       v-if="hasDraft"
@@ -68,7 +51,6 @@
     <div class="flex flex-col gap-6">
       <SettingsPersonalInfo
         v-model:name="formData.name"
-        v-model:location="formData.location"
         v-model:bio="formData.bio"
         v-model:fotoPerfil="formData.fotoPerfil"
       />
@@ -77,16 +59,31 @@
 
       <SettingsEducationList v-model:educacion="formData.educacion" />
 
-      <SettingsSkillsSection v-model:skills="formData.skills" />
+      <SettingsSkillsSection
+        v-model:skills="formData.skills"
+        :catalogSkills="catalogStore.skills"
+      />
+
+      <SettingsSectorsSection
+        v-model:sectors="formData.sectores"
+        :catalogSectors="catalogStore.sectors"
+      />
 
       <SettingsCvUploader
         v-model:cvUrl="formData.cvUrl"
         v-model:cvName="formData.cvName"
       />
 
+      <SettingsAdditionalDocs
+        v-model:documentosAdicionales="formData.documentosAdicionales"
+      />
+
+      <SettingsWebLinks v-model:links="formData.links" />
+
       <SettingsLocationMap
         v-model:lat="formData.lat"
         v-model:lng="formData.lng"
+        @locationName="(name) => (formData.location = name)"
       />
     </div>
 
@@ -110,6 +107,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useAppFeedback } from "~/composables/useAppFeedback";
+import { useCatalogStore } from "~/stores/catalog";
 
 definePageMeta({
   middleware: "auth",
@@ -117,8 +116,9 @@ definePageMeta({
 
 const { status, data: session } = useAuth();
 const isSaving = ref(false);
-const successMessage = ref("");
-const errorMessage = ref("");
+
+const { showSuccess, showError } = useAppFeedback();
+const catalogStore = useCatalogStore();
 
 const formData = ref({
   name: "",
@@ -128,8 +128,11 @@ const formData = ref({
   experiencia: [] as any[],
   educacion: [] as any[],
   skills: [] as string[],
+  sectores: [] as string[],
   cvUrl: "",
   cvName: "",
+  documentosAdicionales: [] as any[],
+  links: [] as any[],
   lat: 19.4326,
   lng: -99.1332,
 });
@@ -140,6 +143,7 @@ const { hasDraft, discardDraft } = useDraftAutoSave(
 );
 
 onMounted(async () => {
+  catalogStore.fetchCatalog();
   if (session.value?.user?.id) {
     try {
       const config = useRuntimeConfig();
@@ -159,8 +163,26 @@ onMounted(async () => {
         formData.value.experiencia = profile.experiencia || [];
         formData.value.educacion = profile.educacion || [];
         formData.value.skills = profile.habilidades || profile.skills || [];
+        formData.value.sectores =
+          profile.sectores || profile.sectoresLaborales || [];
         formData.value.cvUrl = profile.cvUrl || profile.cvPdfUrl || "";
         formData.value.cvName = profile.cvName || "";
+        formData.value.documentosAdicionales =
+          profile.documentosAdicionales ||
+          profile.documentosProfesionales ||
+          [];
+        if (Array.isArray(profile.links)) {
+          formData.value.links = profile.links;
+        } else if (
+          profile.enlacesWeb &&
+          typeof profile.enlacesWeb === "object"
+        ) {
+          formData.value.links = Object.entries(profile.enlacesWeb).map(
+            ([label, url]) => ({ label, url: url as string }),
+          );
+        } else {
+          formData.value.links = [];
+        }
         formData.value.lat = profile.lat || 19.4326;
         formData.value.lng = profile.lng || -99.1332;
       }
@@ -172,8 +194,6 @@ onMounted(async () => {
 
 async function saveProfile() {
   isSaving.value = true;
-  successMessage.value = "";
-  errorMessage.value = "";
 
   try {
     const userId = session.value?.user?.id || "anonymous";
@@ -190,8 +210,17 @@ async function saveProfile() {
       experiencia: formData.value.experiencia,
       educacion: formData.value.educacion,
       habilidades: formData.value.skills,
+      sectores: formData.value.sectores,
+      sectoresLaborales: formData.value.sectores,
       cvUrl: formData.value.cvUrl,
       cvName: formData.value.cvName,
+      documentosAdicionales: formData.value.documentosAdicionales,
+      documentosProfesionales: formData.value.documentosAdicionales,
+      links: formData.value.links,
+      enlacesWeb: formData.value.links.reduce((acc: any, item: any) => {
+        if (item.label && item.url) acc[item.label] = item.url;
+        return acc;
+      }, {}),
       lat: formData.value.lat,
       lng: formData.value.lng,
     };
@@ -203,13 +232,21 @@ async function saveProfile() {
     });
 
     if (res.ok) {
-      successMessage.value = "¡Perfil actualizado exitosamente!";
+      showSuccess(
+        "Perfil Actualizado",
+        "Tus datos personales y profesionales han sido guardados exitosamente.",
+        3500,
+      );
       discardDraft();
     } else {
       throw new Error("No se pudo guardar la información en el servidor.");
     }
   } catch (err: any) {
-    errorMessage.value = err.message || "Error al actualizar perfil.";
+    showError(
+      "Error al Guardar Perfil",
+      err.message || "Error al actualizar perfil.",
+      null,
+    );
   } finally {
     isSaving.value = false;
   }

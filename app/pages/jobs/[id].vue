@@ -123,11 +123,11 @@
                 {{ job.modalidad }}
               </span>
               <span
-                v-if="job.salario"
-                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20"
+                v-if="formatSalaryDisplay(job)"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
               >
                 <span class="material-symbols-outlined text-sm">payments</span>
-                ${{ formatSalary(job.salario) }} MXN
+                {{ formatSalaryDisplay(job) }}
               </span>
               <span
                 v-if="job.sector"
@@ -136,11 +136,37 @@
                 <span class="material-symbols-outlined text-sm">domain</span>
                 {{ job.sector }}
               </span>
+              <span
+                v-if="(job.vacantesDisponibles || 1) > 1"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"
+                title="Múltiples plazas abiertas para esta vacante"
+              >
+                <span class="material-symbols-outlined text-sm text-amber-500"
+                  >local_fire_department</span
+                >
+                {{ job.vacantesDisponibles }} plazas abiertas
+              </span>
+              <span
+                v-else
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20"
+                title="Plaza única a contratar para esta vacante"
+              >
+                <span class="material-symbols-outlined text-sm">badge</span>
+                1 plaza disponible
+              </span>
+              <span
+                v-if="job.maxPostulantes"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
+                title="Tope máximo de postulantes configurado por la empresa"
+              >
+                <span class="material-symbols-outlined text-sm">group</span>
+                Máx {{ job.maxPostulantes }} postulantes
+              </span>
             </div>
           </div>
         </div>
 
-        <!-- Apply Fast Button -->
+        <!-- Apply Button -->
         <button
           @click="handleEasyApplyClick"
           :disabled="hasApplied || isApplying"
@@ -152,9 +178,9 @@
             class="material-symbols-outlined text-base"
             >check_circle</span
           >
-          <span v-else class="material-symbols-outlined text-base">bolt</span>
+          <span v-else class="material-symbols-outlined text-base">send</span>
           <span>{{
-            hasApplied ? "Postulado con Éxito" : "Postulación en 1-Clic"
+            hasApplied ? "Solicitud Enviada" : "Presentar Solicitud"
           }}</span>
         </button>
       </div>
@@ -162,7 +188,7 @@
       <hr class="border-outline-variant/30" />
 
       <!-- 2. Job Description Section -->
-      <div class="space-y-3 text-left">
+      <div class="space-y-4 text-left">
         <h2
           class="text-base font-bold text-on-background flex items-center gap-2"
         >
@@ -179,6 +205,63 @@
             "No se ha proporcionado una descripción detallada para esta vacante."
           }}
         </p>
+
+        <!-- Experience & Aptitudes Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <!-- Experience Years -->
+          <div
+            v-if="
+              job.experienciaAnos !== undefined && job.experienciaAnos !== null
+            "
+            class="flex items-center gap-3 bg-primary/5 border border-primary/15 p-4 rounded-2xl"
+          >
+            <div
+              class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"
+            >
+              <span class="material-symbols-outlined text-xl"
+                >workspace_premium</span
+              >
+            </div>
+            <div>
+              <span
+                class="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-bold tracking-wider block"
+                >Experiencia Requerida</span
+              >
+              <span class="text-xs font-bold text-on-background">
+                {{
+                  job.experienciaAnos > 0
+                    ? `${job.experienciaAnos} ${job.experienciaAnos === 1 ? "año" : "años"} de experiencia previa`
+                    : "Sin experiencia previa requerida"
+                }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Aptitudes -->
+          <div
+            v-if="job.aptitudes"
+            class="flex items-start gap-3 bg-secondary/5 border border-secondary/15 p-4 rounded-2xl"
+          >
+            <div
+              class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center flex-shrink-0"
+            >
+              <span class="material-symbols-outlined text-xl"
+                >psychology_alt</span
+              >
+            </div>
+            <div>
+              <span
+                class="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-bold tracking-wider block"
+                >Aptitudes & Cualidades</span
+              >
+              <p
+                class="text-xs font-semibold text-on-background leading-relaxed whitespace-pre-line"
+              >
+                {{ job.aptitudes }}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 3. Skills & Sectors Section -->
@@ -279,38 +362,16 @@
 
       <hr class="border-outline-variant/30" />
 
-      <!-- 5. White Light Leaflet Location Map Section -->
-      <div class="space-y-3 text-left">
-        <div class="flex items-center justify-between">
-          <h2
-            class="text-base font-bold text-on-background flex items-center gap-2"
-          >
-            <span class="material-symbols-outlined text-secondary text-xl"
-              >location_on</span
-            >
-            Ubicación de la Oferta
-          </h2>
-          <NuxtLink
-            :to="`/map?lat=${job.lat || 19.4326}&lng=${job.lng || -99.1332}`"
-            class="text-xs font-bold text-primary hover:underline flex items-center gap-1"
-          >
-            <span>Ver mapa interactivo</span>
-            <span class="material-symbols-outlined text-sm">open_in_new</span>
-          </NuxtLink>
-        </div>
-
-        <p class="text-xs text-on-surface-variant dark:text-slate-300">
-          {{ job.sector || "Ubicación Georeferenciada" }} • Coordenadas:
-          <span class="font-mono text-on-background font-semibold"
-            >Lat {{ job.lat }}, Lng {{ job.lng }}</span
-          >
-        </p>
-
-        <!-- Pure White Light Map Container -->
-        <div
-          id="job-detail-leaflet-map"
-          class="h-60 w-full rounded-2xl overflow-hidden border border-outline-variant/60 shadow-inner bg-slate-50 z-0"
-        ></div>
+      <!-- 5. Location Map Section -->
+      <div v-if="job" class="space-y-3 text-left">
+        <AppLocationMap
+          :lat="job.lat || 19.2826"
+          :lng="job.lng || -99.6557"
+          :draggable="false"
+          label="Ubicación de la Oferta"
+          height="280px"
+          :show-use-current-location="false"
+        />
       </div>
 
       <hr class="border-outline-variant/30" />
@@ -321,9 +382,9 @@
           class="text-base font-bold text-on-background flex items-center gap-2"
         >
           <span class="material-symbols-outlined text-primary text-xl"
-            >bolt</span
+            >send</span
           >
-          Postulación en 1-Clic (Easy Apply)
+          Presentar Solicitud de Empleo
         </h2>
 
         <!-- Alert if evaluation -->
@@ -352,11 +413,11 @@
             >
             <div>
               <p class="font-bold text-sm text-emerald-950">
-                ¡Ya estás postulado a esta vacante!
+                ¡Solicitud de empleo transmitida con éxito!
               </p>
               <p class="text-emerald-800">
-                Tu información profesional y el CV almacenado en tu perfil han
-                sido transmitidos a <strong>{{ job.company }}</strong
+                Tu perfil profesional y currículum han sido vinculados a esta
+                convocatoria de <strong>{{ job.company }}</strong
                 >.
               </p>
             </div>
@@ -370,71 +431,156 @@
           </NuxtLink>
         </div>
 
-        <!-- Easy Apply Primary Card -->
+        <!-- Interactive Application Mini-Form Card -->
         <div
           v-else
-          class="bg-gradient-to-br from-primary/10 via-surface-container-low to-emerald-500/5 border border-primary/20 p-6 rounded-3xl space-y-4 shadow-sm"
+          class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 p-6 rounded-3xl space-y-5 shadow-sm"
         >
           <div
-            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            class="border-b border-outline-variant/30 pb-3 flex items-center justify-between flex-wrap gap-2"
           >
-            <div class="space-y-1">
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary text-2xl"
-                  >bolt</span
-                >
-                <h3 class="text-sm font-extrabold text-on-background">
-                  Postulación Instantánea en 1-Clic
-                </h3>
-              </div>
-              <p
-                class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+            <div>
+              <h3
+                class="text-sm font-bold text-on-background flex items-center gap-2"
               >
-                Envía un mensaje estandarizado a {{ job.company }} adjuntando el
-                CV PDF que ya tienes cargado en tu perfil digital, sin necesidad
-                de subir archivos repetidos.
+                <span class="material-symbols-outlined text-primary text-xl"
+                  >edit_note</span
+                >
+                Formulario de Postulación Directa
+              </h3>
+              <p class="text-xs text-on-surface-variant dark:text-slate-400">
+                Personaliza la presentación que recibirá el equipo de
+                reclutamiento de {{ job.company }}.
               </p>
             </div>
 
-            <!-- CV Status Badge -->
+            <!-- Mandatory Pre-selected CV Badge (Locked) -->
             <div
               v-if="profileCvUrl"
-              class="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 rounded-xl text-xs font-bold whitespace-nowrap self-start sm:self-center"
+              class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 rounded-xl text-xs font-bold whitespace-nowrap"
+              title="Tu CV principal va adjunto de forma obligatoria y segura"
             >
+              <span class="material-symbols-outlined text-sm text-emerald-600"
+                >lock</span
+              >
               <span class="material-symbols-outlined text-sm"
                 >picture_as_pdf</span
               >
-              <span>CV listo: {{ profileCvName }}</span>
+              <span>CV: {{ profileCvName }}</span>
             </div>
             <div
               v-else
-              class="flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500/10 text-amber-800 border border-amber-500/20 rounded-xl text-xs font-bold whitespace-nowrap self-start sm:self-center"
+              class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20 rounded-xl text-xs font-bold whitespace-nowrap"
             >
               <span class="material-symbols-outlined text-sm">warning</span>
               <span>Sin CV en Perfil</span>
             </div>
           </div>
 
+          <!-- 1. Custom Presentation Message (Textarea) -->
+          <div class="space-y-1.5">
+            <label
+              class="text-xs font-bold text-on-background flex items-center justify-between"
+            >
+              <span>Mensaje de Presentación o Carta de Motivos</span>
+              <span class="text-[10px] text-on-surface-variant font-normal"
+                >Opcional</span
+              >
+            </label>
+            <textarea
+              v-model="coverLetterInput"
+              rows="3"
+              placeholder="Escribe una breve introducción para el reclutador destacando tu motivación y experiencia relevante..."
+              class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-2xl p-3.5 text-xs text-on-background outline-none transition placeholder-on-surface-variant/50 resize-none font-sans"
+            ></textarea>
+          </div>
+
+          <!-- 2. Profile Links Selection (If Available) -->
+          <div v-if="candidateProfileLinks.length > 0" class="space-y-2">
+            <label
+              class="text-xs font-bold text-on-background flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-sm text-primary"
+                >link</span
+              >
+              Adjuntar Enlaces o Portafolios de tu Perfil
+            </label>
+            <div class="flex flex-wrap gap-2.5">
+              <label
+                v-for="link in candidateProfileLinks"
+                :key="link.url"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs cursor-pointer transition select-none"
+                :class="
+                  selectedProfileLinks.includes(link.url)
+                    ? 'bg-primary/10 border-primary text-primary font-bold'
+                    : 'bg-surface border-outline-variant/50 text-on-surface-variant hover:border-outline'
+                "
+              >
+                <input
+                  type="checkbox"
+                  :value="link.url"
+                  v-model="selectedProfileLinks"
+                  class="rounded text-primary focus:ring-primary h-3.5 w-3.5"
+                />
+                <span>{{ link.label }}: {{ link.url }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 3. Profile Additional Docs Selection (If Available) -->
+          <div v-if="candidateProfileDocs.length > 0" class="space-y-2">
+            <label
+              class="text-xs font-bold text-on-background flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-sm text-secondary"
+                >folder_zip</span
+              >
+              Adjuntar Documentos y Certificaciones Adicionales
+            </label>
+            <div class="flex flex-wrap gap-2.5">
+              <label
+                v-for="doc in candidateProfileDocs"
+                :key="doc.url"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs cursor-pointer transition select-none"
+                :class="
+                  selectedProfileDocs.includes(doc.url)
+                    ? 'bg-secondary/10 border-secondary text-secondary font-bold'
+                    : 'bg-surface border-outline-variant/50 text-on-surface-variant hover:border-outline'
+                "
+              >
+                <input
+                  type="checkbox"
+                  :value="doc.url"
+                  v-model="selectedProfileDocs"
+                  class="rounded text-secondary focus:ring-secondary h-3.5 w-3.5"
+                />
+                <span>📄 {{ doc.name }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit Button Row -->
           <div
-            class="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant/20"
+            class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant/20"
           >
             <p
-              class="text-[11px] text-on-surface-variant dark:text-slate-300/80 italic"
+              class="text-[11px] text-on-surface-variant dark:text-slate-400 italic"
             >
-              ⚡ Al hacer clic, se extraerán tus datos profesionales para el
-              reclutador.
+              🔒 Tu CV principal va preseleccionado y enlazado a tu solicitud.
             </p>
 
             <button
               type="button"
               @click="handleEasyApplyClick"
               :disabled="isApplying"
-              class="w-full sm:w-auto bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50"
+              class="w-full sm:w-auto bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-primary/20 active:scale-95 disabled:opacity-50 flex-shrink-0"
             >
               <span v-if="isApplying" class="animate-spin text-xs">⏳</span>
-              <span v-else class="material-symbols-outlined text-sm">bolt</span>
+              <span v-else class="material-symbols-outlined text-sm">send</span>
               <span>{{
-                isApplying ? "Enviando Postulación..." : "Postularme en 1-Clic"
+                isApplying
+                  ? "Enviando Candidatura..."
+                  : "Enviar Solicitud de Empleo"
               }}</span>
             </button>
           </div>
@@ -683,17 +829,62 @@
 </template>
 
 <script setup lang="ts">
+import AppLocationMap from "~/components/common/AppLocationMap.vue";
 import { useJobsStore } from "~/stores/jobs";
 import { useUploadStore } from "~/stores/upload";
-
-let map: any = null;
-let marker: any = null;
 
 const config = useRuntimeConfig();
 
 const profileCvUrl = ref("");
 const profileCvName = ref("");
 const showMissingCvModal = ref(false);
+const candidateProfile = ref<any>(null);
+const coverLetterInput = ref("");
+const selectedProfileLinks = ref<string[]>([]);
+const selectedProfileDocs = ref<string[]>([]);
+
+const candidateProfileLinks = computed(() => {
+  if (!candidateProfile.value) return [];
+  const links: { label: string; url: string }[] = [];
+  const p = candidateProfile.value;
+  if (p.linkedin) links.push({ label: "LinkedIn", url: p.linkedin });
+  if (p.github) links.push({ label: "GitHub", url: p.github });
+  if (p.portfolioUrl || p.sitioWeb || p.website) {
+    links.push({
+      label: "Portafolio / Web",
+      url: p.portfolioUrl || p.sitioWeb || p.website,
+    });
+  }
+  if (Array.isArray(p.links)) {
+    p.links.forEach((l: any) => {
+      if (typeof l === "string") links.push({ label: "Enlace", url: l });
+      else if (l.url) links.push({ label: l.nombre || "Enlace", url: l.url });
+    });
+  }
+  return links;
+});
+
+const candidateProfileDocs = computed(() => {
+  if (!candidateProfile.value) return [];
+  const docs: { name: string; url: string }[] = [];
+  const p = candidateProfile.value;
+  if (Array.isArray(p.documentosAdicionales)) {
+    p.documentosAdicionales.forEach((d: any) => {
+      if (d.url)
+        docs.push({ name: d.nombre || d.name || "Documento", url: d.url });
+    });
+  }
+  if (Array.isArray(p.certificados)) {
+    p.certificados.forEach((c: any) => {
+      if (c.url || c.pdfUrl)
+        docs.push({
+          name: c.titulo || c.name || "Certificado",
+          url: c.url || c.pdfUrl,
+        });
+    });
+  }
+  return docs;
+});
 
 const fetchCandidateProfile = async () => {
   if (status.value !== "authenticated" || !session.value?.user?.id) return;
@@ -708,6 +899,7 @@ const fetchCandidateProfile = async () => {
       `${config.public.apiUrl}/profile/${session.value.user.id}`,
       { headers },
     );
+    candidateProfile.value = profile;
     const foundCv =
       profile?.cvUrl ||
       profile?.documentosProfesionales?.cvUrl ||
@@ -757,16 +949,30 @@ const submitEasyApplication = async () => {
       headers.Authorization = `Bearer ${session.value.accessToken}`;
     }
 
-    const candidateId = session.value?.user?.id || "mock-candidate-id";
+    const candidateId = session.value?.user?.id;
     const candidateName = session.value?.user?.name || "Candidato";
-    const standardizedCoverLetter = `Hola, mi nombre es ${candidateName}. Me complace presentar mi postulación a la vacante '${job.value?.title || "Oferta de Empleo"}' en ${job.value?.company || "la empresa"} mediante la función de Postulación en 1-Clic (Easy Apply). Adjunto mi Currículum Vitae cargado en mi perfil digital.`;
+
+    let finalMessage = coverLetterInput.value.trim()
+      ? coverLetterInput.value.trim()
+      : `Hola, mi nombre es ${candidateName}. Me complace presentar mi candidatura a la vacante de ${job.value?.title || "Empleo"} en ${job.value?.company || "su empresa"}. Adjunto mi Currículum Vitae cargado en mi perfil.`;
+
+    if (selectedProfileLinks.value.length > 0) {
+      finalMessage +=
+        `\n\n🔗 Enlaces profesionales adjuntos:\n` +
+        selectedProfileLinks.value.map((l) => `• ${l}`).join("\n");
+    }
+    if (selectedProfileDocs.value.length > 0) {
+      finalMessage +=
+        `\n\n📄 Documentos/Certificados adicionales adjuntos:\n` +
+        selectedProfileDocs.value.map((d) => `• ${d}`).join("\n");
+    }
 
     await $fetch(`${config.public.apiUrl}/jobs/${jobId}/apply`, {
       method: "POST",
       headers,
       body: {
         candidateId,
-        coverLetter: standardizedCoverLetter,
+        coverLetter: finalMessage,
         cvUrl: profileCvUrl.value,
         cvFileName: profileCvName.value,
       },
@@ -777,11 +983,11 @@ const submitEasyApplication = async () => {
       localStorage.setItem(`job-applied-${jobId}`, "true");
     }
 
-    // Redirect to the private chat conversation
     navigateTo(`/messages?jobId=${jobId}&candidateId=${candidateId}`);
   } catch (e: any) {
-    console.error("Error submitting easy application:", e);
-    alert(
+    console.error("Error submitting application:", e);
+    showInfo(
+      "Notificación",
       "Hubo un inconveniente al registrar la postulación. Intenta nuevamente.",
     );
   } finally {
@@ -836,7 +1042,10 @@ const submitReport = async () => {
     }, 2000);
   } catch (e) {
     console.error("Error creating report:", e);
-    alert("Hubo un error al enviar el reporte. Por favor, intenta de nuevo.");
+    showError(
+      "Error",
+      "Hubo un error al enviar el reporte. Por favor, intenta de nuevo.",
+    );
   } finally {
     isReporting.value = false;
   }
@@ -921,17 +1130,35 @@ const scrollToApply = () => {
   if (el) el.scrollIntoView({ behavior: "smooth" });
 };
 
-// CV Form selection
 const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files.length > 0) {
     const file = target.files[0];
-    if (file.type !== "application/pdf") {
-      alert("Por favor selecciona un archivo en formato PDF.");
+    if (!file) return;
+    const isPdf =
+      file.type === "application/pdf" ||
+      file.type === "application/x-pdf" ||
+      file.name.toLowerCase().endsWith(".pdf");
+
+    const { showError, showWarning } = useAppFeedback();
+
+    if (!isPdf) {
+      target.value = "";
+      showWarning(
+        "Formato No Permitido",
+        "Por favor selecciona un archivo en formato PDF.",
+        4000,
+      );
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      alert("El tamaño del archivo no debe exceder los 5MB.");
+    if (file.size > 10 * 1024 * 1024) {
+      target.value = "";
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      showError(
+        "Límite de Tamaño Excedido",
+        `El archivo PDF "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de 10MB.`,
+        null,
+      );
       return;
     }
     selectedFile.value = file;
@@ -953,7 +1180,10 @@ const submitApplication = async () => {
     candidateId,
   );
   if (!uploadResult.success) {
-    alert("Hubo un error al subir tu CV a S3: " + uploadResult.error);
+    showError(
+      "Error",
+      "Hubo un error al subir tu CV a S3: " + uploadResult.error,
+    );
     isApplying.value = false;
     return;
   }
@@ -970,7 +1200,7 @@ const submitApplication = async () => {
       headers.Authorization = `Bearer ${session.value.accessToken}`;
     }
 
-    const candidateId = session.value?.user?.id || "mock-candidate-id";
+    const candidateId = session.value?.user?.id;
 
     await $fetch(`${config.public.apiUrl}/jobs/${jobId}/apply`, {
       method: "POST",
@@ -990,7 +1220,8 @@ const submitApplication = async () => {
     navigateTo(`/messages?jobId=${jobId}&candidateId=${candidateId}`);
   } catch (e: any) {
     console.error("Error submitting application record:", e);
-    alert(
+    showInfo(
+      "Notificación",
       "Se subió tu CV pero hubo un inconveniente al registrar la postulación. Intenta nuevamente.",
     );
   } finally {
@@ -1064,31 +1295,7 @@ const loadComments = () => {
     if (saved) {
       commentsList.value = JSON.parse(saved);
     } else {
-      // Initialize with mock questions
-      commentsList.value = [
-        {
-          id: "mock-c1",
-          parentCommentId: null,
-          content: "¿Esta vacante incluye opciones de apoyo para reubicación?",
-          createdAt: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
-          user: {
-            username: "Sofía Dev",
-            email: "sofia@gmail.com",
-          },
-        },
-        {
-          id: "mock-c2",
-          parentCommentId: "mock-c1",
-          content:
-            "Hola Sofía, sí, ofrecemos apoyo de reubicación y hospedaje el primer mes.",
-          createdAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-          user: {
-            username: "Tech Solutions Team",
-            email: "team@techsolutions.com",
-          },
-        },
-      ];
-      saveCommentsToLocalStorage();
+      commentsList.value = [];
     }
     totalComments.value = commentsList.value.length;
   }
@@ -1205,36 +1412,5 @@ onMounted(async () => {
     await jobsStore.fetchJobs();
   }
   loading.value = false;
-
-  // Initialize Leaflet map on client side after loading is false and job exists
-  if (process.client && job.value) {
-    await nextTick();
-    try {
-      const L = await import("leaflet");
-
-      map = L.map("job-detail-leaflet-map", {
-        attributionControl: false,
-        scrollWheelZoom: false,
-      }).setView([job.value.lat || 19.4326, job.value.lng || -99.1332], 13);
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap contributors",
-        maxZoom: 19,
-      }).addTo(map);
-
-      marker = L.marker([
-        job.value.lat || 19.4326,
-        job.value.lng || -99.1332,
-      ]).addTo(map);
-    } catch (err) {
-      console.error("Error initializing Leaflet map in job details:", err);
-    }
-  }
-});
-
-onUnmounted(() => {
-  if (map) {
-    map.remove();
-  }
 });
 </script>

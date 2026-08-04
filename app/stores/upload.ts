@@ -81,10 +81,21 @@ export const useUploadStore = defineStore("upload", {
         }
       }
 
-      // 2. Strict 5MB size limit check on frontend
-      const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-      if (file.size > MAX_SIZE) {
-        this.uploadError = "El archivo supera el límite de 5MB.";
+      // 2. Size limit check: 10MB for PDF, 5MB for Images/Others
+      const isPdf =
+        file.type === "application/pdf" ||
+        file.type === "application/x-pdf" ||
+        file.name.toLowerCase().endsWith(".pdf");
+
+      const maxAllowedSize = isPdf ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
+      const limitMb = isPdf ? 10 : 5;
+
+      if (file.size > maxAllowedSize) {
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        const fileTypeLabel = isPdf ? "documento PDF" : "archivo de imagen";
+        this.uploadError = `El ${fileTypeLabel} "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de ${limitMb}MB.`;
+        const { showError } = useAppFeedback();
+        showError("Límite de Tamaño Excedido", this.uploadError, null);
         this.uploading = false;
         return { url: "", success: false, error: this.uploadError };
       }
@@ -140,8 +151,12 @@ export const useUploadStore = defineStore("upload", {
           xhr.send(file);
         });
 
-        // 5. Construct the public S3 URL
-        const publicUrl = response.url.split("?")[0];
+        // 5. Construct the public S3 Website URL for error document fallback support
+        const rawUrl = response.url.split("?")[0];
+        const publicUrl = rawUrl.replace(
+          /https:\/\/([^.]+)\.s3(\.[^.]+)?\.amazonaws\.com\//,
+          "http://$1.s3-website-us-east-1.amazonaws.com/",
+        );
 
         this.uploadProgress = "";
         return { url: publicUrl, success: true };

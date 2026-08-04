@@ -39,3 +39,43 @@ export const formatSalary = (val?: number): string => {
     maximumFractionDigits: 0,
   }).format(val);
 };
+
+export const formatSalaryDisplay = (job?: {
+  salario?: number | string;
+  salarioMinimo?: number;
+  salarioMaximo?: number;
+}): string | null => {
+  if (!job) return null;
+  const min = job.salarioMinimo ? Number(job.salarioMinimo) : 0;
+  const max = job.salarioMaximo ? Number(job.salarioMaximo) : 0;
+  const single = job.salario ? Number(job.salario) : 0;
+
+  const formatAmount = (num: number): string => {
+    if (num >= 1000) {
+      const k = num / 1000;
+      return `${Number.isInteger(k) ? k : k.toFixed(1)}k MXN`;
+    }
+    return `${num.toLocaleString("es-MX")} MXN`;
+  };
+
+  if (min > 0 && max > 0) {
+    if (min === max) {
+      return `${formatAmount(min)} / mes`;
+    }
+    return `${formatAmount(min)} - ${formatAmount(max)} / mes`;
+  }
+
+  if (min > 0) {
+    return `Desde ${formatAmount(min)} / mes`;
+  }
+
+  if (max > 0) {
+    return `Hasta ${formatAmount(max)} / mes`;
+  }
+
+  if (single > 0) {
+    return `${formatAmount(single)} / mes`;
+  }
+
+  return null;
+};

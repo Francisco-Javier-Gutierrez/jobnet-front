@@ -99,12 +99,32 @@ Para asegurar el correcto funcionamiento del registro e inicio de sesión integr
 
 ### B. Configuración de Entornos (.env)
 
-- El frontend lee las credenciales del pool y el cliente del archivo local `.env`.
+- Nunca envíes variables sensibles en tus PRs.
+- Las variables que comienzan con `NUXT_PUBLIC_` quedarán expuestas en el navegador; sé cuidadoso con lo que incluyes ahí.
 - Al realizar cambios en la infraestructura de AWS con Terraform, se deben actualizar de inmediato las variables `NUXT_PUBLIC_COGNITO_USER_POOL_ID` y `NUXT_PUBLIC_COGNITO_CLIENT_ID` tanto en local como en los parámetros del pipeline de despliegue.
 
 ---
 
-## 5. Diseño y Skeleton Loaders (UI/UX)
+## 5. Reglas de Interfaz y Experiencia de Usuario (UX)
+
+### A. Retroalimentación de Usuario (Feedback)
+
+- **¡PROHIBIDO EL USO DE `alert()`!**: Para mantener una estética profesional y limpia, nunca utilices la función nativa `alert()` del navegador para mostrar mensajes al usuario, ni para manejo de errores ni para notificaciones de éxito.
+- **Usa el Modal de Feedback Global (`AppFeedbackModal.vue`)**:
+  - Dispones del composable global auto-importado `useAppFeedback()`.
+  - Para utilizarlo dentro del bloque `<script setup>`:
+    ```typescript
+    const { showSuccess, showError, showWarning, showInfo } = useAppFeedback();
+
+    // Ejemplos de uso:
+    showError("Error al guardar", "Hubo un problema al procesar tu solicitud.");
+    showSuccess("Operación Exitosa", "Los datos se guardaron correctamente.");
+    ```
+  - Este modal provee una interfaz unificada, auto-cierre con barra de progreso, iconos representativos y evita bloquear el hilo principal del navegador de forma abrupta.
+
+---
+
+## 6. Diseño y Skeleton Loaders (UI/UX)
 
 Para garantizar una experiencia de usuario premium y fluida, se deben cumplir las siguientes directrices de diseño visual en el frontend:
 

@@ -74,10 +74,10 @@
   >
     <!-- Header Card -->
     <section
-      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] overflow-hidden"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] relative z-20"
     >
       <!-- Decorative top color bar -->
-      <div class="bg-primary h-2 w-full"></div>
+      <div class="bg-primary h-2 w-full rounded-t-xl"></div>
 
       <div class="p-lg md:p-xl flex flex-col items-center text-center">
         <!-- Profile Picture -->
@@ -146,21 +146,22 @@
             </button>
             <div
               v-if="showDropdown"
-              class="absolute top-full left-0 w-full mt-1 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant rounded-lg shadow-lg z-10 py-1"
+              class="absolute top-full right-0 min-w-[220px] sm:w-full mt-2 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl shadow-2xl z-50 py-2 overflow-hidden"
               id="webLinksDropdown"
             >
               <a
                 v-for="link in webLinks"
                 :key="link.name"
-                class="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low transition-colors font-body-sm text-body-sm text-on-surface"
+                class="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors text-xs font-semibold text-on-surface dark:text-slate-200"
                 :href="link.url"
                 target="_blank"
                 rel="noopener"
               >
-                <span class="material-symbols-outlined text-outline">{{
-                  link.icon
-                }}</span>
-                {{ link.name }}
+                <span
+                  class="material-symbols-outlined text-primary text-base"
+                  >{{ link.icon }}</span
+                >
+                <span class="truncate">{{ link.name }}</span>
               </a>
             </div>
           </div>
@@ -573,29 +574,70 @@ const sectors = computed<string[]>(() => {
 });
 
 const webLinks = computed(() => {
-  const links = profile.value.enlacesWeb;
-  if (!links || typeof links !== "object") return [];
-  return Object.entries(links).map(([name, url]) => ({
-    name,
-    url: url as string,
-    icon: getWebLinkIcon(name),
-  }));
+  const result: Array<{ name: string; url: string; icon: string }> = [];
+  const linksArray = profile.value.links;
+  const linksObj = profile.value.enlacesWeb;
+
+  if (Array.isArray(linksArray) && linksArray.length > 0) {
+    linksArray.forEach((item: any) => {
+      const name = item.label || item.nombre || "Enlace Web";
+      const url = item.url;
+      if (url) {
+        result.push({ name, url, icon: getWebLinkIcon(name + " " + url) });
+      }
+    });
+  } else if (linksObj && typeof linksObj === "object") {
+    Object.entries(linksObj).forEach(([name, url]) => {
+      if (url) {
+        result.push({
+          name,
+          url: url as string,
+          icon: getWebLinkIcon(name + " " + url),
+        });
+      }
+    });
+  }
+  return result;
 });
 
 const documents = computed(() => {
   const docs: Array<{ name: string; meta: string; type: string; url: string }> =
     [];
 
-  const rawDocs = profile.value.documentosProfesionales;
+  // Primary CV
+  if (profile.value.cvUrl) {
+    docs.push({
+      name: profile.value.cvFileName || "Curriculum Vitae Principal",
+      meta: "CV Principal",
+      type: "pdf",
+      url: profile.value.cvUrl,
+    });
+  }
 
+  // Additional documents
+  const rawDocs =
+    profile.value.documentosAdicionales ||
+    profile.value.documentosProfesionales;
   if (Array.isArray(rawDocs) && rawDocs.length > 0) {
     rawDocs.forEach((d: any) => {
-      docs.push({
-        name: d.nombre || d.tipo || "Documento Profesional",
-        meta: d.tipo || "PDF",
-        type: "pdf",
-        url: d.url,
-      });
+      if (d) {
+        const url = typeof d === "string" ? d : d.url;
+        const name =
+          typeof d === "string"
+            ? "Documento Adicional"
+            : d.name || d.nombre || "Documento Adicional";
+        if (url) {
+          const isPdf =
+            (typeof d !== "string" && d.type === "pdf") ||
+            (url && url.includes(".pdf"));
+          docs.push({
+            name,
+            meta: isPdf ? "Documento PDF" : "Imagen / Certificado",
+            type: isPdf ? "pdf" : "image",
+            url,
+          });
+        }
+      }
     });
   } else if (
     rawDocs &&
@@ -604,20 +646,17 @@ const documents = computed(() => {
   ) {
     for (const [name, doc] of Object.entries(rawDocs)) {
       const d = doc as any;
-      docs.push({
-        name,
-        meta: d.meta || "Archivo adjunto",
-        type: d.type || "pdf",
-        url: d.url || "#",
-      });
+      const url = typeof d === "string" ? d : d?.url;
+      if (url) {
+        const isPdf = url.includes(".pdf");
+        docs.push({
+          name,
+          meta: isPdf ? "Documento PDF" : "Imagen / Certificado",
+          type: isPdf ? "pdf" : "image",
+          url,
+        });
+      }
     }
-  } else if (profile.value.cvUrl) {
-    docs.push({
-      name: profile.value.cvFileName || "Curriculum Vitae",
-      meta: "CV Principal",
-      type: "pdf",
-      url: profile.value.cvUrl,
-    });
   }
 
   return docs;
@@ -687,54 +726,46 @@ onUnmounted(() => {
 
 // --- Posts & Bookmarks Tab State ---
 const activeTab = ref<"posts" | "bookmarks">("posts");
-const allPosts = ref<any[]>([]);
-const loadingPosts = ref(false);
+const allUserPosts = ref<any[]>([]);
+const allBookmarkedPosts = ref<any[]>([]);
 
-const userPosts = computed(() => {
-  const authorName = profile.value.nombre?.toLowerCase();
-  const userEmail = profile.value.email?.toLowerCase();
-  const authUser = authData.value?.user as any;
-  const currentAuthId = authUser?.id;
-  const currentAuthEmail = authUser?.email?.toLowerCase();
-  const currentAuthName = authUser?.name?.toLowerCase();
+const { data: postsData, pending: postsPending } = useLazyAsyncData(
+  `candidate-posts-${candidateId}`,
+  () =>
+    $fetch(`${config.public.apiUrl}/profile/${candidateId}/posts`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => ({ data: [] })),
+);
 
-  return allPosts.value.filter((p) => {
-    const postAuthorUuid = p.authorUuid || p.userId || p.userSub || p.idUsuario;
-    const postAuthorName = p.author?.toLowerCase();
-    const postEmail = p.email?.toLowerCase();
+const { data: bookmarksData, pending: bookmarksPending } = useLazyAsyncData(
+  `candidate-bookmarks-${candidateId}`,
+  () =>
+    $fetch(`${config.public.apiUrl}/profile/${candidateId}/bookmarks`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => ({ data: [] })),
+);
 
-    if (
-      postAuthorUuid &&
-      (postAuthorUuid === candidateId ||
-        (isOwner.value && currentAuthId && postAuthorUuid === currentAuthId))
-    ) {
-      return true;
-    }
-    if (authorName && postAuthorName && postAuthorName === authorName) {
-      return true;
-    }
-    if (
-      isOwner.value &&
-      currentAuthName &&
-      postAuthorName &&
-      postAuthorName === currentAuthName
-    ) {
-      return true;
-    }
-    if (userEmail && postEmail && postEmail === userEmail) {
-      return true;
-    }
-    if (
-      isOwner.value &&
-      currentAuthEmail &&
-      postEmail &&
-      postEmail === currentAuthEmail
-    ) {
-      return true;
-    }
-    return false;
-  });
-});
+watch(
+  postsData,
+  (val: any) => {
+    if (val?.data) allUserPosts.value = val.data;
+  },
+  { immediate: true },
+);
+
+watch(
+  bookmarksData,
+  (val: any) => {
+    if (val?.data) allBookmarkedPosts.value = val.data;
+  },
+  { immediate: true },
+);
+
+const loadingPosts = computed(
+  () => postsPending.value || bookmarksPending.value,
+);
+const userPosts = computed(() => allUserPosts.value);
+const bookmarkedPosts = computed(() => allBookmarkedPosts.value);
 
 const isBookmarked = (post: any) => {
   if (!post) return false;
@@ -754,28 +785,15 @@ const isBookmarked = (post: any) => {
   return Boolean(post.isBookmarked || post.bookmarked);
 };
 
-const bookmarkedPosts = computed(() => {
-  return allPosts.value.filter((p) => isBookmarked(p));
-});
-
-async function fetchPosts() {
-  loadingPosts.value = true;
-  try {
-    const res = await $fetch<any>("/api/posts");
-    const data = typeof res === "string" ? JSON.parse(res) : res;
-    const list = Array.isArray(data) ? data : data?.posts || data?.data || [];
-    allPosts.value = list;
-  } catch (e) {
-    console.error("Error loading profile posts:", e);
-  } finally {
-    loadingPosts.value = false;
-  }
-}
-
 const toggleLike = async (itemOrId: any) => {
   const post =
     typeof itemOrId === "string"
-      ? allPosts.value.find((p) => p.uniqueId === itemOrId || p.id === itemOrId)
+      ? allUserPosts.value.find(
+          (p) => p.uniqueId === itemOrId || p.id === itemOrId,
+        ) ||
+        allBookmarkedPosts.value.find(
+          (p) => p.uniqueId === itemOrId || p.id === itemOrId,
+        )
       : itemOrId;
 
   if (!post) return;
@@ -823,7 +841,12 @@ const toggleLike = async (itemOrId: any) => {
 const toggleBookmark = async (itemOrId: any) => {
   const post =
     typeof itemOrId === "string"
-      ? allPosts.value.find((p) => p.uniqueId === itemOrId || p.id === itemOrId)
+      ? allUserPosts.value.find(
+          (p) => p.uniqueId === itemOrId || p.id === itemOrId,
+        ) ||
+        allBookmarkedPosts.value.find(
+          (p) => p.uniqueId === itemOrId || p.id === itemOrId,
+        )
       : itemOrId;
 
   if (!post) return;
@@ -884,7 +907,6 @@ const toggleBookmark = async (itemOrId: any) => {
 
 // --- Init ---
 fetchProfile();
-fetchPosts();
 
 // --- SEO ---
 useSeoMeta({

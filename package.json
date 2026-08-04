@@ -5,6 +5,8 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "clean": "nuxi cleanup",
+    "dev:clean": "nuxi cleanup && nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -18,6 +20,7 @@
   },
   "dependencies": {
     "@sidebase/nuxt-auth": "^0.9.1",
+    "@turf/turf": "^7.3.5",
     "leaflet": "^1.9.4",
     "next-auth": "4.21.1",
     "nuxt": "^4.4.8",

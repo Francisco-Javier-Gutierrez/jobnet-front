@@ -22,14 +22,17 @@
     <!-- Upload Status / Preview Card -->
     <div
       v-if="cvUrl"
-      class="flex items-center justify-between p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl"
+      class="flex items-center justify-between p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex-wrap gap-3"
     >
-      <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-emerald-600 text-3xl"
+      <div class="flex items-center gap-3 min-w-0">
+        <span
+          class="material-symbols-outlined text-emerald-600 text-3xl flex-shrink-0"
           >picture_as_pdf</span
         >
-        <div>
-          <p class="text-xs font-bold text-emerald-950 dark:text-emerald-300">
+        <div class="min-w-0">
+          <p
+            class="text-xs font-bold text-emerald-950 dark:text-emerald-300 truncate"
+          >
             {{ cvName || "Currículum_Principal.pdf" }}
           </p>
           <p class="text-[10px] text-emerald-700 dark:text-emerald-400">
@@ -38,19 +41,27 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button
+          type="button"
+          @click="showPdfModal = true"
+          class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 cursor-pointer shadow-xs"
+        >
+          <span class="material-symbols-outlined text-xs">visibility</span>
+          <span>Ver Previa</span>
+        </button>
         <a
           :href="cvUrl"
           target="_blank"
-          class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1"
+          rel="noopener"
+          class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1"
         >
-          <span class="material-symbols-outlined text-xs">visibility</span>
-          Ver PDF
+          <span class="material-symbols-outlined text-xs">open_in_new</span>
         </a>
         <button
           type="button"
           @click="removeCv"
-          class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 text-xs font-bold rounded-lg transition"
+          class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 text-xs font-bold rounded-xl transition cursor-pointer"
         >
           Eliminar
         </button>
@@ -75,7 +86,7 @@
       <button
         type="button"
         :disabled="uploadingCv"
-        class="mt-2 px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-xl transition flex items-center gap-1"
+        class="mt-2 px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-xl transition flex items-center gap-1 cursor-pointer"
       >
         <span v-if="uploadingCv" class="animate-spin text-xs">⌛</span>
         <span>{{ uploadingCv ? "Subiendo..." : "Seleccionar Archivo" }}</span>
@@ -93,12 +104,21 @@
       accept="application/pdf"
       class="hidden"
     />
+
+    <!-- Standardized PDF Preview Modal -->
+    <AppPdfPreviewModal
+      v-model="showPdfModal"
+      :url="cvUrl"
+      :file-name="cvName || 'Currículum_Principal.pdf'"
+      title="Currículum Vitae Principal"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import { useS3Upload } from "~/composables/useS3Upload";
+import AppPdfPreviewModal from "~/components/common/AppPdfPreviewModal.vue";
 
 const props = defineProps<{
   cvUrl: string;
@@ -110,6 +130,7 @@ const emit = defineEmits<{
   (e: "update:cvName", value: string): void;
 }>();
 
+const showPdfModal = ref(false);
 const cvFileInput = ref<HTMLInputElement | null>(null);
 const cvError = ref("");
 const { isUploading: uploadingCv, uploadFile } = useS3Upload();
@@ -129,8 +150,12 @@ async function handleCvUpload(e: Event) {
     return;
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    cvError.value = "El archivo PDF no debe superar los 5MB.";
+  if (file.size > 10 * 1024 * 1024) {
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    const msg = `El archivo PDF "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de 10MB.`;
+    cvError.value = msg;
+    const { showError } = useAppFeedback();
+    showError("Límite de Tamaño Excedido", msg, null);
     return;
   }
 

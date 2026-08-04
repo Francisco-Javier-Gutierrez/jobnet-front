@@ -210,9 +210,15 @@ const navItems = [
     icon: "account_balance",
     label: "Organizaciones",
   },
+  {
+    to: "/mod/incidents",
+    icon: "report_problem",
+    label: "Bandeja de Incidencias",
+  },
+  { to: "/mod/support", icon: "forum", label: "Mensajes y Soporte WS" },
+  { to: "/notifications", icon: "notifications", label: "Notificaciones" },
   { to: "/companies", icon: "domain", label: "Directorio de Empresas" },
   { to: "/admin/catalog", icon: "layers", label: "Catálogo Maestro" },
-  { to: "/create", icon: "add_circle", label: "Crear Nuevo" },
   { to: "/admin/fraud", icon: "find_in_page", label: "Reportes de Fraude" },
 ];
 
@@ -222,10 +228,15 @@ const isActive = (path: string): boolean => {
 
 // Strict Role Guard (404 Concealment)
 const checkRole = () => {
+  const user = data.value?.user as any;
+  const userRole = (user?.tipoUsuario || user?.role || "").toUpperCase();
+
   if (
     status.value === "unauthenticated" ||
     (status.value === "authenticated" &&
-      data.value?.user?.tipoUsuario !== "ADMIN")
+      userRole !== "ADMIN" &&
+      userRole !== "MODERATOR" &&
+      userRole !== "MODERADOR")
   ) {
     throw createError({
       statusCode: 404,

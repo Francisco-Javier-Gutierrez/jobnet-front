@@ -245,11 +245,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
       event.preventDefault();
       if (!isOpen.value) {
         toggleOpen();
-      } else if (
-        highlightedIndex.value >= 0 &&
-        highlightedIndex.value < normalizedOptions.value.length
-      ) {
-        selectOption(normalizedOptions.value[highlightedIndex.value]);
+      } else {
+        const opt = normalizedOptions.value[highlightedIndex.value];
+        if (opt) {
+          selectOption(opt);
+        }
       }
       break;
 

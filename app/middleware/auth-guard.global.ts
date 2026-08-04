@@ -5,9 +5,20 @@ export default defineNuxtRouteMiddleware((to) => {
 
   const path = to.path.toLowerCase();
 
-  // 1. Admin Routes (/admin/*) -> Strictly ADMIN
-  if (path.startsWith("/admin")) {
-    if (status.value !== "authenticated" || userRole !== "ADMIN") {
+  // 1a. User & Organization Support Route (/support) -> Allowed for all authenticated users
+  if (path === "/support" || path.startsWith("/support/")) {
+    if (status.value !== "authenticated") {
+      return navigateTo("/login");
+    }
+    return;
+  }
+
+  // 1b. Moderator Support Routes (/mod/support) -> Allowed ONLY for MODERATOR
+  if (path.startsWith("/mod/support")) {
+    if (
+      status.value !== "authenticated" ||
+      (userRole !== "MODERATOR" && userRole !== "MODERADOR")
+    ) {
       throw createError({
         statusCode: 404,
         statusMessage: "Página no encontrada",
@@ -16,9 +27,14 @@ export default defineNuxtRouteMiddleware((to) => {
     }
   }
 
-  // 2. Moderator Routes (/mod/*) -> Strictly MODERATOR
-  if (path.startsWith("/mod")) {
-    if (status.value !== "authenticated" || userRole !== "MODERATOR") {
+  // 1b. General Admin & Moderator Routes (/admin/* and /mod/*) -> Allowed for ADMIN, MODERATOR, MODERADOR
+  if (path.startsWith("/admin") || path.startsWith("/mod")) {
+    if (
+      status.value !== "authenticated" ||
+      (userRole !== "ADMIN" &&
+        userRole !== "MODERATOR" &&
+        userRole !== "MODERADOR")
+    ) {
       throw createError({
         statusCode: 404,
         statusMessage: "Página no encontrada",
@@ -39,9 +55,28 @@ export default defineNuxtRouteMiddleware((to) => {
   if (orgRoutes.some((r) => path === r || path.startsWith(`${r}/`))) {
     if (
       status.value !== "authenticated" ||
-      (userRole !== "ORGANIZACION" &&
-        userRole !== "EMPRESA" &&
-        userRole !== "ADMIN")
+      (userRole !== "ORGANIZACION" && userRole !== "EMPRESA")
+    ) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Página no encontrada",
+        fatal: true,
+      });
+    }
+  }
+
+  // 4. Candidate Edit Routes (/settings) -> POSTULANTE, CANDIDATO, ADMIN, MODERADOR, or no role (default user)
+  const candidateRoutes = ["/settings"];
+
+  if (candidateRoutes.some((r) => path === r || path.startsWith(`${r}/`))) {
+    if (
+      status.value !== "authenticated" ||
+      (userRole !== "POSTULANTE" &&
+        userRole !== "CANDIDATO" &&
+        userRole !== "ADMIN" &&
+        userRole !== "MODERATOR" &&
+        userRole !== "MODERADOR" &&
+        userRole !== "")
     ) {
       throw createError({
         statusCode: 404,

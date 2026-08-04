@@ -80,6 +80,19 @@ export const useCatalogStore = defineStore("catalog", {
     async suggestSkill(
       name: string,
     ): Promise<{ success: boolean; error?: string }> {
+      return this.suggestItem(name, "Habilidad");
+    },
+
+    async suggestSector(
+      name: string,
+    ): Promise<{ success: boolean; error?: string }> {
+      return this.suggestItem(name, "Sector");
+    },
+
+    async suggestItem(
+      name: string,
+      category: "Habilidad" | "Sector" = "Habilidad",
+    ): Promise<{ success: boolean; error?: string }> {
       const cleanName = name.trim();
       if (!cleanName) {
         return { success: false, error: "El nombre no puede estar vacío" };
@@ -89,7 +102,7 @@ export const useCatalogStore = defineStore("catalog", {
       try {
         await $fetch(`${config.public.apiUrl}/moderator/skills/suggestions`, {
           method: "POST",
-          body: { name: cleanName },
+          body: { name: cleanName, category },
         });
         return { success: true };
       } catch (error: any) {

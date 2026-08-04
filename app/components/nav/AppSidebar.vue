@@ -239,10 +239,11 @@ const { openProtectedModal } = useProtectedAction();
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
-  const tipo = ((data.value?.user as any)?.tipoUsuario || "").toUpperCase();
+  const user = data.value?.user as any;
+  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
   if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
   if (tipo === "ADMIN") return "admin";
-  if (tipo === "MODERATOR") return "moderator";
+  if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
   return "candidate";
 });
 
@@ -291,7 +292,7 @@ const handleMobileNavClick = (item: NavItem) => {
   router.push(item.to);
 };
 
-// 7 items per role menu, with "Crear Nuevo / Publicar Vacante / Crear Publicación" EXACTLY in 4th place (index 3)
+// 8 items per role menu, with "Crear Nuevo / Publicar Vacante / Crear Publicación" EXACTLY in 4th place (index 3)
 const navItems = computed<NavItem[]>(() => {
   switch (userRole.value) {
     case "admin":
@@ -304,10 +305,10 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         },
         {
-          to: "/companies",
-          icon: "domain",
-          label: "Directorio de Empresas",
-          protected: false,
+          to: "/mod/incidents",
+          icon: "report_problem",
+          label: "Incidencias (Org/Vacantes)",
+          protected: true,
         },
         {
           to: "/create",
@@ -316,21 +317,21 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         }, // CENTER
         {
+          to: "/mod/appeals",
+          icon: "gavel",
+          label: "Canales Apelación",
+          protected: true,
+        },
+        {
+          to: "/notifications",
+          icon: "notifications",
+          label: "Notificaciones",
+          protected: true,
+        },
+        {
           to: "/admin/catalog",
           icon: "layers",
           label: "Catálogo Maestro",
-          protected: true,
-        },
-        {
-          to: "/admin/fraud",
-          icon: "find_in_page",
-          label: "Reportes de Fraude",
-          protected: true,
-        },
-        {
-          to: "/profile",
-          icon: "account_circle",
-          label: "Mi Perfil",
           protected: true,
         },
       ];
@@ -345,9 +346,9 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         },
         {
-          to: "/mod/verifications",
-          icon: "verified",
-          label: "Verificaciones",
+          to: "/mod/appeals",
+          icon: "gavel",
+          label: "Canales Apelación",
           protected: true,
         },
         {
@@ -357,9 +358,9 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         }, // CENTER
         {
-          to: "/mod/skills",
-          icon: "psychology",
-          label: "Habilidades",
+          to: "/notifications",
+          icon: "notifications",
+          label: "Notificaciones",
           protected: true,
         },
         {
@@ -369,9 +370,15 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         },
         {
-          to: "/profile",
-          icon: "account_circle",
-          label: "Mi Perfil",
+          to: "/mod/verifications",
+          icon: "verified",
+          label: "Verificaciones",
+          protected: true,
+        },
+        {
+          to: "/mod/skills",
+          icon: "psychology",
+          label: "Habilidades",
           protected: true,
         },
       ];
@@ -380,9 +387,9 @@ const navItems = computed<NavItem[]>(() => {
       return [
         { to: "/", icon: "home", label: "Inicio", protected: false },
         {
-          to: "/dashboard",
-          icon: "dashboard",
-          label: "Tablero (ATS)",
+          to: "/applicants",
+          icon: "dashboard_customize",
+          label: "Tablero ATS",
           protected: true,
         },
         {
@@ -392,15 +399,15 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         },
         {
-          to: "/create-vacancy",
+          to: "/create",
           icon: "add_circle",
-          label: "Publicar Vacante",
+          label: "Crear Nuevo",
           protected: true,
         }, // CENTER
         {
-          to: "/applicants",
-          icon: "group",
-          label: "Candidatos ATS",
+          to: "/notifications",
+          icon: "notifications",
+          label: "Notificaciones",
           protected: true,
         },
         {
@@ -410,6 +417,18 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         },
         { to: "/messages", icon: "forum", label: "Mensajes", protected: true },
+        {
+          to: "/support",
+          icon: "gavel",
+          label: "Soporte y Apelaciones",
+          protected: true,
+        },
+        {
+          to: "/settings",
+          icon: "settings",
+          label: "Configuración",
+          protected: true,
+        },
       ];
 
     default: // CANDIDATO or GUEST
@@ -434,6 +453,12 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         }, // CENTER
         { to: "/messages", icon: "forum", label: "Mensajes", protected: true },
+        {
+          to: "/notifications",
+          icon: "notifications",
+          label: "Notificaciones",
+          protected: true,
+        },
         {
           to: "/profile",
           icon: "account_circle",
