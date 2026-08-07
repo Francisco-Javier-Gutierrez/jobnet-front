@@ -15,8 +15,8 @@ export function useAdminOrganizations() {
 
   const { data: rawProfiles, pending: profilesPending, refresh } = useLazyAsyncData("admin-profiles-list", () => {
     const url = searchQuery.value
-      ? `/api/profiles?tipoUsuario=ORGANIZACION&q=${encodeURIComponent(searchQuery.value)}`
-      : "/api/profiles?tipoUsuario=ORGANIZACION";
+      ? `/api/profiles?tipoUsuario=EMPRESA&q=${encodeURIComponent(searchQuery.value)}`
+      : "/api/profiles?tipoUsuario=EMPRESA";
     return $fetch<any[]>(url)
       .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
       .catch(() => []);
