@@ -18,7 +18,7 @@
       </button>
     </div>
 
-    <AdminOrganizationsOrganizationStats
+    <OrganizationStats
       :orgs-length="orgs.length"
       :verified-count="verifiedCount"
       :in-review-count="inReviewCount"
@@ -30,7 +30,7 @@
       {{ successMsg }}
     </div>
 
-    <AdminOrganizationsOrganizationFilters
+    <OrganizationFilters
       :loading="loading"
       v-model:modelSearchInput="searchInput"
       v-model:modelFilterVerification="filterVerification"
@@ -42,7 +42,7 @@
       @clear-filters="clearFilters"
     />
 
-    <AdminOrganizationsOrganizationTable
+    <OrganizationTable
       :loading="loading"
       :paginated-orgs="paginatedOrgs"
       :filtered-orgs-length="filteredOrgs.length"
@@ -53,7 +53,7 @@
       @open-sanction-modal="openSanctionModal"
     />
 
-    <AdminOrganizationsSanctionModal
+    <SanctionModal
       v-model="isSanctionModalOpen"
       :selected-org="selectedOrg"
       :sanction-steps="sanctionSteps"
