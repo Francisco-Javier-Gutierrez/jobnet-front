@@ -151,12 +151,8 @@ export const useUploadStore = defineStore("upload", {
           xhr.send(file);
         });
 
-        // 5. Construct the public S3 Website URL for error document fallback support
-        const rawUrl = response.url.split("?")[0];
-        const publicUrl = rawUrl.replace(
-          /https:\/\/([^.]+)\.s3(\.[^.]+)?\.amazonaws\.com\//,
-          "http://$1.s3-website-us-east-1.amazonaws.com/",
-        );
+        // 5. Construct the public S3 URL
+        const publicUrl = response.url.split("?")[0];
 
         this.uploadProgress = "";
         return { url: publicUrl, success: true };

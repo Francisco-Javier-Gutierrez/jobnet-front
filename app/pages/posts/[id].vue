@@ -369,10 +369,19 @@ const updateGlobalPost = () => {
   }
 };
 
-const sharePost = () => {
-  if (process.client) {
-    navigator.clipboard.writeText(window.location.href);
-    showSuccess("Éxito", "¡Enlace copiado al portapapeles!");
+const { sharePost: sharePostUtil, shareUrl } = useShare();
+const sharePost = async () => {
+  if (post.value) {
+    sharePostUtil(post.value);
+    post.value.sharesCount = (post.value.sharesCount || 0) + 1;
+    updateGlobalPost();
+    try {
+      await $fetch(`/api/posts/${post.value.uniqueId}/share`, { method: "POST" });
+    } catch (e) {
+      console.error("Error sharing post:", e);
+    }
+  } else if (process.client) {
+    shareUrl(window.location.href);
   }
 };
 

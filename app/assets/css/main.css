@@ -110,3 +110,7 @@ select:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
   caret-color: #f8fafc !important;
 }
+
+.font-fill-1 {
+  font-variation-settings: "FILL" 1;
+}

@@ -232,7 +232,7 @@ const footerItems = computed<FooterItem[]>(() => {
           protected: false,
         },
         {
-          to: "/feed",
+          to: "/vacancies",
           icon: "work",
           label: "Explorar Vacantes",
           shortLabel: "Vacantes",

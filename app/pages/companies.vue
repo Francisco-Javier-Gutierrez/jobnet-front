@@ -221,76 +221,6 @@ const searchQuery = ref("");
 const onlyVerified = ref(false);
 const rawProfiles = ref<any[]>([]);
 
-// Seed data fallback to satisfy user rule and guarantee a rich functional directory
-const fallbackCompanies = [
-  {
-    id: "84280448-7011-70e6-cd7f-7cdd34f0aeb2",
-    nombreComercial: "TechSolutions Inc.",
-    razonSocial: "TechSolutions S.A. de C.V.",
-    logo: "https://lh3.googleusercontent.com/aida-public/AB6AXuDSzjpaT0Ede7QLy3zl1zft4f4V9csQyhGIsAyNHyyg4lmk54ha7yMkfDw5hbVoBOME8PTGFax9iKrHHZjAmqwMRA4i1UpqhgebzJGIkwq1DS6PKK1G5jxCNSxxPjHi_ezhM-ik2qaFtqa9JYp6ruPrCozHQM4UvsZpk2HUAg07aFTdAk58De2NTtSjHaO49ddhrtHPFA-trQm7WZbFMHwS-NZ7jyJ7ZrGaZD9yxWogET6EbwJ_H8Tk0g",
-    sector: "Desarrollo de Software y Cloud Computing",
-    about:
-      "Empresa tecnológica especializada en desarrollo cloud y arquitectura de microservicios.",
-    verified: true,
-    location: "Ciudad de México, MX",
-  },
-  {
-    id: "b293021d-9102-482a-b021-998274102948",
-    nombreComercial: "InnovaTech Global",
-    razonSocial: "InnovaTech Global Solutions S. de R.L.",
-    logo: "https://images.unsplash.com/photo-1542744094-3a31b272c490?w=150&auto=format&fit=crop&q=80",
-    sector: "Inteligencia Artificial & Ciencia de Datos",
-    about:
-      "Líder en soluciones de inteligencia artificial aplicada a finanzas y retail.",
-    verified: true,
-    location: "Guadalajara, JAL, MX",
-  },
-  {
-    id: "c8392019-3910-4019-a910-492019481029",
-    nombreComercial: "Grupo Financiero Prisma",
-    razonSocial: "Prisma Financial Group S.A.B.",
-    logo: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=150&auto=format&fit=crop&q=80",
-    sector: "Banca, Finanzas y Fintech",
-    about:
-      "Institución financiera con presencia latinoamericana focalizada en inclusión digital.",
-    verified: true,
-    location: "Monterrey, N.L., MX",
-  },
-  {
-    id: "d9302019-1029-4102-b019-592010482019",
-    nombreComercial: "BioSalud México",
-    razonSocial: "Laboratorios BioSalud Innovación S.A.",
-    logo: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=150&auto=format&fit=crop&q=80",
-    sector: "Biotecnología y Salud",
-    about:
-      "Desarrollo de biotecnología avanzada y equipamiento médico inteligente.",
-    verified: false,
-    location: "Querétaro, QRO, MX",
-  },
-  {
-    id: "e0392019-2019-4102-c019-692010482020",
-    nombreComercial: "Starlight Logistics",
-    razonSocial: "Starlight Cargo & Supply Chain S.A. de C.V.",
-    logo: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=150&auto=format&fit=crop&q=80",
-    sector: "Logística y Cadena de Suministro",
-    about:
-      "Operaciones logísticas internacionales con seguimiento automatizado e IoT.",
-    verified: true,
-    location: "Puebla, PUE, MX",
-  },
-  {
-    id: "f1403120-3120-5213-d120-703121593121",
-    nombreComercial: "Pixel & Code Studio",
-    razonSocial: "Pixel Code Digital Agency S.C.",
-    logo: "https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=150&auto=format&fit=crop&q=80",
-    sector: "Diseño UX/UI & Marketing Digital",
-    about:
-      "Estudio creativo centrado en experiencia de usuario y desarrollo web a medida.",
-    verified: false,
-    location: "Mérida, YUC, MX",
-  },
-];
-
 // Map API profiles to company structure
 const dbCompanies = computed(() => {
   return rawProfiles.value
@@ -318,18 +248,11 @@ const dbCompanies = computed(() => {
     });
 });
 
-// Merged list of real DB items + rich fallbacks (avoiding duplicates)
+// Merged list of real DB items (fallback removed)
 const companiesList = computed(() => {
-  const list = [...dbCompanies.value];
-  const existingIds = new Set(list.map((c) => c.id));
-
-  for (const item of fallbackCompanies) {
-    if (!existingIds.has(item.id)) {
-      list.push(item);
-    }
-  }
-  return list;
+  return [...dbCompanies.value];
 });
+
 
 // Search filter
 const filteredCompanies = computed(() => {

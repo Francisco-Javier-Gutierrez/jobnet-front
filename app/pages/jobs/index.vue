@@ -8,6 +8,6 @@
 
 <script setup lang="ts">
 definePageMeta({
-  redirect: "/feed",
+  redirect: "/vacancies",
 });
 </script>

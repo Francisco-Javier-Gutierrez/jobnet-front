@@ -144,6 +144,8 @@
         :initial-mfa-state="mfaEnabled"
         @mfa-updated="(state) => (mfaEnabled = state)"
       />
+      
+      <SettingsPasswordCard />
     </section>
 
     <!-- Standardized Corporate Document Viewer -->
@@ -427,6 +429,10 @@ const handleSave = async () => {
         localStorage.removeItem("jobnet_draft_company_edit");
         hasDraft.value = false;
       }
+      
+      const { setProfilePic } = useProfileState();
+      setProfilePic(fotoPerfil.value);
+      
       showSuccess(
         "Perfil Corporativo Guardado",
         "Los datos de tu organización fueron actualizados correctamente.",

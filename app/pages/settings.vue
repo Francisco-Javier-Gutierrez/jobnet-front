@@ -85,6 +85,8 @@
         v-model:lng="formData.lng"
         @locationName="(name) => (formData.location = name)"
       />
+
+      <SettingsPasswordCard />
     </div>
 
     <!-- Bottom Save Action -->
@@ -237,6 +239,10 @@ async function saveProfile() {
         "Tus datos personales y profesionales han sido guardados exitosamente.",
         3500,
       );
+      
+      const { setProfilePic } = useProfileState();
+      setProfilePic(formData.value.fotoPerfil);
+      
       discardDraft();
     } else {
       throw new Error("No se pudo guardar la información en el servidor.");

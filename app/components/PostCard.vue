@@ -170,14 +170,20 @@
         <span class="text-xs font-semibold">{{ commentsCount }}</span>
       </button>
       <button
-        @click.stop="$emit('share', post)"
-        class="flex items-center gap-1.5 text-on-surface-variant dark:text-slate-300 hover:text-secondary transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+        @click.stop="handleShareClick"
+        class="flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+        :class="
+          isSharedLocally
+            ? 'text-secondary font-bold'
+            : 'text-on-surface-variant dark:text-slate-300 hover:text-secondary'
+        "
       >
-        <span class="material-symbols-outlined text-[20px]">share</span>
+        <span class="material-symbols-outlined text-[20px]" :class="{ 'font-fill-1 text-secondary': isSharedLocally }">share</span>
+        <span class="text-xs font-semibold">{{ sharesCount }}</span>
       </button>
       <button
         @click="handleBookmarkClick"
-        class="ml-auto transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+        class="ml-auto flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
         :class="
           effectiveIsBookmarked
             ? 'text-amber-500 font-bold'
@@ -190,6 +196,7 @@
         >
           {{ effectiveIsBookmarked ? "bookmark" : "bookmark_border" }}
         </span>
+        <span class="text-xs font-semibold">{{ bookmarksCount }}</span>
       </button>
     </div>
 
@@ -323,9 +330,18 @@ const showPdfModal = ref(false);
 const showMediaModal = ref(false);
 const showMenu = ref(false);
 const showReportModal = ref(false);
+const isSharedLocally = ref(false);
 
 const { status, data: authSession } = useAuth();
 const { openProtectedModal } = useProtectedAction();
+
+onMounted(() => {
+  if (process.client) {
+    const currentUserId = props.currentUserId || (authSession.value?.user as any)?.id || 'anonymous';
+    const shared = JSON.parse(localStorage.getItem(`shared-posts-${currentUserId}`) || "[]");
+    isSharedLocally.value = shared.includes(props.post.uniqueId || props.post.id);
+  }
+});
 
 const displayRole = computed(() => {
   const rawRole = (props.post?.role || props.post?.tipoUsuario || "")
@@ -369,6 +385,23 @@ const handleCommentClick = (e: Event) => {
     return;
   }
   emit("navigate", props.post.uniqueId);
+};
+
+const handleShareClick = (e: Event) => {
+  e.stopPropagation();
+  
+  if (process.client) {
+    const currentUserId = props.currentUserId || (authSession.value?.user as any)?.id || 'anonymous';
+    const shared = JSON.parse(localStorage.getItem(`shared-posts-${currentUserId}`) || "[]");
+    const id = props.post.uniqueId || props.post.id;
+    if (!shared.includes(id)) {
+      shared.push(id);
+      localStorage.setItem(`shared-posts-${currentUserId}`, JSON.stringify(shared));
+      isSharedLocally.value = true;
+    }
+  }
+  
+  emit("share", props.post);
 };
 
 const openReportModal = () => {
@@ -443,6 +476,17 @@ const commentsCount = computed(() => {
   return props.post?.comments?.length || 0;
 });
 
+const sharesCount = computed(() => {
+  if (typeof props.post?.sharesCount === "number") return props.post.sharesCount;
+  return 0;
+});
+
+const bookmarksCount = computed(() => {
+  if (typeof props.post?.bookmarksCount === "number") return props.post.bookmarksCount;
+  const bookmarks = props.post?.bookmarksList || props.post?.bookmarkedBy || props.post?.bookmarks || [];
+  return Array.isArray(bookmarks) ? bookmarks.length : 0;
+});
+
 const handleClick = (event: Event) => {
   if (props.isDetail) return;
 
@@ -473,8 +517,3 @@ const navigateToAuthor = () => {
 };
 </script>
 
-<style scoped>
-.font-fill-1 {
-  font-variation-settings: "FILL" 1;
-}
-</style>

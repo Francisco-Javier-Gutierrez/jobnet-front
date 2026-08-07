@@ -61,7 +61,7 @@
         </button>
         <NuxtLink
           :to="profileRoute"
-          class="w-8 h-8 rounded-full border transition flex items-center justify-center text-xs font-bold shadow-sm active:scale-95"
+          class="w-8 h-8 rounded-full border transition flex items-center justify-center text-xs font-bold shadow-sm active:scale-95 overflow-hidden"
           :class="[
             isActive(profileRoute)
               ? 'bg-primary text-white border-primary ring-2 ring-primary/30 dark:ring-indigo-400/40'
@@ -69,7 +69,8 @@
           ]"
           :aria-label="`Perfil de ${userName}`"
         >
-          {{ userInitial }}
+          <img v-if="profilePic" :src="profilePic" alt="Foto de perfil" class="w-full h-full object-cover" />
+          <span v-else>{{ userInitial }}</span>
         </NuxtLink>
       </template>
       <template v-else>
@@ -92,6 +93,13 @@ const props = defineProps<{
 
 const route = useRoute();
 const { status, data, signOut } = useAuth();
+const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
+
+watchEffect(() => {
+  if (status.value === 'authenticated' && data.value?.user?.id && !hasFetched.value) {
+    fetchProfilePic(data.value.user.id as string);
+  }
+});
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
@@ -123,7 +131,7 @@ const searchRoute = computed(() => {
     case "organization":
       return "/companies";
     default:
-      return "/feed";
+      return "/vacancies";
   }
 });
 

@@ -163,11 +163,19 @@
               <span class="material-symbols-outlined text-sm">group</span>
               Ver Candidatos
             </NuxtLink>
-            <button
+            <NuxtLink
               v-if="job.estado !== 'EVALUACION'"
+              :to="`/edit-vacancy/${job.id}`"
               class="bg-surface border border-outline-variant hover:border-primary text-on-surface-variant dark:text-slate-300 hover:text-primary font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
             >
               Editar
+            </NuxtLink>
+            <button
+              v-if="job.estado !== 'EVALUACION'"
+              @click="deleteJob(job.id)"
+              class="bg-surface border border-rose-200 hover:border-rose-500 text-rose-500 hover:bg-rose-50 hover:text-rose-600 font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
+            >
+              Eliminar
             </button>
           </div>
         </div>
@@ -248,4 +256,20 @@ const fetchVacancies = async () => {
 onMounted(() => {
   fetchVacancies();
 });
+
+const deleteJob = async (id: string) => {
+  if (!confirm("¿Estás seguro de que deseas eliminar y cerrar esta vacante? Ya no recibirá postulaciones.")) {
+    return;
+  }
+  try {
+    await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
+      method: "DELETE",
+    });
+    // Remove from local list
+    vacancies.value = vacancies.value.filter(j => j.id !== id);
+  } catch (e) {
+    console.error("Error deleting job:", e);
+    alert("Hubo un error al eliminar la vacante.");
+  }
+};
 </script>
