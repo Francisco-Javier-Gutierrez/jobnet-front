@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware((to) => {
   const { status, data } = useAuth();
-  const rawRole = (data.value?.user as any)?.tipoUsuario;
+  const rawRole = (data.value?.user as any)?.tipoUsuario || (data.value?.user as any)?.role;
   const userRole = (rawRole || "").toUpperCase();
 
   const path = to.path.toLowerCase();
@@ -17,7 +17,7 @@ export default defineNuxtRouteMiddleware((to) => {
   if (path.startsWith("/mod/support")) {
     if (
       status.value !== "authenticated" ||
-      (userRole !== "MODERATOR" && userRole !== "MODERADOR")
+      (userRole !== "MODERATOR" && userRole !== "MODERADOR" && userRole !== "ADMIN")
     ) {
       throw createError({
         statusCode: 404,
