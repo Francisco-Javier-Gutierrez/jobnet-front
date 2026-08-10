@@ -80,6 +80,36 @@
           {{ company.beneficios }}
         </p>
       </div>
+
+      <!-- Presencia de Marca / Redes Oficiales -->
+      <div
+        v-if="webLinks && webLinks.length > 0"
+        class="pt-4 border-t border-outline-variant/30"
+      >
+        <h3
+          class="font-bold text-sm text-on-surface mb-3 flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-primary text-base"
+            >public</span
+          >
+          Presencia de Marca y Redes Oficiales
+        </h3>
+        <div class="flex flex-wrap gap-3">
+          <a
+            v-for="link in webLinks"
+            :key="link.name"
+            :href="link.url"
+            target="_blank"
+            rel="noopener"
+            class="flex items-center gap-2 px-4 py-2 bg-surface-container hover:bg-surface-container-high border border-outline-variant/50 rounded-lg transition-colors text-xs font-semibold text-on-surface"
+          >
+            <span class="material-symbols-outlined text-primary text-base">{{
+              link.icon
+            }}</span>
+            {{ link.name }}
+          </a>
+        </div>
+      </div>
     </div>
 
     <!-- Documentos Corporativos Relevantes (ISO, NOMs, Certificados) -->
@@ -149,6 +179,7 @@
 <script setup lang="ts">
 defineProps<{
   company: any;
+  webLinks?: Array<{ name: string; url: string; icon: string }>;
 }>();
 
 defineEmits(["previewDoc"]);

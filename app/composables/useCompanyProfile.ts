@@ -74,6 +74,47 @@ export const useCompanyProfile = () => {
     vacancies: [] as any[],
   });
 
+  const webLinks = computed(() => {
+    const result: Array<{ name: string; url: string; icon: string }> = [];
+    const p = profileData.value as any;
+    if (!p) return result;
+
+    const linksArray = p.links;
+    const linksObj = p.enlacesWeb;
+
+    const getIcon = (name: string) => {
+      const lower = name.toLowerCase();
+      if (lower.includes("facebook")) return "thumb_up";
+      if (lower.includes("twitter") || lower.includes("x.com")) return "tag";
+      if (lower.includes("instagram")) return "photo_camera";
+      if (lower.includes("linkedin")) return "work";
+      return "link";
+    };
+
+    if (Array.isArray(linksArray) && linksArray.length > 0) {
+      linksArray.forEach((item: any) => {
+        const name = item.label || item.nombre || "Red Oficial";
+        if (item.url)
+          result.push({
+            name,
+            url: item.url,
+            icon: getIcon(name + " " + item.url),
+          });
+      });
+    } else if (linksObj && typeof linksObj === "object") {
+      Object.entries(linksObj).forEach(([name, url]) => {
+        if (url && name !== "website") {
+          result.push({
+            name,
+            url: url as string,
+            icon: getIcon(name + " " + url),
+          });
+        }
+      });
+    }
+    return result;
+  });
+
   watch(
     [profileData, vacanciesData],
     () => {
@@ -276,6 +317,7 @@ export const useCompanyProfile = () => {
   return {
     companyId,
     company,
+    webLinks,
     isOwner,
     loading,
     companyTab,

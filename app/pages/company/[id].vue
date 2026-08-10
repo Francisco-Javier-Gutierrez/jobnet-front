@@ -147,7 +147,11 @@
       @report="showReportCompanyModal = true"
     />
 
-    <CompanyAboutSection :company="company" @preview-doc="previewCompanyDoc" />
+    <CompanyAboutSection
+      :company="company"
+      :web-links="webLinks"
+      @preview-doc="previewCompanyDoc"
+    />
 
     <CompanyLists
       :company-tab="companyTab"
@@ -189,6 +193,7 @@ import { useCompanyProfile } from "~/composables/useCompanyProfile";
 const {
   companyId,
   company,
+  webLinks,
   isOwner,
   loading,
   companyTab,
