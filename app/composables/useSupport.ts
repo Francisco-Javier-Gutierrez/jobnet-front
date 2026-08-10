@@ -29,11 +29,11 @@ export function useSupport() {
     () =>
       userRole.value === "ORGANIZACION" ||
       userRole.value === "EMPRESA" ||
-      userRole.value === "RECRUITER"
+      userRole.value === "RECRUITER",
   );
 
   const isModeratorRole = computed(
-    () => userRole.value === "MODERATOR" || userRole.value === "ADMIN"
+    () => userRole.value === "MODERATOR" || userRole.value === "ADMIN",
   );
 
   const searchQuery = ref("");
@@ -63,7 +63,7 @@ export function useSupport() {
     const q = searchQuery.value.toLowerCase();
     return chats.value.filter(
       (c) =>
-        c.name.toLowerCase().includes(q) || c.reason.toLowerCase().includes(q)
+        c.name.toLowerCase().includes(q) || c.reason.toLowerCase().includes(q),
     );
   });
 
@@ -85,11 +85,11 @@ export function useSupport() {
       if (isOrganization.value) {
         await $fetch(
           `${config.public.apiUrl}/moderator/organizations/${userId.value}/join-appeal`,
-          { method: "POST" }
+          { method: "POST" },
         ).catch(() => {});
 
         const statusRes = await $fetch<any>(
-          `${config.public.apiUrl}/moderator/organizations/${userId.value}/suspension-status`
+          `${config.public.apiUrl}/moderator/organizations/${userId.value}/suspension-status`,
         ).catch(() => null);
 
         chats.value = [
@@ -98,7 +98,8 @@ export function useSupport() {
             companyId: userId.value,
             name: "Soporte y Moderación JobNet",
             reason:
-              statusRes?.reason || "Atención directa de apelación e infracciones",
+              statusRes?.reason ||
+              "Atención directa de apelación e infracciones",
             status: statusRes?.status || "En revisión",
             lastMessage: "",
             time: new Date().toLocaleDateString(),
@@ -106,13 +107,13 @@ export function useSupport() {
         ];
       } else {
         const data = await $fetch<any[]>(
-          `${config.public.apiUrl}/moderator/appeals`
+          `${config.public.apiUrl}/moderator/appeals`,
         ).catch(() => []);
 
         chats.value = (data || []).map((item) => ({
           id: item.id || item.companyId,
           companyId: item.companyId || item.id,
-          name: item.name || "Empresa en Apelación",
+          name: item.name || "Organización en Apelación",
           reason: item.reason || "Revisión de infracción",
           status: item.status || "En revisión",
           lastMessage: "",
@@ -149,7 +150,7 @@ export function useSupport() {
 
     try {
       const data = await $fetch<any[]>(
-        `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`
+        `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
       ).catch(() => []);
 
       messages.value = (data || []).map((m) => ({
@@ -191,11 +192,11 @@ export function useSupport() {
           {
             method: "POST",
             body: { notes: "Apelación aprobada tras revisión en tiempo real" },
-          }
+          },
         );
         showSuccess(
           "Éxito",
-          "Apelación aprobada con éxito. La organización ha sido reactivada."
+          "Apelación aprobada con éxito. La organización ha sido reactivada.",
         );
       } else {
         await $fetch(
@@ -205,11 +206,11 @@ export function useSupport() {
             body: {
               reason: "Confirmación de suspensión tras evaluación de apelación",
             },
-          }
+          },
         );
         showInfo(
           "Notificación",
-          "Suspensión confirmada. La organización ha sido suspendida definitivamente."
+          "Suspensión confirmada. La organización ha sido suspendida definitivamente.",
         );
       }
       chats.value = chats.value.filter((c) => (c.companyId || c.id) !== compId);
@@ -263,11 +264,15 @@ export function useSupport() {
               (appealCompanyId === activeCompId || !appealCompanyId)
             ) {
               const timeStr = new Date(
-                createdAt || Date.now()
+                createdAt || Date.now(),
               ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
               const isDuplicate = messages.value.some((m) => {
-                if (incomingMsgId && m.messageId && m.messageId === incomingMsgId)
+                if (
+                  incomingMsgId &&
+                  m.messageId &&
+                  m.messageId === incomingMsgId
+                )
                   return true;
                 if (m.createdAt && createdAt && m.createdAt === createdAt)
                   return true;
@@ -298,7 +303,7 @@ export function useSupport() {
             }
 
             const chatInList = chats.value.find(
-              (c) => (c.companyId || c.id) === appealCompanyId
+              (c) => (c.companyId || c.id) === appealCompanyId,
             );
             if (chatInList) {
               chatInList.status = status;
@@ -340,7 +345,7 @@ export function useSupport() {
     if (!isImg && !isPdf) {
       showInfo(
         "Notificación",
-        "Solo se permiten archivos en formato PDF o Imágenes (JPG, PNG, WebP, GIF);"
+        "Solo se permiten archivos en formato PDF o Imágenes (JPG, PNG, WebP, GIF);",
       );
       if (fileInput.value) fileInput.value.value = "";
       return;
@@ -378,7 +383,7 @@ export function useSupport() {
     compId: string,
     text: string,
     attachment: any,
-    messageId?: string
+    messageId?: string,
   ) => {
     try {
       const token =
@@ -403,7 +408,7 @@ export function useSupport() {
             messageId: messageId || undefined,
             attachmentUrl: attachment?.url || undefined,
           },
-        }
+        },
       );
     } catch (e) {
       console.warn("HTTP appeal message post notice:", e);
@@ -452,10 +457,13 @@ export function useSupport() {
             attachmentUrl: attachment?.url || null,
             attachmentType: attachment?.type || null,
             attachmentName: attachment?.name || null,
-          })
+          }),
         );
       } catch (wsErr) {
-        console.warn("WebSocket send exception, executing HTTP fallback:", wsErr);
+        console.warn(
+          "WebSocket send exception, executing HTTP fallback:",
+          wsErr,
+        );
         await sendHttpFallback(compId, text, attachment, messageId);
       }
     } else {

@@ -1,8 +1,8 @@
-import { ref, computed, watch } from 'vue';
-import { useRoute, useRouter } from '#app';
-import { useRuntimeConfig, useLazyAsyncData } from '#imports';
-import { useAuth } from '#imports';
-import { useShare } from '~/composables/useShare';
+import { ref, computed, watch } from "vue";
+import { useRoute, useRouter } from "#app";
+import { useRuntimeConfig, useLazyAsyncData } from "#imports";
+import { useAuth } from "#imports";
+import { useShare } from "~/composables/useShare";
 
 export const useCompanyProfile = () => {
   const route = useRoute();
@@ -13,39 +13,47 @@ export const useCompanyProfile = () => {
 
   const companyId = route.params.id as string;
   const isOwner = computed(() => authData.value?.user?.id === companyId);
-  const currentUserId = computed(() => (authData.value?.user as any)?.id || '');
+  const currentUserId = computed(() => (authData.value?.user as any)?.id || "");
 
   // Fetch data
   const { data: profileData, pending: profilePending } = useLazyAsyncData(
     `company-profile-${companyId}`,
-    () => $fetch(`${config.public.apiUrl}/profile/${companyId}`)
-      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => null)
+    () =>
+      $fetch(`${config.public.apiUrl}/profile/${companyId}`)
+        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+        .catch(() => null),
   );
 
   const { data: vacanciesData, pending: vacanciesPending } = useLazyAsyncData(
     `company-vacancies-${companyId}`,
-    () => $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
-      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => ({ data: [] }))
+    () =>
+      $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
+        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+        .catch(() => ({ data: [] })),
   );
 
   const { data: postsData, pending: postsPending } = useLazyAsyncData(
     `company-posts-${companyId}`,
-    () => $fetch(`${config.public.apiUrl}/profile/${companyId}/posts`)
-      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => ({ data: [] }))
+    () =>
+      $fetch(`${config.public.apiUrl}/profile/${companyId}/posts`)
+        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+        .catch(() => ({ data: [] })),
   );
 
   const { data: bookmarksData, pending: bookmarksPending } = useLazyAsyncData(
     `company-bookmarks-${companyId}`,
-    () => $fetch(`${config.public.apiUrl}/profile/${companyId}/bookmarks`)
-      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => ({ data: [] }))
+    () =>
+      $fetch(`${config.public.apiUrl}/profile/${companyId}/bookmarks`)
+        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+        .catch(() => ({ data: [] })),
   );
 
-  const loading = computed(() => profilePending.value || vacanciesPending.value);
-  const loadingCompanyPosts = computed(() => postsPending.value || bookmarksPending.value);
+  const loading = computed(
+    () => profilePending.value || vacanciesPending.value,
+  );
+  const loadingCompanyPosts = computed(
+    () => postsPending.value || bookmarksPending.value,
+  );
 
   // State
   const company = ref({
@@ -57,7 +65,8 @@ export const useCompanyProfile = () => {
     website: "https://techsolutions.com",
     websiteDisplay: "techsolutions.com",
     location: "Ciudad de México, CDMX",
-    about: "Somos una empresa líder en innovación tecnológica, dedicada a construir soluciones de software escalables que transforman industrias.",
+    about:
+      "Somos una organización líder en innovación tecnológica, dedicada a construir soluciones de software escalables que transforman industrias.",
     mision: "",
     vision: "",
     beneficios: "",
@@ -70,20 +79,37 @@ export const useCompanyProfile = () => {
     () => {
       if (profileData.value) {
         const p = profileData.value as any;
-        company.value.name = p.nombre || p.nombreComercial || p.name || "Sin Nombre";
-        company.value.logo = p.fotoPerfil || "https://lh3.googleusercontent.com/aida-public/AB6AXuDSzjpaT0Ede7QLy3zl1zft4f4V9csQyhGIsAyNHyyg4lmk54ha7yMkfDw5hbVoBOME8PTGFax9iKrHHZjAmqwMRA4i1UpqhgebzJGIkwq1DS6PKK1G5jxCNSxxPjHi_ezhM-ik2qaFtqa9JYp6ruPrCozHQM4UvsZpk2HUAg07aFTdAk58De2NTtSjHaO49ddhrtHPFA-trQm7WZbFMHwS-NZ7jyJ7ZrGaZD9yxWogET6EbwJ_H8Tk0g";
+        company.value.name =
+          p.nombre || p.nombreComercial || p.name || "Sin Nombre";
+        company.value.logo =
+          p.fotoPerfil ||
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDSzjpaT0Ede7QLy3zl1zft4f4V9csQyhGIsAyNHyyg4lmk54ha7yMkfDw5hbVoBOME8PTGFax9iKrHHZjAmqwMRA4i1UpqhgebzJGIkwq1DS6PKK1G5jxCNSxxPjHi_ezhM-ik2qaFtqa9JYp6ruPrCozHQM4UvsZpk2HUAg07aFTdAk58De2NTtSjHaO49ddhrtHPFA-trQm7WZbFMHwS-NZ7jyJ7ZrGaZD9yxWogET6EbwJ_H8Tk0g";
         company.value.sector = p.sector || "Sector no especificado";
-        company.value.about = p.biografia || p.descripcion || "Sin descripción corporativa.";
+        company.value.about =
+          p.biografia || p.descripcion || "Sin descripción corporativa.";
         company.value.mision = p.mision || "";
         company.value.vision = p.vision || "";
         company.value.beneficios = p.beneficios || p.culturaLaboral || "";
-        company.value.documents = Array.isArray(p.documentosCorporativos) ? p.documentosCorporativos : [];
-        company.value.location = typeof p.ubicacion === "string"
-          ? p.ubicacion
-          : p.ubicacion?.name || p.ubicacion?.city || p.ubicacion?.pais || "Ubicación no especificada";
-        company.value.verified = p.organizacionVerificada !== undefined ? p.organizacionVerificada : false;
+        company.value.documents = Array.isArray(p.documentosCorporativos)
+          ? p.documentosCorporativos
+          : [];
+        company.value.location =
+          typeof p.ubicacion === "string"
+            ? p.ubicacion
+            : p.ubicacion?.name ||
+              p.ubicacion?.city ||
+              p.ubicacion?.pais ||
+              "Ubicación no especificada";
+        company.value.verified =
+          p.organizacionVerificada !== undefined
+            ? p.organizacionVerificada
+            : false;
         company.value.website = p.enlacesWeb?.website || p.website || "";
-        company.value.websiteDisplay = company.value.website.replace("https://", "").replace("http://", "").split("/")[0] || "Sitio web";
+        company.value.websiteDisplay =
+          company.value.website
+            .replace("https://", "")
+            .replace("http://", "")
+            .split("/")[0] || "Sitio web";
 
         const rawJobs = (vacanciesData.value?.data || []) as any[];
         company.value.vacancies = rawJobs.map((j: any) => ({
@@ -91,11 +117,14 @@ export const useCompanyProfile = () => {
           title: j.title || j.titulo || "Vacante",
           type: j.type || j.modalidad || "Presencial",
           schedule: j.schedule || "Tiempo Completo",
-          salary: typeof j.salario === "number" ? `$${(j.salario / 1000).toFixed(0)}k MXN` : j.salario || "No especificado",
+          salary:
+            typeof j.salario === "number"
+              ? `$${(j.salario / 1000).toFixed(0)}k MXN`
+              : j.salario || "No especificado",
         }));
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
 
   const companyTab = ref<"vacancies" | "posts" | "bookmarks">("vacancies");
@@ -109,7 +138,7 @@ export const useCompanyProfile = () => {
         allCompanyPosts.value = val.data;
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
 
   watch(
@@ -119,11 +148,13 @@ export const useCompanyProfile = () => {
         allCompanyBookmarkedPosts.value = val.data;
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
 
   const companyPosts = computed(() => allCompanyPosts.value);
-  const companyBookmarkedPosts = computed(() => allCompanyBookmarkedPosts.value);
+  const companyBookmarkedPosts = computed(
+    () => allCompanyBookmarkedPosts.value,
+  );
 
   // UI State Modals
   const showReportCompanyModal = ref(false);
@@ -144,8 +175,12 @@ export const useCompanyProfile = () => {
         method: "POST",
         body: { userId: currentUserId.value },
       });
-      const targetPost = allCompanyPosts.value.find((p) => p.uniqueId === postId);
-      const targetBookmark = allCompanyBookmarkedPosts.value.find((p) => p.uniqueId === postId);
+      const targetPost = allCompanyPosts.value.find(
+        (p) => p.uniqueId === postId,
+      );
+      const targetBookmark = allCompanyBookmarkedPosts.value.find(
+        (p) => p.uniqueId === postId,
+      );
       [targetPost, targetBookmark].forEach((target) => {
         if (target) {
           if (res?.likesList) {
@@ -170,8 +205,12 @@ export const useCompanyProfile = () => {
         method: "POST",
         body: { userId: currentUserId.value },
       });
-      const targetPost = allCompanyPosts.value.find((p) => p.uniqueId === postId);
-      const targetBookmark = allCompanyBookmarkedPosts.value.find((p) => p.uniqueId === postId);
+      const targetPost = allCompanyPosts.value.find(
+        (p) => p.uniqueId === postId,
+      );
+      const targetBookmark = allCompanyBookmarkedPosts.value.find(
+        (p) => p.uniqueId === postId,
+      );
       [targetPost, targetBookmark].forEach((target) => {
         if (target) {
           if (res?.bookmarksList) {

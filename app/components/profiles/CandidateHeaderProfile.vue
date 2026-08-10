@@ -1,5 +1,7 @@
 <template>
-  <section class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] relative z-20">
+  <section
+    class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] relative z-20"
+  >
     <!-- Decorative top color bar -->
     <div class="bg-primary h-2 w-full rounded-t-xl"></div>
 
@@ -28,7 +30,9 @@
       </p>
 
       <!-- Status Badge -->
-      <div class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md mb-6 inline-flex items-center gap-1">
+      <div
+        class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md mb-6 inline-flex items-center gap-1"
+      >
         <span class="w-2 h-2 rounded-full bg-secondary"></span>
         {{ profile.estadoBusqueda || "En búsqueda activa" }}
       </div>
@@ -79,7 +83,9 @@
               target="_blank"
               rel="noopener"
             >
-              <span class="material-symbols-outlined text-primary text-base">{{ link.icon }}</span>
+              <span class="material-symbols-outlined text-primary text-base">{{
+                link.icon
+              }}</span>
               <span class="truncate">{{ link.name }}</span>
             </a>
           </div>
@@ -90,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from "vue";
 
 defineProps<{
   profile: Record<string, any>;

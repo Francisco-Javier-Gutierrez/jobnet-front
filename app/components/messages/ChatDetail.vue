@@ -1,19 +1,29 @@
 <template>
-  <div class="lg:col-span-7 flex flex-col h-full bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800">
+  <div
+    class="lg:col-span-7 flex flex-col h-full bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800"
+  >
     <template v-if="activeChat">
       <!-- Header for active chat -->
-      <div class="p-4 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20">
+      <div
+        class="p-4 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20"
+      >
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
+          <div
+            class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs"
+          >
             {{ activeChat.name.charAt(0).toUpperCase() }}
           </div>
           <div>
-            <h2 class="text-xs font-bold text-on-background dark:text-slate-100">
+            <h2
+              class="text-xs font-bold text-on-background dark:text-slate-100"
+            >
               {{ activeChat.name }}
             </h2>
             <p class="text-[11px] text-on-surface-variant dark:text-slate-300">
               {{ activeChat.jobTitle }} •
-              <span class="text-primary font-semibold">{{ activeChat.status }}</span>
+              <span class="text-primary font-semibold">{{
+                activeChat.status
+              }}</span>
             </p>
           </div>
         </div>
@@ -24,10 +34,16 @@
         ref="messageContainer"
         class="flex-grow p-4 overflow-y-auto max-h-[420px] flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
       >
-        <div v-if="isLoadingMessages" class="text-center text-xs text-slate-400 my-4">
+        <div
+          v-if="isLoadingMessages"
+          class="text-center text-xs text-slate-400 my-4"
+        >
           Cargando mensajes...
         </div>
-        <div v-else-if="messages.length === 0" class="text-center text-xs text-slate-400 my-8">
+        <div
+          v-else-if="messages.length === 0"
+          class="text-center text-xs text-slate-400 my-8"
+        >
           ¡Di hola! Escribe un mensaje para iniciar la conversación.
         </div>
 
@@ -84,11 +100,15 @@
                 rel="noopener"
                 class="flex items-center gap-2 p-2.5 rounded-xl bg-black/10 hover:bg-black/20 text-current transition font-medium border border-white/10"
               >
-                <span class="material-symbols-outlined text-base">description</span>
+                <span class="material-symbols-outlined text-base"
+                  >description</span
+                >
                 <span class="truncate max-w-[150px] text-[11px]">{{
                   msg.attachmentName || "Documento Adjunto"
                 }}</span>
-                <span class="material-symbols-outlined text-xs ml-auto">download</span>
+                <span class="material-symbols-outlined text-xs ml-auto"
+                  >download</span
+                >
               </a>
             </div>
 
@@ -107,7 +127,9 @@
       </div>
 
       <!-- Message input bar -->
-      <div class="p-4 border-t border-outline-variant/60 bg-surface-container-low/25 flex items-center gap-3">
+      <div
+        class="p-4 border-t border-outline-variant/60 bg-surface-container-low/25 flex items-center gap-3"
+      >
         <!-- Hidden File Input -->
         <input
           type="file"
@@ -125,7 +147,9 @@
           title="Adjuntar PDF o Imagen"
         >
           <span v-if="isUploading" class="animate-spin text-sm">⏳</span>
-          <span v-else class="material-symbols-outlined text-lg">attach_file</span>
+          <span v-else class="material-symbols-outlined text-lg"
+            >attach_file</span
+          >
         </button>
 
         <input
@@ -147,13 +171,18 @@
 
     <!-- Welcome detail view when no chat active -->
     <template v-else>
-      <div class="flex-grow flex flex-col items-center justify-center p-8 text-center text-on-surface-variant dark:text-slate-300">
-        <span class="material-symbols-outlined text-[48px] text-outline mb-4">forum</span>
+      <div
+        class="flex-grow flex flex-col items-center justify-center p-8 text-center text-on-surface-variant dark:text-slate-300"
+      >
+        <span class="material-symbols-outlined text-[48px] text-outline mb-4"
+          >forum</span
+        >
         <p class="text-sm font-bold text-on-background dark:text-slate-100">
           Selecciona una conversación
         </p>
         <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
-          Elige una postulación de la lista de la izquierda para conversar en tiempo real.
+          Elige una postulación de la lista de la izquierda para conversar en
+          tiempo real.
         </p>
       </div>
     </template>
@@ -161,7 +190,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted, ref } from 'vue';
+import { computed, watch, onMounted, ref } from "vue";
 
 const props = defineProps<{
   activeChat: any;
@@ -177,31 +206,31 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:newMessage': [value: string];
-  'handle-send': [];
-  'handle-file-upload': [event: Event];
-  'set-message-container': [el: HTMLElement | null];
-  'set-file-input': [el: HTMLInputElement | null];
+  "update:newMessage": [value: string];
+  "handle-send": [];
+  "handle-file-upload": [event: Event];
+  "set-message-container": [el: HTMLElement | null];
+  "set-file-input": [el: HTMLInputElement | null];
 }>();
 
 const newMessage = computed({
   get: () => props.newMessage,
-  set: (val) => emit('update:newMessage', val)
+  set: (val) => emit("update:newMessage", val),
 });
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const messageContainer = ref<HTMLElement | null>(null);
 
-watch(fileInput, (val) => emit('set-file-input', val));
-watch(messageContainer, (val) => emit('set-message-container', val));
+watch(fileInput, (val) => emit("set-file-input", val));
+watch(messageContainer, (val) => emit("set-message-container", val));
 
 onMounted(() => {
-  emit('set-file-input', fileInput.value);
-  emit('set-message-container', messageContainer.value);
+  emit("set-file-input", fileInput.value);
+  emit("set-message-container", messageContainer.value);
 });
 
-const handleSend = () => emit('handle-send');
-const handleFileUpload = (e: Event) => emit('handle-file-upload', e);
+const handleSend = () => emit("handle-send");
+const handleFileUpload = (e: Event) => emit("handle-file-upload", e);
 const triggerFileInput = () => fileInput.value?.click();
 </script>
 

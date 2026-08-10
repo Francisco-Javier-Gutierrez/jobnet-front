@@ -1,10 +1,14 @@
 <template>
   <section v-if="documents.length > 0">
-    <h2 class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm px-1">
+    <h2
+      class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm px-1"
+    >
       <span class="material-symbols-outlined">description</span>
       Documentos
     </h2>
-    <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
+    <div
+      class="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2"
+    >
       <div
         v-for="doc in documents"
         :key="doc.name"
@@ -23,10 +27,14 @@
           }}</span>
         </div>
         <div class="flex-grow min-w-0">
-          <h3 class="font-label-md text-label-md text-on-surface truncate w-36 group-hover:text-primary transition-colors">
+          <h3
+            class="font-label-md text-label-md text-on-surface truncate w-36 group-hover:text-primary transition-colors"
+          >
             {{ doc.name }}
           </h3>
-          <p class="font-body-sm text-body-sm text-on-surface-variant dark:text-slate-300 mb-2">
+          <p
+            class="font-body-sm text-body-sm text-on-surface-variant dark:text-slate-300 mb-2"
+          >
             {{ doc.meta }}
           </p>
           <div class="flex gap-3">
@@ -34,7 +42,9 @@
               @click="$emit('open', doc.url, doc.name)"
               class="text-primary hover:underline font-label-sm text-label-sm flex items-center gap-0.5 cursor-pointer"
             >
-              <span class="material-symbols-outlined text-[16px]">visibility</span>
+              <span class="material-symbols-outlined text-[16px]"
+                >visibility</span
+              >
               Ver
             </button>
             <a
@@ -43,7 +53,9 @@
               target="_blank"
               class="text-secondary hover:underline font-label-sm text-label-sm flex items-center gap-0.5"
             >
-              <span class="material-symbols-outlined text-[16px]">download</span>
+              <span class="material-symbols-outlined text-[16px]"
+                >download</span
+              >
               Descargar
             </a>
           </div>
@@ -58,6 +70,6 @@ defineProps<{
   documents: Array<{ name: string; meta: string; type: string; url: string }>;
 }>();
 defineEmits<{
-  (e: 'open', url: string, title: string): void;
+  (e: "open", url: string, title: string): void;
 }>();
 </script>

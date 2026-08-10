@@ -130,6 +130,24 @@
         <div>
           <label
             class="block text-xs font-semibold tracking-wider text-on-surface-variant dark:text-slate-300 mb-2"
+            for="phone"
+          >
+            Ingrese el teléfono de contacto
+          </label>
+          <input
+            id="phone"
+            v-model="phone"
+            type="tel"
+            required
+            aria-required="true"
+            :aria-invalid="!!errorMessage"
+            class="w-full bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background dark:text-slate-100 outline-none transition-colors"
+          />
+        </div>
+
+        <div>
+          <label
+            class="block text-xs font-semibold tracking-wider text-on-surface-variant dark:text-slate-300 mb-2"
             for="corporate_email"
           >
             Ingrese el correo electrónico de la organización
@@ -257,6 +275,7 @@ useSeoMeta({
 
 const companyName = ref("");
 const taxId = ref("");
+const phone = ref("");
 const email = ref("");
 const password = ref("");
 const passwordRules = computed(() => ({
@@ -315,6 +334,7 @@ const handleRegister = async () => {
         role: "company",
         companyName: companyName.value,
         taxId: taxId.value,
+        phone: phone.value,
       },
     });
 

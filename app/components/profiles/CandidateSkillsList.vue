@@ -1,7 +1,12 @@
 <template>
   <div>
-    <h2 class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container pb-sm">
-      <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400">psychology</span>
+    <h2
+      class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container pb-sm"
+    >
+      <span
+        class="material-symbols-outlined text-emerald-600 dark:text-emerald-400"
+        >psychology</span
+      >
       Competencias Técnicas
     </h2>
     <div v-if="skills.length > 0" class="flex flex-wrap gap-2">

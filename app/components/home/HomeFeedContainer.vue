@@ -40,7 +40,9 @@
     <template v-else-if="feedItems.length > 0">
       <template v-for="item in feedItems" :key="item.uniqueId || item.id">
         <JobCard
-          v-if="item.isVacancy || item.tipo === 'VACANTE' || item.type === 'VACANCY'"
+          v-if="
+            item.isVacancy || item.tipo === 'VACANTE' || item.type === 'VACANCY'
+          "
           :job="item"
           :current-user-id="currentUserId"
           :is-bookmarked="isBookmarked(item)"
@@ -81,8 +83,8 @@
         <p
           class="text-on-surface-variant dark:text-slate-300 text-sm max-w-sm mb-6"
         >
-          Aún no se han compartido publicaciones en el feed. ¡Sé el primero
-          en compartir algo interesante con la comunidad!
+          Aún no se han compartido publicaciones en el feed. ¡Sé el primero en
+          compartir algo interesante con la comunidad!
         </p>
       </div>
     </template>
@@ -101,10 +103,10 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'toggle-like', item: any): void;
-  (e: 'toggle-bookmark', item: any): void;
-  (e: 'share-job', item: any): void;
-  (e: 'share-post', item: any): void;
-  (e: 'navigate-to-post', id: string): void;
+  (e: "toggle-like", item: any): void;
+  (e: "toggle-bookmark", item: any): void;
+  (e: "share-job", item: any): void;
+  (e: "share-post", item: any): void;
+  (e: "navigate-to-post", id: string): void;
 }>();
 </script>

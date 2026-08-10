@@ -5,19 +5,19 @@ export const useAppeals = () => {
   const { showError, showSuccess, showInfo } = useAppFeedback();
   const config = useRuntimeConfig();
   const { data: session, getSession } = useAuth();
-  
+
   const userId = computed(() => (session.value?.user as any)?.id || "mod-user");
   const searchQuery = ref("");
   const filterType = ref<"ALL" | "ORGANIZACION" | "VACANTE">("ALL");
-  
+
   const appeals = ref<any[]>([]);
   const selectedAppealId = ref<string | null>(null);
   const isLoading = ref(true);
   const isProcessingAction = ref(false);
-  
+
   const socket = ref<WebSocket | null>(null);
   const wsConnected = ref(false);
-  
+
   const chatContainer = ref<HTMLDivElement | null>(null);
 
   const filteredAppeals = computed(() => {
@@ -29,7 +29,8 @@ export const useAppeals = () => {
     if (q) {
       result = result.filter(
         (a) =>
-          a.name.toLowerCase().includes(q) || a.reason.toLowerCase().includes(q)
+          a.name.toLowerCase().includes(q) ||
+          a.reason.toLowerCase().includes(q),
       );
     }
     return result;
@@ -51,10 +52,10 @@ export const useAppeals = () => {
     if (!activeAppeal.value || !activeAppeal.value.messages) return 0;
     const compId = activeAppeal.value.companyId || activeAppeal.value.id;
     return activeAppeal.value.messages.filter(
-      (m: any) => m.sender === "USER" || m.senderId === compId
+      (m: any) => m.sender === "USER" || m.senderId === compId,
     ).length;
   });
-  
+
   const scrollToBottom = () => {
     nextTick(() => {
       if (chatContainer.value) {
@@ -67,7 +68,7 @@ export const useAppeals = () => {
     isLoading.value = true;
     try {
       const data = await $fetch<any[]>(
-        `${config.public.apiUrl}/moderator/appeals`
+        `${config.public.apiUrl}/moderator/appeals`,
       ).catch(() => []);
 
       appeals.value = (data || []).map((item) => ({
@@ -134,16 +135,21 @@ export const useAppeals = () => {
               messageId: incomingMsgId,
             } = payload;
             const target = appeals.value.find(
-              (a) => a.companyId === appealCompanyId || a.id === appealCompanyId
+              (a) =>
+                a.companyId === appealCompanyId || a.id === appealCompanyId,
             );
             if (target) {
               const compId = target.companyId || target.id;
               const timeStr = new Date(
-                createdAt || Date.now()
+                createdAt || Date.now(),
               ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
               const isDuplicate = target.messages.some((m: any) => {
-                if (incomingMsgId && m.messageId && m.messageId === incomingMsgId)
+                if (
+                  incomingMsgId &&
+                  m.messageId &&
+                  m.messageId === incomingMsgId
+                )
                   return true;
                 if (m.createdAt && createdAt && m.createdAt === createdAt)
                   return true;
@@ -169,7 +175,7 @@ export const useAppeals = () => {
           } else if (payload.type === "APPEAL_RESOLVED") {
             const { appealCompanyId } = payload;
             appeals.value = appeals.value.filter(
-              (a) => (a.companyId || a.id) !== appealCompanyId
+              (a) => (a.companyId || a.id) !== appealCompanyId,
             );
             if (
               selectedAppealId.value === appealCompanyId ||
@@ -187,7 +193,9 @@ export const useAppeals = () => {
 
       socket.value.onclose = () => {
         wsConnected.value = false;
-        console.log("Moderator WebSocket closed. Attempting reconnect in 3s...");
+        console.log(
+          "Moderator WebSocket closed. Attempting reconnect in 3s...",
+        );
         setTimeout(() => {
           connectWebSocket();
         }, 3000);
@@ -203,7 +211,7 @@ export const useAppeals = () => {
 
     try {
       const msgs = await $fetch<any[]>(
-        `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`
+        `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
       ).catch(() => []);
 
       appeal.messages = (msgs || []).map((m) => ({
@@ -239,11 +247,11 @@ export const useAppeals = () => {
           {
             method: "POST",
             body: { notes: "Apelación aprobada tras revisión en tiempo real" },
-          }
+          },
         );
         showSuccess(
           "Éxito",
-          "Apelación aprobada con éxito. La organización ha sido reactivada."
+          "Apelación aprobada con éxito. La organización ha sido reactivada.",
         );
       } else {
         await $fetch(
@@ -253,15 +261,15 @@ export const useAppeals = () => {
             body: {
               reason: "Confirmación de suspensión tras evaluación de apelación",
             },
-          }
+          },
         );
         showInfo(
           "Notificación",
-          "Suspensión confirmada. La organización ha sido suspendida definitivamente."
+          "Suspensión confirmada. La organización ha sido suspendida definitivamente.",
         );
       }
       appeals.value = appeals.value.filter(
-        (a) => a.id !== activeAppeal.value?.id
+        (a) => a.id !== activeAppeal.value?.id,
       );
       selectedAppealId.value = appeals.value[0]?.id || null;
     } catch (e) {
@@ -282,25 +290,25 @@ export const useAppeals = () => {
         {
           method: "POST",
           body: { action },
-        }
+        },
       ).catch(() => {});
 
       showInfo(
         "Notificación",
         action === "approve"
           ? "Vacante aprobada y reactivada en el Job Board."
-          : "Vacante sancionada y cerrada definitivamente."
+          : "Vacante sancionada y cerrada definitivamente.",
       );
 
       appeals.value = appeals.value.filter(
-        (a) => a.id !== activeAppeal.value?.id
+        (a) => a.id !== activeAppeal.value?.id,
       );
       selectedAppealId.value = appeals.value[0]?.id || null;
     } catch (e) {
       console.error("Error resolving vacancy appeal:", e);
       showError(
         "Error",
-        "Hubo un error al procesar la resolución de la vacante."
+        "Hubo un error al procesar la resolución de la vacante.",
       );
     } finally {
       isProcessingAction.value = false;
@@ -311,7 +319,7 @@ export const useAppeals = () => {
     compId: string,
     text: string,
     attachment: any,
-    messageId?: string
+    messageId?: string,
   ) => {
     try {
       const token =
@@ -338,14 +346,17 @@ export const useAppeals = () => {
             attachmentType: attachment?.type || undefined,
             attachmentName: attachment?.name || undefined,
           },
-        }
+        },
       );
     } catch (e) {
       console.warn("HTTP appeal message post notice:", e);
     }
   };
 
-  const sendMessage = async (newMessageText: string, pendingAttachment: any) => {
+  const sendMessage = async (
+    newMessageText: string,
+    pendingAttachment: any,
+  ) => {
     const text = newMessageText.trim();
     const attachment = pendingAttachment;
     if ((!text && !attachment) || !activeAppeal.value) return;
@@ -384,10 +395,13 @@ export const useAppeals = () => {
             attachmentUrl: attachment?.url || null,
             attachmentType: attachment?.type || null,
             attachmentName: attachment?.name || null,
-          })
+          }),
         );
       } catch (wsErr) {
-        console.warn("WebSocket send exception, executing HTTP fallback:", wsErr);
+        console.warn(
+          "WebSocket send exception, executing HTTP fallback:",
+          wsErr,
+        );
         await sendHttpFallback(compId, text, attachment, messageId);
       }
     } else {

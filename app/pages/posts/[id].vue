@@ -376,7 +376,9 @@ const sharePost = async () => {
     post.value.sharesCount = (post.value.sharesCount || 0) + 1;
     updateGlobalPost();
     try {
-      await $fetch(`/api/posts/${post.value.uniqueId}/share`, { method: "POST" });
+      await $fetch(`/api/posts/${post.value.uniqueId}/share`, {
+        method: "POST",
+      });
     } catch (e) {
       console.error("Error sharing post:", e);
     }

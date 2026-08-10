@@ -171,13 +171,22 @@ const handleLogin = async () => {
             query: { email: email.value },
           });
         } else {
-          errorMessage.value = errorDetails.message || "Error de autenticación";
+          const errorMap: Record<string, string> = {
+            NotAuthorizedException: "Credenciales inválidas",
+            UserNotFoundException: "Credenciales inválidas",
+            InvalidPasswordException: "Credenciales inválidas",
+            UserNotConfirmedException: "Cuenta no confirmada",
+            TooManyRequestsException: "Demasiados intentos. Intente más tarde",
+            LimitExceededException: "Demasiados intentos. Intente más tarde",
+          };
+          errorMessage.value =
+            errorMap[errorDetails.code] || "Credenciales inválidas";
         }
       } catch (e) {
         // Fallback for non-JSON errors (like standard NextAuth callback failures)
-        errorMessage.value = result.error.includes("ReadConfigError")
+        errorMessage.value = result.error?.includes("ReadConfigError")
           ? "Error de configuración del servidor"
-          : result.error;
+          : "Credenciales inválidas";
       }
     } else {
       // Success, route to dashboard or home based on role

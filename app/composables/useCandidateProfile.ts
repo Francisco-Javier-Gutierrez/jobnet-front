@@ -1,6 +1,6 @@
-import { ref, computed, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import { useRuntimeConfig } from '#app';
+import { ref, computed, watch } from "vue";
+import { useRoute } from "vue-router";
+import { useRuntimeConfig } from "#app";
 // Assuming useAuth and useShare are available globally as auto-imports in Nuxt
 
 export function useCandidateProfile(candidateIdParam?: string) {
@@ -18,7 +18,7 @@ export function useCandidateProfile(candidateIdParam?: string) {
   const error = ref(false);
   const errorMessage = ref("");
   const profile = ref<Record<string, any>>({});
-  
+
   // Doc Viewer State
   const selectedDocUrl = ref("");
   const selectedDocTitle = ref("");
@@ -81,7 +81,12 @@ export function useCandidateProfile(candidateIdParam?: string) {
   });
 
   const documents = computed(() => {
-    const docs: Array<{ name: string; meta: string; type: string; url: string }> = [];
+    const docs: Array<{
+      name: string;
+      meta: string;
+      type: string;
+      url: string;
+    }> = [];
 
     // Primary CV
     if (profile.value.cvUrl) {
@@ -94,14 +99,21 @@ export function useCandidateProfile(candidateIdParam?: string) {
     }
 
     // Additional documents
-    const rawDocs = profile.value.documentosAdicionales || profile.value.documentosProfesionales;
+    const rawDocs =
+      profile.value.documentosAdicionales ||
+      profile.value.documentosProfesionales;
     if (Array.isArray(rawDocs) && rawDocs.length > 0) {
       rawDocs.forEach((d: any) => {
         if (d) {
           const url = typeof d === "string" ? d : d.url;
-          const name = typeof d === "string" ? "Documento Adicional" : d.name || d.nombre || "Documento Adicional";
+          const name =
+            typeof d === "string"
+              ? "Documento Adicional"
+              : d.name || d.nombre || "Documento Adicional";
           if (url) {
-            const isPdf = (typeof d !== "string" && d.type === "pdf") || (url && url.includes(".pdf"));
+            const isPdf =
+              (typeof d !== "string" && d.type === "pdf") ||
+              (url && url.includes(".pdf"));
             docs.push({
               name,
               meta: isPdf ? "Documento PDF" : "Imagen / Certificado",
@@ -111,7 +123,11 @@ export function useCandidateProfile(candidateIdParam?: string) {
           }
         }
       });
-    } else if (rawDocs && typeof rawDocs === "object" && !Array.isArray(rawDocs)) {
+    } else if (
+      rawDocs &&
+      typeof rawDocs === "object" &&
+      !Array.isArray(rawDocs)
+    ) {
       for (const [name, doc] of Object.entries(rawDocs)) {
         const d = doc as any;
         const url = typeof d === "string" ? d : d?.url;
@@ -145,7 +161,9 @@ export function useCandidateProfile(candidateIdParam?: string) {
     errorMessage.value = "";
 
     try {
-      const res = await $fetch<any>(`${config.public.apiUrl}/profile/${candidateId}`);
+      const res = await $fetch<any>(
+        `${config.public.apiUrl}/profile/${candidateId}`,
+      );
       const data = typeof res === "string" ? JSON.parse(res) : res;
 
       if (!data) {
@@ -205,7 +223,9 @@ export function useCandidateProfile(candidateIdParam?: string) {
     { immediate: true },
   );
 
-  const loadingPosts = computed(() => postsPending.value || bookmarksPending.value);
+  const loadingPosts = computed(
+    () => postsPending.value || bookmarksPending.value,
+  );
   const userPosts = computed(() => allUserPosts.value);
   const bookmarkedPosts = computed(() => allBookmarkedPosts.value);
 
@@ -215,7 +235,8 @@ export function useCandidateProfile(candidateIdParam?: string) {
     const currentAuthId = authUser?.id || candidateId;
     const currentAuthEmail = authUser?.email?.toLowerCase();
 
-    const bookmarks = post.bookmarksList || post.bookmarkedBy || post.bookmarks || [];
+    const bookmarks =
+      post.bookmarksList || post.bookmarkedBy || post.bookmarks || [];
     if (Array.isArray(bookmarks)) {
       return (
         bookmarks.includes(candidateId) ||
@@ -229,8 +250,12 @@ export function useCandidateProfile(candidateIdParam?: string) {
   const toggleLike = async (itemOrId: any) => {
     const post =
       typeof itemOrId === "string"
-        ? allUserPosts.value.find((p) => p.uniqueId === itemOrId || p.id === itemOrId) ||
-          allBookmarkedPosts.value.find((p) => p.uniqueId === itemOrId || p.id === itemOrId)
+        ? allUserPosts.value.find(
+            (p) => p.uniqueId === itemOrId || p.id === itemOrId,
+          ) ||
+          allBookmarkedPosts.value.find(
+            (p) => p.uniqueId === itemOrId || p.id === itemOrId,
+          )
         : itemOrId;
 
     if (!post) return;
@@ -278,8 +303,12 @@ export function useCandidateProfile(candidateIdParam?: string) {
   const toggleBookmark = async (itemOrId: any) => {
     const post =
       typeof itemOrId === "string"
-        ? allUserPosts.value.find((p) => p.uniqueId === itemOrId || p.id === itemOrId) ||
-          allBookmarkedPosts.value.find((p) => p.uniqueId === itemOrId || p.id === itemOrId)
+        ? allUserPosts.value.find(
+            (p) => p.uniqueId === itemOrId || p.id === itemOrId,
+          ) ||
+          allBookmarkedPosts.value.find(
+            (p) => p.uniqueId === itemOrId || p.id === itemOrId,
+          )
         : itemOrId;
 
     if (!post) return;
@@ -365,6 +394,6 @@ export function useCandidateProfile(candidateIdParam?: string) {
     toggleBookmark,
     isBookmarked,
     sharePost,
-    authData
+    authData,
   };
 }

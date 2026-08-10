@@ -61,7 +61,8 @@
         >
         <p class="text-sm font-semibold text-on-surface">Cola limpia</p>
         <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
-          No hay solicitudes de verificación de empresas pendientes de revisión.
+          No hay solicitudes de verificación de organizaciones pendientes de
+          revisión.
         </p>
       </div>
 
@@ -74,7 +75,7 @@
         >
           <div class="min-w-0">
             <h3 class="text-sm font-bold text-on-background mb-1">
-              Empresa: {{ req.companyName }}
+              Organización: {{ req.companyName }}
             </h3>
             <p class="text-xs text-on-surface-variant dark:text-slate-300 mb-1">
               RFC:

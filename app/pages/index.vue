@@ -72,7 +72,7 @@ import { useRouter } from "vue-router";
 useSeoMeta({
   title: "JobNet - Feed de Comunidad",
   description:
-    "El feed profesional inteligente para compartir publicaciones con desarrolladores y empresas.",
+    "El feed profesional inteligente para compartir publicaciones con desarrolladores y organizaciones.",
 });
 
 const router = useRouter();
@@ -137,4 +137,3 @@ const {
   deleteComment,
 } = useJobFeeds();
 </script>
-

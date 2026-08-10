@@ -1,11 +1,13 @@
-import { ref, computed, watch } from 'vue';
-import { useRoute, useRouter, useRuntimeConfig } from '#imports';
-import { useAuth } from '#imports';
+import { ref, computed, watch } from "vue";
+import { useRoute, useRouter, useRuntimeConfig } from "#imports";
+import { useAuth } from "#imports";
 
 // Global shared state for the applicants dashboard
 const selectedJobId = ref("");
 const myJobs = ref<Array<{ id: string; title: string }>>([]);
-const allJobsList = ref<Array<{ id: string; title: string; empresaUuid: string }>>([]);
+const allJobsList = ref<
+  Array<{ id: string; title: string; empresaUuid: string }>
+>([]);
 const candidates = ref<any[]>([]);
 const selectedCandidate = ref<any>(null);
 const isLoading = ref(false);
@@ -36,10 +38,23 @@ export const useApplicants = () => {
 
   const stageTabs = computed(() => [
     { id: "ALL", label: "Todas las etapas", count: candidates.value.length },
-    { id: "PENDIENTE", label: "En Evaluación", count: countByStatus("PENDIENTE") },
-    { id: "ENTREVISTA", label: "Entrevista", count: countByStatus("ENTREVISTA") },
-    { id: "ACEPTADO", label: "Aceptados / Oferta", count: countByStatus("ACEPTADO") },
-    { id: "RECHAZADO", label: "Descartados", count: countByStatus("RECHAZADO") },
+    { id: "PENDIENTE", label: "Pendientes", count: countByStatus("PENDIENTE") },
+    {
+      id: "EN_CONTACTO",
+      label: "En Contacto",
+      count: countByStatus("EN_CONTACTO"),
+    },
+    {
+      id: "SELECCIONADO",
+      label: "Seleccionados",
+      count: countByStatus("SELECCIONADO"),
+    },
+    {
+      id: "CONTRATADO",
+      label: "Contratados",
+      count: countByStatus("CONTRATADO"),
+    },
+    { id: "RECHAZADO", label: "Rechazados", count: countByStatus("RECHAZADO") },
   ]);
 
   const filteredCandidates = computed(() => {
@@ -87,13 +102,17 @@ export const useApplicants = () => {
     }
     const companyId = session.value.user.id;
     try {
-      const allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(() => []);
+      const allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
+        () => [],
+      );
       allJobsList.value = allJobs.map((j) => ({
         id: j.id,
         title: j.title || j.titulo || "Vacante",
         empresaUuid: j.empresaUuid,
       }));
-      const matchedJobs = allJobsList.value.filter((j) => j.empresaUuid === companyId);
+      const matchedJobs = allJobsList.value.filter(
+        (j) => j.empresaUuid === companyId,
+      );
       myJobs.value = matchedJobs.length > 0 ? matchedJobs : allJobsList.value;
       if (route.query.jobId) {
         selectedJobId.value = route.query.jobId as string;
@@ -109,26 +128,51 @@ export const useApplicants = () => {
     try {
       let jobsToFetch = myJobs.value;
       if (selectedJobId.value) {
-        const selectedJob = allJobsList.value.find((j) => j.id === selectedJobId.value);
+        const selectedJob = allJobsList.value.find(
+          (j) => j.id === selectedJobId.value,
+        );
         jobsToFetch = selectedJob ? [selectedJob] : myJobs.value;
       }
       const aggregatedApplicants: any[] = [];
       for (const job of jobsToFetch) {
-        const apps = await $fetch<any[]>(`${config.public.apiUrl}/jobs/${job.id}/applicants`).catch(() => []);
+        const apps = await $fetch<any[]>(
+          `${config.public.apiUrl}/jobs/${job.id}/applicants`,
+        ).catch(() => []);
         for (const app of apps) {
           aggregatedApplicants.push({ ...app, jobTitle: job.title });
         }
       }
       let resolvedCandidates = await Promise.all(
         aggregatedApplicants.map(async (app) => {
-          const profile = await $fetch<any>(`${config.public.apiUrl}/profile/${app.candidateId}`).catch(() => ({}));
+          const profile = await $fetch<any>(
+            `${config.public.apiUrl}/profile/${app.candidateId}`,
+          ).catch(() => ({}));
           return {
             id: app.candidateId,
-            name: profile.nombre || profile.name || profile.nombreComercial || app.candidateName || `Candidato (${app.candidateId.substring(0, 8)})`,
+            name:
+              profile.nombre ||
+              profile.name ||
+              profile.nombreComercial ||
+              app.candidateName ||
+              `Candidato (${app.candidateId.substring(0, 8)})`,
             email: profile.email || app.candidateEmail || app.candidateId,
-            phone: profile.telefono || profile.phone || profile.celular || "No especificado",
-            bio: profile.bio || profile.descripcion || profile.resumen || profile.biografia || "Sin biografía ingresada.",
-            skills: profile.habilidades || profile.skills || profile.habilidadesRequeridas || [],
+            titularProfesional: profile.titularProfesional || "Sin titular",
+            phone:
+              profile.telefono ||
+              profile.phone ||
+              profile.celular ||
+              "No especificado",
+            bio:
+              profile.bio ||
+              profile.descripcion ||
+              profile.resumen ||
+              profile.biografia ||
+              "Sin biografía ingresada.",
+            skills:
+              profile.habilidades ||
+              profile.skills ||
+              profile.habilidadesRequeridas ||
+              [],
             experience: profile.experiencia || profile.experience || [],
             education: profile.educacion || profile.education || [],
             job: app.jobTitle || "Vacante",
@@ -143,7 +187,9 @@ export const useApplicants = () => {
       candidates.value = resolvedCandidates;
       if (resolvedCandidates.length > 0) {
         const stillExists = resolvedCandidates.find(
-          (c) => c.id === selectedCandidate.value?.id && c.jobId === selectedCandidate.value?.jobId,
+          (c) =>
+            c.id === selectedCandidate.value?.id &&
+            c.jobId === selectedCandidate.value?.jobId,
         );
         selectedCandidate.value = stillExists || resolvedCandidates[0];
       } else {

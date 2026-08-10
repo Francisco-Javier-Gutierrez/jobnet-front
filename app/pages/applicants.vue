@@ -61,7 +61,7 @@
         <p class="text-sky-800 dark:text-sky-300">
           El canal de chat directo se habilita automáticamente cuando avanzas a
           un aspirante a la etapa de
-          <strong>"Entrevista"</strong> o <strong>"Seleccionado"</strong>.
+          <strong>"En Contacto"</strong> o superior.
         </p>
       </div>
     </div>
@@ -87,15 +87,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { useSeoMeta } from '#imports';
-import ApplicantsKpiCards from '~/components/applicants/ApplicantsKpiCards.vue';
-import ApplicantsFilterBar from '~/components/applicants/ApplicantsFilterBar.vue';
-import CandidateList from '~/components/applicants/CandidateList.vue';
-import CandidateDetailPanel from '~/components/applicants/CandidateDetailPanel.vue';
-import CandidateModals from '~/components/applicants/CandidateModals.vue';
-import { useApplicants } from '~/composables/useApplicants';
-import { useApplicantActions } from '~/composables/useApplicantActions';
+import { onMounted } from "vue";
+import { useSeoMeta } from "#imports";
+import ApplicantsKpiCards from "~/components/applicants/ApplicantsKpiCards.vue";
+import ApplicantsFilterBar from "~/components/applicants/ApplicantsFilterBar.vue";
+import CandidateList from "~/components/applicants/CandidateList.vue";
+import CandidateDetailPanel from "~/components/applicants/CandidateDetailPanel.vue";
+import CandidateModals from "~/components/applicants/CandidateModals.vue";
+import { useApplicants } from "~/composables/useApplicants";
+import { useApplicantActions } from "~/composables/useApplicantActions";
 
 useSeoMeta({
   title: "Tablero ATS - JobNet",
@@ -106,7 +106,14 @@ useSeoMeta({
 const applicants = useApplicants();
 const actions = useApplicantActions();
 
-const { isLoading, fetchApplicants, fetchMyJobs, isPdfViewerOpen, selectedPdfUrl, selectedPdfCandidateName } = applicants;
+const {
+  isLoading,
+  fetchApplicants,
+  fetchMyJobs,
+  isPdfViewerOpen,
+  selectedPdfUrl,
+  selectedPdfCandidateName,
+} = applicants;
 const { successMsg } = actions;
 
 // Expose to template

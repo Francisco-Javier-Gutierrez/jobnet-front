@@ -6,11 +6,14 @@ export const useProfileState = () => {
   const fetchProfilePic = async (userId: string) => {
     if (!userId || !process.client) return;
     if (isFetching.value || hasFetched.value) return;
-    
+
     isFetching.value = true;
     try {
       const config = useRuntimeConfig();
-      const apiBase = config.public.apiUrl || config.public.apiBase || "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
+      const apiBase =
+        config.public.apiUrl ||
+        config.public.apiBase ||
+        "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
       const profile: any = await $fetch(`${apiBase}/profile/${userId}`);
       if (profile && (profile.fotoPerfil || profile.avatarUrl)) {
         profilePic.value = profile.fotoPerfil || profile.avatarUrl;

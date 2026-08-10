@@ -15,7 +15,7 @@ export function useJobApplication(jobId: string, jobRef: any) {
   const coverLetterInput = ref("");
   const selectedProfileLinks = ref<string[]>([]);
   const selectedProfileDocs = ref<string[]>([]);
-  
+
   const isApplying = ref(false);
   const hasApplied = ref(false);
 
@@ -100,7 +100,9 @@ export function useJobApplication(jobId: string, jobRef: any) {
 
   const handleEasyApplyClick = () => {
     if (status.value !== "authenticated") {
-      navigateTo("/login?redirect=" + encodeURIComponent(window.location.pathname));
+      navigateTo(
+        "/login?redirect=" + encodeURIComponent(window.location.pathname),
+      );
       return;
     }
     if (!profileCvUrl.value) {
@@ -130,7 +132,7 @@ export function useJobApplication(jobId: string, jobRef: any) {
 
       let finalMessage = coverLetterInput.value.trim()
         ? coverLetterInput.value.trim()
-        : `Hola, mi nombre es ${candidateName}. Me complace presentar mi candidatura a la vacante de ${jobRef.value?.title || "Empleo"} en ${jobRef.value?.company || "su empresa"}. Adjunto mi Currículum Vitae cargado en mi perfil.`;
+        : `Hola, mi nombre es ${candidateName}. Me complace presentar mi candidatura a la vacante de ${jobRef.value?.title || "Empleo"} en ${jobRef.value?.company || "su organización"}. Adjunto mi Currículum Vitae cargado en mi perfil.`;
 
       if (selectedProfileLinks.value.length > 0) {
         finalMessage +=
@@ -173,7 +175,8 @@ export function useJobApplication(jobId: string, jobRef: any) {
 
   const checkAppliedStatus = () => {
     if (process.client) {
-      hasApplied.value = localStorage.getItem(`job-applied-${jobId}`) === "true";
+      hasApplied.value =
+        localStorage.getItem(`job-applied-${jobId}`) === "true";
     }
   };
 
@@ -194,6 +197,6 @@ export function useJobApplication(jobId: string, jobRef: any) {
     submitEasyApplication,
     checkAppliedStatus,
     session,
-    status
+    status,
   };
 }

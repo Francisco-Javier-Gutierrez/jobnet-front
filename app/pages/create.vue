@@ -431,7 +431,7 @@ const publishPost = async () => {
     (session.value?.user as any)?.tipoUsuario || ""
   ).toUpperCase();
   if (userType === "EMPRESA" || userType === "ORGANIZACION") {
-    role = "Empresa";
+    role = "Organización";
   } else {
     role = "Candidato";
   }

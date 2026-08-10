@@ -17,7 +17,7 @@
       <label
         class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
         for="descripcion"
-        >Descripción General de la Empresa *</label
+        >Descripción General de la Organización *</label
       >
       <textarea
         :value="descripcion"
@@ -75,7 +75,7 @@
         "
         id="vision"
         rows="3"
-        placeholder="Describe las metas a futuro y hacia dónde aspira llegar la empresa..."
+        placeholder="Describe las metas a futuro y hacia dónde aspira llegar la organización..."
         class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2.5 text-xs text-on-background outline-none transition resize-none"
       ></textarea>
     </div>

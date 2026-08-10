@@ -9,13 +9,13 @@
     >
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-on-background mb-1">
-          Directorio de Organizaciones y Empresas
+          Directorio de Organizaciones
         </h1>
         <p
           class="text-on-surface-variant dark:text-slate-300 text-sm max-w-2xl"
         >
-          Explora el directorio oficial de empresas verificadas y encuentra
-          oportunidades laborales acorde a tus intereses.
+          Explora el directorio oficial de organizaciones verificadas y
+          encuentra oportunidades laborales acorde a tus intereses.
         </p>
       </div>
 
@@ -76,7 +76,7 @@
       <AppEmptyState
         icon="domain_disabled"
         title="No se encontraron organizaciones"
-        :description="`No hay registros de empresas que coincidan con la búsqueda actual.`"
+        :description="`No hay registros de organizaciones que coincidan con la búsqueda actual.`"
         action-label="Limpiar Filtros"
         action-icon="filter_alt_off"
         @action="clearSearch"
@@ -253,7 +253,6 @@ const companiesList = computed(() => {
   return [...dbCompanies.value];
 });
 
-
 // Search filter
 const filteredCompanies = computed(() => {
   const query = searchInput.value.toLowerCase().trim();
@@ -323,6 +322,6 @@ onMounted(() => {
 useSeoMeta({
   title: "Directorio de Organizaciones - JobNet",
   description:
-    "Directorio y buscador contextual de empresas. Filtra organizaciones por nombre comercial o razón social.",
+    "Directorio y buscador contextual de organizaciones. Filtra organizaciones por nombre comercial o razón social.",
 });
 </script>

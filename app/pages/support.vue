@@ -6,26 +6,42 @@
     <!-- Header -->
     <div class="mb-6 flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-bold text-on-background dark:text-slate-100 mb-2 flex items-center gap-2">
-          <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-2xl">gavel</span>
+        <h1
+          class="text-2xl font-bold text-on-background dark:text-slate-100 mb-2 flex items-center gap-2"
+        >
+          <span
+            class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-2xl"
+            >gavel</span
+          >
           Soporte y Canales de Apelación 1-a-1
         </h1>
         <p class="text-on-surface-variant dark:text-slate-300 text-sm">
-          Atención privada y resolución de disputas en tiempo real vía WebSocket con Moderación JobNet.
+          Atención privada y resolución de disputas en tiempo real vía WebSocket
+          con Moderación JobNet.
         </p>
       </div>
       <!-- Connection status badge -->
       <div class="flex items-center gap-2">
-        <span :class="['w-2.5 h-2.5 rounded-full', wsConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500 animate-pulse']"></span>
-        <span class="text-xs font-bold text-on-surface-variant dark:text-slate-300">
+        <span
+          :class="[
+            'w-2.5 h-2.5 rounded-full',
+            wsConnected
+              ? 'bg-emerald-500 animate-pulse'
+              : 'bg-amber-500 animate-pulse',
+          ]"
+        ></span>
+        <span
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
+        >
           {{ wsConnected ? "En línea (WebSocket)" : "Conectando..." }}
         </span>
       </div>
     </div>
 
     <!-- Main Chat Workspace Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl flex-grow overflow-hidden min-h-[580px] shadow-sm animate-fadeIn">
-      
+    <div
+      class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl flex-grow overflow-hidden min-h-[580px] shadow-sm animate-fadeIn"
+    >
       <!-- Left Panel: Chat List (5 Cols) -->
       <SupportChatList
         v-model:searchQuery="searchQuery"
@@ -58,7 +74,6 @@
         @updateContainerRef="chatContainer = $event"
         @updateFileInputRef="fileInput = $event"
       />
-
     </div>
   </div>
 </template>

@@ -9,7 +9,11 @@ export function useShare() {
    * Avoids hardcoded localhost for production environments.
    */
   const getOrigin = (): string => {
-    if (process.client && typeof window !== "undefined" && window.location?.origin) {
+    if (
+      process.client &&
+      typeof window !== "undefined" &&
+      window.location?.origin
+    ) {
       return window.location.origin;
     }
     try {
@@ -49,7 +53,7 @@ export function useShare() {
       textarea.style.opacity = "0";
       textarea.setAttribute("readonly", "");
       document.body.appendChild(textarea);
-      
+
       textarea.focus();
       textarea.select();
 
@@ -66,14 +70,17 @@ export function useShare() {
   /**
    * Shares a generic URL and displays feedback notification.
    */
-  const shareUrl = async (url: string, label = "Enlace copiado al portapapeles") => {
+  const shareUrl = async (
+    url: string,
+    label = "Enlace copiado al portapapeles",
+  ) => {
     const success = await copyToClipboard(url);
     if (success) {
       feedbackStore.showSuccess("Éxito", `${label}:\n${url}`);
     } else {
       feedbackStore.showError(
         "Error al copiar",
-        `No se pudo copiar automáticamente. Puedes copiar la URL manualmente:\n${url}`
+        `No se pudo copiar automáticamente. Puedes copiar la URL manualmente:\n${url}`,
       );
     }
   };

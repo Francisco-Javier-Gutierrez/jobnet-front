@@ -16,7 +16,7 @@ type CommentNode = CommentData & { children: CommentNode[] };
 export function useJobComments(jobId: string, jobRef: any) {
   const config = useRuntimeConfig();
   const { data: session, status } = useAuth();
-  
+
   const commentsList = ref<CommentData[]>([]);
   const totalComments = ref(0);
   const newCommentText = ref("");
@@ -26,7 +26,11 @@ export function useJobComments(jobId: string, jobRef: any) {
 
   const canDeleteComment = (c: CommentData): boolean => {
     if (status.value !== "authenticated") return false;
-    if (c.user === session.value?.user?.name || c.user === session.value?.user?.email) return true;
+    if (
+      c.user === session.value?.user?.name ||
+      c.user === session.value?.user?.email
+    )
+      return true;
     const role = (session.value?.user as any)?.tipoUsuario?.toUpperCase();
     return role === "ADMIN" || role === "MODERATOR";
   };
@@ -51,7 +55,8 @@ export function useJobComments(jobId: string, jobRef: any) {
     });
 
     roots.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
 
     const sortChildren = (nodeList: CommentNode[]) => {
@@ -68,7 +73,9 @@ export function useJobComments(jobId: string, jobRef: any) {
 
   const loadComments = async () => {
     try {
-      const fetchedJob = await $fetch<any>(`${config.public.apiUrl}/jobs/${jobId}`);
+      const fetchedJob = await $fetch<any>(
+        `${config.public.apiUrl}/jobs/${jobId}`,
+      );
       commentsList.value = fetchedJob?.comments || [];
       totalComments.value = commentsList.value.length;
     } catch (e) {
@@ -151,9 +158,12 @@ export function useJobComments(jobId: string, jobRef: any) {
   const deleteComment = async (commentId: string) => {
     if (confirm("¿Estás seguro de que deseas eliminar este comentario?")) {
       try {
-        await $fetch(`/api/jobs/${jobId}/comment/${encodeURIComponent(commentId)}`, {
-          method: "DELETE",
-        });
+        await $fetch(
+          `/api/jobs/${jobId}/comment/${encodeURIComponent(commentId)}`,
+          {
+            method: "DELETE",
+          },
+        );
 
         const idsToRemove = new Set<string>();
         const queue = [commentId];
@@ -211,6 +221,6 @@ export function useJobComments(jobId: string, jobRef: any) {
     submitReply,
     deleteComment,
     canDeleteComment,
-    formatDate
+    formatDate,
   };
 }

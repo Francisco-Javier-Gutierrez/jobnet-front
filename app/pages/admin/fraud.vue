@@ -8,9 +8,7 @@
       >
         Reportes de Fraude (Administrador)
       </h1>
-      <p
-        class="text-slate-500 dark:text-slate-400 text-sm mt-1"
-      >
+      <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
         Monitorea y audita los registros de bloqueos históricos y sospechas de
         fraude de vacantes y organizaciones.
       </p>
@@ -24,6 +22,7 @@
 <script setup lang="ts">
 useSeoMeta({
   title: "Reportes de Fraude - Administrador",
-  description: "Monitorea y audita registros de bloqueos y sospechas de fraude."
+  description:
+    "Monitorea y audita registros de bloqueos y sospechas de fraude.",
 });
 </script>

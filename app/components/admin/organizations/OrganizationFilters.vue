@@ -1,13 +1,23 @@
 <template>
-  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-8 shadow-sm">
-    <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+  <div
+    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-8 shadow-sm"
+  >
+    <h3
+      class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2"
+    >
       <span class="material-symbols-outlined text-[18px]">filter_list</span>
-      Búsqueda y Filtros de Empresas
+      Búsqueda y Filtros de Organizaciones
     </h3>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <form @submit.prevent="executeServerSearch" class="md:col-span-2 flex gap-2">
+      <form
+        @submit.prevent="executeServerSearch"
+        class="md:col-span-2 flex gap-2"
+      >
         <div class="relative flex-grow">
-          <span class="absolute left-3.5 top-3.5 material-symbols-outlined text-slate-400 dark:text-slate-500 text-lg">search</span>
+          <span
+            class="absolute left-3.5 top-3.5 material-symbols-outlined text-slate-400 dark:text-slate-500 text-lg"
+            >search</span
+          >
           <input
             v-model="searchInput"
             type="text"
@@ -29,7 +39,10 @@
           :disabled="loading"
           class="px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow active:scale-95 disabled:opacity-50 flex-shrink-0"
         >
-          <span v-if="loading" class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></span>
+          <span
+            v-if="loading"
+            class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"
+          ></span>
           <span v-else class="material-symbols-outlined text-base">search</span>
           <span>Buscar</span>
         </button>
@@ -40,7 +53,11 @@
           v-model="filterVerification"
           :options="[
             { value: 'ALL', label: 'Todos los Estatus de Verificación' },
-            { value: 'VERIFIED', label: 'Verificada (Icono Activo)', icon: 'verified' },
+            {
+              value: 'VERIFIED',
+              label: 'Verificada (Icono Activo)',
+              icon: 'verified',
+            },
             { value: 'NOT_VERIFIED', label: 'No Verificada' },
           ]"
         />
@@ -53,21 +70,32 @@
             { value: 'ALL', label: 'Todos los Estatus de Cuenta' },
             { value: 'ACTIVO', label: 'Activa', icon: 'check_circle' },
             { value: 'REVISION', label: 'En Revisión', icon: 'warning' },
-            { value: 'SUSPENDIDA', label: 'Suspendida (Bloqueada)', icon: 'block' },
+            {
+              value: 'SUSPENDIDA',
+              label: 'Suspendida (Bloqueada)',
+              icon: 'block',
+            },
           ]"
         />
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+    <div
+      class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800"
+    >
       <div class="md:col-span-2 flex items-center gap-2">
-        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold whitespace-nowrap">Fecha Registro:</span>
+        <span
+          class="text-xs text-slate-500 dark:text-slate-400 font-bold whitespace-nowrap"
+          >Fecha Registro:</span
+        >
         <input
           v-model="filterDateStart"
           type="date"
           class="bg-slate-50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-700 dark:text-slate-300 outline-none w-full"
         />
-        <span class="text-xs text-slate-400 dark:text-slate-500 font-bold">a</span>
+        <span class="text-xs text-slate-400 dark:text-slate-500 font-bold"
+          >a</span
+        >
         <input
           v-model="filterDateEnd"
           type="date"

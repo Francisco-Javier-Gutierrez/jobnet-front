@@ -14,7 +14,7 @@
       <div
         @click.stop="navigateToCompany"
         class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-primary-container text-white flex items-center justify-center text-sm font-bold shadow-sm flex-shrink-0 cursor-pointer hover:opacity-85 transition active:scale-95 overflow-hidden"
-        title="Ver empresa"
+        title="Ver organización"
       >
         <img
           v-if="job.companyLogo || job.empresaLogo"
@@ -44,14 +44,20 @@
           </span>
         </div>
 
-        <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant dark:text-slate-400 truncate">
+        <div
+          class="flex items-center gap-1.5 text-[11px] text-on-surface-variant dark:text-slate-400 truncate"
+        >
           <span
             @click.stop="navigateToCompany"
             class="font-bold text-primary dark:text-indigo-400 hover:underline cursor-pointer select-text"
           >
             {{ companyName }}
           </span>
-          <span class="material-symbols-outlined text-[13px] text-secondary fill-1" title="Verificada">verified</span>
+          <span
+            class="material-symbols-outlined text-[13px] text-secondary fill-1"
+            title="Verificada"
+            >verified</span
+          >
           <span>·</span>
           <span class="select-text">{{ formattedTime }}</span>
         </div>
@@ -109,7 +115,9 @@
         v-if="(job.vacantesDisponibles || 1) > 1"
         class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"
       >
-        <span class="material-symbols-outlined text-[14px] text-amber-500">local_fire_department</span>
+        <span class="material-symbols-outlined text-[14px] text-amber-500"
+          >local_fire_department</span
+        >
         {{ job.vacantesDisponibles }} plazas
       </span>
     </div>
@@ -153,8 +161,12 @@
         class="flex items-center gap-1.5 text-on-surface-variant dark:text-slate-300 hover:text-primary transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
         title="Ver comentarios y detalles en la vacante"
       >
-        <span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
-        <span class="text-xs font-semibold select-none">{{ commentsCount }}</span>
+        <span class="material-symbols-outlined text-[20px]"
+          >chat_bubble_outline</span
+        >
+        <span class="text-xs font-semibold select-none">{{
+          commentsCount
+        }}</span>
       </button>
 
       <!-- SHARE BUTTON -->
@@ -168,7 +180,11 @@
         "
         title="Compartir enlace de vacante"
       >
-        <span class="material-symbols-outlined text-[20px]" :class="{ 'font-fill-1 text-secondary': isSharedLocally }">share</span>
+        <span
+          class="material-symbols-outlined text-[20px]"
+          :class="{ 'font-fill-1 text-secondary': isSharedLocally }"
+          >share</span
+        >
         <span class="text-xs font-semibold">{{ sharesCount }}</span>
       </button>
 
@@ -219,7 +235,7 @@ const props = withDefaults(
     isDetail: false,
     isBookmarked: undefined,
     isLiked: undefined,
-  }
+  },
 );
 
 const emit = defineEmits(["like", "bookmark", "share", "navigate"]);
@@ -236,8 +252,11 @@ const isSharedLocally = ref(false);
 
 onMounted(() => {
   if (process.client) {
-    const currentUserId = props.currentUserId || (session.value?.user as any)?.id || 'anonymous';
-    const shared = JSON.parse(localStorage.getItem(`shared-jobs-${currentUserId}`) || "[]");
+    const currentUserId =
+      props.currentUserId || (session.value?.user as any)?.id || "anonymous";
+    const shared = JSON.parse(
+      localStorage.getItem(`shared-jobs-${currentUserId}`) || "[]",
+    );
     isSharedLocally.value = shared.includes(props.job.id || props.job.uniqueId);
   }
 });
@@ -246,8 +265,8 @@ const companyName = computed(() => {
   return (
     props.job?.company ||
     props.job?.empresaNombre ||
-    props.job?.empresa ||
-    "Empresa Reclutadora"
+    props.job?.organización ||
+    "Organización Reclutadora"
   );
 });
 
@@ -271,7 +290,8 @@ const formattedTime = computed(() => {
 const salaryDisplay = computed(() => {
   if (props.job?.salarioFormatted) return props.job.salarioFormatted;
   if (props.job?.salary) return props.job.salary;
-  if (props.job?.salario) return `$${props.job.salario.toLocaleString("es-MX")}`;
+  if (props.job?.salario)
+    return `$${props.job.salario.toLocaleString("es-MX")}`;
   if (props.job?.salarioMinimo && props.job?.salarioMaximo) {
     return `$${props.job.salarioMinimo.toLocaleString()} - $${props.job.salarioMaximo.toLocaleString()}`;
   }
@@ -296,8 +316,6 @@ const likesCount = computed(() => {
   return likesList.value.length;
 });
 
-
-
 // Bookmarks state
 const bookmarksList = computed<string[]>(() => {
   if (Array.isArray(props.job?.bookmarksList)) return props.job.bookmarksList;
@@ -313,7 +331,8 @@ const effectiveIsBookmarked = computed(() => {
 
 // Comments count
 const commentsCount = computed(() => {
-  if (typeof props.job?.commentsCount === "number") return props.job.commentsCount;
+  if (typeof props.job?.commentsCount === "number")
+    return props.job.commentsCount;
   if (Array.isArray(props.job?.comments)) return props.job.comments.length;
   return 0;
 });
@@ -324,7 +343,8 @@ const sharesCount = computed(() => {
 });
 
 const bookmarksCount = computed(() => {
-  if (typeof props.job?.bookmarksCount === "number") return props.job.bookmarksCount;
+  if (typeof props.job?.bookmarksCount === "number")
+    return props.job.bookmarksCount;
   return bookmarksList.value.length;
 });
 
@@ -332,7 +352,11 @@ const bookmarksCount = computed(() => {
 const handleClick = (e: MouseEvent) => {
   if (props.isDetail) return;
   const target = e.target as HTMLElement;
-  if (target.closest(".prevent-job-nav") || target.closest("button") || target.closest("a")) {
+  if (
+    target.closest(".prevent-job-nav") ||
+    target.closest("button") ||
+    target.closest("a")
+  ) {
     return;
   }
   forceNavigate();
@@ -345,7 +369,8 @@ const forceNavigate = () => {
 };
 
 const navigateToCompany = () => {
-  const companyId = props.job.empresaUuid || props.job.empresaId || props.job.companyId;
+  const companyId =
+    props.job.empresaUuid || props.job.empresaId || props.job.companyId;
   if (companyId) {
     router.push(`/company/${companyId}`);
   }
@@ -369,25 +394,27 @@ const handleLikeClick = (e: Event) => {
   emit("like", props.job);
 };
 
-
-
-
-
 const handleShareClick = (e: Event) => {
   e.stopPropagation();
   shareJob(props.job);
-  
+
   if (process.client) {
-    const currentUserId = props.currentUserId || (session.value?.user as any)?.id || 'anonymous';
-    const shared = JSON.parse(localStorage.getItem(`shared-jobs-${currentUserId}`) || "[]");
+    const currentUserId =
+      props.currentUserId || (session.value?.user as any)?.id || "anonymous";
+    const shared = JSON.parse(
+      localStorage.getItem(`shared-jobs-${currentUserId}`) || "[]",
+    );
     const id = props.job.id || props.job.uniqueId;
     if (!shared.includes(id)) {
       shared.push(id);
-      localStorage.setItem(`shared-jobs-${currentUserId}`, JSON.stringify(shared));
+      localStorage.setItem(
+        `shared-jobs-${currentUserId}`,
+        JSON.stringify(shared),
+      );
       isSharedLocally.value = true;
     }
   }
-  
+
   emit("share", props.job);
 };
 

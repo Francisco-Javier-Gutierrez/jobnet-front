@@ -90,8 +90,7 @@
       <h2
         class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-2"
       >
-        <span
-          class="material-symbols-outlined text-rose-600 dark:text-rose-400"
+        <span class="material-symbols-outlined text-rose-600 dark:text-rose-400"
           >verified</span
         >
         Documentos Corporativos Relevantes
@@ -129,9 +128,7 @@
               @click="$emit('previewDoc', doc)"
               class="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm active:scale-95"
             >
-              <span class="material-symbols-outlined text-sm"
-                >visibility</span
-              >
+              <span class="material-symbols-outlined text-sm">visibility</span>
               Ver
             </button>
             <a
@@ -154,5 +151,5 @@ defineProps<{
   company: any;
 }>();
 
-defineEmits(['previewDoc']);
+defineEmits(["previewDoc"]);
 </script>

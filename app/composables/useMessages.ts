@@ -1,7 +1,7 @@
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
-import { useRoute, useRuntimeConfig } from '#app';
+import { ref, computed, nextTick, onMounted, onUnmounted } from "vue";
+import { useRoute, useRuntimeConfig } from "#app";
 import { useAppFeedback } from "~/composables/useAppFeedback";
-import { useAuth } from '#imports'; // adjust if needed
+import { useAuth } from "#imports"; // adjust if needed
 import { useS3Upload } from "~/composables/useS3Upload";
 
 export const useMessages = () => {
@@ -20,7 +20,7 @@ export const useMessages = () => {
   } | null>(null);
 
   const userId = computed(
-    () => (session.value?.user as any)?.id || "empresa-user",
+    () => (session.value?.user as any)?.id || "organización-user",
   );
   const userRole = computed(
     () => (session.value?.user as any)?.tipoUsuario || "",
@@ -62,7 +62,8 @@ export const useMessages = () => {
     const q = searchQuery.value.toLowerCase();
     return chats.value.filter(
       (c) =>
-        c.name.toLowerCase().includes(q) || c.jobTitle.toLowerCase().includes(q),
+        c.name.toLowerCase().includes(q) ||
+        c.jobTitle.toLowerCase().includes(q),
     );
   });
 
@@ -129,16 +130,16 @@ export const useMessages = () => {
           const job = allJobs.find((j) => j.id === app.jobId);
           const statusMap: Record<string, string> = {
             PENDIENTE: "Pendiente",
-            REVISADO: "Revisado",
-            ENTREVISTA: "Entrevista",
-            ACEPTADO: "Seleccionado",
+            EN_CONTACTO: "En Contacto",
+            SELECCIONADO: "Seleccionado",
+            CONTRATADO: "Contratado",
             RECHAZADO: "Rechazado",
           };
           list.push({
             id: `${app.jobId}#${userId.value}`,
             jobId: app.jobId,
             candidateId: userId.value,
-            name: job?.company || job?.nombreEmpresa || "Empresa",
+            name: job?.company || job?.nombreEmpresa || "Organización",
             jobTitle: job?.title || job?.titulo || "Vacante",
             status: statusMap[app.status] || app.status || "Pendiente",
             lastMessage: "",
@@ -147,7 +148,9 @@ export const useMessages = () => {
         }
       } else {
         // Organization / Company Role
-        let myCompanyJobs = allJobs.filter((j) => j.empresaUuid === userId.value);
+        let myCompanyJobs = allJobs.filter(
+          (j) => j.empresaUuid === userId.value,
+        );
 
         if (myCompanyJobs.length === 0) {
           myCompanyJobs = allJobs;
@@ -165,9 +168,9 @@ export const useMessages = () => {
 
             const statusMap: Record<string, string> = {
               PENDIENTE: "Pendiente",
-              REVISADO: "Revisado",
-              ENTREVISTA: "Entrevista",
-              ACEPTADO: "Seleccionado",
+              EN_CONTACTO: "En Contacto",
+              SELECCIONADO: "Seleccionado",
+              CONTRATADO: "Contratado",
               RECHAZADO: "Rechazado",
             };
 
@@ -217,7 +220,7 @@ export const useMessages = () => {
               profile.nombreComercial ||
               `Candidato (${qCandidateId.substring(0, 8)})`,
             jobTitle: jobDetail.title || jobDetail.titulo || "Vacante",
-            status: "Entrevista",
+            status: "En Contacto",
             lastMessage: "",
             time: new Date().toLocaleDateString(),
           };
@@ -427,7 +430,8 @@ export const useMessages = () => {
 
     // Optimistically push to local UI immediately
     messages.value.push(msgPayload);
-    activeChat.value.lastMessage = text || attachment?.name || "Archivo adjunto";
+    activeChat.value.lastMessage =
+      text || attachment?.name || "Archivo adjunto";
     activeChat.value.time = formatTime(timestamp);
 
     // Clear input immediately for snappy UX

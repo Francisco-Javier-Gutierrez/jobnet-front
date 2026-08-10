@@ -210,9 +210,7 @@
             >"{{ selectedSuggestion?.name }}"</strong
           >
           es muy similar al
-          {{
-            (selectedSuggestion?.category || "elemento").toLowerCase()
-          }}
+          {{ (selectedSuggestion?.category || "elemento").toLowerCase() }}
           existente en catálogo
           <strong class="text-primary">"{{ existingItemName }}"</strong>.
         </p>

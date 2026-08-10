@@ -178,7 +178,11 @@
             : 'text-on-surface-variant dark:text-slate-300 hover:text-secondary'
         "
       >
-        <span class="material-symbols-outlined text-[20px]" :class="{ 'font-fill-1 text-secondary': isSharedLocally }">share</span>
+        <span
+          class="material-symbols-outlined text-[20px]"
+          :class="{ 'font-fill-1 text-secondary': isSharedLocally }"
+          >share</span
+        >
         <span class="text-xs font-semibold">{{ sharesCount }}</span>
       </button>
       <button
@@ -337,9 +341,16 @@ const { openProtectedModal } = useProtectedAction();
 
 onMounted(() => {
   if (process.client) {
-    const currentUserId = props.currentUserId || (authSession.value?.user as any)?.id || 'anonymous';
-    const shared = JSON.parse(localStorage.getItem(`shared-posts-${currentUserId}`) || "[]");
-    isSharedLocally.value = shared.includes(props.post.uniqueId || props.post.id);
+    const currentUserId =
+      props.currentUserId ||
+      (authSession.value?.user as any)?.id ||
+      "anonymous";
+    const shared = JSON.parse(
+      localStorage.getItem(`shared-posts-${currentUserId}`) || "[]",
+    );
+    isSharedLocally.value = shared.includes(
+      props.post.uniqueId || props.post.id,
+    );
   }
 });
 
@@ -354,7 +365,7 @@ const displayRole = computed(() => {
     upperRole === "ORGANIZACION" ||
     props.post?.isCompany
   ) {
-    return "Empresa";
+    return "Organización";
   }
 
   return "Candidato";
@@ -389,18 +400,26 @@ const handleCommentClick = (e: Event) => {
 
 const handleShareClick = (e: Event) => {
   e.stopPropagation();
-  
+
   if (process.client) {
-    const currentUserId = props.currentUserId || (authSession.value?.user as any)?.id || 'anonymous';
-    const shared = JSON.parse(localStorage.getItem(`shared-posts-${currentUserId}`) || "[]");
+    const currentUserId =
+      props.currentUserId ||
+      (authSession.value?.user as any)?.id ||
+      "anonymous";
+    const shared = JSON.parse(
+      localStorage.getItem(`shared-posts-${currentUserId}`) || "[]",
+    );
     const id = props.post.uniqueId || props.post.id;
     if (!shared.includes(id)) {
       shared.push(id);
-      localStorage.setItem(`shared-posts-${currentUserId}`, JSON.stringify(shared));
+      localStorage.setItem(
+        `shared-posts-${currentUserId}`,
+        JSON.stringify(shared),
+      );
       isSharedLocally.value = true;
     }
   }
-  
+
   emit("share", props.post);
 };
 
@@ -477,13 +496,19 @@ const commentsCount = computed(() => {
 });
 
 const sharesCount = computed(() => {
-  if (typeof props.post?.sharesCount === "number") return props.post.sharesCount;
+  if (typeof props.post?.sharesCount === "number")
+    return props.post.sharesCount;
   return 0;
 });
 
 const bookmarksCount = computed(() => {
-  if (typeof props.post?.bookmarksCount === "number") return props.post.bookmarksCount;
-  const bookmarks = props.post?.bookmarksList || props.post?.bookmarkedBy || props.post?.bookmarks || [];
+  if (typeof props.post?.bookmarksCount === "number")
+    return props.post.bookmarksCount;
+  const bookmarks =
+    props.post?.bookmarksList ||
+    props.post?.bookmarkedBy ||
+    props.post?.bookmarks ||
+    [];
   return Array.isArray(bookmarks) ? bookmarks.length : 0;
 });
 
@@ -509,11 +534,10 @@ const navigateToAuthor = () => {
     props.post?.userId ||
     props.post?.author;
   if (!id) return;
-  if (props.post?.role === "Empresa" || props.post?.isCompany) {
+  if (props.post?.role === "Organización" || props.post?.isCompany) {
     navigateTo(`/company/${encodeURIComponent(id)}`);
   } else {
     navigateTo(`/candidate/${encodeURIComponent(id)}`);
   }
 };
 </script>
-

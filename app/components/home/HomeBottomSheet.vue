@@ -9,7 +9,8 @@
       class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 w-full max-w-lg rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh]"
       :class="isDragging ? '' : 'transition-transform duration-300'"
       :style="{
-        transform: sheetOffset > 0 ? `translateY(${sheetOffset}px)` : 'translateY(0px)',
+        transform:
+          sheetOffset > 0 ? `translateY(${sheetOffset}px)` : 'translateY(0px)',
       }"
       @click.stop
     >
@@ -22,7 +23,9 @@
         @mousedown="$emit('mousedown', $event)"
         @click="$emit('close')"
       >
-        <div class="w-12 h-1.5 rounded-full bg-outline/20 hover:bg-outline/40 transition"></div>
+        <div
+          class="w-12 h-1.5 rounded-full bg-outline/20 hover:bg-outline/40 transition"
+        ></div>
       </div>
 
       <!-- Header -->
@@ -33,8 +36,12 @@
         @touchend="$emit('touchend')"
         @mousedown="$emit('mousedown', $event)"
       >
-        <h3 class="text-sm font-bold text-on-background flex items-center gap-1 pointer-events-none">
-          <span class="material-symbols-outlined text-primary text-lg">forum</span>
+        <h3
+          class="text-sm font-bold text-on-background flex items-center gap-1 pointer-events-none"
+        >
+          <span class="material-symbols-outlined text-primary text-lg"
+            >forum</span
+          >
           Publicación y Comentarios
         </h3>
         <button
@@ -62,15 +69,25 @@
         <div
           class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-2xl p-4 border border-outline-variant/30 space-y-4"
         >
-          <h4 class="text-xs font-bold text-on-background flex items-center gap-1 pb-2 border-b border-outline-variant/20">
+          <h4
+            class="text-xs font-bold text-on-background flex items-center gap-1 pb-2 border-b border-outline-variant/20"
+          >
             Comentarios y Respuestas ({{ commentsCount(selectedPost) }})
           </h4>
 
           <!-- Input Form -->
-          <form @submit.prevent="$emit('submit-comment')" class="flex flex-col gap-2">
+          <form
+            @submit.prevent="$emit('submit-comment')"
+            class="flex flex-col gap-2"
+          >
             <textarea
               :value="newCommentText"
-              @input="$emit('update:newCommentText', ($event.target as HTMLTextAreaElement).value)"
+              @input="
+                $emit(
+                  'update:newCommentText',
+                  ($event.target as HTMLTextAreaElement).value,
+                )
+              "
               placeholder="Escribe un comentario público..."
               rows="2"
               class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl p-3 text-xs text-on-background outline-none transition placeholder-on-surface-variant/50 resize-none font-sans"
@@ -81,8 +98,12 @@
                 :disabled="!newCommentText.trim() || isSubmittingComment"
                 class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-[10px] px-4 py-2 rounded-lg transition flex items-center gap-1.5"
               >
-                <span v-if="isSubmittingComment" class="animate-spin text-xs">⌛</span>
-                <span>{{ isSubmittingComment ? "Enviando..." : "Comentar" }}</span>
+                <span v-if="isSubmittingComment" class="animate-spin text-xs"
+                  >⌛</span
+                >
+                <span>{{
+                  isSubmittingComment ? "Enviando..." : "Comentar"
+                }}</span>
               </button>
             </div>
           </form>
@@ -92,7 +113,10 @@
             v-if="commentTree.length === 0"
             class="text-center py-6 text-on-surface-variant dark:text-slate-300/60 text-xs"
           >
-            <span class="material-symbols-outlined text-[28px] text-outline mb-1">comments_disabled</span>
+            <span
+              class="material-symbols-outlined text-[28px] text-outline mb-1"
+              >comments_disabled</span
+            >
             <p>No hay comentarios todavía.</p>
           </div>
           <div v-else class="space-y-4 pt-2">
@@ -104,12 +128,19 @@
             >
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                  <div class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px] shadow-sm">
+                  <div
+                    class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px] shadow-sm"
+                  >
                     {{ node.user ? node.user.charAt(0).toUpperCase() : "U" }}
                   </div>
                   <div>
-                    <h5 class="text-[11px] font-bold text-on-background">{{ node.user || "Usuario" }}</h5>
-                    <span class="text-[9px] text-on-surface-variant dark:text-slate-300/75">{{ node.timeAgo || "Hace un momento" }}</span>
+                    <h5 class="text-[11px] font-bold text-on-background">
+                      {{ node.user || "Usuario" }}
+                    </h5>
+                    <span
+                      class="text-[9px] text-on-surface-variant dark:text-slate-300/75"
+                      >{{ node.timeAgo || "Hace un momento" }}</span
+                    >
                   </div>
                 </div>
                 <button
@@ -122,7 +153,10 @@
               </div>
               <p
                 class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
-                :class="{ 'italic text-on-surface-variant dark:text-slate-300/60': node.isDeleted }"
+                :class="{
+                  'italic text-on-surface-variant dark:text-slate-300/60':
+                    node.isDeleted,
+                }"
               >
                 {{ node.text }}
               </p>
@@ -146,7 +180,12 @@
               >
                 <input
                   :value="replyText"
-                  @input="$emit('update:replyText', ($event.target as HTMLInputElement).value)"
+                  @input="
+                    $emit(
+                      'update:replyText',
+                      ($event.target as HTMLInputElement).value,
+                    )
+                  "
                   type="text"
                   placeholder="Respuesta..."
                   class="flex-grow bg-surface border border-outline-variant/60 focus:border-primary rounded-lg px-3 py-1.5 text-xs text-on-background outline-none transition"
@@ -156,7 +195,9 @@
                   :disabled="!replyText.trim() || isSubmittingReply"
                   class="bg-secondary text-white disabled:bg-secondary/40 font-bold text-[10px] px-3 py-1.5 rounded-lg hover:bg-[#005236] transition flex items-center gap-1"
                 >
-                  <span>{{ isSubmittingReply ? "Enviando..." : "Responder" }}</span>
+                  <span>{{
+                    isSubmittingReply ? "Enviando..." : "Responder"
+                  }}</span>
                 </button>
               </form>
 
@@ -173,12 +214,21 @@
                 >
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
-                      <div class="w-5 h-5 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[9px]">
-                        {{ reply.user ? reply.user.charAt(0).toUpperCase() : "U" }}
+                      <div
+                        class="w-5 h-5 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[9px]"
+                      >
+                        {{
+                          reply.user ? reply.user.charAt(0).toUpperCase() : "U"
+                        }}
                       </div>
                       <div>
-                        <h6 class="text-[10px] font-bold text-on-background">{{ reply.user || "Usuario" }}</h6>
-                        <span class="text-[8px] text-on-surface-variant dark:text-slate-300/75">{{ reply.timeAgo || "Hace un momento" }}</span>
+                        <h6 class="text-[10px] font-bold text-on-background">
+                          {{ reply.user || "Usuario" }}
+                        </h6>
+                        <span
+                          class="text-[8px] text-on-surface-variant dark:text-slate-300/75"
+                          >{{ reply.timeAgo || "Hace un momento" }}</span
+                        >
                       </div>
                     </div>
                     <button
@@ -186,12 +236,17 @@
                       @click="$emit('delete-comment', reply.id)"
                       class="text-rose-600 hover:bg-rose-50 p-0.5 rounded transition opacity-0 group-hover:opacity-100"
                     >
-                      <span class="material-symbols-outlined text-[10px]">delete</span>
+                      <span class="material-symbols-outlined text-[10px]"
+                        >delete</span
+                      >
                     </button>
                   </div>
                   <p
                     class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
-                    :class="{ 'italic text-on-surface-variant dark:text-slate-300/60': reply.isDeleted }"
+                    :class="{
+                      'italic text-on-surface-variant dark:text-slate-300/60':
+                        reply.isDeleted,
+                    }"
                   >
                     {{ reply.text }}
                   </p>
@@ -225,19 +280,19 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'close'): void;
-  (e: 'touchstart', event: TouchEvent): void;
-  (e: 'touchmove', event: TouchEvent): void;
-  (e: 'touchend'): void;
-  (e: 'mousedown', event: MouseEvent): void;
-  (e: 'toggle-like', item: any): void;
-  (e: 'toggle-bookmark', item: any): void;
-  (e: 'share-post', item: any): void;
-  (e: 'update:newCommentText', value: string): void;
-  (e: 'submit-comment'): void;
-  (e: 'delete-comment', id: string): void;
-  (e: 'toggle-reply-form', id: string): void;
-  (e: 'update:replyText', value: string): void;
-  (e: 'submit-reply', id: string): void;
+  (e: "close"): void;
+  (e: "touchstart", event: TouchEvent): void;
+  (e: "touchmove", event: TouchEvent): void;
+  (e: "touchend"): void;
+  (e: "mousedown", event: MouseEvent): void;
+  (e: "toggle-like", item: any): void;
+  (e: "toggle-bookmark", item: any): void;
+  (e: "share-post", item: any): void;
+  (e: "update:newCommentText", value: string): void;
+  (e: "submit-comment"): void;
+  (e: "delete-comment", id: string): void;
+  (e: "toggle-reply-form", id: string): void;
+  (e: "update:replyText", value: string): void;
+  (e: "submit-reply", id: string): void;
 }>();
 </script>

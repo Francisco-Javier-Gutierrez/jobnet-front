@@ -8,7 +8,12 @@
     <form @submit.prevent="$emit('submitComment')" class="flex flex-col gap-3">
       <textarea
         :value="newCommentText"
-        @input="$emit('update:newCommentText', ($event.target as HTMLTextAreaElement).value)"
+        @input="
+          $emit(
+            'update:newCommentText',
+            ($event.target as HTMLTextAreaElement).value,
+          )
+        "
         placeholder="Pregunta algo al reclutador sobre esta vacante..."
         rows="3"
         class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-2xl p-4 text-xs text-on-background outline-none transition placeholder-on-surface-variant/50 resize-none font-sans"
@@ -24,21 +29,37 @@
       </div>
     </form>
 
-    <div v-if="commentTree.length === 0" class="text-center py-6 text-on-surface-variant dark:text-slate-300/60 text-xs">
-      <span class="material-symbols-outlined text-[32px] text-outline mb-1">comments_disabled</span>
+    <div
+      v-if="commentTree.length === 0"
+      class="text-center py-6 text-on-surface-variant dark:text-slate-300/60 text-xs"
+    >
+      <span class="material-symbols-outlined text-[32px] text-outline mb-1"
+        >comments_disabled</span
+      >
       <p>No hay preguntas aún. ¡Sé el primero en consultar!</p>
     </div>
 
     <div v-else class="space-y-4">
-      <div v-for="node in commentTree" :key="node.id" class="p-4 bg-surface-container-low/30 border border-outline-variant/40 rounded-2xl space-y-3 relative">
+      <div
+        v-for="node in commentTree"
+        :key="node.id"
+        class="p-4 bg-surface-container-low/30 border border-outline-variant/40 rounded-2xl space-y-3 relative"
+      >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-inner">
+            <div
+              class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-inner"
+            >
               {{ node.user.charAt(0).toUpperCase() }}
             </div>
             <div>
-              <h4 class="text-xs font-bold text-on-background">{{ node.user }}</h4>
-              <span class="text-[10px] text-on-surface-variant dark:text-slate-300/80">{{ formatDate(node.createdAt) }}</span>
+              <h4 class="text-xs font-bold text-on-background">
+                {{ node.user }}
+              </h4>
+              <span
+                class="text-[10px] text-on-surface-variant dark:text-slate-300/80"
+                >{{ formatDate(node.createdAt) }}</span
+              >
             </div>
           </div>
 
@@ -52,7 +73,9 @@
           </button>
         </div>
 
-        <p class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed">
+        <p
+          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+        >
           {{ node.text }}
         </p>
 
@@ -73,7 +96,12 @@
         >
           <input
             :value="replyContentText"
-            @input="$emit('update:replyContentText', ($event.target as HTMLInputElement).value)"
+            @input="
+              $emit(
+                'update:replyContentText',
+                ($event.target as HTMLInputElement).value,
+              )
+            "
             type="text"
             placeholder="Escribe una respuesta..."
             class="flex-grow bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2 text-xs text-on-background outline-none transition"
@@ -87,16 +115,30 @@
           </button>
         </form>
 
-        <div v-if="node.children && node.children.length > 0" class="ml-6 md:ml-8 mt-3 border-l-2 border-outline-variant/30 pl-4 space-y-3">
-          <div v-for="reply in node.children" :key="reply.id" class="p-3 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/30 rounded-xl space-y-2">
+        <div
+          v-if="node.children && node.children.length > 0"
+          class="ml-6 md:ml-8 mt-3 border-l-2 border-outline-variant/30 pl-4 space-y-3"
+        >
+          <div
+            v-for="reply in node.children"
+            :key="reply.id"
+            class="p-3 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/30 rounded-xl space-y-2"
+          >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[10px]">
+                <div
+                  class="w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[10px]"
+                >
                   {{ reply.user.charAt(0).toUpperCase() }}
                 </div>
                 <div>
-                  <h5 class="text-[11px] font-bold text-on-background">{{ reply.user }}</h5>
-                  <span class="text-[9px] text-on-surface-variant dark:text-slate-300">{{ formatDate(reply.createdAt) }}</span>
+                  <h5 class="text-[11px] font-bold text-on-background">
+                    {{ reply.user }}
+                  </h5>
+                  <span
+                    class="text-[9px] text-on-surface-variant dark:text-slate-300"
+                    >{{ formatDate(reply.createdAt) }}</span
+                  >
                 </div>
               </div>
 
@@ -109,7 +151,9 @@
                 <span class="material-symbols-outlined text-xs">delete</span>
               </button>
             </div>
-            <p class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed">
+            <p
+              class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+            >
               {{ reply.text }}
             </p>
           </div>
@@ -137,6 +181,6 @@ defineEmits([
   "deleteComment",
   "toggleReplyForm",
   "submitReply",
-  "update:replyContentText"
+  "update:replyContentText",
 ]);
 </script>

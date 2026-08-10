@@ -167,7 +167,7 @@
           <input
             type="file"
             accept=".pdf"
-            :ref="(el) => state.vacancyFileInput = el"
+            :ref="(el) => (state.vacancyFileInput = el)"
             @change="state.handleVacancyFileSelect"
             class="hidden"
           />
@@ -487,7 +487,13 @@
         <span class="material-symbols-outlined text-lg">{{
           state.submitting ? "sync" : "post_add"
         }}</span>
-        {{ state.submitting ? "Guardando..." : isEdit ? "Guardar Cambios" : "Publicar Vacante" }}
+        {{
+          state.submitting
+            ? "Guardando..."
+            : isEdit
+              ? "Guardar Cambios"
+              : "Publicar Vacante"
+        }}
       </button>
     </form>
 
@@ -495,7 +501,9 @@
     <AppPdfPreviewModal
       v-model="state.showVacancyPdfModal"
       :url="state.vacancyPdfPreviewUrl"
-      :file-name="state.selectedVacancyFile?.name || 'Especificacion_Vacante.pdf'"
+      :file-name="
+        state.selectedVacancyFile?.name || 'Especificacion_Vacante.pdf'
+      "
       title="Especificación de Puesto (PDF)"
     />
   </div>

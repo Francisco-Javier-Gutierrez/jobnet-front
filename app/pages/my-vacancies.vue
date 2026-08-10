@@ -140,6 +140,17 @@
               >
                 👥 1 plaza
               </span>
+              <span>·</span>
+              <span
+                class="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400"
+              >
+                <span class="material-symbols-outlined text-sm">groups</span>
+                {{ job.postulantesCount || 0 }} postulantes
+              </span>
+              <span>·</span>
+              <span class="text-slate-500 text-[10px] mt-0.5">
+                Creada: {{ new Date(job.createdAt).toLocaleDateString() }}
+              </span>
             </div>
           </div>
 
@@ -171,6 +182,20 @@
               Editar
             </NuxtLink>
             <button
+              v-if="job.estado !== 'EVALUACION' && job.estado !== 'PAUSADA'"
+              @click="togglePause(job.id, 'PAUSADA')"
+              class="bg-surface border border-outline-variant hover:border-amber-500 text-on-surface-variant dark:text-slate-300 hover:text-amber-500 font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
+            >
+              Pausar
+            </button>
+            <button
+              v-if="job.estado === 'PAUSADA'"
+              @click="togglePause(job.id, 'Activa')"
+              class="bg-surface border border-emerald-200 hover:border-emerald-500 text-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
+            >
+              Reanudar
+            </button>
+            <button
               v-if="job.estado !== 'EVALUACION'"
               @click="deleteJob(job.id)"
               class="bg-surface border border-rose-200 hover:border-rose-500 text-rose-500 hover:bg-rose-50 hover:text-rose-600 font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
@@ -196,7 +221,7 @@ import AppAppealModal from "~/components/AppAppealModal.vue";
 useSeoMeta({
   title: "Mis Vacantes Publicadas - JobNet",
   description:
-    "Administración y gestión de publicaciones de empleo para empresas en la plataforma JobNet",
+    "Administración y gestión de publicaciones de empleo para organizaciones en la plataforma JobNet",
 });
 
 const config = useRuntimeConfig();
@@ -233,7 +258,21 @@ const fetchVacancies = async () => {
     // Keep all jobs for the company regardless of active/evaluation/appeal status
     const filtered = allJobs.filter((j) => j.empresaUuid === companyId);
 
-    vacancies.value = filtered.map((j) => ({
+    // Fetch counts
+    const jobsWithCounts = await Promise.all(
+      filtered.map(async (j) => {
+        let count = 0;
+        try {
+          const apps = await $fetch<any[]>(
+            `${config.public.apiUrl}/jobs/${j.id}/applicants`,
+          ).catch(() => []);
+          count = apps.length;
+        } catch (e) {}
+        return { ...j, postulantesCount: count };
+      }),
+    );
+
+    vacancies.value = jobsWithCounts.map((j) => ({
       id: j.id,
       title: j.title || "Vacante sin título",
       type: j.modalidad || "Presencial",
@@ -245,6 +284,8 @@ const fetchVacancies = async () => {
       salarioMaximo: j.salarioMaximo,
       vacantesDisponibles: j.vacantesDisponibles || 1,
       maxPostulantes: j.maxPostulantes || null,
+      createdAt: j.createdAt || new Date().toISOString(),
+      postulantesCount: j.postulantesCount,
     }));
   } catch (e) {
     console.error("Error loading vacancies list:", e);
@@ -258,7 +299,11 @@ onMounted(() => {
 });
 
 const deleteJob = async (id: string) => {
-  if (!confirm("¿Estás seguro de que deseas eliminar y cerrar esta vacante? Ya no recibirá postulaciones.")) {
+  if (
+    !confirm(
+      "¿Estás seguro de que deseas eliminar y cerrar esta vacante? Ya no recibirá postulaciones.",
+    )
+  ) {
     return;
   }
   try {
@@ -266,10 +311,24 @@ const deleteJob = async (id: string) => {
       method: "DELETE",
     });
     // Remove from local list
-    vacancies.value = vacancies.value.filter(j => j.id !== id);
+    vacancies.value = vacancies.value.filter((j) => j.id !== id);
   } catch (e) {
     console.error("Error deleting job:", e);
     alert("Hubo un error al eliminar la vacante.");
+  }
+};
+
+const togglePause = async (id: string, nuevoEstado: string) => {
+  try {
+    await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
+      method: "PUT",
+      body: { estado: nuevoEstado, empresaUuid: companyId.value },
+    });
+    const job = vacancies.value.find((j) => j.id === id);
+    if (job) job.estado = nuevoEstado;
+  } catch (e) {
+    console.error("Error toggling pause:", e);
+    alert("Error al actualizar estado de la vacante.");
   }
 };
 </script>

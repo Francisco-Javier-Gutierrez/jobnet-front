@@ -217,7 +217,7 @@ const navItems = [
   },
   { to: "/mod/support", icon: "forum", label: "Mensajes y Soporte WS" },
   { to: "/notifications", icon: "notifications", label: "Notificaciones" },
-  { to: "/companies", icon: "domain", label: "Directorio de Empresas" },
+  { to: "/companies", icon: "domain", label: "Directorio de Organizaciones" },
   { to: "/admin/catalog", icon: "layers", label: "Catálogo Maestro" },
   { to: "/admin/fraud", icon: "find_in_page", label: "Reportes de Fraude" },
 ];

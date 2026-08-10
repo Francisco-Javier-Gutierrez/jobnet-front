@@ -9,9 +9,7 @@
         <span class="material-symbols-outlined text-xl">work</span>
       </div>
       <div class="text-left">
-        <h3 class="text-xs font-bold text-on-background">
-          Bolsa de Vacantes
-        </h3>
+        <h3 class="text-xs font-bold text-on-background">Bolsa de Vacantes</h3>
         <p class="text-[11px] text-on-surface-variant dark:text-slate-300">
           Explora las ofertas activas y postúlate
         </p>
@@ -27,5 +25,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>

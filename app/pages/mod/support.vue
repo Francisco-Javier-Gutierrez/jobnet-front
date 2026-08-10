@@ -13,7 +13,7 @@
         </h1>
         <p class="text-on-surface-variant dark:text-slate-300 text-sm">
           Resuelve disputas de reclutamiento y atiende dudas de candidatos y
-          empresas en tiempo real.
+          organizaciones en tiempo real.
         </p>
       </div>
       <div

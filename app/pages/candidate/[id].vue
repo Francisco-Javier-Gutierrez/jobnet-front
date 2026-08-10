@@ -5,7 +5,9 @@
     class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16 space-y-6 animate-pulse"
   >
     <!-- Header Card Skeleton -->
-    <div class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl border border-outline-variant/60 overflow-hidden shadow-sm">
+    <div
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl border border-outline-variant/60 overflow-hidden shadow-sm"
+    >
       <div class="bg-outline/10 h-2 w-full"></div>
       <div class="p-8 flex flex-col items-center text-center">
         <!-- Avatar Skeleton -->
@@ -25,7 +27,9 @@
     </div>
 
     <!-- Details Card Skeleton -->
-    <div class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl border border-outline-variant/60 p-6 space-y-4">
+    <div
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl border border-outline-variant/60 p-6 space-y-4"
+    >
       <div class="h-5 w-36 bg-outline/20 rounded-lg"></div>
       <div class="space-y-2">
         <div class="h-4 w-full bg-outline/10 rounded"></div>
@@ -40,12 +44,18 @@
     v-else-if="error"
     class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16 flex items-center justify-center min-h-[60vh]"
   >
-    <div class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] p-lg md:p-xl text-center max-w-md">
-      <span class="material-symbols-outlined text-error text-5xl mb-4">error_outline</span>
+    <div
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] p-lg md:p-xl text-center max-w-md"
+    >
+      <span class="material-symbols-outlined text-error text-5xl mb-4"
+        >error_outline</span
+      >
       <h2 class="font-headline-md text-headline-md text-on-surface mb-2">
         No se pudo cargar el perfil
       </h2>
-      <p class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 mb-6">
+      <p
+        class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 mb-6"
+      >
         {{ errorMessage }}
       </p>
       <button
@@ -72,10 +82,7 @@
     />
 
     <!-- Documents Horizontal Scroll -->
-    <CandidateDocumentsList
-      :documents="documents"
-      @open="openDocViewer"
-    />
+    <CandidateDocumentsList :documents="documents" @open="openDocViewer" />
 
     <!-- Standardized Universal Document Viewer -->
     <AppDocumentViewer
@@ -85,27 +92,20 @@
     />
 
     <!-- Body Card -->
-    <section class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] p-lg md:p-xl space-y-8">
+    <section
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] p-lg md:p-xl space-y-8"
+    >
       <!-- Sobre mí y Sectores -->
-      <CandidateAboutSection
-        :profile="profile"
-        :sectors="sectors"
-      />
+      <CandidateAboutSection :profile="profile" :sectors="sectors" />
 
       <!-- Trayectoria Laboral (Experiencia) -->
-      <CandidateExperienceList
-        :experiencia="profile.experiencia"
-      />
+      <CandidateExperienceList :experiencia="profile.experiencia" />
 
       <!-- Formación Académica (Educación) -->
-      <CandidateEducationList
-        :educacion="profile.educacion"
-      />
+      <CandidateEducationList :educacion="profile.educacion" />
 
       <!-- Habilidades Técnicas -->
-      <CandidateSkillsList
-        :skills="skills"
-      />
+      <CandidateSkillsList :skills="skills" />
     </section>
 
     <!-- Bottom Section Tabs: [Mis publicaciones] / [Guardados] -->
@@ -124,15 +124,15 @@
 </template>
 
 <script setup lang="ts">
-import { useSeoMeta } from '#app';
-import { useCandidateProfile } from '~/composables/useCandidateProfile';
-import CandidateHeaderProfile from '~/components/profiles/CandidateHeaderProfile.vue';
-import CandidateAboutSection from '~/components/profiles/CandidateAboutSection.vue';
-import CandidateExperienceList from '~/components/profiles/CandidateExperienceList.vue';
-import CandidateEducationList from '~/components/profiles/CandidateEducationList.vue';
-import CandidateSkillsList from '~/components/profiles/CandidateSkillsList.vue';
-import CandidateDocumentsList from '~/components/profiles/CandidateDocumentsList.vue';
-import CandidateActivityTabs from '~/components/profiles/CandidateActivityTabs.vue';
+import { useSeoMeta } from "#app";
+import { useCandidateProfile } from "~/composables/useCandidateProfile";
+import CandidateHeaderProfile from "~/components/profiles/CandidateHeaderProfile.vue";
+import CandidateAboutSection from "~/components/profiles/CandidateAboutSection.vue";
+import CandidateExperienceList from "~/components/profiles/CandidateExperienceList.vue";
+import CandidateEducationList from "~/components/profiles/CandidateEducationList.vue";
+import CandidateSkillsList from "~/components/profiles/CandidateSkillsList.vue";
+import CandidateDocumentsList from "~/components/profiles/CandidateDocumentsList.vue";
+import CandidateActivityTabs from "~/components/profiles/CandidateActivityTabs.vue";
 
 const {
   loading,
@@ -160,7 +160,7 @@ const {
   toggleBookmark,
   isBookmarked,
   sharePost,
-  authData
+  authData,
 } = useCandidateProfile();
 
 // --- Init ---
@@ -169,7 +169,8 @@ fetchProfile();
 // --- SEO ---
 useSeoMeta({
   title: () => `${profile.value.nombre || "Candidato"} - Perfil`,
-  description: () => `Perfil público del candidato ${profile.value.nombre || ""} en JobNet`,
+  description: () =>
+    `Perfil público del candidato ${profile.value.nombre || ""} en JobNet`,
 });
 </script>
 

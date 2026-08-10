@@ -53,8 +53,8 @@
         class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
       >
         Sube tu Constancia de Situación Fiscal u otro documento oficial para
-        certificar la identidad de tu empresa frente a los candidatos. El equipo
-        de moderación revisará este documento.
+        certificar la identidad de tu organización frente a los candidatos. El
+        equipo de moderación revisará este documento.
       </p>
 
       <div class="flex flex-col gap-1.5">
@@ -165,7 +165,7 @@
         {{
           submittingVerification
             ? "Enviando..."
-            : "Solicitar Verificación de Empresa"
+            : "Solicitar Verificación de Organización"
         }}
       </button>
     </template>

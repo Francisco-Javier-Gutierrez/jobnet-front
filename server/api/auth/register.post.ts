@@ -6,7 +6,7 @@ import {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { email, password, role, fullname, companyName, taxId } = body;
+  const { email, password, role, fullname, companyName, taxId, phone } = body;
 
   if (!email || !password || !role) {
     throw createError({
@@ -28,6 +28,9 @@ export default defineEventHandler(async (event) => {
     userAttributes.push({ Name: "name", Value: companyName || "" });
     if (taxId) {
       userAttributes.push({ Name: "custom:tax_id", Value: taxId });
+    }
+    if (phone) {
+      userAttributes.push({ Name: "phone_number", Value: phone });
     }
   }
 

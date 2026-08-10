@@ -39,7 +39,7 @@
         >
         <span
           class="font-label-sm text-label-sm font-semibold text-on-surface-variant dark:text-slate-300"
-          >Empresa Verificada</span
+          >Organización Verificada</span
         >
       </div>
       <p
@@ -69,10 +69,10 @@
           v-if="!isOwner"
           @click="$emit('report')"
           class="flex items-center gap-2 font-label-md text-label-md text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors px-4 py-2 rounded-lg w-full justify-center font-bold"
-          title="Reportar esta empresa"
+          title="Reportar esta organización"
         >
           <span class="material-symbols-outlined text-[20px]">flag</span>
-          Reportar empresa
+          Reportar organización
         </button>
       </div>
 
@@ -106,5 +106,5 @@ defineProps<{
   isOwner: boolean;
 }>();
 
-defineEmits(['report']);
+defineEmits(["report"]);
 </script>

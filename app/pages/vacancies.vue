@@ -26,7 +26,7 @@
           <input
             v-model="searchInput"
             type="text"
-            placeholder="Buscar por título, empresa, tecnologías o descripción..."
+            placeholder="Buscar por título, organización, tecnologías o descripción..."
             class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl pl-11 pr-8 py-2.5 text-sm text-on-background outline-none transition"
           />
           <button
@@ -115,9 +115,7 @@
               class="px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs rounded-xl transition flex items-center gap-1 active:scale-95 border border-primary/20"
               title="Obtener ubicación actual"
             >
-              <span class="material-symbols-outlined text-sm"
-                >my_location</span
-              >
+              <span class="material-symbols-outlined text-sm">my_location</span>
               Usar GPS
             </button>
           </div>
@@ -264,7 +262,9 @@
           <div class="h-3.5 w-full bg-outline/20 rounded"></div>
           <div class="h-3.5 w-5/6 bg-outline/20 rounded"></div>
         </div>
-        <div class="border-t border-outline-variant/30 pt-3 flex justify-between">
+        <div
+          class="border-t border-outline-variant/30 pt-3 flex justify-between"
+        >
           <div class="h-4 w-16 bg-outline/20 rounded"></div>
           <div class="h-4 w-16 bg-outline/20 rounded"></div>
         </div>
@@ -514,7 +514,12 @@ const filteredJobs = computed(() => {
     results = results.filter((job: Job) => {
       if (job.modalidad === "Remoto") return true;
       if (!job.lat || !job.lng) return false;
-      const dist = getDistanceKm(userLat.value, userLng.value, job.lat, job.lng);
+      const dist = getDistanceKm(
+        userLat.value,
+        userLng.value,
+        job.lat,
+        job.lng,
+      );
       return dist <= maxKm;
     });
   }
@@ -547,7 +552,10 @@ const filteredJobs = computed(() => {
 
   // Sort descending by date (most recent first)
   results = [...results].sort((a: Job, b: Job) => {
-    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    return (
+      new Date(b.createdAt || 0).getTime() -
+      new Date(a.createdAt || 0).getTime()
+    );
   });
 
   return results;
@@ -578,8 +586,6 @@ const toggleJobLike = async (job: any) => {
     // Local optimistic state preserved
   }
 };
-
-
 
 const toggleJobBookmark = async (job: any) => {
   const currentUserId = (session.value?.user as any)?.id;

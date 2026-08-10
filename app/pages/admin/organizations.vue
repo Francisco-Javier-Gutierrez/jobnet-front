@@ -1,12 +1,21 @@
 <template>
-  <div class="max-w-7xl mx-auto px-6 py-8 w-full bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-200 dark:text-slate-100 transition-colors duration-200">
-    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div
+    class="max-w-7xl mx-auto px-6 py-8 w-full bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-200 dark:text-slate-100 transition-colors duration-200"
+  >
+    <div
+      class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+    >
       <div>
-        <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+        <h1
+          class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+        >
           Control de Organizaciones
         </h1>
-        <p class="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm mt-1">
-          Visualiza, verifica y gestiona sanciones de las empresas del sistema.
+        <p
+          class="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm mt-1"
+        >
+          Visualiza, verifica y gestiona sanciones de las organizaciones del
+          sistema.
         </p>
       </div>
       <button
@@ -25,7 +34,10 @@
       :suspended-count="suspendedCount"
     />
 
-    <div v-if="successMsg" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-xl flex items-center gap-2 text-sm font-semibold">
+    <div
+      v-if="successMsg"
+      class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-xl flex items-center gap-2 text-sm font-semibold"
+    >
       <span class="material-symbols-outlined text-lg">check_circle</span>
       {{ successMsg }}
     </div>
@@ -71,7 +83,8 @@ import { useOrgActions } from "~/composables/useOrgActions";
 
 useSeoMeta({
   title: "Control de Organizaciones - Administrador",
-  description: "Tabla de control maestro y gestión de sanciones de empresas registradas en JobNet",
+  description:
+    "Tabla de control maestro y gestión de sanciones de organizaciones registradas en JobNet",
 });
 
 const {

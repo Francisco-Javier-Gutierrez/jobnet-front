@@ -141,12 +141,12 @@ defineProps<{
 }>();
 
 defineEmits([
-  'update:companyTab',
-  'likeJob',
-  'bookmarkJob',
-  'shareJob',
-  'likePost',
-  'bookmarkPost',
-  'sharePost'
+  "update:companyTab",
+  "likeJob",
+  "bookmarkJob",
+  "shareJob",
+  "likePost",
+  "bookmarkPost",
+  "sharePost",
 ]);
 </script>

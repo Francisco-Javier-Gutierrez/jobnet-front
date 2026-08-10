@@ -1,9 +1,9 @@
-import { ref, computed, watch, onMounted } from 'vue';
-import { useRouter, useRoute, useRuntimeConfig } from '#imports';
-import { useAuth } from '#imports'; // or wherever it comes from
-import { useCatalogStore } from '~/stores/catalog';
-import { useUploadStore } from '~/stores/upload';
-import { useAppFeedback } from '~/composables/useAppFeedback';
+import { ref, computed, watch, onMounted } from "vue";
+import { useRouter, useRoute, useRuntimeConfig } from "#imports";
+import { useAuth } from "#imports"; // or wherever it comes from
+import { useCatalogStore } from "~/stores/catalog";
+import { useUploadStore } from "~/stores/upload";
+import { useAppFeedback } from "~/composables/useAppFeedback";
 
 export interface VacancyFormState {
   title: string;
@@ -54,7 +54,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
   const submitting = ref(false);
   const successMessage = ref("");
   const errorMessage = ref("");
-  const companyName = ref("Empresa Corporativa");
+  const companyName = ref("Organización Corporativa");
 
   const skillSearchQuery = ref("");
   const sectorSearchQuery = ref("");
@@ -124,10 +124,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
         f.salaryMin ||
         f.salaryMax
       ) {
-        localStorage.setItem(
-          "jobnet_draft_vacancy",
-          JSON.stringify(f),
-        );
+        localStorage.setItem("jobnet_draft_vacancy", JSON.stringify(f));
       }
     }
   };
@@ -224,7 +221,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
         `${config.public.apiUrl}/profile/${session.value.user.id}`,
       );
       if (profile) {
-        companyName.value = profile.nombre || "Empresa Corporativa";
+        companyName.value = profile.nombre || "Organización Corporativa";
       }
     } catch (e) {
       console.error("Error fetching company name for vacancy posting:", e);
@@ -234,10 +231,12 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
   onMounted(async () => {
     await fetchCompanyName();
     await catalogStore.fetchCatalog();
-    
+
     if (options.isEdit && route.params.id) {
       try {
-        const job = await $fetch<any>(`${config.public.apiUrl}/jobs/${route.params.id}`);
+        const job = await $fetch<any>(
+          `${config.public.apiUrl}/jobs/${route.params.id}`,
+        );
         if (job) {
           form.value.title = job.title || "";
           form.value.modality = job.modalidad || "Remoto";
@@ -263,7 +262,11 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
   });
 
   const addSkill = (skillName: string) => {
-    if (!form.value.skills.some((s) => s.toLowerCase() === skillName.toLowerCase())) {
+    if (
+      !form.value.skills.some(
+        (s) => s.toLowerCase() === skillName.toLowerCase(),
+      )
+    ) {
       form.value.skills.push(skillName);
     }
     skillSearchQuery.value = "";
@@ -275,7 +278,9 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
 
   const addSector = (sectorName: string) => {
     if (
-      !form.value.sectors.some((s) => s.toLowerCase() === sectorName.toLowerCase())
+      !form.value.sectors.some(
+        (s) => s.toLowerCase() === sectorName.toLowerCase(),
+      )
     ) {
       form.value.sectors.push(sectorName);
     }
@@ -305,7 +310,8 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
   const handleSubmit = async () => {
     if (!session.value?.user?.id) return;
     if (form.value.skills.length === 0) {
-      errorMessage.value = "Debes seleccionar al menos una habilidad requerida.";
+      errorMessage.value =
+        "Debes seleccionar al menos una habilidad requerida.";
       return;
     }
     if (form.value.sectors.length === 0) {
@@ -328,7 +334,8 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
           companyId,
         );
         if (!uploadResult.success) {
-          errorMessage.value = "Error al subir el documento PDF de especificaciones a S3.";
+          errorMessage.value =
+            "Error al subir el documento PDF de especificaciones a S3.";
           submitting.value = false;
           return;
         }
@@ -357,10 +364,13 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
 
       let response;
       if (options.isEdit && route.params.id) {
-        response = await $fetch<any>(`${config.public.apiUrl}/jobs/${route.params.id}`, {
-          method: "PUT",
-          body: payload,
-        });
+        response = await $fetch<any>(
+          `${config.public.apiUrl}/jobs/${route.params.id}`,
+          {
+            method: "PUT",
+            body: payload,
+          },
+        );
         if (response) {
           successMessage.value = "¡Vacante de empleo actualizada con éxito!";
         }
@@ -370,7 +380,8 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
           body: payload,
         });
         if (response) {
-          successMessage.value = "¡Vacante de empleo publicada y registrada con éxito!";
+          successMessage.value =
+            "¡Vacante de empleo publicada y registrada con éxito!";
           if (process.client) {
             localStorage.removeItem("jobnet_draft_vacancy");
           }
@@ -401,7 +412,9 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
       }
     } catch (error: any) {
       console.error("Error creating/updating vacancy:", error);
-      errorMessage.value = options.isEdit ? "Ocurrió un error al intentar actualizar la vacante." : "Ocurrió un error al intentar publicar la vacante.";
+      errorMessage.value = options.isEdit
+        ? "Ocurrió un error al intentar actualizar la vacante."
+        : "Ocurrió un error al intentar publicar la vacante.";
     } finally {
       submitting.value = false;
     }
@@ -432,6 +445,6 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
     removeSector,
     handleQuickAddSector,
     handleQuickAddSkill,
-    handleSubmit
+    handleSubmit,
   };
 }

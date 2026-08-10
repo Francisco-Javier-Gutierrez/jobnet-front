@@ -2,14 +2,18 @@
   <div
     class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl p-6 flex flex-col gap-4 shadow-sm"
   >
-    <div class="flex items-center gap-2 border-b border-outline-variant/40 pb-3">
+    <div
+      class="flex items-center gap-2 border-b border-outline-variant/40 pb-3"
+    >
       <span class="material-symbols-outlined text-primary">key</span>
       <h2 class="text-base font-bold text-on-background dark:text-slate-100">
         Cambiar Contraseña
       </h2>
     </div>
 
-    <p class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed">
+    <p
+      class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+    >
       Actualiza tu contraseña periódicamente para mantener tu cuenta segura.
     </p>
 
@@ -85,10 +89,14 @@
           :disabled="isSubmitting"
           class="px-4 py-2.5 bg-primary hover:bg-primary-container disabled:opacity-50 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-2 active:scale-95"
         >
-          <span v-if="isSubmitting" class="material-symbols-outlined animate-spin text-sm"
+          <span
+            v-if="isSubmitting"
+            class="material-symbols-outlined animate-spin text-sm"
             >progress_activity</span
           >
-          <span v-else class="material-symbols-outlined text-sm">lock_reset</span>
+          <span v-else class="material-symbols-outlined text-sm"
+            >lock_reset</span
+          >
           {{ isSubmitting ? "Actualizando..." : "Actualizar Contraseña" }}
         </button>
       </div>
@@ -141,7 +149,9 @@ const handleChangePassword = async () => {
   } catch (error: any) {
     statusSuccess.value = false;
     statusMsg.value =
-      error.data?.statusMessage || error.message || "Error al actualizar contraseña.";
+      error.data?.statusMessage ||
+      error.message ||
+      "Error al actualizar contraseña.";
   } finally {
     isSubmitting.value = false;
   }

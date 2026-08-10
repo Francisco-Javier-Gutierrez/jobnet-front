@@ -1,5 +1,5 @@
-import { ref } from 'vue';
-import { useRuntimeConfig } from '#imports';
+import { ref } from "vue";
+import { useRuntimeConfig } from "#imports";
 
 const successMsg = ref("");
 const pendingCandidateItem = ref<any>(null);
@@ -15,25 +15,43 @@ export const useApplicantActions = () => {
 
   const getStatusLabel = (st: string) => {
     switch (st) {
-      case "PENDIENTE": return "En Evaluación";
-      case "ENTREVISTA": return "Entrevista";
-      case "ACEPTADO": return "Aceptado";
-      case "RECHAZADO": return "Descartado";
-      default: return st;
+      case "PENDIENTE":
+        return "Pendiente";
+      case "EN_CONTACTO":
+        return "En Contacto";
+      case "SELECCIONADO":
+        return "Seleccionado";
+      case "RECHAZADO":
+        return "Rechazado";
+      case "CONTRATADO":
+        return "Contratado";
+      default:
+        return st;
     }
   };
 
   const getStatusBadgeClass = (st: string) => {
     switch (st) {
-      case "PENDIENTE": return "bg-amber-500/10 text-amber-600 border border-amber-500/20";
-      case "ENTREVISTA": return "bg-sky-500/10 text-sky-600 border border-sky-500/20";
-      case "ACEPTADO": return "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20";
-      case "RECHAZADO": return "bg-rose-500/10 text-rose-600 border border-rose-500/20";
-      default: return "bg-slate-500/10 text-slate-600 border border-slate-500/20";
+      case "PENDIENTE":
+        return "bg-amber-500/10 text-amber-600 border border-amber-500/20";
+      case "EN_CONTACTO":
+        return "bg-sky-500/10 text-sky-600 border border-sky-500/20";
+      case "SELECCIONADO":
+        return "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20";
+      case "CONTRATADO":
+        return "bg-indigo-500/10 text-indigo-600 border border-indigo-500/20";
+      case "RECHAZADO":
+        return "bg-rose-500/10 text-rose-600 border border-rose-500/20";
+      default:
+        return "bg-slate-500/10 text-slate-600 border border-slate-500/20";
     }
   };
 
-  const submitStatusUpdate = async (candidate: any, backendStatus: string, details?: string) => {
+  const submitStatusUpdate = async (
+    candidate: any,
+    backendStatus: string,
+    details?: string,
+  ) => {
     try {
       if (!candidate.id.startsWith("cand-demo")) {
         await $fetch(
@@ -60,14 +78,20 @@ export const useApplicantActions = () => {
     if (candidate.status === "PENDIENTE") {
       interviewDetails.value = "";
       isInterviewModalOpen.value = true;
-    } else if (candidate.status === "ENTREVISTA") {
-      submitStatusUpdate(candidate, "ACEPTADO");
+    } else if (candidate.status === "EN_CONTACTO") {
+      submitStatusUpdate(candidate, "SELECCIONADO");
+    } else if (candidate.status === "SELECCIONADO") {
+      submitStatusUpdate(candidate, "CONTRATADO");
     }
   };
 
   const submitInterviewTransition = async () => {
     if (!pendingCandidateItem.value) return;
-    await submitStatusUpdate(pendingCandidateItem.value, "ENTREVISTA", interviewDetails.value);
+    await submitStatusUpdate(
+      pendingCandidateItem.value,
+      "EN_CONTACTO",
+      interviewDetails.value,
+    );
     isInterviewModalOpen.value = false;
     pendingCandidateItem.value = null;
   };

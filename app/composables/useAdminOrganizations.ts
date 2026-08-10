@@ -7,13 +7,19 @@ export function useAdminOrganizations() {
   const searchInput = ref("");
   const searchQuery = ref("");
   const filterVerification = ref<"ALL" | "VERIFIED" | "NOT_VERIFIED">("ALL");
-  const filterAccountStatus = ref<"ALL" | "ACTIVO" | "REVISION" | "SUSPENDIDA">("ALL");
+  const filterAccountStatus = ref<"ALL" | "ACTIVO" | "REVISION" | "SUSPENDIDA">(
+    "ALL",
+  );
   const filterDateStart = ref("");
   const filterDateEnd = ref("");
   const currentPage = ref(1);
   const itemsPerPage = 20;
 
-  const { data: rawProfiles, pending: profilesPending, refresh } = useLazyAsyncData("admin-profiles-list", () => {
+  const {
+    data: rawProfiles,
+    pending: profilesPending,
+    refresh,
+  } = useLazyAsyncData("admin-profiles-list", () => {
     const url = searchQuery.value
       ? `/api/profiles?tipoUsuario=ORGANIZACION&q=${encodeURIComponent(searchQuery.value)}`
       : "/api/profiles?tipoUsuario=ORGANIZACION";
@@ -26,9 +32,15 @@ export function useAdminOrganizations() {
 
   const orgs = computed(() => {
     return (rawProfiles.value || [])
-      .filter((p: any) => p.tipoUsuario === "ORGANIZACION" || p.tipoUsuario === "EMPRESA" || !p.tipoUsuario)
+      .filter(
+        (p: any) =>
+          p.tipoUsuario === "ORGANIZACION" ||
+          p.tipoUsuario === "EMPRESA" ||
+          !p.tipoUsuario,
+      )
       .map((p: any) => {
-        const companyId = p.id || p.companyId || (p.PK ? p.PK.replace("USER#", "") : "");
+        const companyId =
+          p.id || p.companyId || (p.PK ? p.PK.replace("USER#", "") : "");
         return {
           ...p,
           id: companyId,
@@ -45,7 +57,11 @@ export function useAdminOrganizations() {
       .join(" ")
       .toUpperCase();
 
-    if (statusStr.includes("REVISI") || statusStr.includes("REVISION") || statusStr.includes("IN_REVIEW")) {
+    if (
+      statusStr.includes("REVISI") ||
+      statusStr.includes("REVISION") ||
+      statusStr.includes("IN_REVIEW")
+    ) {
       return "REVISION";
     }
     if (statusStr.includes("SUSPEND") || statusStr.includes("BLOQUEAD")) {
@@ -54,9 +70,17 @@ export function useAdminOrganizations() {
     return "ACTIVO";
   };
 
-  const verifiedCount = computed(() => orgs.value.filter((o: any) => o.organizacionVerificada).length);
-  const inReviewCount = computed(() => orgs.value.filter((o: any) => getOrgStatusKey(o) === "REVISION").length);
-  const suspendedCount = computed(() => orgs.value.filter((o: any) => getOrgStatusKey(o) === "SUSPENDIDA").length);
+  const verifiedCount = computed(
+    () => orgs.value.filter((o: any) => o.organizacionVerificada).length,
+  );
+  const inReviewCount = computed(
+    () =>
+      orgs.value.filter((o: any) => getOrgStatusKey(o) === "REVISION").length,
+  );
+  const suspendedCount = computed(
+    () =>
+      orgs.value.filter((o: any) => getOrgStatusKey(o) === "SUSPENDIDA").length,
+  );
 
   const executeServerSearch = () => {
     searchQuery.value = searchInput.value.trim();
@@ -97,20 +121,30 @@ export function useAdminOrganizations() {
       list = list.filter((o: any) => !o.organizacionVerificada);
     }
     if (filterAccountStatus.value !== "ALL") {
-      list = list.filter((o: any) => getOrgStatusKey(o) === filterAccountStatus.value);
+      list = list.filter(
+        (o: any) => getOrgStatusKey(o) === filterAccountStatus.value,
+      );
     }
     if (filterDateStart.value) {
       const start = new Date(filterDateStart.value).getTime();
-      list = list.filter((o: any) => o.fechaCreacion && new Date(o.fechaCreacion).getTime() >= start);
+      list = list.filter(
+        (o: any) =>
+          o.fechaCreacion && new Date(o.fechaCreacion).getTime() >= start,
+      );
     }
     if (filterDateEnd.value) {
       const end = new Date(filterDateEnd.value).getTime();
-      list = list.filter((o: any) => o.fechaCreacion && new Date(o.fechaCreacion).getTime() <= end);
+      list = list.filter(
+        (o: any) =>
+          o.fechaCreacion && new Date(o.fechaCreacion).getTime() <= end,
+      );
     }
     return list;
   });
 
-  const totalPages = computed(() => Math.ceil(filteredOrgs.value.length / itemsPerPage));
+  const totalPages = computed(() =>
+    Math.ceil(filteredOrgs.value.length / itemsPerPage),
+  );
   const paginatedOrgs = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage;
     return filteredOrgs.value.slice(start, start + itemsPerPage);

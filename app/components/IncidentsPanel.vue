@@ -60,7 +60,7 @@
               : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-low',
           ]"
         >
-          Empresas
+          Organizaciones
         </button>
       </div>
     </div>
@@ -108,6 +108,11 @@
         <div class="min-w-0">
           <div class="flex items-center gap-2 mb-2">
             <span
+              class="text-[9px] font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded"
+            >
+              #{{ inc.id.substring(0, 8) }}
+            </span>
+            <span
               class="px-2.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-rose-500/10 text-rose-600 border border-rose-500/20"
             >
               {{ inc.severity }}
@@ -130,7 +135,7 @@
                 : inc.targetType === "VACANTE"
                   ? "Vacante"
                   : inc.targetType === "ORGANIZACION"
-                    ? "Empresa"
+                    ? "Organización"
                     : "Contenido"
             }}: {{ inc.targetTitle || inc.jobTitle }}
           </h3>
@@ -142,13 +147,30 @@
           >
             {{ inc.reason }}
           </p>
-          <div v-if="inc.jobId">
+          <div class="flex flex-wrap gap-2">
             <NuxtLink
+              v-if="inc.jobId"
               :to="`/jobs/${inc.jobId}`"
               class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-primary-container transition hover:underline"
             >
-              <span class="material-symbols-outlined text-sm">visibility</span>
-              Revisar Contenido
+              <span class="material-symbols-outlined text-sm">work</span>
+              Revisar Vacante
+            </NuxtLink>
+            <NuxtLink
+              v-if="inc.postId"
+              :to="`/posts/${inc.postId}`"
+              class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-primary-container transition hover:underline"
+            >
+              <span class="material-symbols-outlined text-sm">article</span>
+              Revisar Publicación
+            </NuxtLink>
+            <NuxtLink
+              v-if="inc.companyId && inc.targetType === 'ORGANIZACION'"
+              :to="`/company/${inc.companyId}`"
+              class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-primary-container transition hover:underline"
+            >
+              <span class="material-symbols-outlined text-sm">domain</span>
+              Revisar Organización
             </NuxtLink>
           </div>
         </div>
@@ -218,19 +240,6 @@ const activeTab = ref("ALL");
 const displayedIncidents = computed(() => {
   let list = incidents.value;
 
-  if (userRole.value === "ADMIN") {
-    // Admin only sees Organizaciones and Vacantes (NO Posts)
-    list = list.filter(
-      (inc) =>
-        inc.targetType === "VACANTE" ||
-        inc.targetType === "ORGANIZACION" ||
-        inc.targetType === "EMPRESA" ||
-        inc.jobId ||
-        inc.companyId ||
-        (!inc.targetType && !inc.postId),
-    );
-  }
-
   if (activeTab.value !== "ALL") {
     list = list.filter(
       (inc) =>
@@ -245,10 +254,11 @@ const displayedIncidents = computed(() => {
 const fetchIncidents = async () => {
   loading.value = true;
   try {
-    const data = await $fetch<any[]>(
+    const data = await $fetch<any>(
       `${config.public.apiUrl}/moderator/incidents`,
     );
-    incidents.value = data || [];
+    incidents.value =
+      data?.value || data?.Items || (Array.isArray(data) ? data : []);
   } catch (e) {
     console.error("Error loading incidents:", e);
   } finally {

@@ -71,7 +71,11 @@
               v-if="profilePic"
               class="w-8 h-8 rounded-full border border-primary/20 flex-shrink-0 group-hover:scale-105 transition overflow-hidden"
             >
-              <img :src="profilePic" alt="Foto de perfil" class="w-full h-full object-cover" />
+              <img
+                :src="profilePic"
+                alt="Foto de perfil"
+                class="w-full h-full object-cover"
+              />
             </div>
             <div
               v-else
@@ -246,8 +250,15 @@ const { openProtectedModal } = useProtectedAction();
 const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
 
 watchEffect(() => {
-  if (status.value === 'authenticated' && data.value?.user?.id && !hasFetched.value) {
-    console.log("AppSidebar: trigger fetchProfilePic for user", data.value.user.id);
+  if (
+    status.value === "authenticated" &&
+    data.value?.user?.id &&
+    !hasFetched.value
+  ) {
+    console.log(
+      "AppSidebar: trigger fetchProfilePic for user",
+      data.value.user.id,
+    );
     fetchProfilePic(data.value.user.id as string);
   }
 });
@@ -458,7 +469,7 @@ const navItems = computed<NavItem[]>(() => {
         {
           to: "/companies",
           icon: "domain",
-          label: "Directorio de Empresas",
+          label: "Directorio de Organizaciones",
           protected: false,
         },
         {

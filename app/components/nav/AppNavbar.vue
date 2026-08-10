@@ -69,7 +69,12 @@
           ]"
           :aria-label="`Perfil de ${userName}`"
         >
-          <img v-if="profilePic" :src="profilePic" alt="Foto de perfil" class="w-full h-full object-cover" />
+          <img
+            v-if="profilePic"
+            :src="profilePic"
+            alt="Foto de perfil"
+            class="w-full h-full object-cover"
+          />
           <span v-else>{{ userInitial }}</span>
         </NuxtLink>
       </template>
@@ -96,7 +101,11 @@ const { status, data, signOut } = useAuth();
 const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
 
 watchEffect(() => {
-  if (status.value === 'authenticated' && data.value?.user?.id && !hasFetched.value) {
+  if (
+    status.value === "authenticated" &&
+    data.value?.user?.id &&
+    !hasFetched.value
+  ) {
     fetchProfilePic(data.value.user.id as string);
   }
 });

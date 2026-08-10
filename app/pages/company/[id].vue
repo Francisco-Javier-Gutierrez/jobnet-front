@@ -141,18 +141,15 @@
     v-else
     class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16"
   >
-    <ProfilesCompanyHeaderProfile 
-      :company="company" 
-      :is-owner="isOwner" 
-      @report="showReportCompanyModal = true" 
+    <CompanyHeaderProfile
+      :company="company"
+      :is-owner="isOwner"
+      @report="showReportCompanyModal = true"
     />
 
-    <ProfilesCompanyAboutSection 
-      :company="company" 
-      @preview-doc="previewCompanyDoc" 
-    />
+    <CompanyAboutSection :company="company" @preview-doc="previewCompanyDoc" />
 
-    <ProfilesCompanyLists 
+    <CompanyLists
       :company-tab="companyTab"
       :company="company"
       :company-posts="companyPosts"
@@ -187,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { useCompanyProfile } from '~/composables/useCompanyProfile';
+import { useCompanyProfile } from "~/composables/useCompanyProfile";
 
 const {
   companyId,
@@ -213,7 +210,7 @@ const {
 } = useCompanyProfile();
 
 useSeoMeta({
-  title: `${company.value.name} - Perfil de Empresa`,
+  title: `${company.value.name} - Perfil de Organización`,
   description: `Detalle y ofertas de ${company.value.name} en JobNet`,
 });
 

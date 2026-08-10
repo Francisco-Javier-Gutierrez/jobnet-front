@@ -1,5 +1,7 @@
 <template>
-  <section class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] p-lg md:p-xl space-y-6">
+  <section
+    class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] p-lg md:p-xl space-y-6"
+  >
     <div class="flex items-center gap-3 border-b border-surface-container pb-4">
       <button
         type="button"
@@ -49,7 +51,9 @@
           v-for="post in userPosts"
           :key="post.uniqueId"
           :post="post"
-          :current-user-id="(authData?.user as any)?.id || authData?.user?.email || ''"
+          :current-user-id="
+            (authData?.user as any)?.id || authData?.user?.email || ''
+          "
           :is-bookmarked="isBookmarked(post)"
           @navigate="(id) => $router.push(`/posts/${id}`)"
           @like="$emit('like', $event)"
@@ -78,7 +82,9 @@
           v-for="post in bookmarkedPosts"
           :key="post.uniqueId"
           :post="post"
-          :current-user-id="(authData?.user as any)?.id || authData?.user?.email || ''"
+          :current-user-id="
+            (authData?.user as any)?.id || authData?.user?.email || ''
+          "
           :is-bookmarked="true"
           @navigate="(id) => $router.push(`/posts/${id}`)"
           @like="$emit('like', $event)"
@@ -91,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from "vue";
 
 const props = defineProps<{
   userPosts: any[];
@@ -103,14 +109,14 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', val: "posts" | "bookmarks"): void;
-  (e: 'like', val: any): void;
-  (e: 'bookmark', val: any): void;
-  (e: 'share', val: any): void;
+  (e: "update:modelValue", val: "posts" | "bookmarks"): void;
+  (e: "like", val: any): void;
+  (e: "bookmark", val: any): void;
+  (e: "share", val: any): void;
 }>();
 
 const activeTab = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: (val) => emit("update:modelValue", val),
 });
 </script>

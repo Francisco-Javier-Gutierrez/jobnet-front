@@ -2,7 +2,9 @@
   <div class="space-y-8">
     <!-- Sobre mí -->
     <div>
-      <h2 class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container pb-sm">
+      <h2
+        class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container pb-sm"
+      >
         <span class="material-symbols-outlined">person</span>
         Sobre mí
       </h2>
@@ -22,7 +24,9 @@
 
     <!-- Sectores -->
     <div v-if="sectors.length > 0">
-      <h2 class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container pb-sm">
+      <h2
+        class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container pb-sm"
+      >
         <span class="material-symbols-outlined">business_center</span>
         Sectores de Interés
       </h2>

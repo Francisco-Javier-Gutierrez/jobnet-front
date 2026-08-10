@@ -18,8 +18,12 @@ export function useJobDetails(jobId: string) {
 
   const formatSalaryDisplay = (jobInfo: any) => {
     if (!jobInfo.salarioMin && !jobInfo.salarioMax) return null;
-    const min = jobInfo.salarioMin ? `$${jobInfo.salarioMin.toLocaleString("es-MX")}` : "";
-    const max = jobInfo.salarioMax ? `$${jobInfo.salarioMax.toLocaleString("es-MX")}` : "";
+    const min = jobInfo.salarioMin
+      ? `$${jobInfo.salarioMin.toLocaleString("es-MX")}`
+      : "";
+    const max = jobInfo.salarioMax
+      ? `$${jobInfo.salarioMax.toLocaleString("es-MX")}`
+      : "";
     if (min && max) return `${min} - ${max} MXN`;
     if (min) return `Desde ${min} MXN`;
     return `Hasta ${max} MXN`;
@@ -48,7 +52,8 @@ export function useJobDetails(jobId: string) {
         Otro: "otro",
       };
 
-      const reporterEmail = session.value?.user?.email || "candidato.anonimo@gmail.com";
+      const reporterEmail =
+        session.value?.user?.email || "candidato.anonimo@gmail.com";
 
       await $fetch(`${config.public.apiUrl}/moderator/incidents`, {
         method: "POST",

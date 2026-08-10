@@ -77,10 +77,10 @@
             <label
               class="text-[11px] font-bold text-on-surface-variant dark:text-slate-300"
             >
-              Empresa / Organización *
+              Organización / Organización *
             </label>
             <input
-              v-model="exp.empresa"
+              v-model="exp.organización"
               type="text"
               placeholder="Ej: Tech Solutions Inc."
               class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
@@ -155,7 +155,7 @@
 export interface ExperienciaItem {
   id?: string;
   puesto: string;
-  empresa: string;
+  organización: string;
   fechaInicio: string;
   fechaFin: string;
   actualmente: boolean;
@@ -176,7 +176,7 @@ function addExperiencia() {
     {
       id: Math.random().toString(36).substring(2),
       puesto: "",
-      empresa: "",
+      organización: "",
       fechaInicio: "",
       fechaFin: "",
       actualmente: false,

@@ -41,35 +41,53 @@ export function useOrgActions(refreshData: () => Promise<void>) {
     graceDaysInput.value = 4;
   };
 
-  const applySanction = async (actionType: "INITIATE" | "CANCEL" | "CONFIRM", reason?: string) => {
+  const applySanction = async (
+    actionType: "INITIATE" | "CANCEL" | "CONFIRM",
+    reason?: string,
+  ) => {
     if (!selectedOrg.value) return;
     const org = selectedOrg.value;
 
     try {
       if (actionType === "INITIATE") {
-        await $fetch(`${config.public.apiUrl}/moderator/organizations/${org.id}/initiate-suspension`, {
-          method: "POST",
-          body: {
-            reason: suspensionReasonInput.value || reason || "Infracción de términos de servicio",
-            graceDays: graceDaysInput.value || 4,
+        await $fetch(
+          `${config.public.apiUrl}/moderator/organizations/${org.id}/initiate-suspension`,
+          {
+            method: "POST",
+            body: {
+              reason:
+                suspensionReasonInput.value ||
+                reason ||
+                "Infracción de términos de servicio",
+              graceDays: graceDaysInput.value || 4,
+            },
           },
-        });
+        );
         successMsg.value = `Fase 1 completada: Notificación enviada a ${org.nombre}. Cuenta en revisión (${graceDaysInput.value || 4} días de gracia).`;
       } else if (actionType === "CANCEL") {
-        await $fetch(`${config.public.apiUrl}/moderator/organizations/${org.id}/cancel-suspension`, {
-          method: "POST",
-          body: {
-            notes: "Apelación evaluada favorablemente. Suspensión revocada por el Administrador.",
+        await $fetch(
+          `${config.public.apiUrl}/moderator/organizations/${org.id}/cancel-suspension`,
+          {
+            method: "POST",
+            body: {
+              notes:
+                "Apelación evaluada favorablemente. Suspensión revocada por el Administrador.",
+            },
           },
-        });
+        );
         successMsg.value = `Apelación aprobada. Cuenta de ${org.nombre} restablecida.`;
       } else if (actionType === "CONFIRM") {
-        await $fetch(`${config.public.apiUrl}/moderator/organizations/${org.id}/confirm-suspension`, {
-          method: "POST",
-          body: {
-            reason: reason || "Dictamen desfavorable tras proceso de evaluación/apelación",
+        await $fetch(
+          `${config.public.apiUrl}/moderator/organizations/${org.id}/confirm-suspension`,
+          {
+            method: "POST",
+            body: {
+              reason:
+                reason ||
+                "Dictamen desfavorable tras proceso de evaluación/apelación",
+            },
           },
-        });
+        );
         successMsg.value = `Dictamen desfavorable emitido. Cuenta de ${org.nombre} suspendida.`;
       }
 
