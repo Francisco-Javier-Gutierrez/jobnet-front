@@ -11,19 +11,16 @@
         habilidades del catálogo.
       </p>
     </div>
-    <VacancyForm :state="state" />
+    <VacancyForm />
   </div>
 </template>
 
 <script setup lang="ts">
 import VacancyForm from "~/components/vacancies/VacancyForm.vue";
-import { useVacancyForm } from "~/composables/useVacancyForm";
 
 useSeoMeta({
   title: "Publicar Oferta de Empleo - JobNet",
   description:
     "Crea una nueva vacante de reclutamiento utilizando geolocalización y el catálogo maestro",
 });
-
-const state = useVacancyForm();
 </script>

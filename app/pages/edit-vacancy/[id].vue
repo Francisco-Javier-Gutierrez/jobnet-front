@@ -8,19 +8,16 @@
         Modifica los campos informativos de esta vacante previamente publicada.
       </p>
     </div>
-    <VacancyForm :state="state" :is-edit="true" />
+    <VacancyForm :is-edit="true" />
   </div>
 </template>
 
 <script setup lang="ts">
 import VacancyForm from "~/components/vacancies/VacancyForm.vue";
-import { useVacancyForm } from "~/composables/useVacancyForm";
 
 useSeoMeta({
   title: "Editar Oferta de Empleo - JobNet",
   description:
     "Edita una vacante de reclutamiento utilizando geolocalización y el catálogo maestro",
 });
-
-const state = useVacancyForm({ isEdit: true });
 </script>

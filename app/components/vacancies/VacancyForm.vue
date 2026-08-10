@@ -512,9 +512,12 @@
 <script setup lang="ts">
 import AppLocationMap from "~/components/common/AppLocationMap.vue";
 import AppPdfPreviewModal from "~/components/common/AppPdfPreviewModal.vue";
+import { useVacancyForm } from "~/composables/useVacancyForm";
+import { reactive } from "vue";
 
 const props = defineProps<{
-  state: any;
   isEdit?: boolean;
 }>();
+
+const state = reactive(useVacancyForm({ isEdit: props.isEdit }));
 </script>
