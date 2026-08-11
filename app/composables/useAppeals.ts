@@ -230,7 +230,7 @@ export const useAppeals = () => {
     scrollToBottom();
   };
 
-  const processAppealAction = async (actionType: "cancel" | "confirm") => {
+  const resolveOrgAppeal = async (actionType: "cancel" | "confirm") => {
     if (!activeAppeal.value || isProcessingAction.value) return;
     isProcessingAction.value = true;
     const compId = activeAppeal.value.id;
