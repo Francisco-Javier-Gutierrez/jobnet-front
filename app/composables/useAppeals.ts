@@ -121,17 +121,22 @@ export const useAppeals = () => {
       socket.value.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
-          if (payload.action === "newMessage") {
+          if (
+            payload.type === "APPEAL_MESSAGE" ||
+            payload.action === "receiveMessage"
+          ) {
             const {
               appealCompanyId,
               senderId,
               text,
-              createdAt,
-              messageId,
               attachmentUrl,
               attachmentType,
               attachmentName,
+              createdAt,
+              messageId: incomingMsgId,
             } = payload;
+
+            const messageId = incomingMsgId;
 
             const target = appeals.value.find((a) => a.id === appealCompanyId);
             if (target) {
