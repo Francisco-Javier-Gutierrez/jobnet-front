@@ -42,17 +42,18 @@ export const useAppeals = () => {
 
   const isModeratorSender = (msg: any) => {
     if (!activeAppeal.value) return true;
-    const compId = activeAppeal.value.companyId || activeAppeal.value.id;
+    const compId = activeAppeal.value.id;
     return (
-      msg.sender === "MODERATOR" || (msg.senderId && msg.senderId !== compId)
+      msg.sender === "MODERATOR" ||
+      (msg.senderId && msg.senderId !== activeAppeal.value.companyId)
     );
   };
 
   const orgMessageCount = computed(() => {
     if (!activeAppeal.value || !activeAppeal.value.messages) return 0;
-    const compId = activeAppeal.value.companyId || activeAppeal.value.id;
     return activeAppeal.value.messages.filter(
-      (m: any) => m.sender === "USER" || m.senderId === compId,
+      (m: any) =>
+        m.sender === "USER" || m.senderId === activeAppeal.value.companyId,
     ).length;
   });
 
@@ -120,36 +121,27 @@ export const useAppeals = () => {
       socket.value.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
-          if (
-            payload.type === "APPEAL_MESSAGE" ||
-            payload.action === "receiveMessage"
-          ) {
+          if (payload.action === "newMessage") {
             const {
               appealCompanyId,
               senderId,
               text,
+              createdAt,
+              messageId,
               attachmentUrl,
               attachmentType,
               attachmentName,
-              createdAt,
-              messageId: incomingMsgId,
             } = payload;
-            const target = appeals.value.find(
-              (a) =>
-                a.companyId === appealCompanyId || a.id === appealCompanyId,
-            );
+
+            const target = appeals.value.find((a) => a.id === appealCompanyId);
             if (target) {
-              const compId = target.companyId || target.id;
+              const compId = target.id;
               const timeStr = new Date(
                 createdAt || Date.now(),
               ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
               const isDuplicate = target.messages.some((m: any) => {
-                if (
-                  incomingMsgId &&
-                  m.messageId &&
-                  m.messageId === incomingMsgId
-                )
+                if (messageId && m.messageId && m.messageId === messageId)
                   return true;
                 if (m.createdAt && createdAt && m.createdAt === createdAt)
                   return true;
@@ -159,9 +151,9 @@ export const useAppeals = () => {
               if (!isDuplicate) {
                 target.messages.push({
                   id: `m-ws-${Date.now()}`,
-                  messageId: incomingMsgId || null,
+                  messageId: messageId || null,
                   senderId,
-                  sender: senderId === compId ? "USER" : "MODERATOR",
+                  sender: senderId === target.companyId ? "USER" : "MODERATOR",
                   text: text || "",
                   attachmentUrl: attachmentUrl || null,
                   attachmentType: attachmentType || null,
@@ -172,16 +164,14 @@ export const useAppeals = () => {
                 scrollToBottom();
               }
             }
-          } else if (payload.type === "APPEAL_RESOLVED") {
+          } else if (payload.action === "appealResolved") {
             const { appealCompanyId } = payload;
             appeals.value = appeals.value.filter(
-              (a) => (a.companyId || a.id) !== appealCompanyId,
+              (a) => a.id !== appealCompanyId,
             );
             if (
               selectedAppealId.value === appealCompanyId ||
-              (activeAppeal.value &&
-                (activeAppeal.value.companyId || activeAppeal.value.id) ===
-                  appealCompanyId)
+              (activeAppeal.value && activeAppeal.value.id === appealCompanyId)
             ) {
               selectedAppealId.value = null;
             }
@@ -207,7 +197,7 @@ export const useAppeals = () => {
 
   const selectAppeal = async (appeal: any) => {
     selectedAppealId.value = appeal.id;
-    const compId = appeal.companyId || appeal.id;
+    const compId = appeal.id;
 
     try {
       const msgs = await $fetch<any[]>(
@@ -217,7 +207,7 @@ export const useAppeals = () => {
       appeal.messages = (msgs || []).map((m) => ({
         id: `m-${m.createdAt}`,
         senderId: m.senderId,
-        sender: m.senderId === compId ? "USER" : "MODERATOR",
+        sender: m.senderId === appeal.companyId ? "USER" : "MODERATOR",
         text: m.text,
         attachmentUrl: m.attachmentUrl || null,
         attachmentType: m.attachmentType || null,
@@ -235,13 +225,13 @@ export const useAppeals = () => {
     scrollToBottom();
   };
 
-  const resolveOrgAppeal = async (action: "approve" | "confirm") => {
+  const processAppealAction = async (actionType: "cancel" | "confirm") => {
     if (!activeAppeal.value || isProcessingAction.value) return;
     isProcessingAction.value = true;
-    const compId = activeAppeal.value.companyId || activeAppeal.value.id;
+    const compId = activeAppeal.value.id;
 
     try {
-      if (action === "approve") {
+      if (actionType === "cancel") {
         await $fetch(
           `${config.public.apiUrl}/moderator/organizations/${compId}/cancel-suspension`,
           {
@@ -361,7 +351,7 @@ export const useAppeals = () => {
     const attachment = pendingAttachment;
     if ((!text && !attachment) || !activeAppeal.value) return;
 
-    const compId = activeAppeal.value.companyId || activeAppeal.value.id;
+    const compId = activeAppeal.value.id;
     if (!compId) return;
 
     const now = new Date().toISOString();

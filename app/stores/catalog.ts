@@ -124,7 +124,11 @@ export const useCatalogStore = defineStore("catalog", {
             "Error processing suggestion queue, will retry later",
             error,
           );
-          break;
+          setTimeout(() => {
+            this.isProcessingQueue = false;
+            this.processQueue();
+          }, 5000);
+          return;
         }
       }
       this.isProcessingQueue = false;

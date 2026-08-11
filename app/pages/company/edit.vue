@@ -131,6 +131,7 @@
         v-model:taxId="taxId"
         v-model:documentoVerificacion="documentoVerificacion"
         :estatusVerificacion="estatusVerificacion"
+        :is-verified="organizacionVerificada"
         :companyId="companyId"
         :submittingVerification="submittingVerification"
         @verify="handleVerificationRequest"
@@ -233,6 +234,7 @@ const linkedin = ref("");
 const taxId = ref("");
 const documentoVerificacion = ref("");
 const estatusVerificacion = ref("");
+const organizacionVerificada = ref(false);
 const latitude = ref(19.2826);
 const longitude = ref(-99.6557);
 const locationName = ref("");
@@ -373,6 +375,7 @@ const fetchCompanyProfile = async () => {
       taxId.value = profile.taxId || "";
       documentoVerificacion.value = profile.documentoVerificacion || "";
       estatusVerificacion.value = profile.estatusVerificacion || "";
+      organizacionVerificada.value = profile.organizacionVerificada || false;
       mfaEnabled.value = Boolean(profile.mfaConfigured || profile.mfaEnabled);
       documentosCorporativos.value = profile.documentosCorporativos || [];
       if (profile.ubicacion) {

@@ -258,6 +258,7 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
 const props = defineProps<{
   isOpen: boolean;
   companyId: string;
+  targetId?: string;
   reason?: string;
 }>();
 
@@ -306,14 +307,16 @@ const closeModal = () => {
 const fetchAppealMessages = async () => {
   if (!props.companyId) return;
   isLoading.value = true;
+  const compId = props.targetId || props.companyId;
+
   try {
     await $fetch(
-      `${config.public.apiUrl}/moderator/organizations/${props.companyId}/join-appeal`,
+      `${config.public.apiUrl}/moderator/organizations/${compId}/join-appeal`,
       { method: "POST" },
     ).catch(() => {});
 
     const data = await $fetch<any[]>(
-      `${config.public.apiUrl}/moderator/organizations/${props.companyId}/appeal-messages`,
+      `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
     ).catch(() => []);
 
     messages.value = (data || []).map((m) => ({
@@ -528,7 +531,7 @@ const sendMessage = async () => {
       socket.value.send(
         JSON.stringify({
           action: "sendMessage",
-          appealCompanyId: props.companyId,
+          appealCompanyId: props.targetId || props.companyId,
           messageId,
           text: text || "",
           attachmentUrl: attachment?.url || null,
@@ -566,6 +569,7 @@ const sendHttpFallback = async (
       headers.Authorization = `Bearer ${token}`;
     }
 
+    const compId = props.targetId || props.companyId;
     await $fetch(
       `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
       {

@@ -28,7 +28,7 @@
       </div>
     </div>
     <div
-      v-else-if="estatusVerificacion === 'Verificada'"
+      v-else-if="estatusVerificacion === 'Verificada' || isVerified"
       class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 p-4 rounded-xl flex items-start gap-3 shadow-sm mb-2"
     >
       <span class="material-symbols-outlined text-xl flex-shrink-0"
@@ -46,7 +46,8 @@
     <template
       v-if="
         estatusVerificacion !== 'En revisión' &&
-        estatusVerificacion !== 'Verificada'
+        estatusVerificacion !== 'Verificada' &&
+        !isVerified
       "
     >
       <p
@@ -181,6 +182,7 @@ const props = defineProps<{
   taxId: string;
   documentoVerificacion: string;
   estatusVerificacion: string;
+  isVerified?: boolean;
   companyId: string;
   submittingVerification: boolean;
 }>();

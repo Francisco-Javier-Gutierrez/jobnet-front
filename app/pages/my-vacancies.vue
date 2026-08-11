@@ -209,6 +209,7 @@
     <AppAppealModal
       :is-open="isAppealModalOpen"
       :company-id="companyId"
+      :target-id="selectedJobIdForAppeal"
       reason="Apelación de vacante pausada para evaluación"
       @close="isAppealModalOpen = false"
     />
