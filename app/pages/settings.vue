@@ -47,46 +47,78 @@
       </button>
     </div>
 
+    <!-- Segmented Navigation Tabs -->
+    <div
+      class="w-full border-b border-outline-variant/60 overflow-x-auto overflow-y-hidden touch-pan-x hide-scrollbar mb-6"
+    >
+      <nav class="flex flex-nowrap gap-4 w-max pb-1 px-1">
+        <button
+          v-for="tab in tabItems"
+          :key="tab.id"
+          @click="activeTab = tab.id"
+          :class="[
+            activeTab === tab.id
+              ? 'text-primary border-b-2 border-primary font-bold'
+              : 'text-on-surface-variant dark:text-slate-300 hover:text-primary',
+          ]"
+          class="pb-2.5 px-2 text-xs font-medium transition-colors flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap"
+        >
+          <span class="material-symbols-outlined text-base">{{
+            tab.icon
+          }}</span>
+          {{ tab.label }}
+        </button>
+      </nav>
+    </div>
+
     <!-- Main Form Components Stack -->
     <div class="flex flex-col gap-6">
+      <section v-show="activeTab === 'personales'" class="flex flex-col gap-6">
       <SettingsPersonalInfo
         v-model:name="formData.name"
         v-model:bio="formData.bio"
         v-model:fotoPerfil="formData.fotoPerfil"
       />
+        <SettingsLocationMap
+          v-model:lat="formData.lat"
+          v-model:lng="formData.lng"
+          @locationName="(name) => (formData.location = name)"
+        />
+      </section>
 
+      <section v-show="activeTab === 'profesional'" class="flex flex-col gap-6">
       <SettingsExperienceList v-model:experiencia="formData.experiencia" />
+        <SettingsSectorsSection
+          v-model:sectors="formData.sectores"
+          :catalogSectors="catalogStore.sectors"
+        />
+      </section>
 
+      <section v-show="activeTab === 'habilidades'" class="flex flex-col gap-6">
       <SettingsEducationList v-model:educacion="formData.educacion" />
-
       <SettingsSkillsSection
         v-model:skills="formData.skills"
         :catalogSkills="catalogStore.skills"
       />
+      </section>
 
-      <SettingsSectorsSection
-        v-model:sectors="formData.sectores"
-        :catalogSectors="catalogStore.sectors"
-      />
-
+      <section v-show="activeTab === 'documentos'" class="flex flex-col gap-6">
       <SettingsCvUploader
         v-model:cvUrl="formData.cvUrl"
         v-model:cvName="formData.cvName"
       />
-
       <SettingsAdditionalDocs
         v-model:documentosAdicionales="formData.documentosAdicionales"
       />
+      </section>
 
+      <section v-show="activeTab === 'enlaces'" class="flex flex-col gap-6">
       <SettingsWebLinks v-model:links="formData.links" />
+      </section>
 
-      <SettingsLocationMap
-        v-model:lat="formData.lat"
-        v-model:lng="formData.lng"
-        @locationName="(name) => (formData.location = name)"
-      />
-
+      <section v-show="activeTab === 'seguridad'" class="flex flex-col gap-6">
       <SettingsPasswordCard />
+      </section>
     </div>
 
     <!-- Bottom Save Action -->
@@ -121,6 +153,16 @@ const isSaving = ref(false);
 
 const { showSuccess, showError } = useAppFeedback();
 const catalogStore = useCatalogStore();
+
+const activeTab = ref("personales");
+const tabItems = [
+  { id: "personales", label: "Datos Personales", icon: "person" },
+  { id: "profesional", label: "Experiencia", icon: "work" },
+  { id: "habilidades", label: "Educaci├│n", icon: "school" },
+  { id: "documentos", label: "Documentos", icon: "description" },
+  { id: "enlaces", label: "Enlaces", icon: "language" },
+  { id: "seguridad", label: "Seguridad", icon: "shield_lock" },
+];
 
 const formData = ref({
   name: "",
@@ -258,3 +300,13 @@ async function saveProfile() {
   }
 }
 </script>
+
+<style>
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

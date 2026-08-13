@@ -292,7 +292,6 @@ const roleBadge = computed(() => {
 });
 
 const profileRoute = computed(() => {
-  if (userRole.value === "organization") return "/company/edit";
   return "/profile";
 });
 
@@ -367,7 +366,7 @@ const navItems = computed<NavItem[]>(() => {
         { to: "/", icon: "home", label: "Inicio", protected: false },
         {
           to: "/mod/incidents",
-          icon: "warning",
+          icon: "report_problem",
           label: "Incidencias",
           protected: true,
         },
@@ -437,9 +436,9 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         },
         {
-          to: "/company/edit",
+          to: "/company/verification",
           icon: "verified",
-          label: "Identidad y Verificación",
+          label: "Verificación",
           protected: true,
         },
         { to: "/messages", icon: "forum", label: "Mensajes", protected: true },
@@ -447,12 +446,6 @@ const navItems = computed<NavItem[]>(() => {
           to: "/support",
           icon: "gavel",
           label: "Soporte y Apelaciones",
-          protected: true,
-        },
-        {
-          to: "/settings",
-          icon: "settings",
-          label: "Configuración",
           protected: true,
         },
       ];

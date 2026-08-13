@@ -45,7 +45,7 @@
             <button
               @click="$emit('resolveOrgAppeal', 'confirm')"
               :disabled="isProcessingAction"
-              class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
+              class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
               title="Confirmar Suspensión Definitiva"
             >
               <span class="material-symbols-outlined text-[16px]">cancel</span>
@@ -122,7 +122,7 @@
           <!-- Avatar for recipient message -->
           <div
             v-if="!isMyMessage(msg)"
-            class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-700 dark:text-rose-300 flex items-center justify-center font-bold text-xs flex-shrink-0"
+            class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-xs flex-shrink-0"
           >
             {{ (activeChat.name || "M").charAt(0).toUpperCase() }}
           </div>
@@ -138,7 +138,7 @@
           >
             <div
               v-if="!isMyMessage(msg) && isOrganization"
-              class="flex items-center gap-1.5 mb-1 text-[10px] font-bold text-rose-600 dark:text-rose-400"
+              class="flex items-center gap-1.5 mb-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400"
             >
               <span class="material-symbols-outlined text-xs">policy</span>
               <span>Equipo de Moderación</span>
@@ -242,9 +242,7 @@
           @click="$emit('sendMessage')"
           :disabled="!newMessageText.trim() && !pendingAttachment"
           class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
-        >
-          <span class="material-symbols-outlined text-lg">send</span>
-        </button>
+        ><span class="material-symbols-outlined text-lg">send</span></button>
       </div>
     </template>
 

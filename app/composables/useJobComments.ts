@@ -98,8 +98,8 @@ export function useJobComments(jobId: string, jobRef: any) {
       const created = await $fetch<CommentData>(`/api/jobs/${jobId}/comment`, {
         method: "POST",
         body: {
-          user: username,
-          text: newCommentText.value.trim(),
+          author: username,
+          content: newCommentText.value.trim(),
           parentId: null,
         },
       });
@@ -135,8 +135,8 @@ export function useJobComments(jobId: string, jobRef: any) {
       const created = await $fetch<CommentData>(`/api/jobs/${jobId}/comment`, {
         method: "POST",
         body: {
-          user: username,
-          text: replyContentText.value.trim(),
+          author: username,
+          content: replyContentText.value.trim(),
           parentId: parentCommentId,
         },
       });

@@ -36,10 +36,35 @@
       </button>
     </div>
 
+    <!-- Segmented Navigation Tabs -->
+    <div
+      class="w-full border-b border-outline-variant/60 overflow-x-auto overflow-y-hidden touch-pan-x hide-scrollbar mb-6 bg-surface-container-lowest dark:bg-slate-900 rounded-t-2xl px-6 pt-4"
+    >
+      <nav class="flex flex-nowrap gap-4 w-max pb-1">
+        <button
+          v-for="tab in tabItems"
+          :key="tab.id"
+          type="button"
+          @click="activeTab = tab.id"
+          :class="[
+            activeTab === tab.id
+              ? 'text-primary border-b-2 border-primary font-bold'
+              : 'text-on-surface-variant dark:text-slate-300 hover:text-primary',
+          ]"
+          class="pb-2.5 px-2 text-xs font-medium transition-colors flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap"
+        >
+          <span class="material-symbols-outlined text-base">{{ tab.icon }}</span>
+          {{ tab.label }}
+        </button>
+      </nav>
+    </div>
+
     <form
       @submit.prevent="state.handleSubmit"
-      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-6 shadow-sm"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-b-2xl p-6 flex flex-col gap-6 shadow-sm"
     >
+      <!-- SECTION: Datos Generales -->
+      <section v-show="activeTab === 'generales'" class="flex flex-col gap-6">
       <!-- Job Title -->
       <div class="flex flex-col gap-1.5">
         <label
@@ -477,6 +502,7 @@
           </div>
         </div>
       </div>
+      </section>
 
       <!-- Submit button -->
       <button
@@ -510,14 +536,21 @@
 </template>
 
 <script setup lang="ts">
+import { ref, reactive } from "vue";
 import AppLocationMap from "~/components/common/AppLocationMap.vue";
 import AppPdfPreviewModal from "~/components/common/AppPdfPreviewModal.vue";
 import { useVacancyForm } from "~/composables/useVacancyForm";
-import { reactive } from "vue";
 
 const props = defineProps<{
   isEdit?: boolean;
 }>();
 
 const state = reactive(useVacancyForm({ isEdit: props.isEdit }));
+
+const activeTab = ref("generales");
+const tabItems = [
+  { id: "generales", label: "Datos Generales", icon: "assignment" },
+  { id: "requisitos", label: "Requisitos & Cat├ílogo", icon: "psychology" },
+  { id: "ubicacion", label: "Ubicaci├│n", icon: "map" },
+];
 </script>

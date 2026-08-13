@@ -9,7 +9,7 @@
       >
         <div class="flex items-center gap-3">
           <div
-            class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-700 dark:text-rose-300 font-bold text-sm flex-shrink-0"
+            class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-sm flex-shrink-0"
           >
             {{ activeAppeal.name.charAt(0).toUpperCase() }}
           </div>
@@ -21,7 +21,7 @@
                 {{ activeAppeal.name }}
               </h2>
               <span
-                class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20"
+                class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20"
               >
                 {{ activeAppeal.type || "ORGANIZACION" }}
               </span>
@@ -49,7 +49,7 @@
             <button
               @click="$emit('resolve-vacancy', 'block')"
               :disabled="isProcessingAction"
-              class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
+              class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
               title="Mantener sanción y cerrar vacante definitivamente"
             >
               <span class="material-symbols-outlined text-[16px]">block</span>
@@ -72,7 +72,7 @@
             <button
               @click="$emit('resolve-org', 'confirm')"
               :disabled="isProcessingAction"
-              class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
+              class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
               title="Confirmar suspensión permanente de la organización"
             >
               <span class="material-symbols-outlined text-[16px]">cancel</span>
@@ -132,7 +132,7 @@
             :class="[
               'p-3.5 rounded-2xl text-xs leading-relaxed transition',
               isModeratorSender(msg)
-                ? 'bg-rose-600 text-white rounded-tr-none shadow-sm shadow-rose-600/15'
+                ? 'bg-indigo-600 text-white rounded-tr-none shadow-sm shadow-indigo-600/15'
                 : 'bg-surface-container-low dark:bg-slate-800 border border-outline-variant/30 rounded-tl-none text-on-surface dark:text-slate-100',
             ]"
           >
@@ -214,7 +214,7 @@
         <button
           @click="triggerFileInput"
           :disabled="isUploading"
-          class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-rose-600 text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
+          class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-indigo-600 text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
           title="Adjuntar PDF o Imagen de evidencia"
         >
           <span v-if="isUploading" class="animate-spin text-sm">⏳</span>
@@ -228,12 +228,12 @@
           @keyup.enter="handleSendMessage"
           type="text"
           placeholder="Escribe una respuesta para la organización en apelación..."
-          class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-rose-600 rounded-xl px-4 py-3 text-xs text-on-background dark:text-slate-100 outline-none transition"
+          class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-indigo-600 rounded-xl px-4 py-3 text-xs text-on-background dark:text-slate-100 outline-none transition"
         />
         <button
           @click="handleSendMessage"
           :disabled="!newMessageText.trim() && !pendingAttachment"
-          class="w-10 h-10 rounded-xl bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
+          class="w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
           title="Enviar mensaje"
         >
           <span class="material-symbols-outlined text-lg">send</span>
@@ -247,7 +247,7 @@
         class="flex-grow flex flex-col items-center justify-center p-8 text-center text-on-surface-variant dark:text-slate-300 h-full"
       >
         <div
-          class="w-20 h-20 rounded-full bg-rose-500/10 flex items-center justify-center mb-4 text-rose-600 dark:text-rose-400"
+          class="w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center mb-4 text-indigo-600 dark:text-indigo-400"
         >
           <span class="material-symbols-outlined text-[40px]">gavel</span>
         </div>

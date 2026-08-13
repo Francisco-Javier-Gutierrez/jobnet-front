@@ -4,7 +4,7 @@
       class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container dark:border-slate-800 pb-sm"
     >
       <span
-        class="material-symbols-outlined text-purple-600 dark:text-purple-400"
+        class="material-symbols-outlined text-primary dark:text-inverse-primary"
         >school</span
       >
       Formación Académica
@@ -24,13 +24,13 @@
               {{ edu.grado || "Grado Académico" }}
             </h3>
             <p
-              class="text-xs font-semibold text-purple-600 dark:text-purple-400"
+              class="text-xs font-semibold text-primary dark:text-inverse-primary"
             >
               {{ edu.institucion || "Institución Educativa" }}
             </p>
           </div>
           <span
-            class="text-[11px] font-medium bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 px-2.5 py-1 rounded-full border border-purple-200 dark:border-purple-800"
+            class="text-[11px] font-medium bg-primary/10 dark:bg-primary/20 text-primary dark:text-inverse-primary px-2.5 py-1 rounded-full border border-primary/20 dark:border-primary/40"
           >
             {{ edu.anioInicio || "Año Inicio" }} —
             {{ edu.enCurso ? "En curso" : edu.anioGraduacion || "Graduación" }}

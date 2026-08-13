@@ -46,18 +46,18 @@
         class="p-4 bg-surface-container-low/30 border border-outline-variant/40 rounded-2xl space-y-3 relative"
       >
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-grow">
             <div
-              class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-inner"
+              class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-inner shrink-0"
             >
               {{ node.user.charAt(0).toUpperCase() }}
             </div>
-            <div>
+            <div class="flex items-center justify-between w-full pr-2">
               <h4 class="text-xs font-bold text-on-background">
                 {{ node.user }}
               </h4>
               <span
-                class="text-[10px] text-on-surface-variant dark:text-slate-300/80"
+                class="text-[10px] text-on-surface-variant dark:text-slate-300/80 whitespace-nowrap"
                 >{{ formatDate(node.createdAt) }}</span
               >
             </div>
@@ -125,18 +125,18 @@
             class="p-3 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/30 rounded-xl space-y-2"
           >
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 flex-grow">
                 <div
-                  class="w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[10px]"
+                  class="w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[10px] shrink-0"
                 >
                   {{ reply.user.charAt(0).toUpperCase() }}
                 </div>
-                <div>
+                <div class="flex items-center justify-between w-full pr-2">
                   <h5 class="text-[11px] font-bold text-on-background">
                     {{ reply.user }}
                   </h5>
                   <span
-                    class="text-[9px] text-on-surface-variant dark:text-slate-300"
+                    class="text-[9px] text-on-surface-variant dark:text-slate-300 whitespace-nowrap"
                     >{{ formatDate(reply.createdAt) }}</span
                   >
                 </div>

@@ -1,8 +1,10 @@
 <template>
-  <!-- Filters Bar: Vacancy Selector + Stages + Search Bar -->
+  <!-- Filters Bar -->
   <div
-    class="bg-surface-container-low dark:bg-slate-900 border border-outline-variant/60 rounded-2xl p-4 mb-6 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4"
+    class="bg-surface-container-low dark:bg-slate-900 border border-outline-variant/60 rounded-2xl p-4 mb-6 shadow-sm flex flex-col gap-4"
   >
+    <!-- Top Row: Vacancy Selector + Search -->
+    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
     <!-- Vacancy Selector -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
       <label
@@ -21,17 +23,18 @@
       </div>
     </div>
 
-    <!-- Stage Filters Tabs (AppTabs) -->
-    <div class="flex-grow max-w-full">
-      <AppTabs :tabs="stageTabs" v-model="selectedStageFilter" />
-    </div>
-
     <!-- Search Input (AppSearchInput) -->
-    <div class="w-full lg:w-64">
+      <div class="w-full md:w-64 flex-shrink-0">
       <AppSearchInput
         v-model="searchQuery"
         placeholder="Buscar candidato o habilidad..."
       />
+    </div>
+  </div>
+
+    <!-- Bottom Row: Stage Filters Tabs (AppTabs) -->
+    <div class="w-full min-w-0">
+      <AppTabs :tabs="stageTabs" v-model="selectedStageFilter" />
     </div>
   </div>
 </template>

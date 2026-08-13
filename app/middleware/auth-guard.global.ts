@@ -63,6 +63,7 @@ export default defineNuxtRouteMiddleware((to) => {
     "/my-vacancies",
     "/applicants",
     "/company/edit",
+    "/company/verification",
     "/create-vacancy",
   ];
 

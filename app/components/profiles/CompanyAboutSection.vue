@@ -43,12 +43,12 @@
 
         <div
           v-if="company.vision"
-          class="bg-purple-50/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 p-4 rounded-xl space-y-2"
+          class="bg-primary/10/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 p-4 rounded-xl space-y-2"
         >
           <h3
-            class="font-bold text-xs text-purple-700 dark:text-purple-300 flex items-center gap-1.5 uppercase tracking-wider"
+            class="font-bold text-xs text-primary dark:text-inverse-primary flex items-center gap-1.5 uppercase tracking-wider"
           >
-            <span class="material-symbols-outlined text-base text-purple-600"
+            <span class="material-symbols-outlined text-base text-primary"
               >visibility</span
             >
             Visión Corporativa

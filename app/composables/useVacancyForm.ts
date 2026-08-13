@@ -342,12 +342,10 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
         specPdfUrl = uploadResult.url;
       }
 
-      const payload = {
+      const payload: any = {
         title: form.value.title,
         company: companyName.value,
         empresaUuid: session.value.user.id,
-        lat: form.value.lat,
-        lng: form.value.lng,
         modalidad: form.value.modality,
         salarioMinimo: form.value.salaryMin || 0,
         salarioMaximo: form.value.salaryMax || 0,
@@ -361,6 +359,11 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
         maxPostulantes: form.value.maxPostulantes || null,
         pdfUrl: specPdfUrl,
       };
+
+      if (['H├¡brido', 'Presencial'].includes(form.value.modality)) {
+        payload.lat = form.value.lat;
+        payload.lng = form.value.lng;
+      }
 
       let response;
       if (options.isEdit && route.params.id) {

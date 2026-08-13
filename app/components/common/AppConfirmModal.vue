@@ -20,9 +20,7 @@
         @click="onCancel"
         :disabled="isLoading"
         class="px-4 py-2 rounded-xl text-xs font-bold bg-surface-container-low hover:bg-surface border border-outline-variant/60 text-on-background dark:text-slate-200 transition disabled:opacity-50 cursor-pointer"
-      >
-        {{ cancelText }}
-      </button>
+      >{{ cancelText }}</button>
 
       <button
         type="button"

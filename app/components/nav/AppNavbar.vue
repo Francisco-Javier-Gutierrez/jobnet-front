@@ -39,6 +39,19 @@
     <div class="flex items-center gap-2 flex-shrink-0">
       <template v-if="status === 'authenticated'">
         <NuxtLink
+          v-if="userRole === 'organization'"
+          to="/company/edit"
+          class="text-on-surface-variant dark:text-slate-300 hover:text-primary transition p-2 flex items-center justify-center rounded-xl"
+          :class="[
+            isActive('/company/edit')
+              ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-bold'
+              : '',
+          ]"
+          aria-label="Configuraci├│n"
+        >
+          <span class="material-symbols-outlined text-[22px]">settings</span>
+        </NuxtLink>
+        <NuxtLink
           to="/notifications"
           class="text-on-surface-variant dark:text-slate-300 hover:text-primary transition p-2 flex items-center justify-center rounded-xl"
           :class="[
@@ -138,14 +151,13 @@ const searchRoute = computed(() => {
     case "moderator":
       return null;
     case "organization":
-      return "/companies";
+      return null;
     default:
       return "/vacancies";
   }
 });
 
 const profileRoute = computed(() => {
-  if (userRole.value === "organization") return "/company/edit";
   return "/profile";
 });
 

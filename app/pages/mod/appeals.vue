@@ -10,7 +10,7 @@
           class="text-2xl font-bold text-on-background dark:text-slate-100 mb-2 flex items-center gap-2"
         >
           <span
-            class="material-symbols-outlined text-rose-600 dark:text-rose-400 text-2xl"
+            class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-2xl"
             >gavel</span
           >
           Gestión de Apelaciones y Dictámenes
@@ -33,7 +33,7 @@
         <span
           class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
         >
-          {{ wsConnected ? "Canal Live WS Conectado" : "Conectando..." }}
+          {{ wsConnected ? "En linea" : "Conectando..." }}
         </span>
       </div>
     </div>

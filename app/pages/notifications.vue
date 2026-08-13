@@ -244,7 +244,7 @@ const getIconBgClass = (type: NotificationItem["type"]) => {
     case "comment":
       return "bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/40 dark:border-emerald-900";
     case "application":
-      return "bg-blue-50 border border-blue-100 dark:bg-blue-950/40 dark:border-blue-900";
+      return "bg-tertiary/10 border border-tertiary/10 dark:bg-blue-950/40 dark:border-blue-900";
     case "SUSPENSION_NOTICE":
       return "bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-800";
     case "SUSPENSION_CANCELLED":
@@ -263,7 +263,7 @@ const getIconTextClass = (type: NotificationItem["type"]) => {
     case "comment":
       return "text-emerald-600 dark:text-emerald-400";
     case "application":
-      return "text-blue-600 dark:text-blue-400";
+      return "text-tertiary dark:text-inverse-primary";
     case "SUSPENSION_NOTICE":
       return "text-amber-600 dark:text-amber-400";
     case "SUSPENSION_CANCELLED":

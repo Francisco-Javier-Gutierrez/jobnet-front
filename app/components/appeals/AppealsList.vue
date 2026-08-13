@@ -13,7 +13,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="Buscar por organización o motivo..."
-          class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-rose-600 rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-background dark:text-slate-100 outline-none transition"
+          class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-indigo-600 rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-background dark:text-slate-100 outline-none transition"
         />
       </div>
 
@@ -24,7 +24,7 @@
           :class="[
             'flex-1 py-1.5 px-3 rounded-lg font-bold transition text-center text-[11px]',
             filterType === 'ALL'
-              ? 'bg-rose-600 text-white shadow-sm'
+              ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-on-surface-variant hover:text-on-background',
           ]"
         >
@@ -35,7 +35,7 @@
           :class="[
             'flex-1 py-1.5 px-3 rounded-lg font-bold transition text-center text-[11px]',
             filterType === 'ORGANIZACION'
-              ? 'bg-rose-600 text-white shadow-sm'
+              ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-on-surface-variant hover:text-on-background',
           ]"
         >
@@ -46,7 +46,7 @@
           :class="[
             'flex-1 py-1.5 px-3 rounded-lg font-bold transition text-center text-[11px]',
             filterType === 'VACANTE'
-              ? 'bg-rose-600 text-white shadow-sm'
+              ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-on-surface-variant hover:text-on-background',
           ]"
         >
@@ -80,12 +80,12 @@
         :class="[
           'p-4 flex items-start gap-3 cursor-pointer transition hover:bg-surface-container-high/40',
           selectedAppealId === appeal.id
-            ? 'bg-rose-500/10 border-l-4 border-rose-600 font-semibold'
+            ? 'bg-indigo-500/10 border-l-4 border-indigo-600 font-semibold'
             : '',
         ]"
       >
         <div
-          class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center flex-shrink-0 text-rose-700 dark:text-rose-300 font-bold text-sm"
+          class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center flex-shrink-0 text-indigo-700 dark:text-indigo-300 font-bold text-sm"
         >
           {{ appeal.name.charAt(0).toUpperCase() }}
         </div>
@@ -102,7 +102,7 @@
             >
           </div>
           <p
-            class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold truncate mb-1"
+            class="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold truncate mb-1"
           >
             {{ appeal.reason }}
           </p>
@@ -110,7 +110,7 @@
             class="flex items-center justify-between text-[10px] text-on-surface-variant"
           >
             <span
-              class="px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-700 dark:text-rose-300 font-bold"
+              class="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold"
             >
               {{ appeal.type || "ORGANIZACION" }}
             </span>

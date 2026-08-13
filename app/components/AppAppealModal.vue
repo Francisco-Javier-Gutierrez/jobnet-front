@@ -227,9 +227,7 @@
           @click="sendMessage"
           :disabled="!newMessageText.trim() && !pendingAttachment"
           class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
-        >
-          <span class="material-symbols-outlined text-lg">send</span>
-        </button>
+        ><span class="material-symbols-outlined text-lg">send</span></button>
       </div>
 
       <!-- Footer Link to Full Page -->

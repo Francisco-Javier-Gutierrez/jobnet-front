@@ -127,18 +127,18 @@
               :class="{ 'opacity-60 bg-slate-50/50': node.isDeleted }"
             >
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 flex-grow">
                   <div
-                    class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px] shadow-sm"
+                    class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px] shadow-sm shrink-0"
                   >
                     {{ node.user ? node.user.charAt(0).toUpperCase() : "U" }}
                   </div>
-                  <div>
+                  <div class="flex items-center justify-between w-full pr-2">
                     <h5 class="text-[11px] font-bold text-on-background">
                       {{ node.user || "Usuario" }}
                     </h5>
                     <span
-                      class="text-[9px] text-on-surface-variant dark:text-slate-300/75"
+                      class="text-[9px] text-on-surface-variant dark:text-slate-300/75 whitespace-nowrap"
                       >{{ node.timeAgo || "Hace un momento" }}</span
                     >
                   </div>
@@ -194,11 +194,9 @@
                   type="submit"
                   :disabled="!replyText.trim() || isSubmittingReply"
                   class="bg-secondary text-white disabled:bg-secondary/40 font-bold text-[10px] px-3 py-1.5 rounded-lg hover:bg-[#005236] transition flex items-center gap-1"
-                >
-                  <span>{{
+                ><span>{{
                     isSubmittingReply ? "Enviando..." : "Responder"
-                  }}</span>
-                </button>
+                  }}</span></button>
               </form>
 
               <!-- Nested (Replies Level 2) -->
@@ -213,20 +211,20 @@
                   :class="{ 'opacity-60 bg-slate-50/50': reply.isDeleted }"
                 >
                   <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5 flex-grow">
                       <div
-                        class="w-5 h-5 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[9px]"
+                        class="w-5 h-5 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-[9px] shrink-0"
                       >
                         {{
                           reply.user ? reply.user.charAt(0).toUpperCase() : "U"
                         }}
                       </div>
-                      <div>
+                      <div class="flex items-center justify-between w-full pr-2">
                         <h6 class="text-[10px] font-bold text-on-background">
                           {{ reply.user || "Usuario" }}
                         </h6>
                         <span
-                          class="text-[8px] text-on-surface-variant dark:text-slate-300/75"
+                          class="text-[8px] text-on-surface-variant dark:text-slate-300/75 whitespace-nowrap"
                           >{{ reply.timeAgo || "Hace un momento" }}</span
                         >
                       </div>
