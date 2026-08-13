@@ -314,7 +314,7 @@ const fetchAppealMessages = async () => {
     ).catch(() => {});
 
     const data = await $fetch<any[]>(
-      `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
+      `${config.public.apiUrl}/moderator/appeals/${compId}/messages`,
     ).catch(() => []);
 
     messages.value = (data || []).map((m) => ({
@@ -529,7 +529,8 @@ const sendMessage = async () => {
       socket.value.send(
         JSON.stringify({
           action: "sendMessage",
-          appealCompanyId: props.targetId || props.companyId,
+          appealId: props.targetId || props.companyId,
+          appealCompanyId: props.companyId,
           messageId,
           text: text || "",
           attachmentUrl: attachment?.url || null,
@@ -569,12 +570,13 @@ const sendHttpFallback = async (
 
     const compId = props.targetId || props.companyId;
     await $fetch(
-      `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
+      `${config.public.apiUrl}/moderator/appeals/${compId}/messages`,
       {
         method: "POST",
         headers,
         body: {
           text: text || "",
+          companyId: props.companyId,
           senderId: userId.value,
           messageId: messageId || undefined,
           attachmentUrl: attachment?.url || undefined,

@@ -146,16 +146,17 @@ export function useSupport() {
     isLoadingMessages.value = true;
     messages.value = [];
 
-    const compId = chat.companyId || chat.id;
+    const appealId = chat.id;
+    const companyId = chat.companyId || chat.id;
 
     try {
       const data = await $fetch<any[]>(
-        `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
+        `${config.public.apiUrl}/moderator/appeals/${appealId}/messages`,
       ).catch(() => []);
 
       messages.value = (data || []).map((m) => ({
         id: `m-${m.createdAt}`,
-        companyId: m.companyId || compId,
+        companyId: m.companyId || companyId,
         senderId: m.senderId,
         text: m.text,
         attachmentUrl: m.attachmentUrl || null,
@@ -380,7 +381,8 @@ export function useSupport() {
   };
 
   const sendHttpFallback = async (
-    compId: string,
+    appealId: string,
+    companyId: string,
     text: string,
     attachment: any,
     messageId?: string,
@@ -398,12 +400,13 @@ export function useSupport() {
       }
 
       await $fetch(
-        `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
+        `${config.public.apiUrl}/moderator/appeals/${appealId}/messages`,
         {
           method: "POST",
           headers,
           body: {
             text: text || "",
+            companyId: companyId,
             senderId: userId.value,
             messageId: messageId || undefined,
             attachmentUrl: attachment?.url || undefined,
@@ -421,7 +424,8 @@ export function useSupport() {
     if ((!text && !attachment) || !activeChat.value || isSending.value) return;
     isSending.value = true;
 
-    const compId = activeChat.value.companyId || activeChat.value.id;
+    const appealId = activeChat.value.id;
+    const companyId = activeChat.value.companyId || activeChat.value.id;
     const now = new Date().toISOString();
     const timeStr = new Date().toLocaleTimeString([], {
       hour: "2-digit",
@@ -432,7 +436,7 @@ export function useSupport() {
     const localMsg = {
       id: `m-user-${Date.now()}`,
       messageId,
-      companyId: compId,
+      companyId: companyId,
       senderId: userId.value,
       text,
       attachmentUrl: attachment?.url || null,
@@ -451,7 +455,8 @@ export function useSupport() {
         socket.value.send(
           JSON.stringify({
             action: "sendMessage",
-            appealCompanyId: compId,
+            appealId: appealId,
+            appealCompanyId: companyId,
             messageId,
             text: text || "",
             attachmentUrl: attachment?.url || null,
@@ -464,10 +469,10 @@ export function useSupport() {
           "WebSocket send exception, executing HTTP fallback:",
           wsErr,
         );
-        await sendHttpFallback(compId, text, attachment, messageId);
+        await sendHttpFallback(appealId, companyId, text, attachment, messageId);
       }
     } else {
-      await sendHttpFallback(compId, text, attachment, messageId);
+      await sendHttpFallback(appealId, companyId, text, attachment, messageId);
     }
 
     isSending.value = false;

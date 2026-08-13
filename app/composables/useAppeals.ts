@@ -126,6 +126,7 @@ export const useAppeals = () => {
             payload.action === "receiveMessage"
           ) {
             const {
+              appealId,
               appealCompanyId,
               senderId,
               text,
@@ -138,7 +139,7 @@ export const useAppeals = () => {
 
             const messageId = incomingMsgId;
 
-            const target = appeals.value.find((a) => a.id === appealCompanyId);
+            const target = appeals.value.find((a) => a.id === (appealId || appealCompanyId));
             if (target) {
               const compId = target.id;
               const timeStr = new Date(
@@ -206,7 +207,7 @@ export const useAppeals = () => {
 
     try {
       const msgs = await $fetch<any[]>(
-        `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
+        `${config.public.apiUrl}/moderator/appeals/${compId}/messages`,
       ).catch(() => []);
 
       appeal.messages = (msgs || []).map((m) => ({
@@ -311,7 +312,8 @@ export const useAppeals = () => {
   };
 
   const sendHttpFallback = async (
-    compId: string,
+    appealId: string,
+    companyId: string,
     text: string,
     attachment: any,
     messageId?: string,
@@ -329,12 +331,13 @@ export const useAppeals = () => {
       }
 
       await $fetch(
-        `${config.public.apiUrl}/moderator/organizations/${compId}/appeal-messages`,
+        `${config.public.apiUrl}/moderator/appeals/${appealId}/messages`,
         {
           method: "POST",
           headers,
           body: {
             text: text || "",
+            companyId: companyId,
             senderId: userId.value,
             messageId: messageId || undefined,
             attachmentUrl: attachment?.url || undefined,
@@ -356,8 +359,9 @@ export const useAppeals = () => {
     const attachment = pendingAttachment;
     if ((!text && !attachment) || !activeAppeal.value) return;
 
-    const compId = activeAppeal.value.id;
-    if (!compId) return;
+    const appealId = activeAppeal.value.id;
+    const companyId = activeAppeal.value.companyId;
+    if (!appealId) return;
 
     const now = new Date().toISOString();
     const timeStr = new Date().toLocaleTimeString([], {
@@ -384,7 +388,8 @@ export const useAppeals = () => {
         socket.value.send(
           JSON.stringify({
             action: "sendMessage",
-            appealCompanyId: compId,
+            appealId: appealId,
+            appealCompanyId: companyId,
             messageId,
             text: text || "",
             attachmentUrl: attachment?.url || null,
@@ -397,10 +402,10 @@ export const useAppeals = () => {
           "WebSocket send exception, executing HTTP fallback:",
           wsErr,
         );
-        await sendHttpFallback(compId, text, attachment, messageId);
+        await sendHttpFallback(appealId, companyId, text, attachment, messageId);
       }
     } else {
-      await sendHttpFallback(compId, text, attachment, messageId);
+      await sendHttpFallback(appealId, companyId, text, attachment, messageId);
     }
 
     scrollToBottom();
