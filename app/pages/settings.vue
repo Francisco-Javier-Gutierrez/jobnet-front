@@ -20,7 +20,7 @@
         :disabled="isSaving"
         class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3 rounded-xl transition flex items-center gap-2 shadow-md active:scale-95 disabled:opacity-50"
       >
-        <span v-if="isSaving" class="animate-spin text-xs">⌛</span>
+        <span v-if="isSaving" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
         <span v-else class="material-symbols-outlined text-sm">save</span>
         <span>{{ isSaving ? "Guardando..." : "Guardar Cambios" }}</span>
       </button>
@@ -129,7 +129,7 @@
         :disabled="isSaving"
         class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-8 py-3.5 rounded-2xl transition flex items-center gap-2 shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50"
       >
-        <span v-if="isSaving" class="animate-spin text-xs">⌛</span>
+        <span v-if="isSaving" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
         <span v-else class="material-symbols-outlined text-sm">save</span>
         <span>{{
           isSaving ? "Guardando Perfil..." : "Guardar Cambios del Perfil"

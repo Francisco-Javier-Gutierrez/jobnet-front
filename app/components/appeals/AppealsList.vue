@@ -63,7 +63,7 @@
         v-if="isLoading"
         class="p-8 text-center text-xs text-on-surface-variant"
       >
-        <span class="inline-block animate-spin mr-2">⏳</span> Cargando
+        <span class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span> Cargando
         solicitudes de apelación...
       </div>
       <div

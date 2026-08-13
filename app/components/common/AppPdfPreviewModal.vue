@@ -59,7 +59,7 @@
             class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer"
             title="Descargar documento PDF"
           >
-            <span v-if="isDownloading" class="animate-spin text-xs">⏳</span>
+            <span v-if="isDownloading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
             <span v-else class="material-symbols-outlined text-sm"
               >download</span
             >

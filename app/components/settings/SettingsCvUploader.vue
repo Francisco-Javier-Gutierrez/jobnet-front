@@ -88,7 +88,7 @@
         :disabled="uploadingCv"
         class="mt-2 px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-xl transition flex items-center gap-1 cursor-pointer"
       >
-        <span v-if="uploadingCv" class="animate-spin text-xs">⌛</span>
+        <span v-if="uploadingCv" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
         <span>{{ uploadingCv ? "Subiendo..." : "Seleccionar Archivo" }}</span>
       </button>
     </div>

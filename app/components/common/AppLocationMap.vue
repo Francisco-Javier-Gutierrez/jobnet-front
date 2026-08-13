@@ -21,7 +21,7 @@
         :disabled="isLocating"
         class="bg-primary/10 hover:bg-primary/20 text-primary font-bold text-[11px] px-3 py-1.5 rounded-lg transition flex items-center gap-1 active:scale-95 disabled:opacity-50 cursor-pointer"
       >
-        <span v-if="isLocating" class="animate-spin text-xs">⌛</span>
+        <span v-if="isLocating" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
         <span v-else class="material-symbols-outlined text-xs"
           >my_location</span
         >

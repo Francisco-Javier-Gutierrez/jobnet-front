@@ -155,7 +155,7 @@
           :disabled="loading || !acceptTerms"
           class="w-full bg-primary hover:bg-primary-container text-white font-bold py-3.5 px-4 rounded-xl shadow-sm transition disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
         >
-          <span v-if="loading" class="animate-spin text-sm">⌛</span>
+          <span v-if="loading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
           <span>{{
             loading ? "Creando usuario secreto..." : "Crear Usuario Neutral"
           }}</span>

@@ -103,7 +103,7 @@
               :disabled="isUploading"
               class="flex-1 bg-surface border border-outline-variant/60 hover:border-primary text-primary text-xs font-bold py-2.5 px-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <span v-if="isUploading" class="animate-spin text-xs">⌛</span>
+              <span v-if="isUploading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
               <span v-else class="material-symbols-outlined text-base"
                 >upload_file</span
               >
@@ -123,7 +123,7 @@
             :disabled="!selectedFile || isUploading"
             class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 text-xs font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
           >
-            <span v-if="isUploading" class="animate-spin text-xs">⌛</span>
+            <span v-if="isUploading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
             <span v-else class="material-symbols-outlined text-sm"
               >add_circle</span
             >

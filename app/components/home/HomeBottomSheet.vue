@@ -98,9 +98,7 @@
                 :disabled="!newCommentText.trim() || isSubmittingComment"
                 class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-[10px] px-4 py-2 rounded-lg transition flex items-center gap-1.5"
               >
-                <span v-if="isSubmittingComment" class="animate-spin text-xs"
-                  >⌛</span
-                >
+                <span v-if="isSubmittingComment" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
                 <span>{{
                   isSubmittingComment ? "Enviando..." : "Comentar"
                 }}</span>

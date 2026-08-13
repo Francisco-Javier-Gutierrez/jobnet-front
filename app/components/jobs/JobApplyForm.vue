@@ -203,7 +203,7 @@
           :disabled="isApplying"
           class="w-full sm:w-auto bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-primary/20 active:scale-95 disabled:opacity-50 flex-shrink-0"
         >
-          <span v-if="isApplying" class="animate-spin text-xs">⏳</span>
+          <span v-if="isApplying" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
           <span v-else class="material-symbols-outlined text-sm">send</span>
           <span>{{
             isApplying

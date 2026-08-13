@@ -22,9 +22,13 @@
         <button
           type="submit"
           :disabled="!newCommentText.trim() || isCreatingComment"
-          class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm"
+          class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm flex items-center justify-center min-w-[120px]"
         >
-          Publicar Pregunta
+          <span
+            v-if="isCreatingComment"
+            class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+          ></span>
+          <span v-else>Publicar Pregunta</span>
         </button>
       </div>
     </form>

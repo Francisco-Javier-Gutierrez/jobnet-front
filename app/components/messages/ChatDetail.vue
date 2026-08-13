@@ -146,7 +146,7 @@
           class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50"
           title="Adjuntar PDF o Imagen"
         >
-          <span v-if="isUploading" class="animate-spin text-sm">⏳</span>
+          <span v-if="isUploading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
           <span v-else class="material-symbols-outlined text-lg"
             >attach_file</span
           >

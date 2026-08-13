@@ -93,7 +93,7 @@
         :disabled="hasApplied || isApplying || job.estado === 'EVALUACION'"
         class="px-6 py-3 bg-primary hover:bg-primary-container text-white font-bold text-xs rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 flex-shrink-0 disabled:opacity-80"
       >
-        <span v-if="isApplying" class="animate-spin text-sm">⏳</span>
+        <span v-if="isApplying" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
         <span v-else-if="hasApplied" class="material-symbols-outlined text-base"
           >check_circle</span
         >

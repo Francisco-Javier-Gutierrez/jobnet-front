@@ -71,7 +71,7 @@
         :disabled="isReporting || !reportComments.trim()"
         class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-3 rounded-xl transition disabled:opacity-50 flex items-center justify-center gap-1 shadow-md shadow-rose-600/20 cursor-pointer"
       >
-        <span v-if="isReporting" class="animate-spin text-xs">⏳</span>
+        <span v-if="isReporting" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
         <span>{{ isReporting ? "Enviando..." : "Enviar Reporte" }}</span>
       </button>
     </template>

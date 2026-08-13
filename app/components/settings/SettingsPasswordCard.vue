@@ -89,11 +89,7 @@
           :disabled="isSubmitting"
           class="px-4 py-2.5 bg-primary hover:bg-primary-container disabled:opacity-50 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-2 active:scale-95"
         >
-          <span
-            v-if="isSubmitting"
-            class="material-symbols-outlined animate-spin text-sm"
-            >progress_activity</span
-          >
+          <span v-if="isSubmitting" class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
           <span v-else class="material-symbols-outlined text-sm"
             >lock_reset</span
           >

@@ -26,7 +26,7 @@
         v-if="isLoadingChats"
         class="p-8 text-center text-xs text-on-surface-variant dark:text-slate-300/80"
       >
-        <span class="inline-block animate-spin mr-2">⏳</span> Cargando tus
+        <span class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span> Cargando tus
         conversaciones...
       </div>
       <div

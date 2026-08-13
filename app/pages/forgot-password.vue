@@ -96,12 +96,7 @@
           :aria-busy="loading"
           class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm hover:shadow"
         >
-          <span
-            v-if="loading"
-            class="material-symbols-outlined animate-spin text-lg"
-            aria-hidden="true"
-            >progress_activity</span
-          >
+          <span v-if="loading" class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
           <span v-else>Enviar</span>
         </button>
       </form>

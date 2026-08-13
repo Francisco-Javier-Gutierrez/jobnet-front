@@ -79,11 +79,7 @@
         :disabled="!comments.trim() || isSubmitting"
         class="bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-1.5 shadow cursor-pointer"
       >
-        <span
-          v-if="isSubmitting"
-          class="material-symbols-outlined text-sm animate-spin"
-          >progress_activity</span
-        >
+        <span v-if="isSubmitting" class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
         <span>{{ isSubmitting ? "Enviando..." : "Enviar Reporte" }}</span>
       </button>
     </template>
