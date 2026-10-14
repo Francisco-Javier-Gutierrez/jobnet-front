@@ -3,7 +3,7 @@ name: Deploy Frontend
 on:
   push:
     branches:
-      - deployment
+      - main
 
 jobs:
   deploy:
@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
@@ -55,3 +55,9 @@ jobs:
           cd terraform/environments/prod
           BUCKET_NAME=$(terraform output -raw s3_bucket_name)
           aws s3 sync ../../../.output/public s3://$BUCKET_NAME --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          cd terraform/environments/prod
+          DISTRIBUTION_ID=$(terraform output -raw cloudfront_distribution_id)
+          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"

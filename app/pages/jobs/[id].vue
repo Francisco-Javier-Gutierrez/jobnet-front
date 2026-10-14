@@ -1,0 +1,289 @@
+<template>
+  <div
+    class="max-w-4xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+  >
+    <!-- Top Breadcrumb -->
+    <div class="mb-6 flex items-center justify-between">
+      <NuxtLink
+        to="/vacancies"
+        class="inline-flex items-center gap-1.5 text-primary hover:text-primary-container text-xs font-bold transition px-3 py-1.5 bg-primary/10 rounded-xl"
+      >
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Volver a vacantes
+      </NuxtLink>
+
+      <div class="flex items-center gap-2">
+        <button
+          v-if="job"
+          @click="shareJob(job)"
+          class="inline-flex items-center gap-1 text-primary hover:text-primary-container text-xs font-bold transition px-3 py-1.5 bg-primary/10 rounded-xl border border-primary/20"
+          title="Copiar enlace de esta vacante"
+        >
+          <span class="material-symbols-outlined text-sm">share</span>
+          Compartir vacante
+        </button>
+
+        <button
+          v-if="job"
+          @click="showReportModal = true"
+          class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 text-xs font-bold transition px-3 py-1.5 bg-rose-500/10 rounded-xl border border-rose-500/20"
+        >
+          <span class="material-symbols-outlined text-sm">flag</span>
+          Reportar vacante
+        </button>
+      </div>
+    </div>
+
+    <!-- Skeleton Loading Detail Page -->
+    <div
+      v-if="loading"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-3xl border border-outline-variant/60 p-8 space-y-6 animate-pulse shadow-sm"
+      role="status"
+    >
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-outline/10 animate-pulse"></div>
+        <div class="space-y-2 flex-grow">
+          <div class="h-6 w-1/2 bg-outline/20 rounded animate-pulse"></div>
+          <div class="h-4 w-1/4 bg-outline/10 rounded animate-pulse"></div>
+        </div>
+      </div>
+      <div class="h-4 w-full bg-outline/10 rounded animate-pulse"></div>
+      <div class="h-4 w-5/6 bg-outline/10 rounded animate-pulse"></div>
+      <div class="h-48 bg-outline/10 rounded-2xl animate-pulse"></div>
+    </div>
+
+    <!-- Vacancy Not Found State -->
+    <div
+      v-else-if="!job"
+      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-3xl shadow-sm px-6"
+    >
+      <div
+        class="w-16 h-16 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mb-4"
+      >
+        <span class="material-symbols-outlined text-[32px]">work_off</span>
+      </div>
+      <h2 class="text-lg font-bold text-on-background mb-2">
+        Vacante no encontrada
+      </h2>
+      <p
+        class="text-on-surface-variant dark:text-slate-300 text-xs max-w-sm mb-6"
+      >
+        La oferta de empleo que estás buscando no existe, ha sido desactivada o
+        el enlace es incorrecto.
+      </p>
+      <NuxtLink
+        to="/vacancies"
+        class="bg-primary text-white hover:bg-primary-container font-semibold text-xs px-5 py-2.5 rounded-xl transition"
+      >
+        Volver a la Bolsa de Trabajo
+      </NuxtLink>
+    </div>
+
+    <!-- UNIFIED MASTER DETAIL CARD -->
+    <div
+      v-else
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-8"
+    >
+      <div
+        class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-secondary to-emerald-500"
+      ></div>
+
+      <!-- 1-4. Header & Details -->
+      <JobDetails
+        :job="job"
+        :hasApplied="hasApplied"
+        :isApplying="isApplying"
+        :formatSalaryDisplay="formatSalaryDisplay"
+        @easyApply="handleEasyApplyClick"
+      />
+
+      <hr class="border-outline-variant/30" />
+
+      <!-- 5. Location Map Section -->
+      <div v-if="job && job.lat && job.lng" class="space-y-3 text-left">
+        <AppLocationMap
+          :lat="job.lat"
+          :lng="job.lng"
+          :draggable="false"
+          label="Ubicación de la Oferta"
+          height="280px"
+          :show-use-current-location="false"
+        />
+      </div>
+
+      <hr v-if="job && job.lat && job.lng" class="border-outline-variant/30" />
+
+      <!-- 6. Application Form Section -->
+      <JobApplyForm
+        :job="job"
+        :jobId="jobId"
+        :hasApplied="hasApplied"
+        :isApplying="isApplying"
+        :session="session"
+        :profileCvUrl="profileCvUrl"
+        :profileCvName="profileCvName"
+        v-model:coverLetterInput="coverLetterInput"
+        :candidateProfileLinks="candidateProfileLinks"
+        :candidateProfileDocs="candidateProfileDocs"
+        v-model:selectedProfileLinks="selectedProfileLinks"
+        v-model:selectedProfileDocs="selectedProfileDocs"
+        @easyApply="handleEasyApplyClick"
+      />
+
+      <hr class="border-outline-variant/30" />
+
+      <!-- 7. Public Q&A Section -->
+      <JobComments
+        :totalComments="totalComments"
+        v-model:newCommentText="newCommentText"
+        :isCreatingComment="isCreatingComment"
+        :commentTree="commentTree"
+        :replyingToCommentId="replyingToCommentId"
+        v-model:replyContentText="replyContentText"
+        :canDeleteComment="canDeleteComment"
+        :formatDate="formatDate"
+        @submitComment="submitComment"
+        @deleteComment="deleteComment"
+        @toggleReplyForm="toggleReplyForm"
+        @submitReply="submitReply"
+      />
+    </div>
+  </div>
+
+  <!-- Modal de Reporte -->
+  <ReportModal
+    :is-open="showReportModal"
+    target-type="VACANTE"
+    :target-id="job?.id || ''"
+    :target-title="job?.title || 'Vacante'"
+    @close="showReportModal = false"
+  />
+
+  <!-- Modal de Perfil Desactualizado (Falta CV) -->
+  <div
+    v-if="showMissingCvModal"
+    class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+  >
+    <div
+      class="bg-white border border-outline-variant/60 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-6 text-left"
+    >
+      <div
+        class="flex items-center justify-between border-b border-outline-variant/30 pb-4"
+      >
+        <div class="flex items-center gap-2 text-amber-600">
+          <span class="material-symbols-outlined text-2xl">warning</span>
+          <h3 class="text-base font-extrabold text-on-background">
+            Perfil desactualizado
+          </h3>
+        </div>
+        <button
+          @click="showMissingCvModal = false"
+          class="text-on-surface-variant dark:text-slate-300 hover:bg-surface-container rounded-lg p-1.5 transition"
+        >
+          <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <p
+          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+        >
+          Para realizar una
+          <strong class="text-on-background"
+            >Postulación en 1-Clic (Easy Apply)</strong
+          >, es requisito indispensable tener tu
+          <strong>Currículum Vitae (PDF)</strong> cargado en tu perfil digital.
+        </p>
+        <p
+          class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed bg-amber-50 border border-amber-200 p-3.5 rounded-2xl text-amber-900 font-semibold"
+        >
+          💡 Al subir tu CV en tu perfil una sola vez, podrás postularte de
+          forma instantánea a cualquier vacante sin necesidad de volver a cargar
+          archivos.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-2.5 pt-2">
+        <NuxtLink
+          to="/profile"
+          class="w-full bg-primary hover:bg-primary-container text-white font-bold text-xs py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-md shadow-primary/20 text-center"
+        >
+          <span class="material-symbols-outlined text-sm">badge</span>
+          <span>Ir a mi Perfil a subir mi CV</span>
+        </NuxtLink>
+
+        <button
+          type="button"
+          @click="showMissingCvModal = false"
+          class="w-full bg-surface border border-outline-variant hover:bg-surface-container text-on-surface-variant dark:text-slate-300 font-semibold text-xs py-3 rounded-2xl transition"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useJobDetails } from "~/composables/useJobDetails";
+import { useJobApplication } from "~/composables/useJobApplication";
+import { useJobComments } from "~/composables/useJobComments";
+import { useRoute } from "#imports";
+
+const route = useRoute();
+const jobId = route.params.id as string;
+const { shareJob } = useShare();
+
+const { job, loading, formatSalaryDisplay, showReportModal, loadJob } =
+  useJobDetails(jobId);
+
+const {
+  profileCvUrl,
+  profileCvName,
+  showMissingCvModal,
+  coverLetterInput,
+  selectedProfileLinks,
+  selectedProfileDocs,
+  candidateProfileLinks,
+  candidateProfileDocs,
+  isApplying,
+  hasApplied,
+  fetchCandidateProfile,
+  handleEasyApplyClick,
+  checkAppliedStatus,
+  session,
+} = useJobApplication(jobId, job);
+
+const {
+  totalComments,
+  newCommentText,
+  replyContentText,
+  replyingToCommentId,
+  isCreatingComment,
+  commentTree,
+  loadComments,
+  submitComment,
+  toggleReplyForm,
+  submitReply,
+  deleteComment,
+  canDeleteComment,
+  formatDate,
+} = useJobComments(jobId, job);
+
+useHead({
+  link: [
+    {
+      rel: "stylesheet",
+      href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+      crossorigin: "",
+    },
+  ],
+});
+
+onMounted(async () => {
+  checkAppliedStatus();
+  loadComments();
+  await fetchCandidateProfile();
+  await loadJob();
+});
+</script>

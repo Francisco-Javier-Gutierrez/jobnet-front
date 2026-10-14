@@ -1,35 +1,135 @@
 <template>
-  <div class="relative overflow-hidden flex-grow flex flex-col justify-center items-center py-20 px-4 sm:px-6 lg:px-8">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_40%)]"></div>
-    <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
-    
-    <div class="max-w-3xl text-center relative z-10">
-      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 mb-6">
-        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
-        Nueva Versión 2.0
-      </span>
-      <h1 class="text-5xl sm:text-6xl font-extrabold tracking-tight text-white mb-6">
-        Encuentra el empleo de tus sueños con
-        <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">JobNet</span>
-      </h1>
-      <p class="text-lg sm:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-        Conectamos el talento técnico con las mejores empresas globales. Explora vacantes geolocalizadas, gestiona tus postulaciones y da el siguiente gran salto en tu carrera profesional.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <NuxtLink to="/jobs" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/30">
-          Explorar Empleos
-        </NuxtLink>
-        <NuxtLink to="/map" class="inline-flex items-center justify-center px-6 py-3 border border-slate-700 text-base font-medium rounded-xl text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-800 transition">
-          Ver en el Mapa
-        </NuxtLink>
-      </div>
-    </div>
+  <div
+    class="bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200 flex flex-col font-sans"
+  >
+    <!-- Main Container -->
+    <main
+      class="flex-grow max-w-lg mx-auto w-full px-4 py-8 space-y-6"
+      role="main"
+    >
+      <HomeQuickVacancyBanner />
+
+      <HomeFeedContainer
+        :posts-loading="postsLoading"
+        :feed-items="feedItems"
+        :current-user-id="currentUserId"
+        :is-bookmarked="isBookmarked"
+        :is-liked="isLiked"
+        @toggle-like="toggleLike"
+        @toggle-bookmark="toggleBookmark"
+        @share-job="handleShareJob"
+        @share-post="handleSharePost"
+        @navigate-to-post="navigateToPost"
+      />
+    </main>
+
+    <HomeBottomSheet
+      :selected-post="selectedPost"
+      :current-user-id="currentUserId"
+      :is-bookmarked="isBookmarked"
+      :comments-count="commentsCount"
+      :comment-tree="commentTree"
+      :can-delete-comment="canDeleteComment"
+      :is-dragging="isDragging"
+      :sheet-offset="sheetOffset"
+      :new-comment-text="newCommentText"
+      :is-submitting-comment="isSubmittingComment"
+      :replying-to-id="replyingToId"
+      :reply-text="replyText"
+      :is-submitting-reply="isSubmittingReply"
+      @close="closeBottomSheet"
+      @touchstart="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
+      @mousedown="onMouseDown"
+      @toggle-like="toggleLike"
+      @toggle-bookmark="toggleBookmark"
+      @share-post="handleSharePost"
+      @update:newCommentText="newCommentText = $event"
+      @submit-comment="submitComment"
+      @delete-comment="deleteComment"
+      @toggle-reply-form="toggleReplyForm"
+      @update:replyText="replyText = $event"
+      @submit-reply="submitReply"
+    />
+
+    <HomeAuthModal
+      :show-auth-modal="showAuthModal"
+      @close="showAuthModal = false"
+      @login="router.push('/login')"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useJobFeeds } from "~/composables/useJobFeeds";
+import { useRouter } from "vue-router";
+
 useSeoMeta({
-  title: 'JobNet - Plataforma de Búsqueda de Empleos',
-  description: 'Explora ofertas de empleo con ubicación geográfica interactiva y gestiona tu carrera profesional.'
-})
+  title: "JobNet - Feed de Comunidad",
+  description:
+    "El feed profesional inteligente para compartir publicaciones con desarrolladores y organizaciones.",
+});
+
+const router = useRouter();
+
+const {
+  postsLoading,
+  isPublishing,
+  isSubmittingComment,
+  isSubmittingReply,
+  showAuthModal,
+  selectedImageFile,
+  selectedPdfFile,
+  newPostContent,
+  previewImage,
+  previewPdf,
+  previewPdfName,
+  imageInput,
+  pdfInput,
+  feedItems,
+  postsList,
+  currentUserId,
+  selectedPost,
+  newCommentText,
+  replyingToId,
+  replyText,
+  startY,
+  isDragging,
+  sheetOffset,
+  commentTree,
+  isLiked,
+  isBookmarked,
+  likesCount,
+  triggerImageSelect,
+  handleImageSelect,
+  triggerPdfSelect,
+  handlePdfSelect,
+  clearAttachment,
+  loadPosts,
+  savePostsToLocalStorage,
+  buildFeed,
+  publishPost,
+  toggleLike,
+  toggleBookmark,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
+  onMouseDown,
+  onMouseMove,
+  onMouseUp,
+  commentsCount,
+  closeBottomSheet,
+  navigateToPost,
+  handleSharePost,
+  handleShareJob,
+  submitComment,
+  toggleReplyForm,
+  submitReply,
+  canDeleteComment,
+  deleteComment,
+} = useJobFeeds();
 </script>

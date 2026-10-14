@@ -1,0 +1,108 @@
+import { useS3Upload } from "~/composables/useS3Upload";
+import { useAppFeedback } from "~/composables/useAppFeedback";
+
+export interface PendingAttachment {
+  url: string;
+  type: string;
+  name: string;
+}
+
+export const useChatAttachments = (folderName: string = "chat") => {
+  const { uploadFile, uploadError: s3UploadError } = useS3Upload();
+  const { showError, showInfo } = useAppFeedback();
+
+  const fileInput = ref<HTMLInputElement | null>(null);
+  const isUploading = ref(false);
+  const pendingAttachment = ref<PendingAttachment | null>(null);
+
+  const triggerFileInput = () => {
+    fileInput.value?.click();
+  };
+
+  const isImageUrl = (url?: string) => {
+    if (!url) return false;
+    const cleanUrl = url.split("?")[0];
+    return /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(cleanUrl);
+  };
+
+  const openImagePreview = (url: string) => {
+    window.open(url, "_blank");
+  };
+
+  const formatTime = (dateStr?: string) => {
+    if (!dateStr) return "Reciente";
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "Reciente";
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    } catch {
+      return "Reciente";
+    }
+  };
+
+  const handleFileUpload = async (
+    event: Event,
+    userId: string,
+    onSuccess?: () => void,
+  ) => {
+    const target = event.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+
+    const file = target.files[0];
+    if (!file) return;
+
+    const isImg =
+      file.type.startsWith("image/") ||
+      /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(file.name);
+    const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+
+    if (!isImg && !isPdf) {
+      showInfo(
+        "Notificaci├│n",
+        "Solo se permiten archivos en formato PDF o Im├ígenes (JPG, PNG, WebP, GIF).",
+      );
+      if (fileInput.value) fileInput.value.value = "";
+      return;
+    }
+
+    isUploading.value = true;
+
+    try {
+      const uploadRes = await uploadFile(file, {
+        folder: folderName,
+        userId: userId || "user",
+      });
+
+      if (uploadRes && uploadRes.url) {
+        pendingAttachment.value = {
+          url: uploadRes.url,
+          type: isImg ? "image" : "file",
+          name: file.name,
+        };
+
+        if (onSuccess) {
+          await onSuccess();
+        }
+      } else if (s3UploadError.value) {
+        showError("Error", `Error al subir archivo: ${s3UploadError.value}`);
+      }
+    } catch (err: any) {
+      console.error(`Error uploading file to S3 (${folderName}):`, err);
+      showError("Error", `Error al subir el archivo: ${err.message || err}`);
+    } finally {
+      isUploading.value = false;
+      if (fileInput.value) fileInput.value.value = "";
+    }
+  };
+
+  return {
+    fileInput,
+    isUploading,
+    pendingAttachment,
+    triggerFileInput,
+    handleFileUpload,
+    isImageUrl,
+    openImagePreview,
+    formatTime,
+  };
+};

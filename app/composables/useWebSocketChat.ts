@@ -1,0 +1,61 @@
+import { WebSocketClient, type WebSocketStatus } from "~/utils/wsClient";
+
+export interface UseWebSocketChatOptions {
+  url: string;
+  onMessageReceived: (payload: any) => void;
+  onStatusChange?: (status: WebSocketStatus) => void;
+  reconnect?: boolean;
+}
+
+export const useWebSocketChat = () => {
+  const wsStatus = ref<WebSocketStatus>("disconnected");
+  const wsClient = ref<WebSocketClient | null>(null);
+
+  const connectWebSocket = (options: UseWebSocketChatOptions) => {
+    if (wsClient.value) {
+      wsClient.value.disconnect();
+    }
+
+    wsStatus.value = "connecting";
+
+    wsClient.value = new WebSocketClient({
+      url: options.url,
+      reconnect: options.reconnect ?? true,
+      onMessage: options.onMessageReceived,
+      onStatusChange: (status) => {
+        wsStatus.value = status;
+        if (options.onStatusChange) {
+          options.onStatusChange(status);
+        }
+      },
+    });
+
+    wsClient.value.connect();
+  };
+
+  const disconnectWebSocket = () => {
+    if (wsClient.value) {
+      wsClient.value.disconnect();
+      wsClient.value = null;
+    }
+    wsStatus.value = "disconnected";
+  };
+
+  const sendWsMessage = (payload: any): boolean => {
+    if (wsClient.value && wsStatus.value === "connected") {
+      return wsClient.value.send(payload);
+    }
+    return false;
+  };
+
+  onUnmounted(() => {
+    disconnectWebSocket();
+  });
+
+  return {
+    wsStatus,
+    connectWebSocket,
+    disconnectWebSocket,
+    sendWsMessage,
+  };
+};

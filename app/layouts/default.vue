@@ -1,44 +1,67 @@
 <template>
-  <div class="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
-    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">
-            J
-          </div>
-          <span class="text-xl font-bold bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">JobNet</span>
-        </div>
-        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-          <NuxtLink to="/" class="hover:text-white transition">Inicio</NuxtLink>
-          <NuxtLink to="/jobs" class="hover:text-white transition">Empleos</NuxtLink>
-          <NuxtLink to="/map" class="hover:text-white transition">Mapa</NuxtLink>
-        </nav>
-        <div class="flex items-center gap-4">
-          <template v-if="status === 'authenticated'">
-            <span class="text-sm text-slate-400 hidden sm:inline">{{ data?.user?.email }}</span>
-            <button @click="signOut()" class="text-sm bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-medium transition">
-              Cerrar Sesión
-            </button>
-          </template>
-          <template v-else>
-            <button @click="signIn('cognito')" class="text-sm bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition shadow-lg shadow-indigo-600/20">
-              Iniciar Sesión
-            </button>
-          </template>
-        </div>
-      </div>
-    </header>
-    <main class="flex-grow flex flex-col">
+  <div
+    class="min-h-screen bg-background dark:bg-slate-950 text-on-background dark:text-slate-100 font-sans transition-colors duration-200"
+  >
+    <!-- Modular Desktop & Mobile Drawer Sidebar -->
+    <AppSidebar v-model:isMobileMenuOpen="isMobileMenuOpen" />
+
+    <!-- Modular Mobile Top Header Navbar -->
+    <AppNavbar :is-visible="isHeaderVisible" />
+
+    <!-- Main Content Area -->
+    <main
+      class="flex-grow min-h-screen pt-16 pb-16 md:pt-0 md:pb-0 md:ml-64 transition-all duration-200"
+      role="main"
+    >
       <slot />
     </main>
-    <footer class="border-t border-slate-800 bg-slate-950/50 py-8">
-      <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-xs">
-        <p>&copy; 2026 JobNet Platform. Todos los derechos reservados.</p>
-      </div>
-    </footer>
+
+    <!-- Modular Mobile Bottom Navigation Footer -->
+    <AppFooter :is-visible="isFooterVisible" />
   </div>
 </template>
 
 <script setup lang="ts">
-const { status, data, signIn, signOut } = useAuth()
+const isMobileMenuOpen = ref(false);
+
+// Scroll tracking for hide/show nav bars on mobile
+const isHeaderVisible = ref(true);
+const isFooterVisible = ref(true);
+let lastScrollY = 0;
+
+const handleScroll = () => {
+  if (process.client) {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY <= 20) {
+      isHeaderVisible.value = true;
+      isFooterVisible.value = true;
+    } else {
+      if (currentScrollY > lastScrollY) {
+        // Scrolling down -> Hide top header, keep bottom footer visible
+        isHeaderVisible.value = false;
+        isFooterVisible.value = true;
+      } else {
+        // Scrolling up -> Show top header, hide bottom footer
+        isHeaderVisible.value = true;
+        isFooterVisible.value = false;
+      }
+    }
+    lastScrollY = currentScrollY;
+  }
+};
+
+onMounted(() => {
+  if (process.client) {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    isHeaderVisible.value = true;
+    isFooterVisible.value = true;
+  }
+});
+
+onUnmounted(() => {
+  if (process.client) {
+    window.removeEventListener("scroll", handleScroll);
+  }
+});
 </script>

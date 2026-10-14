@@ -1,0 +1,61 @@
+export interface JobComment {
+  id?: string;
+  uniqueId?: string;
+  commentId?: string;
+  author?: string;
+  authorId?: string;
+  authorUuid?: string;
+  authorAvatar?: string;
+  fotoPerfil?: string;
+  content: string;
+  createdAt?: string;
+  replies?: JobComment[];
+}
+
+export interface Job {
+  id?: string;
+  uniqueId?: string;
+  title?: string;
+  titulo?: string;
+  company?: string;
+  empresaNombre?: string;
+  organización?: string;
+  empresaUuid?: string;
+  empresaId?: string;
+  companyId?: string;
+  companyLogo?: string;
+  empresaLogo?: string;
+  lat?: number;
+  lng?: number;
+  modalidad?: string;
+  type?: string;
+  descripcion?: string;
+  description?: string;
+  habilidadesRequeridas?: string[];
+  aptitudes?: string;
+  salario?: number;
+  salarioFormatted?: string;
+  salary?: string;
+  salarioMinimo?: number;
+  salarioMaximo?: number;
+  experienciaAnos?: number;
+  sector?: string;
+  sectores?: string[];
+  location?: string;
+  vacantesDisponibles?: number;
+  pdfUrl?: string;
+  pdfName?: string;
+  estado?: "ACTIVO" | "EVALUACION" | "CERRADA" | "PAUSADA" | string;
+  createdAt?: string;
+  likes?: number;
+  likesCount?: number;
+  likesList?: string[];
+  savedBy?: string[];
+  bookmarksList?: string[];
+  bookmarksCount?: number;
+  comments?: JobComment[];
+  commentsCount?: number;
+  sharesCount?: number;
+  isLiked?: boolean;
+  isBookmarked?: boolean;
+}
