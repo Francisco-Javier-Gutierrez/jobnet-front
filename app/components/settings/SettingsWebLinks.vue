@@ -138,16 +138,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-
 export interface WebLinkItem {
-  label: string;
+  label?: string;
+  nombre?: string;
+  name?: string;
   url: string;
 }
 
 const props = withDefaults(
   defineProps<{
-    links?: any;
+    links?: WebLinkItem[] | Record<string, string | { url: string }>;
   }>(),
   {
     links: () => [],
@@ -168,7 +168,7 @@ const linkList = computed<WebLinkItem[]>(() => {
   if (raw && typeof raw === "object") {
     return Object.entries(raw).map(([label, url]) => ({
       label,
-      url: typeof url === "string" ? url : (url as any)?.url || "",
+      url: typeof url === "string" ? url : (url as { url: string })?.url || "",
     }));
   }
   return [];

@@ -175,7 +175,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 

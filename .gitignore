@@ -19,3 +19,17 @@ logs
 .terraform/
 *.tfstate*
 .terraform.lock.hcl
+
+# Archives & Binaries
+*.zip
+*.tar.gz
+*.exe
+*.pdb
+*.patch
+*.diff
+
+# Temporary extracts & tools
+test_zip_extract/
+vue-to-html/
+figma-views-headless/
+stitch_jobnet_nuxt_login_component/

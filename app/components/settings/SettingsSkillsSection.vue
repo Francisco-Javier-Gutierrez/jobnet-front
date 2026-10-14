@@ -102,8 +102,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-
 const props = defineProps<{
   skills: string[];
   catalogSkills?: { id: string; name: string }[];

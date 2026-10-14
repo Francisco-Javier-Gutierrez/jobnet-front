@@ -7,7 +7,7 @@
         class="text-base font-bold text-on-background flex items-center gap-2"
       >
         <span
-          class="material-symbols-outlined text-purple-600 dark:text-purple-400"
+          class="material-symbols-outlined text-primary dark:text-inverse-primary"
           >school</span
         >
         Formación Académica (Educación)
@@ -15,7 +15,7 @@
       <button
         type="button"
         @click="addEducacion"
-        class="bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 text-purple-600 dark:text-purple-400 text-xs font-bold px-3 py-1.5 rounded-xl border border-purple-200 dark:border-purple-800 transition flex items-center gap-1 active:scale-95"
+        class="bg-primary/10 dark:bg-primary/20 hover:bg-purple-100 text-primary dark:text-inverse-primary text-xs font-bold px-3 py-1.5 rounded-xl border border-primary/20 dark:border-primary/40 transition flex items-center gap-1 active:scale-95"
       >
         <span class="material-symbols-outlined text-sm">add</span>
         Agregar Educación
@@ -44,7 +44,9 @@
         <div
           class="flex items-center justify-between border-b border-outline-variant/40 pb-2"
         >
-          <span class="text-xs font-bold text-purple-600 dark:text-purple-400">
+          <span
+            class="text-xs font-bold text-primary dark:text-inverse-primary"
+          >
             Educación #{{ idx + 1 }}
           </span>
           <button
@@ -116,7 +118,7 @@
                 <input
                   type="checkbox"
                   v-model="edu.enCurso"
-                  class="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                  class="rounded border-slate-300 text-primary focus:ring-primary"
                 />
                 En curso
               </label>
@@ -132,7 +134,7 @@
             />
             <span
               v-else
-              class="w-full bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 font-bold px-3 py-2 text-xs rounded-xl border border-purple-200 dark:border-purple-800 text-center"
+              class="w-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-inverse-primary font-bold px-3 py-2 text-xs rounded-xl border border-primary/20 dark:border-primary/40 text-center"
             >
               Estudios en curso
             </span>

@@ -8,8 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import AppPdfPreviewModal from "./common/AppPdfPreviewModal.vue";
-
 defineProps<{
   modelValue: boolean;
   url: string;

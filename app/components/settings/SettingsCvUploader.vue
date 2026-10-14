@@ -2,7 +2,7 @@
   <div
     class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-4 shadow-sm"
   >
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-3">
       <h2
         class="text-base font-bold text-on-background flex items-center gap-2"
       >
@@ -11,62 +11,49 @@
         >
         Currículum Vitae Principal (CV PDF)
       </h2>
+
+      <!-- Create with Templates Button -->
+      <button
+        type="button"
+        @click="showCvBuilderModal = true"
+        class="px-3.5 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+      >
+        <span class="material-symbols-outlined text-sm">auto_fix_high</span>
+        <span>✨ Generar CV con Plantillas (Carta)</span>
+      </button>
     </div>
+
     <p
       class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
     >
-      Sube tu CV oficial en formato PDF (Máximo 5MB). Este documento se enviará
+      Sube tu CV oficial o créalo automáticamente con nuestras plantillas
+      profesionales en tamaño Carta (8.5" × 11"). Este documento se enviará
       automáticamente en tus postulaciones en 1-clic.
     </p>
 
     <!-- Upload Status / Preview Card -->
-    <div
+    <AppFileAttachment
       v-if="cvUrl"
-      class="flex items-center justify-between p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex-wrap gap-3"
+      :name="cvName || 'Currículum_Principal.pdf'"
+      subtitle="Documento cargado exitosamente"
+      type="pdf"
+      variant="success"
+      :show-preview="true"
+      @preview="showPdfModal = true"
+      @remove="removeCv"
     >
-      <div class="flex items-center gap-3 min-w-0">
-        <span
-          class="material-symbols-outlined text-emerald-600 text-3xl flex-shrink-0"
-          >picture_as_pdf</span
-        >
-        <div class="min-w-0">
-          <p
-            class="text-xs font-bold text-emerald-950 dark:text-emerald-300 truncate"
-          >
-            {{ cvName || "Currículum_Principal.pdf" }}
-          </p>
-          <p class="text-[10px] text-emerald-700 dark:text-emerald-400">
-            Documento cargado exitosamente
-          </p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2 flex-shrink-0">
-        <button
-          type="button"
-          @click="showPdfModal = true"
-          class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 cursor-pointer shadow-xs"
-        >
-          <span class="material-symbols-outlined text-xs">visibility</span>
-          <span>Ver Previa</span>
-        </button>
+      <template #extra-actions>
         <a
           :href="cvUrl"
           target="_blank"
           rel="noopener"
-          class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1"
+          class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg transition flex items-center justify-center cursor-pointer"
+          title="Abrir PDF en pestaña nueva"
         >
-          <span class="material-symbols-outlined text-xs">open_in_new</span>
+          <span class="material-symbols-outlined text-[14px]">open_in_new</span>
         </a>
-        <button
-          type="button"
-          @click="removeCv"
-          class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 text-xs font-bold rounded-xl transition cursor-pointer"
-        >
-          Eliminar
-        </button>
-      </div>
-    </div>
+      </template>
+    </AppFileAttachment>
 
     <!-- Upload Dropzone -->
     <div
@@ -81,16 +68,30 @@
         Haz clic para seleccionar tu CV (PDF)
       </p>
       <p class="text-[11px] text-on-surface-variant dark:text-slate-400">
-        Formatos permitidos: PDF (Máx 5MB)
+        Formatos permitidos: PDF (Máx 10MB)
       </p>
-      <button
-        type="button"
-        :disabled="uploadingCv"
-        class="mt-2 px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-xl transition flex items-center gap-1 cursor-pointer"
-      >
-        <span v-if="uploadingCv" class="animate-spin text-xs">⌛</span>
-        <span>{{ uploadingCv ? "Subiendo..." : "Seleccionar Archivo" }}</span>
-      </button>
+      <div class="flex items-center gap-2 mt-2">
+        <button
+          type="button"
+          :disabled="uploadingCv"
+          class="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-xl transition flex items-center gap-1 cursor-pointer"
+        >
+          <span
+            v-if="uploadingCv"
+            class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
+          <span>{{ uploadingCv ? "Subiendo..." : "Subir Archivo" }}</span>
+        </button>
+
+        <button
+          type="button"
+          @click.stop="showCvBuilderModal = true"
+          class="px-4 py-1.5 bg-surface border border-primary/40 text-primary hover:bg-primary/5 text-xs font-bold rounded-xl transition flex items-center gap-1 cursor-pointer"
+        >
+          <span>✨ Usar Creador</span>
+        </button>
+      </div>
     </div>
 
     <p v-if="cvError" class="text-xs text-rose-600 font-semibold mt-1">
@@ -112,18 +113,30 @@
       :file-name="cvName || 'Currículum_Principal.pdf'"
       title="Currículum Vitae Principal"
     />
+
+    <!-- Interactive CV Builder Modal (Carta 215.9 x 279.4 mm) -->
+    <CvBuilderModal
+      v-model="showCvBuilderModal"
+      :profile="currentProfileData"
+      @cv-updated="handleCvUpdated"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { useS3Upload } from "~/composables/useS3Upload";
-import AppPdfPreviewModal from "~/components/common/AppPdfPreviewModal.vue";
+import type { CandidateProfile } from "~/types/candidate";
 
-const props = defineProps<{
-  cvUrl: string;
-  cvName: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    cvUrl: string;
+    cvName: string;
+    profile?: CandidateProfile;
+  }>(),
+  {
+    profile: () => ({}),
+  },
+);
 
 const emit = defineEmits<{
   (e: "update:cvUrl", value: string): void;
@@ -131,9 +144,19 @@ const emit = defineEmits<{
 }>();
 
 const showPdfModal = ref(false);
+const showCvBuilderModal = ref(false);
 const cvFileInput = ref<HTMLInputElement | null>(null);
 const cvError = ref("");
 const { isUploading: uploadingCv, uploadFile } = useS3Upload();
+
+const currentProfileData = computed<CandidateProfile>(() => {
+  return props.profile || {};
+});
+
+function handleCvUpdated(url: string) {
+  emit("update:cvUrl", url);
+  emit("update:cvName", "Curriculum_Vitae_Carta.pdf");
+}
 
 function triggerCvSelect() {
   cvFileInput.value?.click();
@@ -145,7 +168,10 @@ async function handleCvUpload(e: Event) {
   const file = target.files[0];
   cvError.value = "";
 
-  if (file.type !== "application/pdf") {
+  if (
+    file.type !== "application/pdf" &&
+    !file.name.toLowerCase().endsWith(".pdf")
+  ) {
     cvError.value = "Solo se permiten archivos PDF.";
     return;
   }

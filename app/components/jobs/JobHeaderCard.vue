@@ -73,7 +73,13 @@
 </template>
 
 <script setup lang="ts">
+import type { Job } from "~/types";
+
 defineProps<{
-  job: any;
+  job: Job & {
+    estadoBadge?: { badgeColor: string; label: string };
+    ubicacionFormatted?: string;
+  };
+  formatSalaryDisplay?: (jobInfo: Job) => string | null;
 }>();
 </script>

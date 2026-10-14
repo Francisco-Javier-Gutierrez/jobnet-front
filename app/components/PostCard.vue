@@ -71,16 +71,25 @@
       </div>
     </div>
 
+    <!-- POST CONTENT BODY (select-text allowed) -->
+    <div v-if="post.content" class="px-4 pb-3 flex flex-col gap-3">
+      <p
+        class="text-sm text-on-surface-variant dark:text-slate-300 dark:text-slate-200 leading-relaxed text-left select-text"
+      >
+        {{ post.content }}
+      </p>
+    </div>
+
     <!-- POST IMAGE/MEDIA CONTAINER -->
     <div
       v-if="post.media"
-      class="aspect-video w-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden border-y border-outline-variant/20 dark:border-slate-800 cursor-pointer"
+      class="w-full max-h-[600px] bg-slate-100 dark:bg-slate-800 relative flex items-center justify-center overflow-hidden border-y border-outline-variant/20 dark:border-slate-800 cursor-pointer"
       @click.stop="showMediaModal = true"
     >
       <img
         :src="post.media"
         alt="Imagen del post"
-        class="w-full h-full object-cover hover:scale-105 transition duration-300"
+        class="max-w-full h-auto max-h-[600px] object-contain hover:scale-105 transition duration-300"
       />
     </div>
 
@@ -130,15 +139,6 @@
       </div>
     </div>
 
-    <!-- POST CONTENT BODY (select-text allowed) -->
-    <div class="p-4 flex flex-col gap-3">
-      <p
-        class="text-sm text-on-surface-variant dark:text-slate-300 dark:text-slate-200 leading-relaxed text-left select-text"
-      >
-        {{ post.content }}
-      </p>
-    </div>
-
     <!-- BOTTOM ACTIONS BAR -->
     <div
       class="px-4 py-2 flex items-center gap-1 border-t border-outline-variant/30 prevent-post-nav select-none"
@@ -170,14 +170,24 @@
         <span class="text-xs font-semibold">{{ commentsCount }}</span>
       </button>
       <button
-        @click.stop="$emit('share', post)"
-        class="flex items-center gap-1.5 text-on-surface-variant dark:text-slate-300 hover:text-secondary transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+        @click.stop="handleShareClick"
+        class="flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+        :class="
+          isSharedLocally
+            ? 'text-secondary font-bold'
+            : 'text-on-surface-variant dark:text-slate-300 hover:text-secondary'
+        "
       >
-        <span class="material-symbols-outlined text-[20px]">share</span>
+        <span
+          class="material-symbols-outlined text-[20px]"
+          :class="{ 'font-fill-1 text-secondary': isSharedLocally }"
+          >share</span
+        >
+        <span class="text-xs font-semibold">{{ sharesCount }}</span>
       </button>
       <button
         @click="handleBookmarkClick"
-        class="ml-auto transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
+        class="ml-auto flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
         :class="
           effectiveIsBookmarked
             ? 'text-amber-500 font-bold'
@@ -190,6 +200,7 @@
         >
           {{ effectiveIsBookmarked ? "bookmark" : "bookmark_border" }}
         </span>
+        <span class="text-xs font-semibold">{{ bookmarksCount }}</span>
       </button>
     </div>
 
@@ -303,9 +314,11 @@
 </template>
 
 <script setup lang="ts">
+import type { Post } from "~/types";
+
 const props = withDefaults(
   defineProps<{
-    post: any;
+    post: Post;
     currentUserId?: string;
     isBookmarked?: boolean;
     isDetail?: boolean;
@@ -316,16 +329,35 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(["like", "bookmark", "share", "navigate"]);
+const emit = defineEmits<{
+  (e: "like", post: Post): void;
+  (e: "bookmark", post: Post): void;
+  (e: "share", post: Post): void;
+  (e: "navigate", id?: string): void;
+}>();
 
 const showAvatarModal = ref(false);
 const showPdfModal = ref(false);
 const showMediaModal = ref(false);
 const showMenu = ref(false);
 const showReportModal = ref(false);
+const isSharedLocally = ref(false);
 
 const { status, data: authSession } = useAuth();
 const { openProtectedModal } = useProtectedAction();
+
+onMounted(() => {
+  if (process.client) {
+    const currentUserId =
+      props.currentUserId || authSession.value?.user?.id || "anonymous";
+    const shared = JSON.parse(
+      localStorage.getItem(`shared-posts-${currentUserId}`) || "[]",
+    );
+    isSharedLocally.value = shared.includes(
+      props.post.uniqueId || props.post.id,
+    );
+  }
+});
 
 const displayRole = computed(() => {
   const rawRole = (props.post?.role || props.post?.tipoUsuario || "")
@@ -338,7 +370,7 @@ const displayRole = computed(() => {
     upperRole === "ORGANIZACION" ||
     props.post?.isCompany
   ) {
-    return "Empresa";
+    return "Organización";
   }
 
   return "Candidato";
@@ -368,7 +400,30 @@ const handleCommentClick = (e: Event) => {
     openProtectedModal();
     return;
   }
-  emit("navigate", props.post.uniqueId);
+  emit("navigate", props.post.uniqueId || props.post.id);
+};
+
+const handleShareClick = (e: Event) => {
+  e.stopPropagation();
+
+  if (process.client) {
+    const currentUserId =
+      props.currentUserId || authSession.value?.user?.id || "anonymous";
+    const shared = JSON.parse(
+      localStorage.getItem(`shared-posts-${currentUserId}`) || "[]",
+    );
+    const id = props.post.uniqueId || props.post.id;
+    if (id && !shared.includes(id)) {
+      shared.push(id);
+      localStorage.setItem(
+        `shared-posts-${currentUserId}`,
+        JSON.stringify(shared),
+      );
+      isSharedLocally.value = true;
+    }
+  }
+
+  emit("share", props.post);
 };
 
 const openReportModal = () => {
@@ -384,15 +439,14 @@ const isLiked = computed(() => {
   const post = props.post;
   if (!post) return false;
 
-  const authUser = authSession.value?.user as any;
+  const authUser = authSession.value?.user;
   const loggedEmail = authUser?.email?.toLowerCase();
   const loggedId = authUser?.id;
   const passedUserId = props.currentUserId?.toLowerCase();
 
-  const likes =
-    post.likesList || post.likedBy || post.likes_list || post.likes || [];
+  const likes = post.likesList || post.likedBy || post.likes_list || [];
   if (Array.isArray(likes)) {
-    return likes.some((item: any) => {
+    return likes.some((item: unknown) => {
       const s = String(item).toLowerCase();
       return (
         (passedUserId && s === passedUserId) ||
@@ -402,14 +456,14 @@ const isLiked = computed(() => {
     });
   }
 
-  return Boolean(post.isLiked || post.liked);
+  return Boolean(post.isLiked);
 });
 
 const effectiveIsBookmarked = computed(() => {
   const post = props.post;
   if (!post) return false;
 
-  const authUser = authSession.value?.user as any;
+  const authUser = authSession.value?.user;
   const loggedEmail = authUser?.email?.toLowerCase();
   const loggedId = authUser?.id;
   const passedUserId = props.currentUserId?.toLowerCase();
@@ -417,7 +471,7 @@ const effectiveIsBookmarked = computed(() => {
   const bookmarks =
     post.bookmarksList || post.bookmarkedBy || post.bookmarks || [];
   if (Array.isArray(bookmarks)) {
-    const foundInList = bookmarks.some((item: any) => {
+    const foundInList = bookmarks.some((item: unknown) => {
       const s = String(item).toLowerCase();
       return (
         (passedUserId && s === passedUserId) ||
@@ -430,7 +484,7 @@ const effectiveIsBookmarked = computed(() => {
 
   if (props.isBookmarked === true) return true;
 
-  return Boolean(post.isBookmarked || post.bookmarked);
+  return Boolean(post.isBookmarked);
 });
 
 const likesCount = computed(() => {
@@ -441,6 +495,23 @@ const likesCount = computed(() => {
 
 const commentsCount = computed(() => {
   return props.post?.comments?.length || 0;
+});
+
+const sharesCount = computed(() => {
+  if (typeof props.post?.sharesCount === "number")
+    return props.post.sharesCount;
+  return 0;
+});
+
+const bookmarksCount = computed(() => {
+  if (typeof props.post?.bookmarksCount === "number")
+    return props.post.bookmarksCount;
+  const bookmarks =
+    props.post?.bookmarksList ||
+    props.post?.bookmarkedBy ||
+    props.post?.bookmarks ||
+    [];
+  return Array.isArray(bookmarks) ? bookmarks.length : 0;
 });
 
 const handleClick = (event: Event) => {
@@ -455,7 +526,7 @@ const handleClick = (event: Event) => {
   ) {
     return;
   }
-  emit("navigate", props.post.uniqueId);
+  emit("navigate", props.post.uniqueId || props.post.id);
 };
 
 const navigateToAuthor = () => {
@@ -465,16 +536,10 @@ const navigateToAuthor = () => {
     props.post?.userId ||
     props.post?.author;
   if (!id) return;
-  if (props.post?.role === "Empresa" || props.post?.isCompany) {
+  if (props.post?.role === "Organización" || props.post?.isCompany) {
     navigateTo(`/company/${encodeURIComponent(id)}`);
   } else {
     navigateTo(`/candidate/${encodeURIComponent(id)}`);
   }
 };
 </script>
-
-<style scoped>
-.font-fill-1 {
-  font-variation-settings: "FILL" 1;
-}
-</style>

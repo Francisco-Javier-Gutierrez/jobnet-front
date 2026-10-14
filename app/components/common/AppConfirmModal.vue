@@ -35,9 +35,9 @@
       >
         <span
           v-if="isLoading"
-          class="material-symbols-outlined text-sm animate-spin"
-          >progress_activity</span
-        >
+          class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin"
+          aria-hidden="true"
+        ></span>
         {{ confirmText }}
       </button>
     </template>
@@ -45,8 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
 const props = withDefaults(
   defineProps<{
     modelValue: boolean;

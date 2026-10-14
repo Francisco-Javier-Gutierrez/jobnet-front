@@ -5,7 +5,8 @@
     <h2
       class="text-base font-bold text-on-background mb-1 flex items-center gap-2"
     >
-      <span class="material-symbols-outlined text-blue-600 dark:text-blue-400"
+      <span
+        class="material-symbols-outlined text-tertiary dark:text-inverse-primary"
         >work</span
       >
       Sectores Laborales
@@ -22,7 +23,7 @@
       <span
         v-for="sector in sectors"
         :key="sector"
-        class="bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 font-bold shadow-sm"
+        class="bg-tertiary/10 dark:bg-tertiary/20 text-tertiary dark:text-inverse-primary border border-tertiary/20 dark:border-tertiary/40 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 font-bold shadow-sm"
       >
         {{ sector }}
         <button
@@ -80,7 +81,7 @@
           :key="masterSector.id"
           type="button"
           @click="selectCatalogSector(masterSector.name)"
-          class="bg-surface hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-outline-variant/50 hover:border-blue-400 text-on-surface hover:text-blue-600 dark:hover:text-blue-300 transition px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1"
+          class="bg-surface hover:bg-tertiary/10 dark:hover:bg-blue-950/40 border border-outline-variant/50 hover:border-tertiary/50 text-on-surface hover:text-tertiary dark:hover:text-blue-300 transition px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1"
         >
           <span class="material-symbols-outlined text-[10px]">add</span>
           {{ masterSector.name }}
@@ -101,8 +102,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-
 const props = defineProps<{
   sectors: string[];
   catalogSectors?: { id: string; name: string }[];

@@ -93,8 +93,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onUnmounted } from "vue";
-
 const props = withDefaults(
   defineProps<{
     modelValue: boolean;

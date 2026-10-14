@@ -135,12 +135,12 @@
       <!-- Image Preview -->
       <div
         v-if="previewImage"
-        class="relative rounded-xl overflow-hidden border border-outline-variant/30 aspect-video max-w-full"
+        class="relative rounded-xl overflow-hidden border border-outline-variant/30 max-h-[300px] flex items-center justify-center bg-surface-container-low/50"
       >
         <img
           :src="previewImage"
           alt="Vista previa de imagen"
-          class="w-full h-full object-cover"
+          class="max-w-full max-h-[300px] object-contain"
         />
         <button
           @click="clearAttachment"
@@ -153,27 +153,15 @@
       </div>
 
       <!-- PDF Preview -->
-      <div
+      <AppFileAttachment
         v-if="previewPdf"
-        class="flex items-center justify-between p-3 bg-surface-container-low border border-outline-variant/30 rounded-xl"
-      >
-        <div class="flex items-center gap-2 text-xs">
-          <span class="material-symbols-outlined text-rose-600"
-            >picture_as_pdf</span
-          >
-          <span class="font-bold truncate max-w-[240px] text-on-background">{{
-            previewPdfName
-          }}</span>
-        </div>
-        <button
-          @click="clearAttachment"
-          type="button"
-          class="text-on-surface-variant dark:text-slate-300 hover:text-rose-600 p-1 transition flex items-center justify-center"
-          title="Quitar PDF"
-        >
-          <span class="material-symbols-outlined text-sm">close</span>
-        </button>
-      </div>
+        :name="previewPdfName"
+        type="pdf"
+        :show-preview="true"
+        :show-remove="true"
+        @preview="showPdfModal = true"
+        @remove="clearAttachment"
+      />
 
       <!-- Footer Actions -->
       <div
@@ -219,30 +207,48 @@
           />
         </div>
 
-        <button
-          @click="publishPost"
-          type="button"
-          :disabled="
-            (!newPostContent.trim() &&
-              !selectedImageFile &&
-              !selectedPdfFile) ||
-            isPublishing
-          "
-          class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-xs px-6 py-2.5 rounded-xl transition font-sans flex items-center gap-1.5"
-        >
-          <span
-            v-if="isPublishing"
-            class="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"
-          ></span>
-          {{ isPublishing ? "Publicando..." : "Publicar" }}
-        </button>
+        <div class="flex gap-2">
+          <button
+            @click="goToPreview"
+            type="button"
+            :disabled="
+              !newPostContent.trim() && !selectedImageFile && !selectedPdfFile
+            "
+            class="bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant font-bold text-xs px-4 py-2.5 rounded-xl transition font-sans flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span class="material-symbols-outlined text-sm">visibility</span>
+            <span class="hidden sm:inline">Previsualizar</span>
+          </button>
+
+          <button
+            @click="publishPost"
+            type="button"
+            :disabled="!newPostContent.trim() || isPublishing"
+            class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-xs px-6 py-2.5 rounded-xl transition font-sans flex items-center gap-1.5"
+          >
+            <span
+              v-if="isPublishing"
+              class="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"
+            ></span>
+            {{ isPublishing ? "Publicando..." : "Publicar" }}
+          </button>
+        </div>
       </div>
     </div>
+
+    <AppPdfPreviewModal
+      v-model="showPdfModal"
+      :url="previewPdf || ''"
+      :file-name="previewPdfName"
+      :title="'Vista Previa de ' + previewPdfName"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useRouter } from "vue-router";
 import { useUploadStore } from "~/stores/upload";
+import { usePreviewStore } from "~/stores/preview";
 
 useSeoMeta({
   title: "Crear Nuevo - JobNet",
@@ -279,6 +285,7 @@ const { showError, showWarning } = useAppFeedback();
 
 // State for post creation
 const isPublishing = ref(false);
+const showPdfModal = ref(false);
 const selectedImageFile = ref<File | null>(null);
 const selectedPdfFile = ref<File | null>(null);
 const newPostContent = ref("");
@@ -287,6 +294,65 @@ const previewPdf = ref<string | null>(null);
 const previewPdfName = ref("");
 const imageInput = ref<HTMLInputElement | null>(null);
 const pdfInput = ref<HTMLInputElement | null>(null);
+
+const previewStore = usePreviewStore();
+
+const mockPostPreview = computed(() => {
+  const authorAvatar =
+    (session.value?.user as any)?.fotoPerfil ||
+    (session.value?.user as any)?.avatarUrl ||
+    (session.value?.user as any)?.avatar ||
+    undefined;
+
+  let role = "Candidato";
+  const userType = (
+    (session.value?.user as any)?.tipoUsuario || ""
+  ).toUpperCase();
+  if (userType === "EMPRESA" || userType === "ORGANIZACION") {
+    role = "Organización";
+  }
+
+  return {
+    uniqueId: "preview-only",
+    author: session.value?.user?.name || "Usuario JobNet",
+    authorAvatar,
+    fotoPerfil: authorAvatar,
+    role,
+    createdAt: new Date().toISOString(),
+    content: newPostContent.value.trim() || "...",
+    media: previewImage.value || undefined,
+    pdfUrl: previewPdf.value || undefined,
+    pdfName: previewPdfName.value || undefined,
+    likesList: [],
+    comments: [],
+    sharesCount: 0,
+    bookmarksCount: 0,
+  };
+});
+
+const goToPreview = () => {
+  const draft = {
+    newPostContent: newPostContent.value,
+    selectedImageFile: selectedImageFile.value,
+    selectedPdfFile: selectedPdfFile.value,
+    previewImage: previewImage.value,
+    previewPdf: previewPdf.value,
+    previewPdfName: previewPdfName.value,
+  };
+  previewStore.setPreviewPost(mockPostPreview.value, draft);
+  router.push("/preview/post");
+};
+
+onMounted(() => {
+  if (previewStore.postDraft) {
+    newPostContent.value = previewStore.postDraft.newPostContent;
+    selectedImageFile.value = previewStore.postDraft.selectedImageFile;
+    selectedPdfFile.value = previewStore.postDraft.selectedPdfFile;
+    previewImage.value = previewStore.postDraft.previewImage;
+    previewPdf.value = previewStore.postDraft.previewPdf;
+    previewPdfName.value = previewStore.postDraft.previewPdfName;
+  }
+});
 
 const triggerImageSelect = () => {
   imageInput.value?.click();
@@ -349,7 +415,7 @@ const handlePdfSelect = (e: Event) => {
       return;
     }
     selectedPdfFile.value = file;
-    previewPdf.value = "pdf-selected";
+    previewPdf.value = URL.createObjectURL(file);
     previewPdfName.value = file.name;
 
     // Clear Image
@@ -370,12 +436,7 @@ const clearAttachment = () => {
 
 // Publish Post with AWS Presigned S3 uploads
 const publishPost = async () => {
-  if (
-    !newPostContent.value.trim() &&
-    !selectedImageFile.value &&
-    !selectedPdfFile.value
-  )
-    return;
+  if (!newPostContent.value.trim()) return;
   isPublishing.value = true;
 
   let mediaUrl = "";
@@ -431,7 +492,7 @@ const publishPost = async () => {
     (session.value?.user as any)?.tipoUsuario || ""
   ).toUpperCase();
   if (userType === "EMPRESA" || userType === "ORGANIZACION") {
-    role = "Empresa";
+    role = "Organización";
   } else {
     role = "Candidato";
   }

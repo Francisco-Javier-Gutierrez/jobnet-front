@@ -1,0 +1,129 @@
+export type WebSocketStatus =
+  "disconnected" | "connecting" | "connected" | "reconnecting" | "error";
+
+export interface WebSocketClientOptions {
+  url: string;
+  onMessage?: (payload: any) => void;
+  onStatusChange?: (status: WebSocketStatus) => void;
+  reconnect?: boolean;
+  maxReconnectAttempts?: number;
+  baseReconnectDelay?: number;
+}
+
+export class WebSocketClient {
+  private socket: WebSocket | null = null;
+  private options: WebSocketClientOptions;
+  private reconnectAttempts = 0;
+  private reconnectTimeout: any = null;
+  private currentStatus: WebSocketStatus = "disconnected";
+
+  constructor(options: WebSocketClientOptions) {
+    this.options = {
+      reconnect: true,
+      maxReconnectAttempts: 5,
+      baseReconnectDelay: 2000,
+      ...options,
+    };
+  }
+
+  public connect() {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) return;
+
+    this.updateStatus("connecting");
+
+    try {
+      this.socket = new WebSocket(this.options.url);
+
+      this.socket.onopen = () => {
+        this.updateStatus("connected");
+        this.reconnectAttempts = 0;
+        if (this.reconnectTimeout) {
+          clearTimeout(this.reconnectTimeout);
+          this.reconnectTimeout = null;
+        }
+      };
+
+      this.socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (this.options.onMessage) {
+            this.options.onMessage(payload);
+          }
+        } catch (err) {
+          console.error("Error parsing WebSocket message:", err);
+        }
+      };
+
+      this.socket.onclose = () => {
+        if (this.currentStatus !== "disconnected") {
+          this.handleReconnect();
+        }
+      };
+
+      this.socket.onerror = (err) => {
+        console.warn("WebSocket error:", err);
+      };
+    } catch (err) {
+      console.error("Failed to establish WebSocket connection:", err);
+      this.handleReconnect();
+    }
+  }
+
+  public send(payload: any): boolean {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(
+        typeof payload === "string" ? payload : JSON.stringify(payload),
+      );
+      return true;
+    }
+    return false;
+  }
+
+  public disconnect() {
+    this.updateStatus("disconnected");
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    if (this.socket) {
+      this.socket.onclose = null; // Prevent reconnect on explicit disconnect
+      this.socket.close();
+      this.socket = null;
+    }
+  }
+
+  private handleReconnect() {
+    if (!this.options.reconnect) {
+      this.updateStatus("disconnected");
+      return;
+    }
+
+    if (this.reconnectAttempts >= (this.options.maxReconnectAttempts || 5)) {
+      console.warn("Max WebSocket reconnect attempts reached.");
+      this.updateStatus("error");
+      return;
+    }
+
+    this.reconnectAttempts++;
+    this.updateStatus("reconnecting");
+
+    const delay =
+      (this.options.baseReconnectDelay || 2000) *
+      Math.pow(1.5, this.reconnectAttempts - 1);
+
+    this.reconnectTimeout = setTimeout(() => {
+      this.connect();
+    }, delay);
+  }
+
+  private updateStatus(status: WebSocketStatus) {
+    this.currentStatus = status;
+    if (this.options.onStatusChange) {
+      this.options.onStatusChange(status);
+    }
+  }
+
+  public getStatus(): WebSocketStatus {
+    return this.currentStatus;
+  }
+}

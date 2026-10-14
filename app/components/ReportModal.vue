@@ -81,9 +81,9 @@
       >
         <span
           v-if="isSubmitting"
-          class="material-symbols-outlined text-sm animate-spin"
-          >progress_activity</span
-        >
+          class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin"
+          aria-hidden="true"
+        ></span>
         <span>{{ isSubmitting ? "Enviando..." : "Enviar Reporte" }}</span>
       </button>
     </template>
@@ -91,9 +91,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import AppModal from "./common/AppModal.vue";
-
 const props = defineProps<{
   isOpen: boolean;
   targetType: "POST" | "VACANTE" | "ORGANIZACION" | "EMPRESA";
@@ -101,7 +98,10 @@ const props = defineProps<{
   targetTitle?: string;
 }>();
 
-const emit = defineEmits(["close", "submitted"]);
+const emit = defineEmits<{
+  (e: "close"): void;
+  (e: "submitted"): void;
+}>();
 
 const config = useRuntimeConfig();
 const { data: authSession } = useAuth();
@@ -145,8 +145,8 @@ const submitReport = async () => {
 
   try {
     const reporter =
-      (authSession.value?.user as any)?.email ||
-      (authSession.value?.user as any)?.id ||
+      authSession.value?.user?.email ||
+      authSession.value?.user?.id ||
       "Usuario Registrado";
 
     await $fetch(`${config.public.apiUrl}/moderator/incidents`, {
@@ -180,7 +180,7 @@ const submitReport = async () => {
       close();
       emit("submitted");
     }, 1800);
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Error submitting report:", e);
     const { showError } = useAppFeedback();
     showError(

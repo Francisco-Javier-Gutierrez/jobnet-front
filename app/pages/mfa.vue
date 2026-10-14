@@ -109,10 +109,9 @@
         >
           <span
             v-if="loading"
-            class="material-symbols-outlined animate-spin text-lg"
+            class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin"
             aria-hidden="true"
-            >progress_activity</span
-          >
+          ></span>
           <span v-else>Verificar</span>
         </button>
       </form>

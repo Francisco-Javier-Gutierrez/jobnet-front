@@ -1,6 +1,7 @@
 export default defineNuxtRouteMiddleware((to) => {
   const { status, data } = useAuth();
-  const rawRole = (data.value?.user as any)?.tipoUsuario;
+  const rawRole =
+    (data.value?.user as any)?.tipoUsuario || (data.value?.user as any)?.role;
   const userRole = (rawRole || "").toUpperCase();
 
   const path = to.path.toLowerCase();
@@ -17,7 +18,9 @@ export default defineNuxtRouteMiddleware((to) => {
   if (path.startsWith("/mod/support")) {
     if (
       status.value !== "authenticated" ||
-      (userRole !== "MODERATOR" && userRole !== "MODERADOR")
+      (userRole !== "MODERATOR" &&
+        userRole !== "MODERADOR" &&
+        userRole !== "ADMIN")
     ) {
       throw createError({
         statusCode: 404,
@@ -27,8 +30,19 @@ export default defineNuxtRouteMiddleware((to) => {
     }
   }
 
-  // 1b. General Admin & Moderator Routes (/admin/* and /mod/*) -> Allowed for ADMIN, MODERATOR, MODERADOR
-  if (path.startsWith("/admin") || path.startsWith("/mod")) {
+  // 2. Admin Routes (/admin/*) -> Allowed ONLY for ADMIN
+  if (path.startsWith("/admin")) {
+    if (status.value !== "authenticated" || userRole !== "ADMIN") {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Página no encontrada",
+        fatal: true,
+      });
+    }
+  }
+
+  // 3. Moderator Routes (/mod/*) -> Allowed for ADMIN, MODERATOR, MODERADOR
+  if (path.startsWith("/mod")) {
     if (
       status.value !== "authenticated" ||
       (userRole !== "ADMIN" &&
@@ -43,12 +57,13 @@ export default defineNuxtRouteMiddleware((to) => {
     }
   }
 
-  // 3. Organization Routes (/dashboard, /my-vacancies, /applicants, /company/edit, /create-vacancy) -> ORGANIZACION or ADMIN
+  // 4. Organization Routes (/dashboard, /my-vacancies, /applicants, /company/edit, /create-vacancy) -> Allowed ONLY for ORGANIZACION or EMPRESA
   const orgRoutes = [
     "/dashboard",
     "/my-vacancies",
     "/applicants",
     "/company/edit",
+    "/company/verification",
     "/create-vacancy",
   ];
 
@@ -65,7 +80,7 @@ export default defineNuxtRouteMiddleware((to) => {
     }
   }
 
-  // 4. Candidate Edit Routes (/settings) -> POSTULANTE, CANDIDATO, ADMIN, MODERADOR, or no role (default user)
+  // 5. Candidate Edit Routes (/settings) -> POSTULANTE, CANDIDATO, ADMIN, MODERADOR, or no role (default user)
   const candidateRoutes = ["/settings"];
 
   if (candidateRoutes.some((r) => path === r || path.startsWith(`${r}/`))) {
@@ -83,6 +98,15 @@ export default defineNuxtRouteMiddleware((to) => {
         statusMessage: "Página no encontrada",
         fatal: true,
       });
+    }
+  }
+
+  // 6. Public Job Search Routes (/vacancies, /jobs) -> BLOCKED for ORGANIZACION / EMPRESA
+  const searchRoutes = ["/vacancies", "/jobs"];
+
+  if (searchRoutes.some((r) => path === r || path.startsWith(`${r}/`))) {
+    if (userRole === "ORGANIZACION" || userRole === "EMPRESA") {
+      return navigateTo("/dashboard");
     }
   }
 });

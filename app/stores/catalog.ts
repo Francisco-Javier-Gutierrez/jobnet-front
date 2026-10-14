@@ -11,6 +11,8 @@ export const useCatalogStore = defineStore("catalog", {
   state: () => ({
     items: [] as CatalogItem[],
     loaded: false,
+    pendingSuggestionsQueue: [] as { name: string; category: string }[],
+    isProcessingQueue: false,
   }),
   getters: {
     skills: (state) =>
@@ -98,19 +100,38 @@ export const useCatalogStore = defineStore("catalog", {
         return { success: false, error: "El nombre no puede estar vacío" };
       }
 
+      this.pendingSuggestionsQueue.push({ name: cleanName, category });
+      this.processQueue();
+      return { success: true };
+    },
+
+    async processQueue() {
+      if (this.isProcessingQueue || this.pendingSuggestionsQueue.length === 0)
+        return;
+      this.isProcessingQueue = true;
       const config = useRuntimeConfig();
-      try {
-        await $fetch(`${config.public.apiUrl}/moderator/skills/suggestions`, {
-          method: "POST",
-          body: { name: cleanName, category },
-        });
-        return { success: true };
-      } catch (error: any) {
-        return {
-          success: false,
-          error: error.data?.error || "Error al registrar la sugerencia.",
-        };
+
+      while (this.pendingSuggestionsQueue.length > 0) {
+        const item = this.pendingSuggestionsQueue[0];
+        try {
+          await $fetch(`${config.public.apiUrl}/moderator/skills/suggestions`, {
+            method: "POST",
+            body: item,
+          });
+          this.pendingSuggestionsQueue.shift();
+        } catch (error) {
+          console.error(
+            "Error processing suggestion queue, will retry later",
+            error,
+          );
+          setTimeout(() => {
+            this.isProcessingQueue = false;
+            this.processQueue();
+          }, 5000);
+          return;
+        }
       }
+      this.isProcessingQueue = false;
     },
 
     async updateItem(

@@ -68,6 +68,17 @@
             class="flex items-center gap-3 overflow-hidden group min-w-0"
           >
             <div
+              v-if="profilePic"
+              class="w-8 h-8 rounded-full border border-primary/20 flex-shrink-0 group-hover:scale-105 transition overflow-hidden"
+            >
+              <img
+                :src="profilePic"
+                alt="Foto de perfil"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              v-else
               class="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0 group-hover:scale-105 transition"
             >
               {{ userInitial }}
@@ -236,11 +247,26 @@ const route = useRoute();
 const router = useRouter();
 const { status, data, signOut } = useAuth();
 const { openProtectedModal } = useProtectedAction();
+const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
+
+watchEffect(() => {
+  if (
+    status.value === "authenticated" &&
+    data.value?.user?.id &&
+    !hasFetched.value
+  ) {
+    console.log(
+      "AppSidebar: trigger fetchProfilePic for user",
+      data.value.user.id,
+    );
+    fetchProfilePic(data.value.user.id as string);
+  }
+});
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
-  const user = data.value?.user as any;
-  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
+  const user = data.value?.user;
+  const tipo = (user?.tipoUsuario || "").toUpperCase();
   if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
   if (tipo === "ADMIN") return "admin";
   if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
@@ -266,7 +292,6 @@ const roleBadge = computed(() => {
 });
 
 const profileRoute = computed(() => {
-  if (userRole.value === "organization") return "/company/edit";
   return "/profile";
 });
 
@@ -341,7 +366,7 @@ const navItems = computed<NavItem[]>(() => {
         { to: "/", icon: "home", label: "Inicio", protected: false },
         {
           to: "/mod/incidents",
-          icon: "warning",
+          icon: "report_problem",
           label: "Incidencias",
           protected: true,
         },
@@ -411,9 +436,9 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         },
         {
-          to: "/company/edit",
+          to: "/company/verification",
           icon: "verified",
-          label: "Identidad y Verificación",
+          label: "Verificación",
           protected: true,
         },
         { to: "/messages", icon: "forum", label: "Mensajes", protected: true },
@@ -423,19 +448,13 @@ const navItems = computed<NavItem[]>(() => {
           label: "Soporte y Apelaciones",
           protected: true,
         },
-        {
-          to: "/settings",
-          icon: "settings",
-          label: "Configuración",
-          protected: true,
-        },
       ];
 
     default: // CANDIDATO or GUEST
       return [
         { to: "/", icon: "home", label: "Inicio", protected: false },
         {
-          to: "/feed",
+          to: "/vacancies",
           icon: "work",
           label: "Explorar Vacantes",
           protected: false,
@@ -443,7 +462,7 @@ const navItems = computed<NavItem[]>(() => {
         {
           to: "/companies",
           icon: "domain",
-          label: "Directorio de Empresas",
+          label: "Directorio de Organizaciones",
           protected: false,
         },
         {

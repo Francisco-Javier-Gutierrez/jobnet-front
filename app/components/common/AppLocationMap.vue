@@ -21,7 +21,11 @@
         :disabled="isLocating"
         class="bg-primary/10 hover:bg-primary/20 text-primary font-bold text-[11px] px-3 py-1.5 rounded-lg transition flex items-center gap-1 active:scale-95 disabled:opacity-50 cursor-pointer"
       >
-        <span v-if="isLocating" class="animate-spin text-xs">⌛</span>
+        <span
+          v-if="isLocating"
+          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+          aria-hidden="true"
+        ></span>
         <span v-else class="material-symbols-outlined text-xs"
           >my_location</span
         >
@@ -85,14 +89,13 @@
       <span
         class="text-[10px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/20 flex-shrink-0"
       >
-        Sur EdoMex
+        EdoMex
       </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import * as turf from "@turf/turf";
 
 useHead({
@@ -155,63 +158,29 @@ let map: any = null;
 let marker: any = null;
 let resizeObserver: ResizeObserver | null = null;
 
-// South Estado de México Geofence Polygon (Toluca to South boundary)
-const SOUTH_EDOMEX_BOUNDS = {
-  minLat: 18.3,
-  maxLat: 19.4,
-  minLng: -100.7,
-  maxLng: -99.2,
-};
+import {
+  getNativeLocationName,
+  isInsideEdoMex,
+  EDO_MEX_FEATURES,
+} from "~/utils/edoMexGeoJSON";
 
-const SOUTH_EDOMEX_POLYGON = turf.polygon([
-  [
-    [-100.7, 19.4],
-    [-99.2, 19.4],
-    [-99.2, 18.3],
-    [-100.7, 18.3],
-    [-100.7, 19.4],
-  ],
-]);
-
-/**
- * Validates if coordinates are inside South Estado de México using Turf.js
- */
-function isValidLocation(latVal: number, lngVal: number): boolean {
-  try {
-    const pt = turf.point([lngVal, latVal]);
-    return turf.booleanPointInPolygon(pt, SOUTH_EDOMEX_POLYGON);
-  } catch (e) {
-    return (
-      latVal >= SOUTH_EDOMEX_BOUNDS.minLat &&
-      latVal <= SOUTH_EDOMEX_BOUNDS.maxLat &&
-      lngVal >= SOUTH_EDOMEX_BOUNDS.minLng &&
-      lngVal <= SOUTH_EDOMEX_BOUNDS.maxLng
-    );
-  }
-}
-
-/**
- * Snaps coordinates to closest valid point inside South Estado de México
- */
-function clampToSouthEdoMex(
+function getNearestValidPoint(
   latVal: number,
   lngVal: number,
 ): { lat: number; lng: number } {
-  const clampedLat = Math.min(
-    Math.max(latVal, SOUTH_EDOMEX_BOUNDS.minLat),
-    SOUTH_EDOMEX_BOUNDS.maxLat,
-  );
-  const clampedLng = Math.min(
-    Math.max(lngVal, SOUTH_EDOMEX_BOUNDS.minLng),
-    SOUTH_EDOMEX_BOUNDS.maxLng,
-  );
-  return {
-    lat: Number(clampedLat.toFixed(6)),
-    lng: Number(clampedLng.toFixed(6)),
-  };
+  const point = turf.point([lngVal, latVal]);
+  let closestCenter = [-99.6557, 19.2826]; // Toluca default
+  let minDistance = Infinity;
+  for (const muni of EDO_MEX_FEATURES) {
+    const centerPt = turf.point(muni.center);
+    const dist = turf.distance(point, centerPt, { units: "kilometers" });
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestCenter = muni.center;
+    }
+  }
+  return { lat: closestCenter[1], lng: closestCenter[0] };
 }
-
-import { getNativeLocationName } from "~/utils/southEdoMexGeoJSON";
 
 /**
  * Resolves location name natively using Turf.js spatial index
@@ -227,11 +196,12 @@ function updateCoordinates(newLat: number, newLng: number) {
   let finalLat = newLat;
   let finalLng = newLng;
 
-  if (!isValidLocation(newLat, newLng)) {
-    const clamped = clampToSouthEdoMex(newLat, newLng);
-    finalLat = clamped.lat;
-    finalLng = clamped.lng;
-    geofenceWarning.value = "Ubicación limitada al Sur del Estado de México.";
+  if (!isInsideEdoMex(newLat, newLng)) {
+    const nearest = getNearestValidPoint(newLat, newLng);
+    finalLat = nearest.lat;
+    finalLng = nearest.lng;
+    geofenceWarning.value =
+      "Ubicación limitada al Estado de México. Se ha movido al municipio más cercano.";
   } else {
     geofenceWarning.value = "";
   }
@@ -282,16 +252,16 @@ onMounted(async () => {
     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
   });
 
-  // Format bounds for Leaflet map restriction
+  // Format bounds for Leaflet map restriction (Full State of Mexico approx bounds)
   const southWest = L.latLng(18.2, -100.7);
-  const northEast = L.latLng(19.5, -99.1);
+  const northEast = L.latLng(20.4, -98.5);
   const maxBounds = L.latLngBounds(southWest, northEast);
 
   // Validate initial location
-  if (!isValidLocation(currentLat.value, currentLng.value)) {
-    const clamped = clampToSouthEdoMex(currentLat.value, currentLng.value);
-    currentLat.value = clamped.lat;
-    currentLng.value = clamped.lng;
+  if (!isInsideEdoMex(currentLat.value, currentLng.value)) {
+    const nearest = getNearestValidPoint(currentLat.value, currentLng.value);
+    currentLat.value = nearest.lat;
+    currentLng.value = nearest.lng;
   }
 
   map = L.map(mapContainerId.value, {
@@ -302,13 +272,11 @@ onMounted(async () => {
     maxZoom: 18,
   }).setView([currentLat.value, currentLng.value], props.zoom);
 
-  L.tileLayer(
-    "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-    {
-      maxZoom: 18,
-      attribution: "",
-    },
-  ).addTo(map);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
 
   marker = L.marker([currentLat.value, currentLng.value], {
     draggable: props.draggable,

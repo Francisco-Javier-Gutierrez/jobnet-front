@@ -46,9 +46,9 @@
 
     <!-- Segmented Navigation Tabs -->
     <div
-      class="w-full border-b border-outline-variant/60 overflow-x-auto hide-scrollbar"
+      class="w-full border-b border-outline-variant/60 overflow-x-auto overflow-y-hidden touch-pan-x hide-scrollbar"
     >
-      <nav class="flex gap-4 min-w-max pb-1">
+      <nav class="flex flex-nowrap gap-4 w-max pb-1 px-1">
         <button
           v-for="tab in tabItems"
           :key="tab.id"
@@ -58,7 +58,7 @@
               ? 'text-primary border-b-2 border-primary font-bold'
               : 'text-on-surface-variant dark:text-slate-300 hover:text-primary',
           ]"
-          class="pb-2.5 px-2 text-xs font-medium transition-colors flex items-center gap-1.5"
+          class="pb-2.5 px-2 text-xs font-medium transition-colors flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap"
         >
           <span class="material-symbols-outlined text-base">{{
             tab.icon
@@ -131,6 +131,7 @@
         v-model:taxId="taxId"
         v-model:documentoVerificacion="documentoVerificacion"
         :estatusVerificacion="estatusVerificacion"
+        :is-verified="organizacionVerificada"
         :companyId="companyId"
         :submittingVerification="submittingVerification"
         @verify="handleVerificationRequest"
@@ -144,6 +145,8 @@
         :initial-mfa-state="mfaEnabled"
         @mfa-updated="(state) => (mfaEnabled = state)"
       />
+
+      <SettingsPasswordCard />
     </section>
 
     <!-- Standardized Corporate Document Viewer -->
@@ -171,11 +174,6 @@
 import { useAppFeedback } from "~/composables/useAppFeedback";
 
 // Component imports
-import CompanyIdentityTab from "~/components/company/settings/CompanyIdentityTab.vue";
-import CompanyProfileTab from "~/components/company/settings/CompanyProfileTab.vue";
-import CompanyDocumentsTab from "~/components/company/settings/CompanyDocumentsTab.vue";
-import CompanyBrandTab from "~/components/company/settings/CompanyBrandTab.vue";
-import CompanyVerificationTab from "~/components/company/settings/CompanyVerificationTab.vue";
 
 interface DocumentoCorporativo {
   id: string;
@@ -204,7 +202,7 @@ useHead({
 const router = useRouter();
 const config = useRuntimeConfig();
 const { data: sessionData, status } = useAuth();
-const { showSuccess, showError, showWarning } = useAppFeedback();
+const { showFeedback, showError, showWarning } = useAppFeedback();
 
 const activeTab = ref("identidad");
 const mfaEnabled = ref(false);
@@ -231,6 +229,7 @@ const linkedin = ref("");
 const taxId = ref("");
 const documentoVerificacion = ref("");
 const estatusVerificacion = ref("");
+const organizacionVerificada = ref(false);
 const latitude = ref(19.2826);
 const longitude = ref(-99.6557);
 const locationName = ref("");
@@ -371,6 +370,7 @@ const fetchCompanyProfile = async () => {
       taxId.value = profile.taxId || "";
       documentoVerificacion.value = profile.documentoVerificacion || "";
       estatusVerificacion.value = profile.estatusVerificacion || "";
+      organizacionVerificada.value = profile.organizacionVerificada || false;
       mfaEnabled.value = Boolean(profile.mfaConfigured || profile.mfaEnabled);
       documentosCorporativos.value = profile.documentosCorporativos || [];
       if (profile.ubicacion) {
@@ -427,14 +427,24 @@ const handleSave = async () => {
         localStorage.removeItem("jobnet_draft_company_edit");
         hasDraft.value = false;
       }
-      showSuccess(
-        "Perfil Corporativo Guardado",
-        "Los datos de tu organización fueron actualizados correctamente.",
-        2500,
-      );
-      setTimeout(() => {
-        router.push(`/company/${companyId.value}`);
-      }, 1500);
+
+      const { setProfilePic } = useProfileState();
+      setProfilePic(fotoPerfil.value);
+
+      // Explicitly clear Nuxt cache to fetch fresh data on redirect
+      clearNuxtData(`company-profile-${companyId.value}`);
+      clearNuxtData(); // Fallback
+
+      showFeedback({
+        type: "success",
+        title: "Perfil Corporativo Guardado",
+        message:
+          "Los datos de tu organización fueron actualizados correctamente.",
+        autoCloseTimeout: 3500,
+        onClose: () => {
+          router.push(`/company/${companyId.value}`);
+        },
+      });
     }
   } catch (error: any) {
     console.error("Error saving company configuration:", error);

@@ -20,6 +20,82 @@
         </button>
       </div>
 
+      <!-- Web Push Notification Banner -->
+      <div
+        v-if="isPushSupported"
+        class="mt-4 p-4 rounded-2xl border transition-all duration-200"
+        :class="[
+          isPushSubscribed
+            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-950 dark:text-emerald-200'
+            : pushPermission === 'denied'
+              ? 'bg-amber-500/10 border-amber-500/20 text-amber-950 dark:text-amber-200'
+              : 'bg-primary/5 border-primary/20 text-on-surface'
+        ]"
+      >
+        <div class="flex items-start gap-3">
+          <span
+            class="material-symbols-outlined text-2xl flex-shrink-0"
+            :class="[
+              isPushSubscribed
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : pushPermission === 'denied'
+                  ? 'text-amber-600 dark:text-amber-400'
+                  : 'text-primary'
+            ]"
+          >
+            {{
+              isPushSubscribed
+                ? 'notifications_active'
+                : pushPermission === 'denied'
+                  ? 'notifications_off'
+                  : 'add_alert'
+            }}
+          </span>
+
+          <div class="flex-grow min-w-0">
+            <h3 class="text-xs font-bold leading-tight">
+              {{
+                isPushSubscribed
+                  ? 'Notificaciones Push activadas'
+                  : pushPermission === 'denied'
+                    ? 'Notificaciones bloqueadas en el navegador'
+                    : 'Activa las notificaciones en tu navegador'
+              }}
+            </h3>
+            <p class="text-[11px] opacity-80 mt-0.5 leading-normal">
+              {{
+                isPushSubscribed
+                  ? 'Recibirás alertas en segundo plano cuando recibas mensajes o cambios en tus vacantes.'
+                  : pushPermission === 'denied'
+                    ? 'Has bloqueado los permisos de notificación. Para recibirlas, permite las notificaciones en los ajustes de tu navegador.'
+                    : 'Entérate al instante de nuevas respuestas, mensajes y postulaciones incluso con la pestaña cerrada.'
+              }}
+            </p>
+          </div>
+
+          <div class="flex-shrink-0 self-center">
+            <button
+              v-if="!isPushSubscribed && pushPermission !== 'denied'"
+              @click="subscribePush(userId)"
+              :disabled="loadingPush"
+              class="px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded-xl hover:bg-primary/90 transition shadow-sm disabled:opacity-50 flex items-center gap-1.5"
+            >
+              <span v-if="loadingPush" class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+              <span>Activar</span>
+            </button>
+
+            <button
+              v-else-if="isPushSubscribed"
+              @click="unsubscribePush(userId)"
+              :disabled="loadingPush"
+              class="text-[11px] font-semibold text-on-surface-variant hover:text-rose-600 dark:hover:text-rose-400 transition"
+            >
+              Desactivar
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Filter Dropdown & Counter -->
       <div
         v-if="!loading && notifications.length > 0"
@@ -164,8 +240,6 @@
 </template>
 
 <script setup lang="ts">
-import AppAppealModal from "~/components/AppAppealModal.vue";
-
 useSeoMeta({
   title: "Notificaciones - JobNet",
   description:
@@ -218,6 +292,15 @@ const router = useRouter();
 
 const userId = computed(() => (authSession.value?.user as any)?.id || null);
 
+const {
+  isSupported: isPushSupported,
+  permission: pushPermission,
+  isSubscribed: isPushSubscribed,
+  loading: loadingPush,
+  subscribe: subscribePush,
+  unsubscribe: unsubscribePush,
+} = useWebPush();
+
 const getIconName = (type: NotificationItem["type"]) => {
   switch (type) {
     case "like":
@@ -244,7 +327,7 @@ const getIconBgClass = (type: NotificationItem["type"]) => {
     case "comment":
       return "bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/40 dark:border-emerald-900";
     case "application":
-      return "bg-blue-50 border border-blue-100 dark:bg-blue-950/40 dark:border-blue-900";
+      return "bg-tertiary/10 border border-tertiary/10 dark:bg-blue-950/40 dark:border-blue-900";
     case "SUSPENSION_NOTICE":
       return "bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-800";
     case "SUSPENSION_CANCELLED":
@@ -263,7 +346,7 @@ const getIconTextClass = (type: NotificationItem["type"]) => {
     case "comment":
       return "text-emerald-600 dark:text-emerald-400";
     case "application":
-      return "text-blue-600 dark:text-blue-400";
+      return "text-tertiary dark:text-inverse-primary";
     case "SUSPENSION_NOTICE":
       return "text-amber-600 dark:text-amber-400";
     case "SUSPENSION_CANCELLED":

@@ -133,7 +133,9 @@ const props = defineProps<{
   initialMfaState?: boolean;
 }>();
 
-const emit = defineEmits(["mfa-updated"]);
+const emit = defineEmits<{
+  (e: "mfa-updated", enabled: boolean): void;
+}>();
 
 const router = useRouter();
 const config = useRuntimeConfig();
@@ -161,9 +163,9 @@ const disableMfa = async () => {
   disabling.value = true;
   statusMsg.value = "";
 
+  const s = sessionData.value as Record<string, any> | null;
   const accessToken =
-    (sessionData.value as any)?.accessToken ||
-    (sessionData.value as any)?.idToken;
+    sessionData.value?.user?.idToken || s?.accessToken || s?.idToken;
 
   try {
     // 1. Disable in Cognito if accessToken is present

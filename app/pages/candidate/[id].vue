@@ -72,846 +72,98 @@
     v-else
     class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16 space-y-6"
   >
-    <!-- Header Card -->
-    <section
-      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] relative z-20"
-    >
-      <!-- Decorative top color bar -->
-      <div class="bg-primary h-2 w-full rounded-t-xl"></div>
-
-      <div class="p-lg md:p-xl flex flex-col items-center text-center">
-        <!-- Profile Picture -->
-        <div class="relative mb-4">
-          <img
-            :alt="profile.nombre"
-            class="w-32 h-32 rounded-full object-cover shadow-sm border-4 border-surface-container-lowest"
-            :src="profile.fotoPerfil || defaultAvatar"
-          />
-        </div>
-
-        <!-- Name -->
-        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-1">
-          {{ profile.nombre || "Sin Nombre" }}
-        </h1>
-
-        <!-- Location -->
-        <p
-          v-if="locationText"
-          class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 flex items-center gap-1 mb-3"
-        >
-          <span class="material-symbols-outlined text-[16px]">location_on</span>
-          {{ locationText }}
-        </p>
-
-        <!-- Status Badge -->
-        <div
-          class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md mb-6 inline-flex items-center gap-1"
-        >
-          <span class="w-2 h-2 rounded-full bg-secondary"></span>
-          {{ profile.estadoBusqueda || "En búsqueda activa" }}
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="w-full flex gap-3 max-w-sm mb-2">
-          <NuxtLink
-            v-if="isOwner"
-            to="/settings"
-            class="flex-1 bg-primary hover:bg-tertiary-container text-on-primary h-12 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
-          >
-            <span class="material-symbols-outlined">edit</span>
-            Editar Perfil
-          </NuxtLink>
-          <a
-            v-else
-            :href="`mailto:${profile.email}`"
-            class="flex-1 bg-primary hover:bg-tertiary-container text-on-primary h-12 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
-          >
-            <span class="material-symbols-outlined">mail</span>
-            Contactar
-          </a>
-
-          <!-- Enlaces Web Dropdown -->
-          <div v-if="webLinks.length > 0" class="relative flex-1">
-            <button
-              @click.stop="toggleDropdown"
-              class="w-full bg-surface-container-low text-on-surface h-12 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 transition-transform active:scale-95 border border-outline-variant"
-              id="webLinksBtn"
-            >
-              Enlaces Web
-              <span
-                class="material-symbols-outlined text-[20px] transition-transform duration-200"
-                :class="{ 'rotate-180': showDropdown }"
-                >expand_more</span
-              >
-            </button>
-            <div
-              v-if="showDropdown"
-              class="absolute top-full right-0 min-w-[220px] sm:w-full mt-2 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl shadow-2xl z-50 py-2 overflow-hidden"
-              id="webLinksDropdown"
-            >
-              <a
-                v-for="link in webLinks"
-                :key="link.name"
-                class="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors text-xs font-semibold text-on-surface dark:text-slate-200"
-                :href="link.url"
-                target="_blank"
-                rel="noopener"
-              >
-                <span
-                  class="material-symbols-outlined text-primary text-base"
-                  >{{ link.icon }}</span
-                >
-                <span class="truncate">{{ link.name }}</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- Header Profile -->
+    <CandidateHeaderProfile
+      :profile="profile"
+      :default-avatar="defaultAvatar"
+      :location-text="locationText"
+      :is-owner="isOwner"
+      :web-links="webLinks"
+    />
 
     <!-- Documents Horizontal Scroll -->
-    <section v-if="documents.length > 0">
-      <h2
-        class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm px-1"
-      >
-        <span class="material-symbols-outlined">description</span>
-        Documentos
-      </h2>
-      <div
-        class="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2"
-      >
-        <div
-          v-for="doc in documents"
-          :key="doc.name"
-          class="snap-start shrink-0 w-64 bg-surface-container-low border border-surface-container hover:border-primary-container p-md rounded-lg flex items-start gap-md transition-all group shadow-sm hover:shadow-md"
-        >
-          <div
-            class="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
-            :class="
-              doc.type === 'pdf'
-                ? 'bg-error-container text-on-error-container'
-                : 'bg-surface-container-high text-primary'
-            "
-          >
-            <span class="material-symbols-outlined">{{
-              doc.type === "pdf" ? "picture_as_pdf" : "image"
-            }}</span>
-          </div>
-          <div class="flex-grow min-w-0">
-            <h3
-              class="font-label-md text-label-md text-on-surface truncate w-36 group-hover:text-primary transition-colors"
-            >
-              {{ doc.name }}
-            </h3>
-            <p
-              class="font-body-sm text-body-sm text-on-surface-variant dark:text-slate-300 mb-2"
-            >
-              {{ doc.meta }}
-            </p>
-            <div class="flex gap-3">
-              <button
-                @click="openDocViewer(doc.url, doc.name)"
-                class="text-primary hover:underline font-label-sm text-label-sm flex items-center gap-0.5 cursor-pointer"
-              >
-                <span class="material-symbols-outlined text-[16px]"
-                  >visibility</span
-                >
-                Ver
-              </button>
-              <a
-                :href="doc.url"
-                download
-                target="_blank"
-                class="text-secondary hover:underline font-label-sm text-label-sm flex items-center gap-0.5"
-              >
-                <span class="material-symbols-outlined text-[16px]"
-                  >download</span
-                >
-                Descargar
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+    <CandidateDocumentsList :documents="documents" @open="openDocViewer" />
 
-      <!-- Standardized Universal Document Viewer -->
-      <AppDocumentViewer
-        v-model="showDocViewer"
-        :url="selectedDocUrl"
-        :title="selectedDocTitle"
-      />
-    </section>
+    <!-- Standardized Universal Document Viewer -->
+    <AppDocumentViewer
+      v-model="showDocViewer"
+      :url="selectedDocUrl"
+      :title="selectedDocTitle"
+    />
 
     <!-- Body Card -->
     <section
       class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] p-lg md:p-xl space-y-8"
     >
-      <!-- Sobre mí -->
-      <div>
-        <h2
-          class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container pb-sm"
-        >
-          <span class="material-symbols-outlined">person</span>
-          Sobre mí
-        </h2>
-        <p
-          v-if="profile.biografia"
-          class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 leading-relaxed"
-        >
-          {{ profile.biografia }}
-        </p>
-        <p
-          v-else
-          class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 italic"
-        >
-          Este candidato aún no ha agregado una biografía.
-        </p>
-      </div>
+      <!-- Sobre mí y Sectores -->
+      <CandidateAboutSection :profile="profile" :sectors="sectors" />
 
-      <!-- RF-54: Trayectoria Laboral (Experiencia) -->
-      <div>
-        <h2
-          class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container dark:border-slate-800 pb-sm"
-        >
-          <span
-            class="material-symbols-outlined text-indigo-600 dark:text-indigo-400"
-            >work</span
-          >
-          Trayectoria Laboral
-        </h2>
+      <!-- Trayectoria Laboral (Experiencia) -->
+      <CandidateExperienceList :experiencia="profile.experiencia" />
 
-        <div
-          v-if="profile.experiencia && profile.experiencia.length > 0"
-          class="space-y-4"
-        >
-          <div
-            v-for="(exp, idx) in profile.experiencia"
-            :key="exp.id || idx"
-            class="bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 dark:border-slate-800 p-4 rounded-xl space-y-1 relative"
-          >
-            <div class="flex items-start justify-between flex-wrap gap-2">
-              <div>
-                <h3
-                  class="font-bold text-sm text-on-background dark:text-slate-100"
-                >
-                  {{ exp.puesto || "Cargo no especificado" }}
-                </h3>
-                <p
-                  class="text-xs font-semibold text-indigo-600 dark:text-indigo-400"
-                >
-                  {{ exp.empresa || "Empresa" }}
-                </p>
-              </div>
-              <span
-                class="text-[11px] font-medium bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-800"
-              >
-                {{ exp.fechaInicio || "Inicio" }} —
-                {{ exp.actualmente ? "Presente" : exp.fechaFin || "Fin" }}
-              </span>
-            </div>
-            <p
-              v-if="exp.descripcion"
-              class="text-xs text-on-surface-variant dark:text-slate-300 mt-2 leading-relaxed whitespace-pre-line"
-            >
-              {{ exp.descripcion }}
-            </p>
-          </div>
-        </div>
-        <p
-          v-else
-          class="font-body-md text-body-md text-on-surface-variant dark:text-slate-400 italic"
-        >
-          No se ha registrado experiencia laboral en el historial.
-        </p>
-      </div>
+      <!-- Formación Académica (Educación) -->
+      <CandidateEducationList :educacion="profile.educacion" />
 
-      <!-- RF-54: Formación Académica (Educación) -->
-      <div>
-        <h2
-          class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container dark:border-slate-800 pb-sm"
-        >
-          <span
-            class="material-symbols-outlined text-purple-600 dark:text-purple-400"
-            >school</span
-          >
-          Formación Académica
-        </h2>
-
-        <div
-          v-if="profile.educacion && profile.educacion.length > 0"
-          class="space-y-4"
-        >
-          <div
-            v-for="(edu, idx) in profile.educacion"
-            :key="edu.id || idx"
-            class="bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 dark:border-slate-800 p-4 rounded-xl space-y-1 relative"
-          >
-            <div class="flex items-start justify-between flex-wrap gap-2">
-              <div>
-                <h3
-                  class="font-bold text-sm text-on-background dark:text-slate-100"
-                >
-                  {{ edu.grado || "Grado Académico" }}
-                </h3>
-                <p
-                  class="text-xs font-semibold text-purple-600 dark:text-purple-400"
-                >
-                  {{ edu.institucion || "Institución Educativa" }}
-                </p>
-              </div>
-              <span
-                class="text-[11px] font-medium bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 px-2.5 py-1 rounded-full border border-purple-200 dark:border-purple-800"
-              >
-                {{ edu.anioInicio || "Año Inicio" }} —
-                {{
-                  edu.enCurso ? "En curso" : edu.anioGraduacion || "Graduación"
-                }}
-              </span>
-            </div>
-          </div>
-        </div>
-        <p
-          v-else
-          class="font-body-md text-body-md text-on-surface-variant dark:text-slate-400 italic"
-        >
-          No se ha registrado formación académica en el historial.
-        </p>
-      </div>
-
-      <!-- Habilidades Técnicas (RF-55) -->
-      <div>
-        <h2
-          class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container pb-sm"
-        >
-          <span
-            class="material-symbols-outlined text-emerald-600 dark:text-emerald-400"
-            >psychology</span
-          >
-          Competencias Técnicas
-        </h2>
-        <div v-if="skills.length > 0" class="flex flex-wrap gap-2">
-          <span
-            v-for="skill in skills"
-            :key="skill"
-            class="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs px-3.5 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-800 shadow-sm"
-          >
-            {{ skill }}
-          </span>
-        </div>
-        <p
-          v-else
-          class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 italic"
-        >
-          No se han seleccionado competencias técnicas aún.
-        </p>
-      </div>
-
-      <!-- Sectores -->
-      <div v-if="sectors.length > 0">
-        <h2
-          class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm border-b border-surface-container pb-sm"
-        >
-          <span class="material-symbols-outlined">business_center</span>
-          Sectores de Interés
-        </h2>
-        <div class="flex flex-wrap gap-2">
-          <span
-            v-for="sector in sectors"
-            :key="sector"
-            class="bg-surface-container text-secondary font-label-md text-label-md px-4 py-2 rounded-full border border-surface-container-high hover:bg-secondary-container hover:text-on-secondary-container transition-colors"
-          >
-            {{ sector }}
-          </span>
-        </div>
-      </div>
+      <!-- Habilidades Técnicas -->
+      <CandidateSkillsList :skills="skills" />
     </section>
 
     <!-- Bottom Section Tabs: [Mis publicaciones] / [Guardados] -->
-    <section
-      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] p-lg md:p-xl space-y-6"
-    >
-      <div
-        class="flex items-center gap-3 border-b border-surface-container pb-4"
-      >
-        <button
-          type="button"
-          @click="activeTab = 'posts'"
-          :class="[
-            activeTab === 'posts'
-              ? 'bg-primary text-white shadow-sm font-bold'
-              : 'bg-surface-container text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container-high',
-          ]"
-          class="px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-2 active:scale-95"
-        >
-          <span class="material-symbols-outlined text-base">article</span>
-          <span>Mis publicaciones ({{ userPosts.length }})</span>
-        </button>
-
-        <button
-          type="button"
-          @click="activeTab = 'bookmarks'"
-          :class="[
-            activeTab === 'bookmarks'
-              ? 'bg-primary text-white shadow-sm font-bold'
-              : 'bg-surface-container text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container-high',
-          ]"
-          class="px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-2 active:scale-95"
-        >
-          <span class="material-symbols-outlined text-base">bookmark</span>
-          <span>Guardados ({{ bookmarkedPosts.length }})</span>
-        </button>
-      </div>
-
-      <!-- Tab Content 1: Mis Publicaciones -->
-      <div v-if="activeTab === 'posts'" class="space-y-4">
-        <div
-          v-if="loadingPosts"
-          class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 animate-pulse"
-        >
-          Cargando publicaciones...
-        </div>
-        <div
-          v-else-if="userPosts.length === 0"
-          class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 italic"
-        >
-          No hay publicaciones para mostrar.
-        </div>
-        <div v-else class="grid grid-cols-1 gap-4">
-          <PostCard
-            v-for="post in userPosts"
-            :key="post.uniqueId"
-            :post="post"
-            :current-user-id="
-              (authData?.user as any)?.id || authData?.user?.email || ''
-            "
-            :is-bookmarked="isBookmarked(post)"
-            @navigate="(id) => $router.push(`/posts/${id}`)"
-            @like="toggleLike"
-            @bookmark="toggleBookmark"
-          />
-        </div>
-      </div>
-
-      <!-- Tab Content 2: Guardados -->
-      <div v-if="activeTab === 'bookmarks'" class="space-y-4">
-        <div
-          v-if="loadingPosts"
-          class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 animate-pulse"
-        >
-          Cargando publicaciones guardadas...
-        </div>
-        <div
-          v-else-if="bookmarkedPosts.length === 0"
-          class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 italic"
-        >
-          No tienes publicaciones guardadas.
-        </div>
-        <div v-else class="grid grid-cols-1 gap-4">
-          <PostCard
-            v-for="post in bookmarkedPosts"
-            :key="post.uniqueId"
-            :post="post"
-            :current-user-id="
-              (authData?.user as any)?.id || authData?.user?.email || ''
-            "
-            :is-bookmarked="true"
-            @navigate="(id) => $router.push(`/posts/${id}`)"
-            @like="toggleLike"
-            @bookmark="toggleBookmark"
-          />
-        </div>
-      </div>
-    </section>
+    <CandidateActivityTabs
+      v-model="activeTab"
+      :user-posts="userPosts"
+      :bookmarked-posts="bookmarkedPosts"
+      :loading-posts="loadingPosts"
+      :auth-data="authData"
+      :is-bookmarked="isBookmarked"
+      @like="toggleLike"
+      @bookmark="toggleBookmark"
+      @share="sharePost"
+    />
   </main>
 </template>
 
 <script setup lang="ts">
-const route = useRoute();
-const candidateId = route.params.id as string;
-const { data: authData } = useAuth();
-const config = useRuntimeConfig();
+import { useSeoMeta } from "#app";
+import { useCandidateProfile } from "~/composables/useCandidateProfile";
 
-const defaultAvatar =
-  "https://ui-avatars.com/api/?name=User&background=6366f1&color=fff&size=128";
-
-// --- State ---
-const loading = ref(true);
-const error = ref(false);
-const errorMessage = ref("");
-const profile = ref<Record<string, any>>({});
-const showDropdown = ref(false);
-const selectedDocUrl = ref("");
-const selectedDocTitle = ref("");
-const showDocViewer = ref(false);
-
-const openDocViewer = (url: string, title: string) => {
-  selectedDocUrl.value = url;
-  selectedDocTitle.value = title;
-  showDocViewer.value = true;
-};
-
-// --- Ownership Check ---
-const isOwner = computed(() => {
-  const user = authData.value?.user as any;
-  if (!user) return false;
-  return user.id === candidateId || user.email === candidateId;
-});
-
-// --- Computed from profile data ---
-const locationText = computed(() => {
-  const loc = profile.value.ubicacion;
-  if (!loc) return "";
-  if (typeof loc === "string") return loc;
-  return [loc.city, loc.pais].filter(Boolean).join(", ") || "";
-});
-
-const skills = computed<string[]>(() => {
-  return profile.value.habilidades || [];
-});
-
-const sectors = computed<string[]>(() => {
-  return profile.value.sectores || [];
-});
-
-const webLinks = computed(() => {
-  const result: Array<{ name: string; url: string; icon: string }> = [];
-  const linksArray = profile.value.links;
-  const linksObj = profile.value.enlacesWeb;
-
-  if (Array.isArray(linksArray) && linksArray.length > 0) {
-    linksArray.forEach((item: any) => {
-      const name = item.label || item.nombre || "Enlace Web";
-      const url = item.url;
-      if (url) {
-        result.push({ name, url, icon: getWebLinkIcon(name + " " + url) });
-      }
-    });
-  } else if (linksObj && typeof linksObj === "object") {
-    Object.entries(linksObj).forEach(([name, url]) => {
-      if (url) {
-        result.push({
-          name,
-          url: url as string,
-          icon: getWebLinkIcon(name + " " + url),
-        });
-      }
-    });
-  }
-  return result;
-});
-
-const documents = computed(() => {
-  const docs: Array<{ name: string; meta: string; type: string; url: string }> =
-    [];
-
-  // Primary CV
-  if (profile.value.cvUrl) {
-    docs.push({
-      name: profile.value.cvFileName || "Curriculum Vitae Principal",
-      meta: "CV Principal",
-      type: "pdf",
-      url: profile.value.cvUrl,
-    });
-  }
-
-  // Additional documents
-  const rawDocs =
-    profile.value.documentosAdicionales ||
-    profile.value.documentosProfesionales;
-  if (Array.isArray(rawDocs) && rawDocs.length > 0) {
-    rawDocs.forEach((d: any) => {
-      if (d) {
-        const url = typeof d === "string" ? d : d.url;
-        const name =
-          typeof d === "string"
-            ? "Documento Adicional"
-            : d.name || d.nombre || "Documento Adicional";
-        if (url) {
-          const isPdf =
-            (typeof d !== "string" && d.type === "pdf") ||
-            (url && url.includes(".pdf"));
-          docs.push({
-            name,
-            meta: isPdf ? "Documento PDF" : "Imagen / Certificado",
-            type: isPdf ? "pdf" : "image",
-            url,
-          });
-        }
-      }
-    });
-  } else if (
-    rawDocs &&
-    typeof rawDocs === "object" &&
-    !Array.isArray(rawDocs)
-  ) {
-    for (const [name, doc] of Object.entries(rawDocs)) {
-      const d = doc as any;
-      const url = typeof d === "string" ? d : d?.url;
-      if (url) {
-        const isPdf = url.includes(".pdf");
-        docs.push({
-          name,
-          meta: isPdf ? "Documento PDF" : "Imagen / Certificado",
-          type: isPdf ? "pdf" : "image",
-          url,
-        });
-      }
-    }
-  }
-
-  return docs;
-});
-
-// --- Helpers ---
-function getWebLinkIcon(name: string): string {
-  const lower = name.toLowerCase();
-  if (lower.includes("github")) return "code";
-  if (lower.includes("portfolio")) return "language";
-  if (lower.includes("linkedin")) return "link";
-  return "link";
-}
-
-// --- Fetch Profile ---
-async function fetchProfile() {
-  loading.value = true;
-  error.value = false;
-  errorMessage.value = "";
-
-  try {
-    const res = await $fetch<any>(
-      `${config.public.apiUrl}/profile/${candidateId}`,
-    );
-    const data = typeof res === "string" ? JSON.parse(res) : res;
-
-    if (!data) {
-      throw new Error("Perfil no encontrado");
-    }
-
-    profile.value = data;
-  } catch (e: any) {
-    error.value = true;
-    errorMessage.value =
-      e?.data?.message ||
-      e?.message ||
-      "Ocurrió un error al cargar el perfil. Por favor, inténtalo de nuevo.";
-  } finally {
-    loading.value = false;
-  }
-}
-
-async function refreshProfile() {
-  await fetchProfile();
-}
-
-// --- Dropdown ---
-const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value;
-};
-
-const closeDropdown = () => {
-  showDropdown.value = false;
-};
-
-onMounted(() => {
-  if (import.meta.client) {
-    document.addEventListener("click", closeDropdown);
-  }
-});
-
-onUnmounted(() => {
-  if (import.meta.client) {
-    document.removeEventListener("click", closeDropdown);
-  }
-});
-
-// --- Posts & Bookmarks Tab State ---
-const activeTab = ref<"posts" | "bookmarks">("posts");
-const allUserPosts = ref<any[]>([]);
-const allBookmarkedPosts = ref<any[]>([]);
-
-const { data: postsData, pending: postsPending } = useLazyAsyncData(
-  `candidate-posts-${candidateId}`,
-  () =>
-    $fetch(`${config.public.apiUrl}/profile/${candidateId}/posts`)
-      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => ({ data: [] })),
-);
-
-const { data: bookmarksData, pending: bookmarksPending } = useLazyAsyncData(
-  `candidate-bookmarks-${candidateId}`,
-  () =>
-    $fetch(`${config.public.apiUrl}/profile/${candidateId}/bookmarks`)
-      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => ({ data: [] })),
-);
-
-watch(
-  postsData,
-  (val: any) => {
-    if (val?.data) allUserPosts.value = val.data;
-  },
-  { immediate: true },
-);
-
-watch(
-  bookmarksData,
-  (val: any) => {
-    if (val?.data) allBookmarkedPosts.value = val.data;
-  },
-  { immediate: true },
-);
-
-const loadingPosts = computed(
-  () => postsPending.value || bookmarksPending.value,
-);
-const userPosts = computed(() => allUserPosts.value);
-const bookmarkedPosts = computed(() => allBookmarkedPosts.value);
-
-const isBookmarked = (post: any) => {
-  if (!post) return false;
-  const authUser = authData.value?.user as any;
-  const currentAuthId = authUser?.id || candidateId;
-  const currentAuthEmail = authUser?.email?.toLowerCase();
-
-  const bookmarks =
-    post.bookmarksList || post.bookmarkedBy || post.bookmarks || [];
-  if (Array.isArray(bookmarks)) {
-    return (
-      bookmarks.includes(candidateId) ||
-      (currentAuthId && bookmarks.includes(currentAuthId)) ||
-      (currentAuthEmail && bookmarks.includes(currentAuthEmail))
-    );
-  }
-  return Boolean(post.isBookmarked || post.bookmarked);
-};
-
-const toggleLike = async (itemOrId: any) => {
-  const post =
-    typeof itemOrId === "string"
-      ? allUserPosts.value.find(
-          (p) => p.uniqueId === itemOrId || p.id === itemOrId,
-        ) ||
-        allBookmarkedPosts.value.find(
-          (p) => p.uniqueId === itemOrId || p.id === itemOrId,
-        )
-      : itemOrId;
-
-  if (!post) return;
-  const authUser = authData.value?.user as any;
-  const currentUserId = authUser?.id || authUser?.email;
-  if (!currentUserId) return;
-
-  if (!post.likesList) post.likesList = [];
-
-  const userEmail = authUser?.email?.toLowerCase();
-  const userId = authUser?.id;
-
-  const originalLikes = [...post.likesList];
-  const existingIdx = post.likesList.findIndex((item: any) => {
-    const s = String(item).toLowerCase();
-    return (
-      s === String(currentUserId).toLowerCase() ||
-      (userEmail && s === userEmail) ||
-      (userId && s === String(userId).toLowerCase())
-    );
-  });
-
-  if (existingIdx !== -1) {
-    post.likesList.splice(existingIdx, 1);
-  } else {
-    post.likesList.push(currentUserId);
-  }
-
-  try {
-    const postId = post.uniqueId || post.id;
-    const res = await $fetch<any>(`/api/posts/${postId}/like`, {
-      method: "POST",
-      body: { userId: currentUserId, userUuid: currentUserId },
-    });
-
-    if (res?.likesList) {
-      post.likesList = res.likesList;
-    }
-  } catch (e) {
-    console.error("Error toggling like:", e);
-    post.likesList = originalLikes;
-  }
-};
-
-const toggleBookmark = async (itemOrId: any) => {
-  const post =
-    typeof itemOrId === "string"
-      ? allUserPosts.value.find(
-          (p) => p.uniqueId === itemOrId || p.id === itemOrId,
-        ) ||
-        allBookmarkedPosts.value.find(
-          (p) => p.uniqueId === itemOrId || p.id === itemOrId,
-        )
-      : itemOrId;
-
-  if (!post) return;
-  const authUser = authData.value?.user as any;
-  const currentUserId = authUser?.id || authUser?.email;
-  if (!currentUserId) return;
-
-  if (!post.bookmarksList) post.bookmarksList = [];
-
-  const userEmail = authUser?.email?.toLowerCase();
-  const userId = authUser?.id;
-
-  const originalBookmarks = [...post.bookmarksList];
-  const existingIdx = post.bookmarksList.findIndex((item: any) => {
-    const s = String(item).toLowerCase();
-    return (
-      s === String(currentUserId).toLowerCase() ||
-      (userEmail && s === userEmail) ||
-      (userId && s === String(userId).toLowerCase())
-    );
-  });
-
-  if (existingIdx !== -1) {
-    post.bookmarksList.splice(existingIdx, 1);
-  } else {
-    post.bookmarksList.push(currentUserId);
-  }
-
-  try {
-    const postId = post.uniqueId || post.id;
-    const res = await $fetch<any>(`/api/posts/${postId}/bookmark`, {
-      method: "POST",
-      body: { userId: currentUserId, userUuid: currentUserId },
-    });
-
-    if (res?.bookmarksList) {
-      post.bookmarksList = res.bookmarksList;
-    } else if (res?.bookmarked !== undefined) {
-      const idxNow = post.bookmarksList.findIndex((item: any) => {
-        const s = String(item).toLowerCase();
-        return (
-          s === String(currentUserId).toLowerCase() ||
-          (userEmail && s === userEmail) ||
-          (userId && s === String(userId).toLowerCase())
-        );
-      });
-      if (res.bookmarked && idxNow === -1) {
-        post.bookmarksList.push(currentUserId);
-      } else if (!res.bookmarked && idxNow !== -1) {
-        post.bookmarksList.splice(idxNow, 1);
-      }
-    }
-  } catch (e) {
-    console.error("Error toggling bookmark:", e);
-    post.bookmarksList = originalBookmarks;
-  }
-};
+const {
+  loading,
+  error,
+  errorMessage,
+  profile,
+  defaultAvatar,
+  locationText,
+  skills,
+  sectors,
+  webLinks,
+  documents,
+  isOwner,
+  refreshProfile,
+  fetchProfile,
+  selectedDocUrl,
+  selectedDocTitle,
+  showDocViewer,
+  openDocViewer,
+  activeTab,
+  loadingPosts,
+  userPosts,
+  bookmarkedPosts,
+  toggleLike,
+  toggleBookmark,
+  isBookmarked,
+  sharePost,
+  authData,
+} = useCandidateProfile();
 
 // --- Init ---
 fetchProfile();
 
 // --- SEO ---
 useSeoMeta({
-  title: `${profile.value.nombre || "Candidato"} - Perfil`,
-  description: `Perfil público del candidato ${profile.value.nombre || ""} en JobNet`,
+  title: () => `${profile.value.nombre || "Candidato"} - Perfil`,
+  description: () =>
+    `Perfil público del candidato ${profile.value.nombre || ""} en JobNet`,
 });
 </script>
 

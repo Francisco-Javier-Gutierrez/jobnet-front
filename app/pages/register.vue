@@ -192,18 +192,22 @@
             class="text-xs text-on-surface-variant dark:text-slate-300 leading-normal"
           >
             Acepto los
-            <a
-              href="#"
-              class="text-primary hover:underline"
+            <button
+              type="button"
+              @click.prevent="showTermsModal = true"
+              class="text-primary hover:underline cursor-pointer"
               aria-label="Ver los Términos de Servicio"
-              >Términos de Servicio</a
             >
+              Términos de Servicio
+            </button>
             y la
-            <a
-              href="#"
-              class="text-primary hover:underline"
+            <button
+              type="button"
+              @click.prevent="showTermsModal = true"
+              class="text-primary hover:underline cursor-pointer"
               aria-label="Ver la Política de Privacidad"
-              >Política de Privacidad</a
+            >
+              Política de Privacidad</button
             >.
           </label>
         </div>
@@ -216,15 +220,25 @@
         >
           <span
             v-if="loading"
-            class="material-symbols-outlined animate-spin text-lg"
+            class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin"
             aria-hidden="true"
-            >progress_activity</span
-          >
+          ></span>
           <span v-else>Registrarse</span>
         </button>
       </form>
     </div>
   </div>
+
+  <!-- Terms Modal -->
+  <AppModal
+    v-model="showTermsModal"
+    title="Términos y Condiciones de Uso"
+    icon="gavel"
+    max-width="3xl"
+    @close="showTermsModal = false"
+  >
+    <AppTermsContent />
+  </AppModal>
 </template>
 
 <script setup lang="ts">
@@ -315,4 +329,5 @@ const handleRegister = async () => {
     loading.value = false;
   }
 };
+const showTermsModal = ref(false);
 </script>

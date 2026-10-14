@@ -11,8 +11,8 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: false },
   css: ["~/assets/css/main.css"],
-  routeRules: {
-    "/**": { ssr: false },
+  alias: {
+    "vue-demi": "vue",
   },
   build: {
     transpile: [
@@ -37,6 +37,9 @@ export default defineNuxtConfig({
       wsUrl:
         process.env.NUXT_PUBLIC_WS_URL ||
         "wss://lzvcx59zaa.execute-api.us-east-1.amazonaws.com/prod",
+      vapidPublicKey:
+        process.env.NUXT_PUBLIC_VAPID_KEY ||
+        "BOIrktuQCHHiOWcKICA7YEwdKJf8WNYCmBS_PI338wnaB9VqXPQfCRwTN5NLYokujXBp5pdD83av6DACG2rAYok",
     },
   },
   app: {
@@ -75,7 +78,7 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
-    preset: process.env.NODE_ENV === "production" ? "aws-lambda" : undefined,
+    preset: "aws-lambda",
     externals: {
       inline: [
         "@babel/runtime",
@@ -83,12 +86,6 @@ export default defineNuxtConfig({
         "jose",
         "@sidebase/nuxt-auth",
         "next-auth",
-        "hookable",
-        "unhead",
-        "pinia",
-        "vue-demi",
-        "devalue",
-        "ufo",
       ],
     },
   },

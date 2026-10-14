@@ -39,6 +39,19 @@
     <div class="flex items-center gap-2 flex-shrink-0">
       <template v-if="status === 'authenticated'">
         <NuxtLink
+          v-if="userRole === 'organization'"
+          to="/company/edit"
+          class="text-on-surface-variant dark:text-slate-300 hover:text-primary transition p-2 flex items-center justify-center rounded-xl"
+          :class="[
+            isActive('/company/edit')
+              ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-bold'
+              : '',
+          ]"
+          aria-label="Configuración"
+        >
+          <span class="material-symbols-outlined text-[22px]">settings</span>
+        </NuxtLink>
+        <NuxtLink
           to="/notifications"
           class="text-on-surface-variant dark:text-slate-300 hover:text-primary transition p-2 flex items-center justify-center rounded-xl"
           :class="[
@@ -61,7 +74,7 @@
         </button>
         <NuxtLink
           :to="profileRoute"
-          class="w-8 h-8 rounded-full border transition flex items-center justify-center text-xs font-bold shadow-sm active:scale-95"
+          class="w-8 h-8 rounded-full border transition flex items-center justify-center text-xs font-bold shadow-sm active:scale-95 overflow-hidden"
           :class="[
             isActive(profileRoute)
               ? 'bg-primary text-white border-primary ring-2 ring-primary/30 dark:ring-indigo-400/40'
@@ -69,7 +82,13 @@
           ]"
           :aria-label="`Perfil de ${userName}`"
         >
-          {{ userInitial }}
+          <img
+            v-if="profilePic"
+            :src="profilePic"
+            alt="Foto de perfil"
+            class="w-full h-full object-cover"
+          />
+          <span v-else>{{ userInitial }}</span>
         </NuxtLink>
       </template>
       <template v-else>
@@ -92,11 +111,22 @@ const props = defineProps<{
 
 const route = useRoute();
 const { status, data, signOut } = useAuth();
+const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
+
+watchEffect(() => {
+  if (
+    status.value === "authenticated" &&
+    data.value?.user?.id &&
+    !hasFetched.value
+  ) {
+    fetchProfilePic(data.value.user.id as string);
+  }
+});
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
-  const user = data.value?.user as any;
-  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
+  const user = data.value?.user;
+  const tipo = (user?.tipoUsuario || "").toUpperCase();
   if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
   if (tipo === "ADMIN") return "admin";
   if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
@@ -121,14 +151,13 @@ const searchRoute = computed(() => {
     case "moderator":
       return null;
     case "organization":
-      return "/companies";
+      return null;
     default:
-      return "/feed";
+      return "/vacancies";
   }
 });
 
 const profileRoute = computed(() => {
-  if (userRole.value === "organization") return "/company/edit";
   return "/profile";
 });
 

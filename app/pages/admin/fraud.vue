@@ -1,42 +1,28 @@
 <template>
   <div
-    class="max-w-4xl mx-auto px-6 py-8 w-full bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-200 dark:text-slate-100 transition-colors duration-200"
+    class="max-w-5xl mx-auto px-6 py-8 w-full bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-200 transition-colors duration-200"
   >
     <div class="mb-8">
       <h1
         class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
       >
-        Reportes de Fraude
+        Reportes de Fraude (Administrador)
       </h1>
-      <p
-        class="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm mt-1"
-      >
+      <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
         Monitorea y audita los registros de bloqueos históricos y sospechas de
-        fraude.
+        fraude de vacantes y organizaciones.
       </p>
     </div>
 
-    <div
-      class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-slate-800 rounded-2xl overflow-hidden p-12 text-center text-slate-400 dark:text-slate-500 shadow-sm"
-    >
-      <span class="material-symbols-outlined text-[64px] text-slate-200 mb-4"
-        >find_in_page</span
-      >
-      <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">
-        Todo en orden
-      </h3>
-      <p
-        class="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-2"
-      >
-        No hay alertas de fraude activas o actividades sospechosas detectadas
-        por el sistema.
-      </p>
-    </div>
+    <!-- Reusable Component -->
+    <IncidentsPanel />
   </div>
 </template>
 
 <script setup lang="ts">
 useSeoMeta({
   title: "Reportes de Fraude - Administrador",
+  description:
+    "Monitorea y audita registros de bloqueos y sospechas de fraude.",
 });
 </script>

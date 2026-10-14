@@ -168,7 +168,7 @@ export default NuxtAuthHandler({
                   message: translateCognitoError(
                     errorCode,
                     responseData.message ||
-                      "Código de MFA incorrecto o expirado",
+                    "Código de MFA incorrecto o expirado",
                   ),
                 }),
               );
@@ -273,16 +273,52 @@ export default NuxtAuthHandler({
           const payload = JSON.parse(
             Buffer.from(payloadBase64, "base64").toString("ascii"),
           );
-          const userId = payload.sub;
+          // Detect assigned Cognito Scopes or custom attributes in token
+          const rawScope = payload.scope || payload.scp || "";
+          const scopes = Array.isArray(rawScope)
+            ? rawScope
+            : typeof rawScope === "string"
+              ? rawScope.split(" ")
+              : [];
+          const customRole = (
+            payload["custom:role"] ||
+            payload["custom:tipoUsuario"] ||
+            ""
+          )
+            .toString()
+            .toUpperCase();
 
-          // Detect assigned Cognito Groups in token
-          const groups: string[] = payload["cognito:groups"] || [];
           let cognitoRole = "";
-          if (groups.includes("ADMIN")) cognitoRole = "ADMIN";
-          else if (groups.includes("MODERATOR")) cognitoRole = "MODERATOR";
-          else if (groups.includes("ORGANIZACION"))
+          if (
+            scopes.some((s: string) => s.includes("admin")) ||
+            customRole === "ADMIN"
+          )
+            cognitoRole = "ADMIN";
+          else if (
+            scopes.some(
+              (s: string) => s.includes("moderator") || s.includes("mod"),
+            ) ||
+            customRole === "MODERATOR"
+          )
+            cognitoRole = "MODERATOR";
+          else if (
+            scopes.some(
+              (s: string) =>
+                s.includes("organization") || s.includes("empresa"),
+            ) ||
+            customRole === "ORGANIZACION" ||
+            customRole === "EMPRESA" ||
+            customRole === "COMPANY"
+          )
             cognitoRole = "ORGANIZACION";
-          else if (groups.includes("CANDIDATO")) cognitoRole = "CANDIDATO";
+          else if (
+            scopes.some(
+              (s: string) => s.includes("candidate") || s.includes("candidato"),
+            ) ||
+            customRole === "CANDIDATO" ||
+            customRole === "CANDIDATE"
+          )
+            cognitoRole = "CANDIDATO";
 
           const config = useRuntimeConfig();
           const profile: any = await $fetch(
@@ -391,13 +427,42 @@ export default NuxtAuthHandler({
               token.name = payload.name;
             }
 
-            const groups = payload["cognito:groups"] || [];
-            if (groups.includes("ORGANIZACION")) {
-              token.tipoUsuario = "ORGANIZACION";
-            } else if (groups.includes("ADMIN")) {
+            const rawScope = payload.scope || payload.scp || "";
+            const scopes = Array.isArray(rawScope)
+              ? rawScope
+              : typeof rawScope === "string"
+                ? rawScope.split(" ")
+                : [];
+            const customRole = (
+              payload["custom:role"] ||
+              payload["custom:tipoUsuario"] ||
+              ""
+            )
+              .toString()
+              .toUpperCase();
+
+            if (
+              scopes.some((s: string) => s.includes("admin")) ||
+              customRole === "ADMIN"
+            ) {
               token.tipoUsuario = "ADMIN";
-            } else if (groups.includes("MODERATOR")) {
+            } else if (
+              scopes.some(
+                (s: string) => s.includes("moderator") || s.includes("mod"),
+              ) ||
+              customRole === "MODERATOR"
+            ) {
               token.tipoUsuario = "MODERATOR";
+            } else if (
+              scopes.some(
+                (s: string) =>
+                  s.includes("organization") || s.includes("empresa"),
+              ) ||
+              customRole === "ORGANIZACION" ||
+              customRole === "EMPRESA" ||
+              customRole === "COMPANY"
+            ) {
+              token.tipoUsuario = "ORGANIZACION";
             } else {
               token.tipoUsuario = "CANDIDATO";
             }

@@ -13,7 +13,7 @@
         </h1>
         <p class="text-on-surface-variant dark:text-slate-300 text-sm">
           Resuelve disputas de reclutamiento y atiende dudas de candidatos y
-          empresas en tiempo real.
+          organizaciones en tiempo real.
         </p>
       </div>
       <div
@@ -116,7 +116,7 @@
                   class="text-[8px] font-bold tracking-wider px-1.5 py-0.5 rounded uppercase"
                   :class="
                     ticket.userRole === 'CANDIDATO'
-                      ? 'bg-blue-100 text-blue-700 border border-blue-200/30'
+                      ? 'bg-tertiary/20 text-tertiary border border-tertiary/20'
                       : 'bg-indigo-100 text-indigo-700 border border-indigo-200/30'
                   "
                 >
@@ -169,7 +169,7 @@
                     class="text-[8px] font-bold px-1.5 py-0.5 rounded"
                     :class="
                       activeTicket.userRole === 'CANDIDATO'
-                        ? 'bg-blue-100 text-blue-700'
+                        ? 'bg-tertiary/20 text-tertiary'
                         : 'bg-indigo-100 text-indigo-700'
                     "
                   >

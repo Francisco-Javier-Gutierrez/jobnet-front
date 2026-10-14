@@ -82,8 +82,8 @@ const { openProtectedModal } = useProtectedAction();
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
-  const user = data.value?.user as any;
-  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
+  const user = data.value?.user;
+  const tipo = (user?.tipoUsuario || "").toUpperCase();
   if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
   if (tipo === "ADMIN") return "admin";
   if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
@@ -123,16 +123,16 @@ const footerItems = computed<FooterItem[]>(() => {
         },
         {
           to: "/create",
-          icon: "add",
+          icon: "add_circle",
           label: "Crear Nuevo",
           shortLabel: "Crear",
           protected: true,
         },
         {
-          to: "/mod/support",
-          icon: "forum",
-          label: "Soporte WS",
-          shortLabel: "Mensajes",
+          to: "/mod/appeals",
+          icon: "gavel",
+          label: "Canales Apelación",
+          shortLabel: "Apelaciones",
           protected: true,
         },
         {
@@ -155,14 +155,14 @@ const footerItems = computed<FooterItem[]>(() => {
         },
         {
           to: "/mod/incidents",
-          icon: "warning",
+          icon: "report_problem",
           label: "Incidencias",
           shortLabel: "Incidencias",
           protected: true,
         },
         {
           to: "/create",
-          icon: "add",
+          icon: "add_circle",
           label: "Crear Nuevo",
           shortLabel: "Crear",
           protected: true,
@@ -186,11 +186,11 @@ const footerItems = computed<FooterItem[]>(() => {
     case "organization":
       return [
         {
-          to: "/dashboard",
-          icon: "dashboard",
-          label: "Tablero ATS",
+          to: "/",
+          icon: "home",
+          label: "Inicio",
           shortLabel: "Inicio",
-          protected: true,
+          protected: false,
         },
         {
           to: "/my-vacancies",
@@ -201,23 +201,23 @@ const footerItems = computed<FooterItem[]>(() => {
         },
         {
           to: "/create",
-          icon: "add",
+          icon: "add_circle",
           label: "Crear Nuevo",
           shortLabel: "Crear",
           protected: true,
         },
         {
           to: "/applicants",
-          icon: "group",
-          label: "Candidatos ATS",
-          shortLabel: "Candidatos",
+          icon: "dashboard_customize",
+          label: "Tablero ATS",
+          shortLabel: "ATS",
           protected: true,
         },
         {
-          to: "/company/edit",
-          icon: "verified",
-          label: "Identidad",
-          shortLabel: "Perfil",
+          to: "/messages",
+          icon: "forum",
+          label: "Mensajes",
+          shortLabel: "Mensajes",
           protected: true,
         },
       ];
@@ -232,7 +232,7 @@ const footerItems = computed<FooterItem[]>(() => {
           protected: false,
         },
         {
-          to: "/feed",
+          to: "/vacancies",
           icon: "work",
           label: "Explorar Vacantes",
           shortLabel: "Vacantes",
@@ -240,7 +240,7 @@ const footerItems = computed<FooterItem[]>(() => {
         },
         {
           to: "/create",
-          icon: "add",
+          icon: "add_circle",
           label: "Crear Publicación",
           shortLabel: "Crear",
           protected: true,

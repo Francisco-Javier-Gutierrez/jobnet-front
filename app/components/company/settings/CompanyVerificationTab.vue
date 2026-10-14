@@ -28,7 +28,7 @@
       </div>
     </div>
     <div
-      v-else-if="estatusVerificacion === 'Verificada'"
+      v-else-if="estatusVerificacion === 'Verificada' || isVerified"
       class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 p-4 rounded-xl flex items-start gap-3 shadow-sm mb-2"
     >
       <span class="material-symbols-outlined text-xl flex-shrink-0"
@@ -46,15 +46,16 @@
     <template
       v-if="
         estatusVerificacion !== 'En revisión' &&
-        estatusVerificacion !== 'Verificada'
+        estatusVerificacion !== 'Verificada' &&
+        !isVerified
       "
     >
       <p
         class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
       >
         Sube tu Constancia de Situación Fiscal u otro documento oficial para
-        certificar la identidad de tu empresa frente a los candidatos. El equipo
-        de moderación revisará este documento.
+        certificar la identidad de tu organización frente a los candidatos. El
+        equipo de moderación revisará este documento.
       </p>
 
       <div class="flex flex-col gap-1.5">
@@ -165,7 +166,7 @@
         {{
           submittingVerification
             ? "Enviando..."
-            : "Solicitar Verificación de Empresa"
+            : "Solicitar Verificación de Organización"
         }}
       </button>
     </template>
@@ -173,7 +174,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 
@@ -181,6 +181,7 @@ const props = defineProps<{
   taxId: string;
   documentoVerificacion: string;
   estatusVerificacion: string;
+  isVerified?: boolean;
   companyId: string;
   submittingVerification: boolean;
 }>();

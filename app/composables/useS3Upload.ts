@@ -1,5 +1,3 @@
-import { ref } from "vue";
-
 export interface UploadOptions {
   folder?: string;
   userId?: string;
@@ -59,7 +57,7 @@ export function useS3Upload() {
         throw new Error(errData.error || "No se pudo obtener la URL de subida");
       }
 
-      const { url, key } = await res.json();
+      const { url, key, publicUrl } = await res.json();
 
       // Perform S3 upload
       const uploadRes = await fetch(url, {
@@ -75,7 +73,7 @@ export function useS3Upload() {
       }
 
       // Use the standard S3 HTTPS REST endpoint
-      const filePublicUrl = url.split("?")[0];
+      const filePublicUrl = publicUrl || url.split("?")[0];
       return { url: filePublicUrl, key };
     } catch (err: any) {
       uploadError.value = err.message || "Error al subir archivo";

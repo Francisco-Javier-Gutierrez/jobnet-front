@@ -1,0 +1,56 @@
+<template>
+  <!-- Filters Bar -->
+  <div
+    class="bg-surface-container-low dark:bg-slate-900 border border-outline-variant/60 rounded-2xl p-4 mb-6 shadow-sm flex flex-col gap-4"
+  >
+    <!-- Top Row: Vacancy Selector + Search -->
+    <div
+      class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4"
+    >
+      <!-- Vacancy Selector -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <label
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1.5 whitespace-nowrap"
+        >
+          <span class="material-symbols-outlined text-sm text-primary"
+            >work</span
+          >
+          Vacante Publicada:
+        </label>
+        <div class="w-full sm:w-72">
+          <AppSelect
+            v-model="selectedJobId"
+            @change="fetchApplicants"
+            :options="jobSelectOptions"
+            placeholder="Selecciona una vacante..."
+          />
+        </div>
+      </div>
+
+      <!-- Search Input (AppSearchInput) -->
+      <div class="w-full md:w-64 flex-shrink-0">
+        <AppSearchInput
+          v-model="searchQuery"
+          placeholder="Buscar candidato o habilidad..."
+        />
+      </div>
+    </div>
+
+    <!-- Bottom Row: Stage Filters Tabs (AppTabs) -->
+    <div class="w-full min-w-0">
+      <AppTabs :tabs="stageTabs" v-model="selectedStageFilter" />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useApplicants } from "~/composables/useApplicants";
+const {
+  selectedJobId,
+  jobSelectOptions,
+  fetchApplicants,
+  stageTabs,
+  selectedStageFilter,
+  searchQuery,
+} = useApplicants();
+</script>

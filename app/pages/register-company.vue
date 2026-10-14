@@ -130,6 +130,24 @@
         <div>
           <label
             class="block text-xs font-semibold tracking-wider text-on-surface-variant dark:text-slate-300 mb-2"
+            for="phone"
+          >
+            Ingrese el teléfono de contacto
+          </label>
+          <input
+            id="phone"
+            v-model="phone"
+            type="tel"
+            required
+            aria-required="true"
+            :aria-invalid="!!errorMessage"
+            class="w-full bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background dark:text-slate-100 outline-none transition-colors"
+          />
+        </div>
+
+        <div>
+          <label
+            class="block text-xs font-semibold tracking-wider text-on-surface-variant dark:text-slate-300 mb-2"
             for="corporate_email"
           >
             Ingrese el correo electrónico de la organización
@@ -210,19 +228,23 @@
             class="text-xs text-on-surface-variant dark:text-slate-300 leading-normal"
           >
             Acepto los
-            <a
-              href="#"
-              class="text-primary hover:underline"
+            <button
+              type="button"
+              @click.prevent="showTermsModal = true"
+              class="text-primary hover:underline cursor-pointer"
               aria-label="Ver los Términos y Condiciones"
-              >Términos y Condiciones</a
             >
+              Términos y Condiciones
+            </button>
             y el
-            <a
-              href="#"
-              class="text-primary hover:underline"
+            <button
+              type="button"
+              @click.prevent="showTermsModal = true"
+              class="text-primary hover:underline cursor-pointer"
               aria-label="Ver el Aviso de Privacidad"
-              >Aviso de Privacidad</a
             >
+              Aviso de Privacidad
+            </button>
           </label>
         </div>
 
@@ -234,15 +256,25 @@
         >
           <span
             v-if="loading"
-            class="material-symbols-outlined animate-spin text-lg"
+            class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin"
             aria-hidden="true"
-            >progress_activity</span
-          >
+          ></span>
           <span v-else>Registrar</span>
         </button>
       </form>
     </div>
   </div>
+
+  <!-- Terms Modal -->
+  <AppModal
+    v-model="showTermsModal"
+    title="Términos y Condiciones de Uso"
+    icon="gavel"
+    max-width="3xl"
+    @close="showTermsModal = false"
+  >
+    <AppTermsContent />
+  </AppModal>
 </template>
 
 <script setup lang="ts">
@@ -257,6 +289,7 @@ useSeoMeta({
 
 const companyName = ref("");
 const taxId = ref("");
+const phone = ref("");
 const email = ref("");
 const password = ref("");
 const passwordRules = computed(() => ({
@@ -315,6 +348,7 @@ const handleRegister = async () => {
         role: "company",
         companyName: companyName.value,
         taxId: taxId.value,
+        phone: phone.value,
       },
     });
 
@@ -335,4 +369,5 @@ const handleRegister = async () => {
     loading.value = false;
   }
 };
+const showTermsModal = ref(false);
 </script>

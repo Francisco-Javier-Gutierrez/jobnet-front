@@ -210,9 +210,7 @@
             >"{{ selectedSuggestion?.name }}"</strong
           >
           es muy similar al
-          {{
-            (selectedSuggestion?.category || "elemento").toLowerCase()
-          }}
+          {{ (selectedSuggestion?.category || "elemento").toLowerCase() }}
           existente en catálogo
           <strong class="text-primary">"{{ existingItemName }}"</strong>.
         </p>
@@ -269,9 +267,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import AppModal from "~/components/common/AppModal.vue";
-
 useSeoMeta({
   title: "Aprobación de Catálogo (Habilidades y Sectores) - JobNet",
   description:
