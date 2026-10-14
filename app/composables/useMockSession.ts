@@ -52,15 +52,28 @@ const MOCK_ROLE_USERS: Record<Exclude<MockRole, "GUEST">, MockUserSession> = {
 };
 
 export function useMockSession() {
+  const cookieRole = useCookie<MockRole>("jobnet-mock-role", { default: () => "CANDIDATO" });
+  const cookieEnabled = useCookie<boolean>("jobnet-mock-enabled", { default: () => true });
+
+  if (cookieRole.value && (cookieRole.value in MOCK_ROLE_USERS || cookieRole.value === "GUEST")) {
+    mockRoleState.value = cookieRole.value;
+  }
+  if (cookieEnabled.value !== undefined) {
+    isMockEnabledState.value = Boolean(cookieEnabled.value);
+  }
+
   // Sync with localStorage on client
   if (import.meta.client) {
     const savedRole = localStorage.getItem("jobnet-mock-role") as MockRole | null;
     if (savedRole && (savedRole in MOCK_ROLE_USERS || savedRole === "GUEST")) {
       mockRoleState.value = savedRole;
+      cookieRole.value = savedRole;
     }
     const savedEnabled = localStorage.getItem("jobnet-mock-enabled");
     if (savedEnabled !== null) {
-      isMockEnabledState.value = savedEnabled === "true";
+      const b = savedEnabled === "true";
+      isMockEnabledState.value = b;
+      cookieEnabled.value = b;
     }
   }
 
@@ -73,6 +86,7 @@ export function useMockSession() {
 
   const setMockRole = (role: MockRole) => {
     mockRoleState.value = role;
+    cookieRole.value = role;
     if (import.meta.client) {
       localStorage.setItem("jobnet-mock-role", role);
     }
@@ -81,6 +95,7 @@ export function useMockSession() {
   const toggleMockEnabled = (enabled?: boolean) => {
     const val = enabled !== undefined ? enabled : !isMockEnabledState.value;
     isMockEnabledState.value = val;
+    cookieEnabled.value = val;
     if (import.meta.client) {
       localStorage.setItem("jobnet-mock-enabled", String(val));
     }
