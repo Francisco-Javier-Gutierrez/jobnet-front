@@ -528,9 +528,7 @@
                 <span
                   class="text-[11px] text-on-surface-variant dark:text-slate-400"
                 >
-                  A todos los usuarios activos ({{
-                    subscribers.length
-                  }}
+                  A todos los usuarios activos ({{ subscribers.length }}
                   suscriptores)
                 </span>
               </div>
