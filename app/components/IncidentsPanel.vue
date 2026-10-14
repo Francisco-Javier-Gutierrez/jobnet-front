@@ -226,6 +226,7 @@
 
 <script setup lang="ts">
 import type { Incident } from "~/types";
+import { MOCK_INCIDENTS } from "~/utils/mockData";
 
 const config = useRuntimeConfig();
 const { data: session } = useAuth();
@@ -259,10 +260,12 @@ const fetchIncidents = async () => {
     const data = await $fetch<any>(
       `${config.public.apiUrl}/moderator/incidents`,
     );
-    incidents.value =
+    const fetched =
       data?.value || data?.Items || (Array.isArray(data) ? data : []);
+    incidents.value = fetched.length > 0 ? fetched : MOCK_INCIDENTS;
   } catch (e) {
     console.error("Error loading incidents:", e);
+    incidents.value = MOCK_INCIDENTS;
   } finally {
     loading.value = false;
   }

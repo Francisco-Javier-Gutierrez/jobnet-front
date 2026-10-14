@@ -118,45 +118,79 @@ const { data: session, status } = useAuth();
 const config = useRuntimeConfig();
 const router = useRouter();
 
+const { isMockEnabled, currentMockUser } = useMockSession();
 const loading = ref(true);
 const applications = ref<any[]>([]);
 
+const MOCK_MY_APPLICATIONS = [
+  {
+    jobId: "vac-frontend-sr-01",
+    jobTitle: "Ingeniero Frontend Senior (Vue 3 / Nuxt / Tailwind)",
+    companyName: "TechSolutions México",
+    status: "EN_CONTACTO",
+    appliedAt: "2026-10-12T14:30:00Z",
+    coverLetter:
+      "Cuento con más de 5 años diseñando aplicaciones empresariales con Vue 3 y Nuxt.",
+  },
+  {
+    jobId: "vac-devops-aws-02",
+    jobTitle: "Especialista Cloud AWS & DevOps Platform",
+    companyName: "Innovatech Global",
+    status: "SELECCIONADO",
+    appliedAt: "2026-10-10T10:00:00Z",
+    coverLetter:
+      "Interesado en la gestión de infraestructura cloud con Terraform.",
+  },
+];
+
 const fetchApplications = async () => {
-  if (status.value !== "authenticated" || !session.value?.user?.id) {
+  const effectiveAuthenticated =
+    (isMockEnabled.value && !!currentMockUser.value) ||
+    status.value === "authenticated";
+
+  if (!effectiveAuthenticated) {
     router.push("/login");
     return;
   }
   loading.value = true;
   try {
-    const candidateId = session.value.user.id;
+    const candidateId =
+      currentMockUser.value?.id ||
+      session.value?.user?.id ||
+      "candidate-francisco-gomez";
     const apps = await $fetch<any[]>(
       `${config.public.apiUrl}/applications?candidateId=${candidateId}`,
-    );
+    ).catch(() => []);
 
-    // Enrich with job info
-    const enrichedApps = await Promise.all(
-      apps.map(async (a) => {
-        let jobTitle = "Vacante no disponible";
-        let companyName = "Empresa no disponible";
-        try {
-          const jobDetail = await $fetch<any>(
-            `${config.public.apiUrl}/jobs/${a.jobId}`,
-          );
-          if (jobDetail) {
-            jobTitle = jobDetail.title || jobDetail.titulo;
-            companyName = jobDetail.company;
-          }
-        } catch (e) {}
-        return { ...a, jobTitle, companyName };
-      }),
-    );
+    if (apps && apps.length > 0) {
+      // Enrich with job info
+      const enrichedApps = await Promise.all(
+        apps.map(async (a) => {
+          let jobTitle = "Vacante no disponible";
+          let companyName = "Empresa no disponible";
+          try {
+            const jobDetail = await $fetch<any>(
+              `${config.public.apiUrl}/jobs/${a.jobId}`,
+            );
+            if (jobDetail) {
+              jobTitle = jobDetail.title || jobDetail.titulo;
+              companyName = jobDetail.company;
+            }
+          } catch (e) {}
+          return { ...a, jobTitle, companyName };
+        }),
+      );
 
-    applications.value = enrichedApps.sort(
-      (a, b) =>
-        new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
-    );
+      applications.value = enrichedApps.sort(
+        (a, b) =>
+          new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
+      );
+    } else {
+      applications.value = MOCK_MY_APPLICATIONS;
+    }
   } catch (e) {
     console.error(e);
+    applications.value = MOCK_MY_APPLICATIONS;
   } finally {
     loading.value = false;
   }

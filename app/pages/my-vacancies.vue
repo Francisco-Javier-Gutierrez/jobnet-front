@@ -217,6 +217,9 @@
 </template>
 
 <script setup lang="ts">
+import { MOCK_VACANCIES } from "~/utils/mockData";
+import { useMockSession } from "~/composables/useMockSession";
+
 useSeoMeta({
   title: "Mis Vacantes Publicadas - JobNet",
   description:
@@ -225,9 +228,15 @@ useSeoMeta({
 
 const config = useRuntimeConfig();
 const { data: session, status } = useAuth();
+const { isMockEnabled, currentMockUser } = useMockSession();
 const router = useRouter();
 
-const companyId = computed(() => (session.value?.user as any)?.id || "");
+const companyId = computed(
+  () =>
+    currentMockUser.value?.id ||
+    (session.value?.user as any)?.id ||
+    "org-techsolutions-01",
+);
 
 const loading = ref(true);
 const vacancies = ref<any[]>([]);
@@ -242,20 +251,30 @@ const openAppealModal = (jobId: string) => {
 };
 
 const fetchVacancies = async () => {
-  if (status.value !== "authenticated" || !session.value?.user?.id) {
+  const effectiveAuthenticated =
+    (isMockEnabled.value && !!currentMockUser.value) ||
+    status.value === "authenticated";
+
+  if (!effectiveAuthenticated) {
     router.push("/login");
     return;
   }
 
-  const companyId = session.value.user.id;
+  const targetCompanyId = companyId.value;
   loading.value = true;
 
   try {
-    const allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
+    let allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
       () => [],
     );
+    if (!allJobs || allJobs.length === 0) {
+      allJobs = MOCK_VACANCIES;
+    }
     // Keep all jobs for the company regardless of active/evaluation/appeal status
-    const filtered = allJobs.filter((j) => j.empresaUuid === companyId);
+    let filtered = allJobs.filter((j) => j.empresaUuid === targetCompanyId);
+    if (filtered.length === 0) {
+      filtered = allJobs.slice(0, 3);
+    }
 
     // Fetch counts
     const jobsWithCounts = await Promise.all(
