@@ -27,7 +27,8 @@ describe("useWebPush", () => {
 
   describe("urlBase64ToUint8Array", () => {
     it("converts a base64url string to Uint8Array properly", () => {
-      const base64 = "BOIrktuQCHHiOWcKICA7YEwdKJf8WNYCmBS_PI338wnaB9VqXPQfCRwTN5NLYokujXBp5pdD83av6DACG2rAYok";
+      const base64 =
+        "BOIrktuQCHHiOWcKICA7YEwdKJf8WNYCmBS_PI338wnaB9VqXPQfCRwTN5NLYokujXBp5pdD83av6DACG2rAYok";
       const result = urlBase64ToUint8Array(base64);
       expect(result).toBeInstanceOf(Uint8Array);
       expect(result.length).toBeGreaterThan(0);
@@ -126,7 +127,9 @@ describe("useWebPush", () => {
       const mockUnsubscribe = vi.fn().mockResolvedValue(true);
       mockPushManager.getSubscription = vi.fn().mockResolvedValue({
         endpoint: "https://fcm.googleapis.com/fcm/send/test-endpoint",
-        toJSON: () => ({ endpoint: "https://fcm.googleapis.com/fcm/send/test-endpoint" }),
+        toJSON: () => ({
+          endpoint: "https://fcm.googleapis.com/fcm/send/test-endpoint",
+        }),
         unsubscribe: mockUnsubscribe,
       });
       mockFetch.mockResolvedValue({ success: true });
@@ -141,7 +144,9 @@ describe("useWebPush", () => {
         "https://api.jobnet.test/profile/user-123/push-subscriptions",
         expect.objectContaining({
           method: "DELETE",
-          body: { endpoint: "https://fcm.googleapis.com/fcm/send/test-endpoint" },
+          body: {
+            endpoint: "https://fcm.googleapis.com/fcm/send/test-endpoint",
+          },
         }),
       );
     });

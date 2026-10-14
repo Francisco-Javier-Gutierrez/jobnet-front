@@ -30,6 +30,7 @@ self.addEventListener("push", (event) => {
     body: data.body,
     icon: data.icon || "/logotipo.svg",
     badge: data.badge || "/logotipo.svg",
+    image: data.image || undefined,
     tag: data.tag || "jobnet-notification",
     data: {
       url: data.url || "/notifications",

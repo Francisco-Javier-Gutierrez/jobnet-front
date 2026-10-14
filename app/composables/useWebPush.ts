@@ -1,12 +1,11 @@
 import { ref, computed, onMounted, getCurrentInstance } from "vue";
 
-export type PushPermissionState = "default" | "granted" | "denied" | "unsupported";
+export type PushPermissionState =
+  "default" | "granted" | "denied" | "unsupported";
 
 export function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding)
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
 
   const rawData = window.atob(base64);
   const outputArray = new Uint8Array(rawData.length);
@@ -59,20 +58,6 @@ export const useWebPush = () => {
       await navigator.serviceWorker.ready;
       const existingSub = await registration.pushManager.getSubscription();
       isSubscribed.value = !!existingSub;
-      if (existingSub) {
-        try {
-          const subData =
-            typeof existingSub.toJSON === "function"
-              ? existingSub.toJSON()
-              : existingSub;
-          await $fetch("/api/push/register", {
-            method: "POST",
-            body: { subscription: subData },
-          });
-        } catch {
-          // Silencioso en entornos donde no existe el endpoint local
-        }
-      }
     } catch (err: any) {
       console.error("[useWebPush] Error checking push state:", err);
       error.value = err?.message || "Error al verificar suscripción push";
@@ -149,25 +134,12 @@ export const useWebPush = () => {
         });
       }
 
-      // Guardar copia local para pruebas de desarrollo
-      try {
-        const subData =
-          typeof subscription.toJSON === "function"
-            ? subscription.toJSON()
-            : subscription;
-        await $fetch("/api/push/register", {
-          method: "POST",
-          body: { subscription: subData },
-        });
-      } catch {
-        // Silencioso si falla la copia local
-      }
-
       isSubscribed.value = true;
       return true;
     } catch (err: any) {
       console.error("[useWebPush] Subscription error:", err);
-      error.value = err?.message || "Error al suscribirse a notificaciones push";
+      error.value =
+        err?.message || "Error al suscribirse a notificaciones push";
       return false;
     } finally {
       loading.value = false;
@@ -226,7 +198,6 @@ export const useWebPush = () => {
       checkSupportAndState();
     });
   }
-
 
   return {
     isSupported,
