@@ -103,6 +103,11 @@ aws s3 sync "$ROOT_DIR/.output/public/_nuxt" "s3://$BUCKET_NAME/_nuxt" --profile
 # Sync other public static assets
 aws s3 sync "$ROOT_DIR/.output/public" "s3://$BUCKET_NAME" --profile $AWS_PROFILE_NAME --delete --cache-control "public,max-age=3600"
 
+# Explicitly ensure sw.js has no-cache and standard JavaScript MIME type
+if (Test-Path "$ROOT_DIR/.output/public/sw.js") {
+    aws s3 cp "$ROOT_DIR/.output/public/sw.js" "s3://$BUCKET_NAME/sw.js" --profile $AWS_PROFILE_NAME --content-type "application/javascript" --cache-control "no-cache, no-store, must-revalidate"
+}
+
 # 6. Invalidate CloudFront Cache
 Write-Host "`n[6/6] Invalidating CloudFront cache ($DISTRIBUTION_ID)..." -ForegroundColor Yellow
 $INVALIDATION_ID = (aws cloudfront create-invalidation --profile $AWS_PROFILE_NAME --distribution-id $DISTRIBUTION_ID --paths "/*" --query "Invalidation.Id" --output text).Trim()

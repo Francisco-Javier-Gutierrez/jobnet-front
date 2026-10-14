@@ -59,20 +59,6 @@ export const useWebPush = () => {
       await navigator.serviceWorker.ready;
       const existingSub = await registration.pushManager.getSubscription();
       isSubscribed.value = !!existingSub;
-      if (existingSub) {
-        try {
-          const subData =
-            typeof existingSub.toJSON === "function"
-              ? existingSub.toJSON()
-              : existingSub;
-          await $fetch("/api/push/register", {
-            method: "POST",
-            body: { subscription: subData },
-          });
-        } catch {
-          // Silencioso en entornos donde no existe el endpoint local
-        }
-      }
     } catch (err: any) {
       console.error("[useWebPush] Error checking push state:", err);
       error.value = err?.message || "Error al verificar suscripción push";
@@ -147,20 +133,6 @@ export const useWebPush = () => {
             userAgent: navigator.userAgent,
           },
         });
-      }
-
-      // Guardar copia local para pruebas de desarrollo
-      try {
-        const subData =
-          typeof subscription.toJSON === "function"
-            ? subscription.toJSON()
-            : subscription;
-        await $fetch("/api/push/register", {
-          method: "POST",
-          body: { subscription: subData },
-        });
-      } catch {
-        // Silencioso si falla la copia local
       }
 
       isSubscribed.value = true;
