@@ -1,4 +1,3 @@
-import { ref, computed, watch, onMounted } from "vue";
 import { useRouter, useRoute, useRuntimeConfig } from "#imports";
 import { useAuth } from "#imports"; // or wherever it comes from
 import { useCatalogStore } from "~/stores/catalog";
@@ -358,9 +357,10 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
         vacantesDisponibles: form.value.vacantesDisponibles || 1,
         maxPostulantes: form.value.maxPostulantes || null,
         pdfUrl: specPdfUrl,
+        pdfName: selectedVacancyFile.value?.name || undefined,
       };
 
-      if (['H├¡brido', 'Presencial'].includes(form.value.modality)) {
+      if (["Híbrido", "Presencial"].includes(form.value.modality)) {
         payload.lat = form.value.lat;
         payload.lng = form.value.lng;
       }

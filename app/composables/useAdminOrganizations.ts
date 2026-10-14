@@ -1,5 +1,5 @@
-import { ref, computed } from "vue";
 import { useRuntimeConfig, useLazyAsyncData } from "#imports";
+import type { AdminOrganization } from "~/types";
 
 export function useAdminOrganizations() {
   const config = useRuntimeConfig();
@@ -30,7 +30,7 @@ export function useAdminOrganizations() {
 
   const loading = computed(() => profilesPending.value);
 
-  const orgs = computed(() => {
+  const orgs = computed<AdminOrganization[]>(() => {
     return (rawProfiles.value || [])
       .filter(
         (p: any) =>
@@ -50,7 +50,9 @@ export function useAdminOrganizations() {
       });
   });
 
-  const getOrgStatusKey = (org: any): "ACTIVO" | "REVISION" | "SUSPENDIDA" => {
+  const getOrgStatusKey = (
+    org: AdminOrganization | null,
+  ): "ACTIVO" | "REVISION" | "SUSPENDIDA" => {
     if (!org) return "ACTIVO";
     const statusStr = [org.suspensionStatus, org.estatus, org.estadoCuenta]
       .filter(Boolean)

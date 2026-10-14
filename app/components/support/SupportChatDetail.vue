@@ -215,7 +215,11 @@
           class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
           title="Adjuntar PDF o Imagen"
         >
-          <span v-if="isUploading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+          <span
+            v-if="isUploading"
+            class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
           <span v-else class="material-symbols-outlined text-lg"
             >attach_file</span
           >
@@ -242,7 +246,9 @@
           @click="$emit('sendMessage')"
           :disabled="!newMessageText.trim() && !pendingAttachment"
           class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
-        ><span class="material-symbols-outlined text-lg">send</span></button>
+        >
+          <span class="material-symbols-outlined text-lg">send</span>
+        </button>
       </div>
     </template>
 
@@ -267,19 +273,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import type { SupportChat, ChatMessage, ChatAttachment } from "~/types";
 
 const props = defineProps<{
-  activeChat: any;
+  activeChat: SupportChat | null;
   isModeratorRole: boolean;
   isProcessingAction: boolean;
   orgMessageCount: number;
   isOrganization: boolean;
   isLoadingMessages: boolean;
-  messages: any[];
-  isMyMessage: (msg: any) => boolean;
+  messages: ChatMessage[];
+  isMyMessage: (msg: ChatMessage | { senderId: string }) => boolean;
   isUploading: boolean;
-  pendingAttachment: any;
+  pendingAttachment: ChatAttachment | null;
   newMessageText: string;
   isImageUrl: (url?: string) => boolean;
   formatTime: (dateStr?: string) => string;

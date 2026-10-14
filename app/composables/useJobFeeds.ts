@@ -1,8 +1,9 @@
-import { ref, computed, onMounted, watch, onBeforeUnmount } from "vue";
 import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useAuth } from "#imports";
 import { useShare } from "#imports";
+
+import type { Post, Job } from "~/types";
 
 export function useJobFeeds() {
   const { showError, showSuccess, showInfo } = useAppFeedback();
@@ -26,14 +27,12 @@ export function useJobFeeds() {
   const pdfInput = ref<HTMLInputElement | null>(null);
 
   // Unified reactive feed items
-  const feedItems = ref<any[]>([]);
-  const postsList = ref<any[]>([]);
+  const feedItems = ref<(Post | Job)[]>([]);
+  const postsList = ref<Post[]>([]);
 
   const currentUserId = computed(() => {
     return (
-      (session.value?.user as any)?.id ||
-      session.value?.user?.email ||
-      "anonymous-user"
+      session.value?.user?.id || session.value?.user?.email || "anonymous-user"
     );
   });
 

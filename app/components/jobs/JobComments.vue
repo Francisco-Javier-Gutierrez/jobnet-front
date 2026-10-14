@@ -168,23 +168,32 @@
 </template>
 
 <script setup lang="ts">
+export interface CommentNode {
+  id: string;
+  user: string;
+  userId?: string;
+  text: string;
+  createdAt: string;
+  children?: CommentNode[];
+}
+
 defineProps<{
   totalComments: number;
   newCommentText: string;
   isCreatingComment: boolean;
-  commentTree: any[];
+  commentTree: CommentNode[];
   replyingToCommentId: string | null;
   replyContentText: string;
-  canDeleteComment: (c: any) => boolean;
+  canDeleteComment: (c: CommentNode) => boolean;
   formatDate: (dateString: string) => string;
 }>();
 
-defineEmits([
-  "submitComment",
-  "update:newCommentText",
-  "deleteComment",
-  "toggleReplyForm",
-  "submitReply",
-  "update:replyContentText",
-]);
+defineEmits<{
+  (e: "submitComment"): void;
+  (e: "update:newCommentText", value: string): void;
+  (e: "deleteComment", id: string): void;
+  (e: "toggleReplyForm", id: string): void;
+  (e: "submitReply", id: string): void;
+  (e: "update:replyContentText", value: string): void;
+}>();
 </script>

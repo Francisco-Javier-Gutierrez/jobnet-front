@@ -97,22 +97,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import type { Post } from "~/types";
+import type { Session } from "next-auth";
 
 const props = defineProps<{
-  userPosts: any[];
-  bookmarkedPosts: any[];
+  userPosts: Post[];
+  bookmarkedPosts: Post[];
   loadingPosts: boolean;
-  authData: any;
+  authData: Session | null;
   modelValue: "posts" | "bookmarks";
-  isBookmarked: (post: any) => boolean;
+  isBookmarked: (post: Post) => boolean;
 }>();
 
 const emit = defineEmits<{
   (e: "update:modelValue", val: "posts" | "bookmarks"): void;
-  (e: "like", val: any): void;
-  (e: "bookmark", val: any): void;
-  (e: "share", val: any): void;
+  (e: "like", val: Post): void;
+  (e: "bookmark", val: Post): void;
+  (e: "share", val: Post): void;
 }>();
 
 const activeTab = computed({

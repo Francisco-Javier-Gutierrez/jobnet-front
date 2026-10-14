@@ -1,8 +1,8 @@
-import { ref } from "vue";
 import { useRuntimeConfig } from "#imports";
+import type { ApplicantCandidate } from "~/types";
 
 const successMsg = ref("");
-const pendingCandidateItem = ref<any>(null);
+const pendingCandidateItem = ref<ApplicantCandidate | null>(null);
 
 const isInterviewModalOpen = ref(false);
 const interviewDetails = ref("");

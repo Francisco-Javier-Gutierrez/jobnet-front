@@ -126,13 +126,6 @@
 <script setup lang="ts">
 import { useSeoMeta } from "#app";
 import { useCandidateProfile } from "~/composables/useCandidateProfile";
-import CandidateHeaderProfile from "~/components/profiles/CandidateHeaderProfile.vue";
-import CandidateAboutSection from "~/components/profiles/CandidateAboutSection.vue";
-import CandidateExperienceList from "~/components/profiles/CandidateExperienceList.vue";
-import CandidateEducationList from "~/components/profiles/CandidateEducationList.vue";
-import CandidateSkillsList from "~/components/profiles/CandidateSkillsList.vue";
-import CandidateDocumentsList from "~/components/profiles/CandidateDocumentsList.vue";
-import CandidateActivityTabs from "~/components/profiles/CandidateActivityTabs.vue";
 
 const {
   loading,

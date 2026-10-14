@@ -54,7 +54,9 @@
 </template>
 
 <script setup lang="ts">
+import type { ExperienciaItem } from "~/types";
+
 defineProps<{
-  experiencia: any[];
+  experiencia: ExperienciaItem[];
 }>();
 </script>

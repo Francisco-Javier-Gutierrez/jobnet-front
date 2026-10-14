@@ -103,7 +103,11 @@
               :disabled="isUploading"
               class="flex-1 bg-surface border border-outline-variant/60 hover:border-primary text-primary text-xs font-bold py-2.5 px-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <span v-if="isUploading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+              <span
+                v-if="isUploading"
+                class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+                aria-hidden="true"
+              ></span>
               <span v-else class="material-symbols-outlined text-base"
                 >upload_file</span
               >
@@ -123,7 +127,11 @@
             :disabled="!selectedFile || isUploading"
             class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 text-xs font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
           >
-            <span v-if="isUploading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+            <span
+              v-if="isUploading"
+              class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+              aria-hidden="true"
+            ></span>
             <span v-else class="material-symbols-outlined text-sm"
               >add_circle</span
             >
@@ -193,64 +201,35 @@
       </h3>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div
+        <AppFileAttachment
           v-for="(doc, index) in docList"
           :key="doc.url || index"
-          class="flex items-center justify-between p-3 bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/50 rounded-xl shadow-sm hover:border-primary/40 transition"
+          :name="doc.name || doc.nombre || 'Documento Adicional'"
+          :type="
+            doc.type === 'pdf' || (doc.url && doc.url.includes('.pdf'))
+              ? 'pdf'
+              : 'image'
+          "
+          :show-preview="true"
+          :show-remove="true"
+          @preview="openPreview(doc)"
+          @remove="removeDocument(index)"
         >
-          <div class="flex items-center gap-3 min-w-0">
-            <div
-              class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-              :class="
-                doc.type === 'pdf' || (doc.url && doc.url.includes('.pdf'))
-                  ? 'bg-rose-500/10 text-rose-600'
-                  : 'bg-primary/10 text-primary'
-              "
+          <template #extra-actions>
+            <a
+              :href="doc.url"
+              target="_blank"
+              rel="noopener"
+              class="font-bold px-2 py-1.5 rounded-lg text-[11px] sm:text-xs transition flex items-center gap-1 text-on-surface-variant hover:text-primary hover:bg-primary/10 hover:underline cursor-pointer hidden sm:flex"
+              title="Abrir en pestaña nueva"
             >
-              <span class="material-symbols-outlined text-lg">
-                {{
-                  doc.type === "pdf" || (doc.url && doc.url.includes(".pdf"))
-                    ? "picture_as_pdf"
-                    : "image"
-                }}
-              </span>
-            </div>
-            <div class="min-w-0">
-              <p class="text-xs font-bold text-on-background truncate">
-                {{ doc.name || doc.nombre || "Documento Adicional" }}
-              </p>
-              <div class="flex items-center gap-2 mt-0.5">
-                <button
-                  type="button"
-                  @click="openPreview(doc)"
-                  class="text-[10px] text-primary hover:underline font-semibold flex items-center gap-1 cursor-pointer"
-                >
-                  <span class="material-symbols-outlined text-xs"
-                    >visibility</span
-                  >
-                  <span>Ver Previa</span>
-                </button>
-                <a
-                  :href="doc.url"
-                  target="_blank"
-                  rel="noopener"
-                  class="text-[10px] text-on-surface-variant hover:underline font-medium block truncate"
-                >
-                  Abrir ↗
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            @click="removeDocument(index)"
-            class="text-rose-500 hover:bg-rose-500/10 p-1.5 rounded-lg transition ml-2 flex-shrink-0"
-            title="Eliminar documento"
-          >
-            <span class="material-symbols-outlined text-sm">delete</span>
-          </button>
-        </div>
+              <span class="material-symbols-outlined text-[14px]"
+                >open_in_new</span
+              >
+              <span>Abrir</span>
+            </a>
+          </template>
+        </AppFileAttachment>
       </div>
     </div>
 
@@ -264,31 +243,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
 import { useUploadStore } from "~/stores/upload";
-import AppPdfPreviewModal from "~/components/common/AppPdfPreviewModal.vue";
+import type { AdditionalDoc } from "~/types";
 
 const showPdfModal = ref(false);
 const previewPdfUrl = ref("");
 const previewPdfTitle = ref("");
 
-const openPreview = (doc: any) => {
+const openPreview = (doc: AdditionalDoc) => {
   if (!doc.url) return;
   previewPdfUrl.value = doc.url;
   previewPdfTitle.value = doc.name || doc.nombre || "Documento Adicional";
   showPdfModal.value = true;
 };
 
-export interface AdditionalDoc {
-  name: string;
-  url: string;
-  type?: string;
-  nombre?: string;
-}
-
 const props = withDefaults(
   defineProps<{
-    documentosAdicionales?: any;
+    documentosAdicionales?: AdditionalDoc[] | Record<string, any>;
   }>(),
   {
     documentosAdicionales: () => [],

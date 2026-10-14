@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { computed } from "vue";
 
 export type FeedbackType = "success" | "error" | "warning" | "info";
 

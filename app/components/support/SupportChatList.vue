@@ -32,8 +32,11 @@
         v-if="isLoadingChats"
         class="p-8 text-center text-xs text-on-surface-variant dark:text-slate-300/80"
       >
-        <span class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span> Cargando
-        conversaciones de soporte...
+        <span
+          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+          aria-hidden="true"
+        ></span>
+        Cargando conversaciones de soporte...
       </div>
       <div
         v-else-if="filteredChats.length === 0"
@@ -86,15 +89,17 @@
 </template>
 
 <script setup lang="ts">
+import type { SupportChat } from "~/types";
+
 defineProps<{
   searchQuery: string;
   isLoadingChats: boolean;
-  filteredChats: any[];
-  activeChat: any;
+  filteredChats: SupportChat[];
+  activeChat: SupportChat | null;
 }>();
 
 defineEmits<{
   (e: "update:searchQuery", value: string): void;
-  (e: "selectChat", chat: any): void;
+  (e: "selectChat", chat: SupportChat): void;
 }>();
 </script>

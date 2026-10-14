@@ -45,8 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from "vue";
-import AppModal from "./AppModal.vue";
 import {
   useAppFeedback,
   type FeedbackType,

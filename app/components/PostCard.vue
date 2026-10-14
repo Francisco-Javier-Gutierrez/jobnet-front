@@ -71,16 +71,25 @@
       </div>
     </div>
 
+    <!-- POST CONTENT BODY (select-text allowed) -->
+    <div v-if="post.content" class="px-4 pb-3 flex flex-col gap-3">
+      <p
+        class="text-sm text-on-surface-variant dark:text-slate-300 dark:text-slate-200 leading-relaxed text-left select-text"
+      >
+        {{ post.content }}
+      </p>
+    </div>
+
     <!-- POST IMAGE/MEDIA CONTAINER -->
     <div
       v-if="post.media"
-      class="aspect-video w-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden border-y border-outline-variant/20 dark:border-slate-800 cursor-pointer"
+      class="w-full max-h-[600px] bg-slate-100 dark:bg-slate-800 relative flex items-center justify-center overflow-hidden border-y border-outline-variant/20 dark:border-slate-800 cursor-pointer"
       @click.stop="showMediaModal = true"
     >
       <img
         :src="post.media"
         alt="Imagen del post"
-        class="w-full h-full object-cover hover:scale-105 transition duration-300"
+        class="max-w-full h-auto max-h-[600px] object-contain hover:scale-105 transition duration-300"
       />
     </div>
 
@@ -128,15 +137,6 @@
           </a>
         </div>
       </div>
-    </div>
-
-    <!-- POST CONTENT BODY (select-text allowed) -->
-    <div class="p-4 flex flex-col gap-3">
-      <p
-        class="text-sm text-on-surface-variant dark:text-slate-300 dark:text-slate-200 leading-relaxed text-left select-text"
-      >
-        {{ post.content }}
-      </p>
     </div>
 
     <!-- BOTTOM ACTIONS BAR -->
@@ -314,9 +314,11 @@
 </template>
 
 <script setup lang="ts">
+import type { Post } from "~/types";
+
 const props = withDefaults(
   defineProps<{
-    post: any;
+    post: Post;
     currentUserId?: string;
     isBookmarked?: boolean;
     isDetail?: boolean;
@@ -327,7 +329,12 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(["like", "bookmark", "share", "navigate"]);
+const emit = defineEmits<{
+  (e: "like", post: Post): void;
+  (e: "bookmark", post: Post): void;
+  (e: "share", post: Post): void;
+  (e: "navigate", id?: string): void;
+}>();
 
 const showAvatarModal = ref(false);
 const showPdfModal = ref(false);
@@ -342,9 +349,7 @@ const { openProtectedModal } = useProtectedAction();
 onMounted(() => {
   if (process.client) {
     const currentUserId =
-      props.currentUserId ||
-      (authSession.value?.user as any)?.id ||
-      "anonymous";
+      props.currentUserId || authSession.value?.user?.id || "anonymous";
     const shared = JSON.parse(
       localStorage.getItem(`shared-posts-${currentUserId}`) || "[]",
     );
@@ -395,7 +400,7 @@ const handleCommentClick = (e: Event) => {
     openProtectedModal();
     return;
   }
-  emit("navigate", props.post.uniqueId);
+  emit("navigate", props.post.uniqueId || props.post.id);
 };
 
 const handleShareClick = (e: Event) => {
@@ -403,14 +408,12 @@ const handleShareClick = (e: Event) => {
 
   if (process.client) {
     const currentUserId =
-      props.currentUserId ||
-      (authSession.value?.user as any)?.id ||
-      "anonymous";
+      props.currentUserId || authSession.value?.user?.id || "anonymous";
     const shared = JSON.parse(
       localStorage.getItem(`shared-posts-${currentUserId}`) || "[]",
     );
     const id = props.post.uniqueId || props.post.id;
-    if (!shared.includes(id)) {
+    if (id && !shared.includes(id)) {
       shared.push(id);
       localStorage.setItem(
         `shared-posts-${currentUserId}`,
@@ -436,15 +439,14 @@ const isLiked = computed(() => {
   const post = props.post;
   if (!post) return false;
 
-  const authUser = authSession.value?.user as any;
+  const authUser = authSession.value?.user;
   const loggedEmail = authUser?.email?.toLowerCase();
   const loggedId = authUser?.id;
   const passedUserId = props.currentUserId?.toLowerCase();
 
-  const likes =
-    post.likesList || post.likedBy || post.likes_list || post.likes || [];
+  const likes = post.likesList || post.likedBy || post.likes_list || [];
   if (Array.isArray(likes)) {
-    return likes.some((item: any) => {
+    return likes.some((item: unknown) => {
       const s = String(item).toLowerCase();
       return (
         (passedUserId && s === passedUserId) ||
@@ -454,14 +456,14 @@ const isLiked = computed(() => {
     });
   }
 
-  return Boolean(post.isLiked || post.liked);
+  return Boolean(post.isLiked);
 });
 
 const effectiveIsBookmarked = computed(() => {
   const post = props.post;
   if (!post) return false;
 
-  const authUser = authSession.value?.user as any;
+  const authUser = authSession.value?.user;
   const loggedEmail = authUser?.email?.toLowerCase();
   const loggedId = authUser?.id;
   const passedUserId = props.currentUserId?.toLowerCase();
@@ -469,7 +471,7 @@ const effectiveIsBookmarked = computed(() => {
   const bookmarks =
     post.bookmarksList || post.bookmarkedBy || post.bookmarks || [];
   if (Array.isArray(bookmarks)) {
-    const foundInList = bookmarks.some((item: any) => {
+    const foundInList = bookmarks.some((item: unknown) => {
       const s = String(item).toLowerCase();
       return (
         (passedUserId && s === passedUserId) ||
@@ -482,7 +484,7 @@ const effectiveIsBookmarked = computed(() => {
 
   if (props.isBookmarked === true) return true;
 
-  return Boolean(post.isBookmarked || post.bookmarked);
+  return Boolean(post.isBookmarked);
 });
 
 const likesCount = computed(() => {
@@ -524,7 +526,7 @@ const handleClick = (event: Event) => {
   ) {
     return;
   }
-  emit("navigate", props.post.uniqueId);
+  emit("navigate", props.post.uniqueId || props.post.id);
 };
 
 const navigateToAuthor = () => {

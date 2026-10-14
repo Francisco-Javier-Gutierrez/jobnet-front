@@ -38,34 +38,46 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="w-full flex gap-3 max-w-sm mb-2">
+      <div class="w-full flex flex-wrap gap-3 max-w-md justify-center mb-2">
         <NuxtLink
           v-if="isOwner"
           to="/settings"
-          class="flex-1 bg-primary hover:bg-tertiary-container text-on-primary h-12 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+          class="flex-1 min-w-[140px] bg-primary hover:bg-primary/90 text-on-primary h-12 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
         >
-          <span class="material-symbols-outlined">edit</span>
+          <span class="material-symbols-outlined text-sm">edit</span>
           Editar Perfil
         </NuxtLink>
+
+        <!-- Generate CV Button (Only for owner) -->
+        <button
+          v-if="isOwner"
+          type="button"
+          @click="showCvModal = true"
+          class="flex-1 min-w-[140px] bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 h-12 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-xs cursor-pointer"
+        >
+          <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+          <span>✨ Generar CV (Carta)</span>
+        </button>
+
         <a
           v-else
           :href="`mailto:${profile.email}`"
-          class="flex-1 bg-primary hover:bg-tertiary-container text-on-primary h-12 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+          class="flex-1 bg-primary hover:bg-primary/90 text-on-primary h-12 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
         >
-          <span class="material-symbols-outlined">mail</span>
+          <span class="material-symbols-outlined text-sm">mail</span>
           Contactar
         </a>
 
         <!-- Enlaces Web Dropdown -->
-        <div v-if="webLinks.length > 0" class="relative flex-1">
+        <div v-if="webLinks.length > 0" class="relative flex-1 min-w-[120px]">
           <button
             @click.stop="toggleDropdown"
-            class="w-full bg-surface-container-low text-on-surface h-12 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 transition-transform active:scale-95 border border-outline-variant"
+            class="w-full bg-surface-container-low text-on-surface h-12 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-transform active:scale-95 border border-outline-variant cursor-pointer"
             id="webLinksBtn"
           >
-            Enlaces Web
+            Enlaces
             <span
-              class="material-symbols-outlined text-[20px] transition-transform duration-200"
+              class="material-symbols-outlined text-[18px] transition-transform duration-200"
               :class="{ 'rotate-180': showDropdown }"
               >expand_more</span
             >
@@ -92,21 +104,34 @@
         </div>
       </div>
     </div>
+
+    <!-- CV Builder Modal -->
+    <CvBuilderModal
+      v-if="isOwner"
+      v-model="showCvModal"
+      :profile="profile"
+      @cv-updated="emit('cv-updated', $event)"
+    />
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import type { CandidateProfile, WebLinkItem } from "~/types";
 
 defineProps<{
-  profile: Record<string, any>;
+  profile: CandidateProfile;
   defaultAvatar: string;
   locationText: string;
   isOwner: boolean;
-  webLinks: Array<{ name: string; url: string; icon: string }>;
+  webLinks: WebLinkItem[];
+}>();
+
+const emit = defineEmits<{
+  (e: "cv-updated", url: string): void;
 }>();
 
 const showDropdown = ref(false);
+const showCvModal = ref(false);
 
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value;

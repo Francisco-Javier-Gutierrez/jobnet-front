@@ -67,9 +67,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
-import AppealsList from "~/components/appeals/AppealsList.vue";
-import AppealWorkspace from "~/components/appeals/AppealWorkspace.vue";
 import { useAppeals } from "~/composables/useAppeals";
 
 useSeoMeta({

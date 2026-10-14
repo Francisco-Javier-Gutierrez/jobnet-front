@@ -227,15 +227,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import type { AdminOrganization, CompanyProfile } from "~/types";
+
+export interface SanctionStep {
+  title: string;
+  desc: string;
+  icon: string;
+  actionText: string;
+  btnVariant: string;
+  actionType: "INITIATE" | "CANCEL" | "CONFIRM";
+}
 
 const props = defineProps<{
   modelValue: boolean;
-  selectedOrg: any;
-  sanctionSteps: any[];
+  selectedOrg: (AdminOrganization | CompanyProfile) | null;
+  sanctionSteps: SanctionStep[];
   suspensionReasonInput: string;
   graceDaysInput: number;
-  getOrgStatusKey: (org: any) => string;
+  getOrgStatusKey: (org: AdminOrganization | CompanyProfile) => string;
 }>();
 
 const emit = defineEmits<{

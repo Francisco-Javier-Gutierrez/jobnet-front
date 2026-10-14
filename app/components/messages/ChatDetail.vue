@@ -126,8 +126,22 @@
         </div>
       </div>
 
+      <!-- Read-only banner -->
+      <div
+        v-if="isChatClosed"
+        class="p-4 border-t border-outline-variant/60 bg-surface-container-lowest flex items-center justify-center text-center"
+      >
+        <p
+          class="text-xs text-on-surface-variant font-medium flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-sm">lock</span>
+          Este chat es de solo lectura porque el proceso ha concluido.
+        </p>
+      </div>
+
       <!-- Message input bar -->
       <div
+        v-else
         class="p-4 border-t border-outline-variant/60 bg-surface-container-low/25 flex items-center gap-3"
       >
         <!-- Hidden File Input -->
@@ -146,7 +160,11 @@
           class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50"
           title="Adjuntar PDF o Imagen"
         >
-          <span v-if="isUploading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+          <span
+            v-if="isUploading"
+            class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
           <span v-else class="material-symbols-outlined text-lg"
             >attach_file</span
           >
@@ -163,7 +181,9 @@
           @click="handleSend"
           :disabled="!newMessage.trim() && !pendingAttachment"
           class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
-        ><span class="material-symbols-outlined text-lg">send</span></button>
+        >
+          <span class="material-symbols-outlined text-lg">send</span>
+        </button>
       </div>
     </template>
 
@@ -188,15 +208,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted, ref } from "vue";
+import type { ChatConversation, ChatMessage, ChatAttachment } from "~/types";
 
 const props = defineProps<{
-  activeChat: any;
-  messages: any[];
+  activeChat: ChatConversation | null;
+  messages: ChatMessage[];
   isLoadingMessages: boolean;
   userId: string;
   isUploading: boolean;
-  pendingAttachment: any;
+  pendingAttachment: ChatAttachment | null;
   newMessage: string;
   isImageUrl: (url: string) => boolean;
   openImagePreview: (url: string) => void;
@@ -204,11 +224,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  "update:newMessage": [value: string];
-  "handle-send": [];
-  "handle-file-upload": [event: Event];
-  "set-message-container": [el: HTMLElement | null];
-  "set-file-input": [el: HTMLInputElement | null];
+  (e: "update:newMessage", value: string): void;
+  (e: "handle-send"): void;
+  (e: "handle-file-upload", event: Event): void;
+  (e: "set-message-container", el: HTMLElement | null): void;
+  (e: "set-file-input", el: HTMLInputElement | null): void;
 }>();
 
 const newMessage = computed({
@@ -230,6 +250,18 @@ onMounted(() => {
 const handleSend = () => emit("handle-send");
 const handleFileUpload = (e: Event) => emit("handle-file-upload", e);
 const triggerFileInput = () => fileInput.value?.click();
+
+const isChatClosed = computed(() => {
+  if (!props.activeChat) return false;
+  const status = props.activeChat.status?.toUpperCase() || "";
+  return [
+    "RECHAZADO",
+    "CONTRATADO",
+    "CERRADO",
+    "RESUELTO",
+    "APROBADO",
+  ].includes(status);
+});
 </script>
 
 <style scoped>

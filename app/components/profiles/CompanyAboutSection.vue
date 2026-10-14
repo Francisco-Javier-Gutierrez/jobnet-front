@@ -177,10 +177,14 @@
 </template>
 
 <script setup lang="ts">
+import type { CompanyProfile, WebLinkItem } from "~/types";
+
 defineProps<{
-  company: any;
-  webLinks?: Array<{ name: string; url: string; icon: string }>;
+  company: CompanyProfile;
+  webLinks?: WebLinkItem[];
 }>();
 
-defineEmits(["previewDoc"]);
+defineEmits<{
+  (e: "previewDoc", doc: any): void;
+}>();
 </script>

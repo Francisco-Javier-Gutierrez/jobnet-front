@@ -68,6 +68,8 @@ resource "aws_lambda_function" "ssr_server" {
   role          = aws_iam_role.lambda_role.arn
   handler       = "index.handler"
   runtime       = "nodejs18.x"
+  memory_size   = 512
+  timeout       = 30
   source_code_hash = filebase64sha256(var.lambda_zip_path)
 
   lifecycle {
@@ -79,6 +81,7 @@ resource "aws_lambda_function" "ssr_server" {
     ]
   }
 }
+
 
 resource "aws_lambda_function_url" "ssr_url" {
   function_name      = aws_lambda_function.ssr_server.function_name

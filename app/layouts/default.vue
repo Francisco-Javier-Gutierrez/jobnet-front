@@ -22,10 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import AppNavbar from "~/components/nav/AppNavbar.vue";
-import AppSidebar from "~/components/nav/AppSidebar.vue";
-import AppFooter from "~/components/nav/AppFooter.vue";
-
 const isMobileMenuOpen = ref(false);
 
 // Scroll tracking for hide/show nav bars on mobile

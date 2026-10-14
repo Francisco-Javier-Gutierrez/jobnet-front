@@ -46,7 +46,11 @@
             :disabled="uploadingLogo"
             class="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs rounded-xl transition disabled:opacity-50 flex items-center gap-1 active:scale-95"
           >
-            <span v-if="uploadingLogo" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+            <span
+              v-if="uploadingLogo"
+              class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+              aria-hidden="true"
+            ></span>
             <span>{{
               uploadingLogo ? "Subiendo..." : "Subir Nuevo Logotipo"
             }}</span>
@@ -145,7 +149,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 

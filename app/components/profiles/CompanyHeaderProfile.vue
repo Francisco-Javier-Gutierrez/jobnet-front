@@ -101,10 +101,14 @@
 </template>
 
 <script setup lang="ts">
+import type { CompanyProfile } from "~/types";
+
 defineProps<{
-  company: any;
+  company: CompanyProfile;
   isOwner: boolean;
 }>();
 
-defineEmits(["report"]);
+defineEmits<{
+  (e: "report"): void;
+}>();
 </script>

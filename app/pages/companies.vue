@@ -206,13 +206,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
-import AppSearchInput from "~/components/common/AppSearchInput.vue";
-import AppSkeletonLoader from "~/components/common/AppSkeletonLoader.vue";
-import AppEmptyState from "~/components/common/AppEmptyState.vue";
-import AppStatusBadge from "~/components/common/AppStatusBadge.vue";
-import AppPagination from "~/components/common/AppPagination.vue";
-
 const router = useRouter();
 const loading = ref(true);
 const searchInput = ref("");

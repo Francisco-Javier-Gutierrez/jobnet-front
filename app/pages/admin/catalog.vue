@@ -319,13 +319,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
 import { useCatalogStore, type CatalogItem } from "~/stores/catalog";
-import AppStatusBadge from "~/components/common/AppStatusBadge.vue";
-import AppPagination from "~/components/common/AppPagination.vue";
-import AppEmptyState from "~/components/common/AppEmptyState.vue";
-import AppConfirmModal from "~/components/common/AppConfirmModal.vue";
-import AppTabs from "~/components/common/AppTabs.vue";
 
 useSeoMeta({
   title: "Catálogo Maestro - Administrador",

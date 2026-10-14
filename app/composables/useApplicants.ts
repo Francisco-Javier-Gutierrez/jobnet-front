@@ -1,6 +1,6 @@
-import { ref, computed, watch } from "vue";
 import { useRoute, useRouter, useRuntimeConfig } from "#imports";
 import { useAuth } from "#imports";
+import type { ApplicantCandidate, ApplicantStage } from "~/types";
 
 // Global shared state for the applicants dashboard
 const selectedJobId = ref("");
@@ -8,12 +8,12 @@ const myJobs = ref<Array<{ id: string; title: string }>>([]);
 const allJobsList = ref<
   Array<{ id: string; title: string; empresaUuid: string }>
 >([]);
-const candidates = ref<any[]>([]);
-const selectedCandidate = ref<any>(null);
+const candidates = ref<ApplicantCandidate[]>([]);
+const selectedCandidate = ref<ApplicantCandidate | null>(null);
 const isLoading = ref(false);
 const candidateDetailPanel = ref<HTMLElement | null>(null);
 
-const selectedStageFilter = ref("ALL");
+const selectedStageFilter = ref<ApplicantStage>("ALL");
 const searchQuery = ref("");
 
 const isMobileDetailModalOpen = ref(false);

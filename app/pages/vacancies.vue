@@ -346,7 +346,6 @@
 <script setup lang="ts">
 import { useJobsStore, type Job } from "../stores/jobs";
 import { useCatalogStore } from "../stores/catalog";
-import JobCard from "~/components/jobs/JobCard.vue";
 
 useSeoMeta({
   title: "Explorar Vacantes - JobNet",

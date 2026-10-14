@@ -253,7 +253,6 @@
 </template>
 
 <script setup lang="ts">
-import AppModal from "~/components/common/AppModal.vue";
 import { useApplicants } from "~/composables/useApplicants";
 import { useApplicantActions } from "~/composables/useApplicantActions";
 
@@ -277,7 +276,9 @@ const {
   submitRejection,
 } = useApplicantActions();
 
-const openPdfViewer = (candidate: any) => {
+import type { ApplicantCandidate } from "~/types";
+
+const openPdfViewer = (candidate: ApplicantCandidate) => {
   selectedPdfUrl.value = candidate.cvUrl || "";
   selectedPdfCandidateName.value = candidate.name || "";
   isPdfViewerOpen.value = true;

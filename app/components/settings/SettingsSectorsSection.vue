@@ -5,7 +5,8 @@
     <h2
       class="text-base font-bold text-on-background mb-1 flex items-center gap-2"
     >
-      <span class="material-symbols-outlined text-tertiary dark:text-inverse-primary"
+      <span
+        class="material-symbols-outlined text-tertiary dark:text-inverse-primary"
         >work</span
       >
       Sectores Laborales
@@ -101,8 +102,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-
 const props = defineProps<{
   sectors: string[];
   catalogSectors?: { id: string; name: string }[];

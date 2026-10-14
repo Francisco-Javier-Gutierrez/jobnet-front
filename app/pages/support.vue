@@ -33,7 +33,7 @@
         <span
           class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
         >
-          {{ wsConnected ? "En línea (WebSocket)" : "Conectando..." }}
+          {{ wsConnected ? "En línea" : "Conectando..." }}
         </span>
       </div>
     </div>
@@ -79,9 +79,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
-import SupportChatList from "~/components/support/SupportChatList.vue";
-import SupportChatDetail from "~/components/support/SupportChatDetail.vue";
 import { useSupport } from "~/composables/useSupport";
 
 useSeoMeta({

@@ -1,5 +1,3 @@
-import { ref, computed, watch, type Ref } from "vue";
-
 export interface FilterOptions<T> {
   searchFields?: (keyof T | string)[];
   debounceMs?: number;

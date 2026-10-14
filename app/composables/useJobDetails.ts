@@ -1,4 +1,3 @@
-import { ref, computed } from "vue";
 import { useJobsStore } from "~/stores/jobs";
 import { useAuth } from "#imports";
 import { useRuntimeConfig } from "#imports";

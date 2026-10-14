@@ -210,7 +210,11 @@
           class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
           title="Adjuntar PDF o Imagen"
         >
-          <span v-if="isUploading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+          <span
+            v-if="isUploading"
+            class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
           <span v-else class="material-symbols-outlined text-lg"
             >attach_file</span
           >
@@ -227,7 +231,9 @@
           @click="sendMessage"
           :disabled="!newMessageText.trim() && !pendingAttachment"
           class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
-        ><span class="material-symbols-outlined text-lg">send</span></button>
+        >
+          <span class="material-symbols-outlined text-lg">send</span>
+        </button>
       </div>
 
       <!-- Footer Link to Full Page -->
@@ -250,8 +256,8 @@
 
 <script setup lang="ts">
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import type { AppealMessage, AppealAttachment } from "~/types";
 const { showError, showSuccess, showInfo } = useAppFeedback();
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
 
 const props = defineProps<{
   isOpen: boolean;
@@ -270,15 +276,9 @@ const { uploadFile, uploadError: s3UploadError } = useS3Upload();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
-const pendingAttachment = ref<{
-  url: string;
-  type: string;
-  name: string;
-} | null>(null);
+const pendingAttachment = ref<AppealAttachment | null>(null);
 
-const userId = computed(
-  () => (session.value?.user as any)?.id || props.companyId,
-);
+const userId = computed(() => session.value?.user?.id || props.companyId);
 
 const newMessageText = ref("");
 const chatContainer = ref<HTMLDivElement | null>(null);
@@ -288,13 +288,13 @@ const statusText = ref("En revisión");
 
 const socket = ref<WebSocket | null>(null);
 const wsConnected = ref(false);
-const messages = ref<any[]>([]);
+const messages = ref<AppealMessage[]>([]);
 
 const orgMessageCount = computed(() => {
   return messages.value.filter((m) => m.senderId === props.companyId).length;
 });
 
-const isMyMessage = (msg: any) => {
+const isMyMessage = (msg: { senderId: string }) => {
   return msg.senderId === props.companyId || msg.senderId === userId.value;
 };
 
@@ -325,6 +325,7 @@ const fetchAppealMessages = async () => {
       attachmentUrl: m.attachmentUrl || null,
       attachmentType: m.attachmentType || null,
       attachmentName: m.attachmentName || null,
+      timestamp: m.createdAt || Date.now(),
       time: new Date(m.createdAt || Date.now()).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -348,11 +349,9 @@ const connectWebSocket = async () => {
   const currentSession = await getSession().catch(() => null);
   const s = currentSession || session.value;
   const token =
-    (s as any)?.idToken ||
-    (s as any)?.accessToken ||
-    (s as any)?.token ||
-    (s as any)?.user?.idToken ||
-    (s as any)?.user?.token ||
+    s?.user?.idToken ||
+    (s as Record<string, any>)?.idToken ||
+    (s as Record<string, any>)?.accessToken ||
     "";
 
   if (!token) {
@@ -558,8 +557,9 @@ const sendHttpFallback = async (
 ) => {
   try {
     const token =
-      (session.value as any)?.idToken ||
-      (session.value as any)?.accessToken ||
+      session.value?.user?.idToken ||
+      (session.value as Record<string, any>)?.idToken ||
+      (session.value as Record<string, any>)?.accessToken ||
       "";
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

@@ -26,8 +26,11 @@
         v-if="isLoadingChats"
         class="p-8 text-center text-xs text-on-surface-variant dark:text-slate-300/80"
       >
-        <span class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span> Cargando tus
-        conversaciones...
+        <span
+          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+          aria-hidden="true"
+        ></span>
+        Cargando tus conversaciones...
       </div>
       <div
         v-else-if="filteredChats.length === 0"
@@ -78,18 +81,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import type { ChatConversation } from "~/types";
 
 const props = defineProps<{
   searchQuery: string;
   isLoadingChats: boolean;
-  filteredChats: any[];
-  activeChat: any;
+  filteredChats: ChatConversation[];
+  activeChat: ChatConversation | null;
 }>();
 
 const emit = defineEmits<{
-  "update:searchQuery": [value: string];
-  "select-chat": [chat: any];
+  (e: "update:searchQuery", value: string): void;
+  (e: "select-chat", chat: ChatConversation): void;
 }>();
 
 const searchQuery = computed({
@@ -97,7 +100,7 @@ const searchQuery = computed({
   set: (val) => emit("update:searchQuery", val),
 });
 
-const selectChat = (chat: any) => {
+const selectChat = (chat: ChatConversation) => {
   emit("select-chat", chat);
 };
 </script>

@@ -103,33 +103,40 @@
             type="password"
             required
             placeholder="••••••••"
-            class="w-full bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background dark:text-slate-100 outline-none transition-colors mb-2"
+            class="w-full bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-sm text-on-background dark:text-slate-100 outline-none transition-colors"
           />
-          <div
-            class="bg-[#F8FAFC] dark:bg-slate-800/80 border border-outline-variant/30 dark:border-slate-700 rounded-xl p-3 text-[11px]"
+        </div>
+
+        <!-- Password Requirements Box (Dark Mode Adapted) -->
+        <div
+          class="select-none pointer-events-none rounded-xl border border-outline-variant/60 dark:border-slate-800 bg-[#F1F5F9] dark:bg-slate-800/80 p-3 text-on-surface-variant dark:text-slate-300"
+          aria-live="polite"
+        >
+          <p
+            class="mb-2 text-sm font-semibold text-on-surface dark:text-slate-100"
           >
-            <p
-              class="font-bold text-on-surface-variant dark:text-slate-200 mb-1"
+            Requisitos de contraseña de AWS Cognito
+          </p>
+          <div class="flex flex-col gap-1">
+            <label
+              v-for="rule in passwordRuleItems"
+              :key="rule.key"
+              class="flex items-center gap-2 text-xs"
+              :class="
+                rule.valid
+                  ? 'text-secondary dark:text-emerald-400 font-medium'
+                  : 'text-on-surface-variant dark:text-slate-400'
+              "
             >
-              Requisitos de contraseña de AWS Cognito:
-            </p>
-            <ul class="space-y-1">
-              <li
-                v-for="rule in passwordRuleItems"
-                :key="rule.key"
-                class="flex items-center gap-1.5"
-                :class="
-                  rule.valid
-                    ? 'text-secondary dark:text-emerald-400 font-semibold'
-                    : 'text-on-surface-variant dark:text-slate-400'
-                "
-              >
-                <span class="material-symbols-outlined text-xs">
-                  {{ rule.valid ? "check_circle" : "cancel" }}
-                </span>
-                <span>{{ rule.label }}</span>
-              </li>
-            </ul>
+              <input
+                type="checkbox"
+                disabled
+                :checked="rule.valid"
+                class="h-4 w-4 rounded border-outline-variant/60 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary accent-secondary"
+                aria-hidden="true"
+              />
+              <span>{{ rule.label }}</span>
+            </label>
           </div>
         </div>
 
@@ -155,7 +162,11 @@
           :disabled="loading || !acceptTerms"
           class="w-full bg-primary hover:bg-primary-container text-white font-bold py-3.5 px-4 rounded-xl shadow-sm transition disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
         >
-          <span v-if="loading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+          <span
+            v-if="loading"
+            class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
           <span>{{
             loading ? "Creando usuario secreto..." : "Crear Usuario Neutral"
           }}</span>

@@ -1,8 +1,9 @@
-import { ref, computed, nextTick } from "vue";
 import { useRuntimeConfig } from "#app";
 import { useAuth } from "#imports";
 import { useS3Upload } from "~/composables/useS3Upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
+
+import type { SupportChat, ChatMessage, ChatAttachment } from "~/types";
 
 export function useSupport() {
   const config = useRuntimeConfig();
@@ -12,24 +13,17 @@ export function useSupport() {
 
   const fileInput = ref<HTMLInputElement | null>(null);
   const isUploading = ref(false);
-  const pendingAttachment = ref<{
-    url: string;
-    type: string;
-    name: string;
-  } | null>(null);
+  const pendingAttachment = ref<ChatAttachment | null>(null);
 
-  const userId = computed(() => (session.value?.user as any)?.id || "");
+  const userId = computed(() => session.value?.user?.id || "");
 
   const userRole = computed(() => {
-    const user = session.value?.user as any;
-    return (user?.tipoUsuario || user?.role || "").toUpperCase();
+    const user = session.value?.user;
+    return (user?.tipoUsuario || "").toUpperCase();
   });
 
   const isOrganization = computed(
-    () =>
-      userRole.value === "ORGANIZACION" ||
-      userRole.value === "EMPRESA" ||
-      userRole.value === "RECRUITER",
+    () => userRole.value === "ORGANIZACION" || userRole.value === "EMPRESA",
   );
 
   const isModeratorRole = computed(
@@ -37,12 +31,12 @@ export function useSupport() {
   );
 
   const searchQuery = ref("");
-  const activeChat = ref<any>(null);
+  const activeChat = ref<SupportChat | null>(null);
   const newMessageText = ref("");
   const chatContainer = ref<HTMLDivElement | null>(null);
 
-  const chats = ref<any[]>([]);
-  const messages = ref<any[]>([]);
+  const chats = ref<SupportChat[]>([]);
+  const messages = ref<ChatMessage[]>([]);
 
   const isLoadingChats = ref(true);
   const isLoadingMessages = ref(false);
@@ -469,7 +463,13 @@ export function useSupport() {
           "WebSocket send exception, executing HTTP fallback:",
           wsErr,
         );
-        await sendHttpFallback(appealId, companyId, text, attachment, messageId);
+        await sendHttpFallback(
+          appealId,
+          companyId,
+          text,
+          attachment,
+          messageId,
+        );
       }
     } else {
       await sendHttpFallback(appealId, companyId, text, attachment, messageId);

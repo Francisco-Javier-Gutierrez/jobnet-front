@@ -1,5 +1,3 @@
-import { ref } from "vue";
-
 export interface UploadOptions {
   folder?: string;
   userId?: string;

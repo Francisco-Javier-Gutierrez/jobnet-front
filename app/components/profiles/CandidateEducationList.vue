@@ -48,7 +48,9 @@
 </template>
 
 <script setup lang="ts">
+import type { EducacionItem } from "~/types";
+
 defineProps<{
-  educacion: any[];
+  educacion: EducacionItem[];
 }>();
 </script>

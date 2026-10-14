@@ -92,21 +92,21 @@
 </template>
 
 <script setup lang="ts">
-import PostCard from "~/components/PostCard.vue";
+import type { Post, Job } from "~/types";
 
 const props = defineProps<{
   postsLoading: boolean;
-  feedItems: any[];
+  feedItems: (Post | Job)[];
   currentUserId: string;
-  isBookmarked: (item: any) => boolean;
-  isLiked: (item: any) => boolean;
+  isBookmarked: (item: Post | Job) => boolean;
+  isLiked: (item: Post | Job) => boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: "toggle-like", item: any): void;
-  (e: "toggle-bookmark", item: any): void;
-  (e: "share-job", item: any): void;
-  (e: "share-post", item: any): void;
+  (e: "toggle-like", item: Post | Job): void;
+  (e: "toggle-bookmark", item: Post | Job): void;
+  (e: "share-job", item: Job): void;
+  (e: "share-post", item: Post): void;
   (e: "navigate-to-post", id: string): void;
 }>();
 </script>

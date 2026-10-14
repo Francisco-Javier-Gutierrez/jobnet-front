@@ -47,7 +47,7 @@
               ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-bold'
               : '',
           ]"
-          aria-label="Configuraci├│n"
+          aria-label="Configuración"
         >
           <span class="material-symbols-outlined text-[22px]">settings</span>
         </NuxtLink>
@@ -125,8 +125,8 @@ watchEffect(() => {
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
-  const user = data.value?.user as any;
-  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
+  const user = data.value?.user;
+  const tipo = (user?.tipoUsuario || "").toUpperCase();
   if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
   if (tipo === "ADMIN") return "admin";
   if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";

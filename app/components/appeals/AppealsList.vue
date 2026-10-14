@@ -63,8 +63,11 @@
         v-if="isLoading"
         class="p-8 text-center text-xs text-on-surface-variant"
       >
-        <span class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span> Cargando
-        solicitudes de apelación...
+        <span
+          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+          aria-hidden="true"
+        ></span>
+        Cargando solicitudes de apelación...
       </div>
       <div
         v-else-if="filteredAppeals.length === 0"
@@ -125,15 +128,17 @@
 </template>
 
 <script setup lang="ts">
+import type { Appeal } from "~/types";
+
 const props = defineProps<{
   appealsLength: number;
-  filteredAppeals: any[];
+  filteredAppeals: Appeal[];
   isLoading: boolean;
   selectedAppealId: string | null;
 }>();
 
 const emit = defineEmits<{
-  (e: "select-appeal", appeal: any): void;
+  (e: "select-appeal", appeal: Appeal): void;
 }>();
 
 const searchQuery = defineModel<string>("searchQuery", { default: "" });

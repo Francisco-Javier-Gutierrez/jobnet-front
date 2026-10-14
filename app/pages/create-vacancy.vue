@@ -16,8 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import VacancyForm from "~/components/vacancies/VacancyForm.vue";
-
 useSeoMeta({
   title: "Publicar Oferta de Empleo - JobNet",
   description:

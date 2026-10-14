@@ -240,21 +240,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import type { AdminOrganization, CompanyProfile } from "~/types";
 
 const props = defineProps<{
   loading: boolean;
-  paginatedOrgs: any[];
+  paginatedOrgs: (AdminOrganization | CompanyProfile)[];
   filteredOrgsLength: number;
   currentPage: number;
   totalPages: number;
-  getOrgStatusKey: (org: any) => string;
+  getOrgStatusKey: (org: AdminOrganization | CompanyProfile) => string;
 }>();
 
 const emit = defineEmits<{
   (e: "update:currentPage", value: number): void;
-  (e: "toggleVerification", org: any): void;
-  (e: "openSanctionModal", org: any): void;
+  (e: "toggleVerification", org: AdminOrganization | CompanyProfile): void;
+  (e: "openSanctionModal", org: AdminOrganization | CompanyProfile): void;
 }>();
 
 const internalCurrentPage = computed({

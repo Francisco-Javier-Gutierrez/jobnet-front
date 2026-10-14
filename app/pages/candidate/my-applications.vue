@@ -103,7 +103,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import { useAuth, useRuntimeConfig, useRouter } from "#imports";
 
 definePageMeta({

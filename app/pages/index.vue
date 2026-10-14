@@ -62,10 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import HomeQuickVacancyBanner from "~/components/home/HomeQuickVacancyBanner.vue";
-import HomeFeedContainer from "~/components/home/HomeFeedContainer.vue";
-import HomeBottomSheet from "~/components/home/HomeBottomSheet.vue";
-import HomeAuthModal from "~/components/home/HomeAuthModal.vue";
 import { useJobFeeds } from "~/composables/useJobFeeds";
 import { useRouter } from "vue-router";
 

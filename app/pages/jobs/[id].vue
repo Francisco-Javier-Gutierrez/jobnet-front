@@ -100,10 +100,10 @@
       <hr class="border-outline-variant/30" />
 
       <!-- 5. Location Map Section -->
-      <div v-if="job" class="space-y-3 text-left">
+      <div v-if="job && job.lat && job.lng" class="space-y-3 text-left">
         <AppLocationMap
-          :lat="job.lat || 19.2826"
-          :lng="job.lng || -99.6557"
+          :lat="job.lat"
+          :lng="job.lng"
           :draggable="false"
           label="Ubicación de la Oferta"
           height="280px"
@@ -111,7 +111,7 @@
         />
       </div>
 
-      <hr class="border-outline-variant/30" />
+      <hr v-if="job && job.lat && job.lng" class="border-outline-variant/30" />
 
       <!-- 6. Application Form Section -->
       <JobApplyForm
@@ -225,10 +225,6 @@
 </template>
 
 <script setup lang="ts">
-import AppLocationMap from "~/components/common/AppLocationMap.vue";
-import JobDetails from "~/components/jobs/JobDetails.vue";
-import JobApplyForm from "~/components/jobs/JobApplyForm.vue";
-import JobComments from "~/components/jobs/JobComments.vue";
 import { useJobDetails } from "~/composables/useJobDetails";
 import { useJobApplication } from "~/composables/useJobApplication";
 import { useJobComments } from "~/composables/useJobComments";

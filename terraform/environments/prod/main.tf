@@ -9,8 +9,10 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region  = "us-east-1"
+  profile = "terra-profile"
 }
+
 
 module "frontend" {
   source          = "../../modules/cloudfront_s3_lambda"

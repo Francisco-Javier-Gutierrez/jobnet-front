@@ -75,8 +75,6 @@
 <script setup lang="ts">
 import { useSeoMeta } from "#imports";
 import { useMessages } from "~/composables/useMessages";
-import ChatList from "~/components/messages/ChatList.vue";
-import ChatDetail from "~/components/messages/ChatDetail.vue";
 
 useSeoMeta({
   title: "Mensajes y Chat Privado - JobNet",

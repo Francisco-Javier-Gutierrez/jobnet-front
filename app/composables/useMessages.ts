@@ -1,8 +1,9 @@
-import { ref, computed, nextTick, onMounted, onUnmounted } from "vue";
 import { useRoute, useRuntimeConfig } from "#app";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useAuth } from "#imports"; // adjust if needed
 import { useS3Upload } from "~/composables/useS3Upload";
+
+import type { ChatConversation, ChatMessage, ChatAttachment } from "~/types";
 
 export const useMessages = () => {
   const { showError, showSuccess, showInfo } = useAppFeedback();
@@ -13,18 +14,10 @@ export const useMessages = () => {
 
   const fileInput = ref<HTMLInputElement | null>(null);
   const isUploading = ref(false);
-  const pendingAttachment = ref<{
-    url: string;
-    type: string;
-    name: string;
-  } | null>(null);
+  const pendingAttachment = ref<ChatAttachment | null>(null);
 
-  const userId = computed(
-    () => (session.value?.user as any)?.id || "organización-user",
-  );
-  const userRole = computed(
-    () => (session.value?.user as any)?.tipoUsuario || "",
-  );
+  const userId = computed(() => session.value?.user?.id || "organización-user");
+  const userRole = computed(() => session.value?.user?.tipoUsuario || "");
 
   const isCompanyRole = computed(() => {
     const role = (userRole.value || "").toUpperCase();
@@ -40,10 +33,10 @@ export const useMessages = () => {
   });
 
   const searchQuery = ref("");
-  const activeChat = ref<any>(null);
+  const activeChat = ref<ChatConversation | null>(null);
   const newMessage = ref("");
-  const chats = ref<any[]>([]);
-  const messages = ref<any[]>([]);
+  const chats = ref<ChatConversation[]>([]);
+  const messages = ref<ChatMessage[]>([]);
 
   const isLoadingChats = ref(true);
   const isLoadingMessages = ref(false);

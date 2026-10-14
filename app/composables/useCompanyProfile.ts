@@ -1,8 +1,8 @@
-import { ref, computed, watch } from "vue";
 import { useRoute, useRouter } from "#app";
 import { useRuntimeConfig, useLazyAsyncData } from "#imports";
 import { useAuth } from "#imports";
 import { useShare } from "~/composables/useShare";
+import type { Post, Job, CompanyProfile } from "~/types";
 
 export const useCompanyProfile = () => {
   const route = useRoute();
@@ -13,7 +13,7 @@ export const useCompanyProfile = () => {
 
   const companyId = route.params.id as string;
   const isOwner = computed(() => authData.value?.user?.id === companyId);
-  const currentUserId = computed(() => (authData.value?.user as any)?.id || "");
+  const currentUserId = computed(() => authData.value?.user?.id || "");
 
   // Fetch data
   const { data: profileData, pending: profilePending } = useLazyAsyncData(

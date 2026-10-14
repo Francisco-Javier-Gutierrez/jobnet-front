@@ -174,11 +174,6 @@
 import { useAppFeedback } from "~/composables/useAppFeedback";
 
 // Component imports
-import CompanyIdentityTab from "~/components/company/settings/CompanyIdentityTab.vue";
-import CompanyProfileTab from "~/components/company/settings/CompanyProfileTab.vue";
-import CompanyDocumentsTab from "~/components/company/settings/CompanyDocumentsTab.vue";
-import CompanyBrandTab from "~/components/company/settings/CompanyBrandTab.vue";
-import CompanyVerificationTab from "~/components/company/settings/CompanyVerificationTab.vue";
 
 interface DocumentoCorporativo {
   id: string;
@@ -207,7 +202,7 @@ useHead({
 const router = useRouter();
 const config = useRuntimeConfig();
 const { data: sessionData, status } = useAuth();
-const { showSuccess, showError, showWarning } = useAppFeedback();
+const { showFeedback, showError, showWarning } = useAppFeedback();
 
 const activeTab = ref("identidad");
 const mfaEnabled = ref(false);
@@ -436,14 +431,20 @@ const handleSave = async () => {
       const { setProfilePic } = useProfileState();
       setProfilePic(fotoPerfil.value);
 
-      showSuccess(
-        "Perfil Corporativo Guardado",
-        "Los datos de tu organización fueron actualizados correctamente.",
-        2500,
-      );
-      setTimeout(() => {
-        router.push(`/company/${companyId.value}`);
-      }, 1500);
+      // Explicitly clear Nuxt cache to fetch fresh data on redirect
+      clearNuxtData(`company-profile-${companyId.value}`);
+      clearNuxtData(); // Fallback
+
+      showFeedback({
+        type: "success",
+        title: "Perfil Corporativo Guardado",
+        message:
+          "Los datos de tu organización fueron actualizados correctamente.",
+        autoCloseTimeout: 3500,
+        onClose: () => {
+          router.push(`/company/${companyId.value}`);
+        },
+      });
     }
   } catch (error: any) {
     console.error("Error saving company configuration:", error);

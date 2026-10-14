@@ -129,24 +129,24 @@
 </template>
 
 <script setup lang="ts">
-import JobCard from "~/components/jobs/JobCard.vue";
+import type { Post, Job, CompanyProfile } from "~/types";
 
 defineProps<{
   companyTab: string;
-  company: any;
-  companyPosts: any[];
-  companyBookmarkedPosts: any[];
+  company: CompanyProfile;
+  companyPosts: Post[];
+  companyBookmarkedPosts: Post[];
   loadingCompanyPosts: boolean;
   currentUserId: string;
 }>();
 
-defineEmits([
-  "update:companyTab",
-  "likeJob",
-  "bookmarkJob",
-  "shareJob",
-  "likePost",
-  "bookmarkPost",
-  "sharePost",
-]);
+defineEmits<{
+  (e: "update:companyTab", tab: string): void;
+  (e: "likeJob", job: Job): void;
+  (e: "bookmarkJob", job: Job): void;
+  (e: "shareJob", job: Job): void;
+  (e: "likePost", post: Post): void;
+  (e: "bookmarkPost", post: Post): void;
+  (e: "sharePost", post: Post): void;
+}>();
 </script>

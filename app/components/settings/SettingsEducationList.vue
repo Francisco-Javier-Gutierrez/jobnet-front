@@ -44,7 +44,9 @@
         <div
           class="flex items-center justify-between border-b border-outline-variant/40 pb-2"
         >
-          <span class="text-xs font-bold text-primary dark:text-inverse-primary">
+          <span
+            class="text-xs font-bold text-primary dark:text-inverse-primary"
+          >
             Educación #{{ idx + 1 }}
           </span>
           <button

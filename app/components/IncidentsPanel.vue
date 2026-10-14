@@ -225,15 +225,17 @@
 </template>
 
 <script setup lang="ts">
+import type { Incident } from "~/types";
+
 const config = useRuntimeConfig();
 const { data: session } = useAuth();
 
 const userRole = computed(() => {
-  const user = session.value?.user as any;
-  return (user?.tipoUsuario || user?.role || "").toUpperCase();
+  const user = session.value?.user;
+  return (user?.tipoUsuario || "").toUpperCase();
 });
 
-const incidents = ref<any[]>([]);
+const incidents = ref<Incident[]>([]);
 const loading = ref(true);
 const activeTab = ref("ALL");
 
@@ -288,7 +290,7 @@ const resolve = async (id: string, action: string) => {
     if (action === "evaluate") {
       const idx = incidents.value.findIndex((i) => i.id === id);
       if (idx !== -1) {
-        incidents.value[idx].estatus = "EVALUACION";
+        incidents.value[idx].status = "EVALUACION";
       }
     } else {
       incidents.value = incidents.value.filter((i) => i.id !== id);

@@ -89,7 +89,11 @@
           :disabled="isSubmitting"
           class="px-4 py-2.5 bg-primary hover:bg-primary-container disabled:opacity-50 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-2 active:scale-95"
         >
-          <span v-if="isSubmitting" class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+          <span
+            v-if="isSubmitting"
+            class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
           <span v-else class="material-symbols-outlined text-sm"
             >lock_reset</span
           >
@@ -101,7 +105,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 const { data: sessionData } = useAuth();
 
 const oldPassword = ref("");
@@ -121,9 +124,9 @@ const handleChangePassword = async () => {
   isSubmitting.value = true;
   statusMsg.value = "";
 
+  const s = sessionData.value as Record<string, any> | null;
   const accessToken =
-    (sessionData.value as any)?.accessToken ||
-    (sessionData.value as any)?.idToken;
+    sessionData.value?.user?.idToken || s?.accessToken || s?.idToken;
 
   try {
     const res = await $fetch("/api/change-password", {

@@ -227,11 +227,9 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
 import { useApplicants } from "~/composables/useApplicants";
 import { useApplicantActions } from "~/composables/useApplicantActions";
 import { useMessages } from "~/composables/useMessages";
-import ChatDetail from "~/components/messages/ChatDetail.vue";
 
 const {
   selectedCandidate,
@@ -298,7 +296,9 @@ watch(
   { immediate: true, deep: true },
 );
 
-const openPdfViewer = (candidate: any) => {
+import type { ApplicantCandidate } from "~/types";
+
+const openPdfViewer = (candidate: ApplicantCandidate) => {
   selectedPdfUrl.value = candidate.cvUrl || "";
   selectedPdfCandidateName.value = candidate.name || "";
   isPdfViewerOpen.value = true;

@@ -221,11 +221,11 @@
 </template>
 
 <script setup lang="ts">
-import ReportModal from "~/components/ReportModal.vue";
+import type { Job } from "~/types";
 
 const props = withDefaults(
   defineProps<{
-    job: any;
+    job: Job;
     currentUserId?: string;
     isBookmarked?: boolean;
     isLiked?: boolean;
@@ -238,12 +238,17 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(["like", "bookmark", "share", "navigate"]);
+const emit = defineEmits<{
+  (e: "like", job: Job): void;
+  (e: "bookmark", job: Job): void;
+  (e: "share", job: Job): void;
+  (e: "navigate", id?: string): void;
+}>();
 
 const showMenu = ref(false);
 const showReportModal = ref(false);
 
-const { status } = useAuth();
+const { status, data: session } = useAuth();
 const { openProtectedModal } = useProtectedAction();
 const { shareJob } = useShare();
 const router = useRouter();
@@ -253,11 +258,14 @@ const isSharedLocally = ref(false);
 onMounted(() => {
   if (process.client) {
     const currentUserId =
-      props.currentUserId || (session.value?.user as any)?.id || "anonymous";
+      props.currentUserId || session.value?.user?.id || "anonymous";
     const shared = JSON.parse(
       localStorage.getItem(`shared-jobs-${currentUserId}`) || "[]",
     );
-    isSharedLocally.value = shared.includes(props.job.id || props.job.uniqueId);
+    const jobId = props.job.id || props.job.uniqueId;
+    if (jobId) {
+      isSharedLocally.value = shared.includes(jobId);
+    }
   }
 });
 
@@ -301,7 +309,6 @@ const salaryDisplay = computed(() => {
 // Likes count & state
 const likesList = computed<string[]>(() => {
   if (Array.isArray(props.job?.likesList)) return props.job.likesList;
-  if (Array.isArray(props.job?.likes)) return props.job.likes;
   return [];
 });
 
@@ -312,7 +319,9 @@ const isLiked = computed(() => {
 });
 
 const likesCount = computed(() => {
+  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
   if (typeof props.job?.likesCount === "number") return props.job.likesCount;
+  if (typeof props.job?.likes === "number") return props.job.likes;
   return likesList.value.length;
 });
 
@@ -338,11 +347,12 @@ const commentsCount = computed(() => {
 });
 
 const sharesCount = computed(() => {
-  if (typeof props.job?.sharesCount === "number") return props.job.sharesCount;
-  return 0;
+  return props.job?.sharesCount || 0;
 });
 
 const bookmarksCount = computed(() => {
+  if (Array.isArray(props.job?.bookmarksList))
+    return props.job.bookmarksList.length;
   if (typeof props.job?.bookmarksCount === "number")
     return props.job.bookmarksCount;
   return bookmarksList.value.length;
@@ -364,8 +374,11 @@ const handleClick = (e: MouseEvent) => {
 
 const forceNavigate = () => {
   if (props.isDetail) return;
-  emit("navigate", props.job.id || props.job.uniqueId);
-  router.push(`/jobs/${props.job.id || props.job.uniqueId}`);
+  const targetId = props.job.id || props.job.uniqueId;
+  emit("navigate", targetId);
+  if (targetId) {
+    router.push(`/jobs/${targetId}`);
+  }
 };
 
 const navigateToCompany = () => {
@@ -400,12 +413,12 @@ const handleShareClick = (e: Event) => {
 
   if (process.client) {
     const currentUserId =
-      props.currentUserId || (session.value?.user as any)?.id || "anonymous";
+      props.currentUserId || session.value?.user?.id || "anonymous";
     const shared = JSON.parse(
       localStorage.getItem(`shared-jobs-${currentUserId}`) || "[]",
     );
     const id = props.job.id || props.job.uniqueId;
-    if (!shared.includes(id)) {
+    if (id && !shared.includes(id)) {
       shared.push(id);
       localStorage.setItem(
         `shared-jobs-${currentUserId}`,

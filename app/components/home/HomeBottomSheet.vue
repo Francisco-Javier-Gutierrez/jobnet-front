@@ -98,7 +98,11 @@
                 :disabled="!newCommentText.trim() || isSubmittingComment"
                 class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-[10px] px-4 py-2 rounded-lg transition flex items-center gap-1.5"
               >
-                <span v-if="isSubmittingComment" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+                <span
+                  v-if="isSubmittingComment"
+                  class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+                  aria-hidden="true"
+                ></span>
                 <span>{{
                   isSubmittingComment ? "Enviando..." : "Comentar"
                 }}</span>
@@ -192,9 +196,11 @@
                   type="submit"
                   :disabled="!replyText.trim() || isSubmittingReply"
                   class="bg-secondary text-white disabled:bg-secondary/40 font-bold text-[10px] px-3 py-1.5 rounded-lg hover:bg-[#005236] transition flex items-center gap-1"
-                ><span>{{
+                >
+                  <span>{{
                     isSubmittingReply ? "Enviando..." : "Responder"
-                  }}</span></button>
+                  }}</span>
+                </button>
               </form>
 
               <!-- Nested (Replies Level 2) -->
@@ -217,7 +223,9 @@
                           reply.user ? reply.user.charAt(0).toUpperCase() : "U"
                         }}
                       </div>
-                      <div class="flex items-center justify-between w-full pr-2">
+                      <div
+                        class="flex items-center justify-between w-full pr-2"
+                      >
                         <h6 class="text-[10px] font-bold text-on-background">
                           {{ reply.user || "Usuario" }}
                         </h6>
@@ -257,15 +265,16 @@
 </template>
 
 <script setup lang="ts">
-import PostCard from "~/components/PostCard.vue";
+import type { Post } from "~/types";
+import type { CommentNode } from "~/components/jobs/JobComments.vue";
 
 const props = defineProps<{
-  selectedPost: any;
+  selectedPost: Post | null;
   currentUserId: string;
-  isBookmarked: (item: any) => boolean;
-  commentsCount: (postItem: any) => number;
-  commentTree: any[];
-  canDeleteComment: (node: any) => boolean;
+  isBookmarked: (item: Post) => boolean;
+  commentsCount: (postItem: Post) => number;
+  commentTree: CommentNode[];
+  canDeleteComment: (node: CommentNode) => boolean;
   isDragging: boolean;
   sheetOffset: number;
   newCommentText: string;
@@ -281,9 +290,9 @@ const emit = defineEmits<{
   (e: "touchmove", event: TouchEvent): void;
   (e: "touchend"): void;
   (e: "mousedown", event: MouseEvent): void;
-  (e: "toggle-like", item: any): void;
-  (e: "toggle-bookmark", item: any): void;
-  (e: "share-post", item: any): void;
+  (e: "toggle-like", item: Post): void;
+  (e: "toggle-bookmark", item: Post): void;
+  (e: "share-post", item: Post): void;
   (e: "update:newCommentText", value: string): void;
   (e: "submit-comment"): void;
   (e: "delete-comment", id: string): void;

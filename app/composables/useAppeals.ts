@@ -1,16 +1,16 @@
-import { ref, computed, nextTick } from "vue";
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import type { Appeal, AppealMessage, AppealAttachment } from "~/types";
 
 export const useAppeals = () => {
   const { showError, showSuccess, showInfo } = useAppFeedback();
   const config = useRuntimeConfig();
   const { data: session, getSession } = useAuth();
 
-  const userId = computed(() => (session.value?.user as any)?.id || "mod-user");
+  const userId = computed(() => session.value?.user?.id || "mod-user");
   const searchQuery = ref("");
   const filterType = ref<"ALL" | "ORGANIZACION" | "VACANTE">("ALL");
 
-  const appeals = ref<any[]>([]);
+  const appeals = ref<Appeal[]>([]);
   const selectedAppealId = ref<string | null>(null);
   const isLoading = ref(true);
   const isProcessingAction = ref(false);
@@ -23,28 +23,30 @@ export const useAppeals = () => {
   const filteredAppeals = computed(() => {
     let result = appeals.value;
     if (filterType.value !== "ALL") {
-      result = result.filter((a) => a.type === filterType.value);
+      result = result.filter((a: any) => a.type === filterType.value);
     }
     const q = searchQuery.value.toLowerCase().trim();
     if (q) {
       result = result.filter(
-        (a) =>
-          a.name.toLowerCase().includes(q) ||
-          a.reason.toLowerCase().includes(q),
+        (a: any) =>
+          (a.name || a.companyName || "").toLowerCase().includes(q) ||
+          (a.reason || a.motivo || "").toLowerCase().includes(q),
       );
     }
     return result;
   });
 
-  const activeAppeal = computed(() => {
+  const activeAppeal = computed<Appeal | null>(() => {
     return appeals.value.find((a) => a.id === selectedAppealId.value) || null;
   });
 
-  const isModeratorSender = (msg: any) => {
+  const isModeratorSender = (
+    msg: AppealMessage | { sender?: string; senderId?: string },
+  ) => {
     if (!activeAppeal.value) return true;
-    const compId = activeAppeal.value.id;
     return (
-      msg.sender === "MODERATOR" ||
+      msg.senderRole === "MODERADOR" ||
+      (msg as any).sender === "MODERATOR" ||
       (msg.senderId && msg.senderId !== activeAppeal.value.companyId)
     );
   };
@@ -53,7 +55,7 @@ export const useAppeals = () => {
     if (!activeAppeal.value || !activeAppeal.value.messages) return 0;
     return activeAppeal.value.messages.filter(
       (m: any) =>
-        m.sender === "USER" || m.senderId === activeAppeal.value.companyId,
+        m.sender === "USER" || m.senderId === activeAppeal.value?.companyId,
     ).length;
   });
 
@@ -139,7 +141,9 @@ export const useAppeals = () => {
 
             const messageId = incomingMsgId;
 
-            const target = appeals.value.find((a) => a.id === (appealId || appealCompanyId));
+            const target = appeals.value.find(
+              (a) => a.id === (appealId || appealCompanyId),
+            );
             if (target) {
               const compId = target.id;
               const timeStr = new Date(
@@ -402,7 +406,13 @@ export const useAppeals = () => {
           "WebSocket send exception, executing HTTP fallback:",
           wsErr,
         );
-        await sendHttpFallback(appealId, companyId, text, attachment, messageId);
+        await sendHttpFallback(
+          appealId,
+          companyId,
+          text,
+          attachment,
+          messageId,
+        );
       }
     } else {
       await sendHttpFallback(appealId, companyId, text, attachment, messageId);

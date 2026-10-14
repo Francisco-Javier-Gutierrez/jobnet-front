@@ -1,5 +1,3 @@
-import { ref } from "vue";
-
 export type ConfirmVariant = "danger" | "warning" | "info" | "success";
 
 export interface ConfirmDialogOptions {

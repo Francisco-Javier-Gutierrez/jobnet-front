@@ -1,5 +1,3 @@
-import { ref } from "vue";
-
 export interface AsyncActionOptions<T> {
   successTitle?: string;
   successMessage?: string | ((result: T) => string);

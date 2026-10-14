@@ -217,7 +217,11 @@
           class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-indigo-600 text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
           title="Adjuntar PDF o Imagen de evidencia"
         >
-          <span v-if="isUploading" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+          <span
+            v-if="isUploading"
+            class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
           <span v-else class="material-symbols-outlined text-lg"
             >attach_file</span
           >
@@ -266,22 +270,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
 import { useS3Upload } from "~/composables/useS3Upload";
 import { useAuth } from "#imports";
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import type { Appeal, AppealMessage, AppealAttachment } from "~/types";
 
 const props = defineProps<{
-  activeAppeal: any;
+  activeAppeal: Appeal | null;
   isProcessingAction: boolean;
   orgMessageCount: number;
-  isModeratorSender: (msg: any) => boolean;
+  isModeratorSender: (msg: AppealMessage) => boolean;
 }>();
 
 const emit = defineEmits<{
   (e: "resolve-org", action: "approve" | "confirm"): void;
   (e: "resolve-vacancy", action: "approve" | "block"): void;
-  (e: "send-message", text: string, attachment: any): void;
+  (e: "send-message", text: string, attachment: AppealAttachment | null): void;
   (e: "chat-ref", ref: HTMLDivElement | null): void;
 }>();
 
@@ -292,11 +296,7 @@ const { showInfo, showError } = useAppFeedback();
 const fileInput = ref<HTMLInputElement | null>(null);
 const chatContainerRef = ref<HTMLDivElement | null>(null);
 const isUploading = ref(false);
-const pendingAttachment = ref<{
-  url: string;
-  type: string;
-  name: string;
-} | null>(null);
+const pendingAttachment = ref<AppealAttachment | null>(null);
 const newMessageText = ref("");
 
 watch(chatContainerRef, (val) => {
@@ -335,7 +335,7 @@ const handleFileUpload = async (event: Event) => {
   }
 
   isUploading.value = true;
-  const userId = (session.value?.user as any)?.id || "mod-user";
+  const userId = session.value?.user?.id || "mod-user";
 
   try {
     const uploadRes = await uploadFile(file, { folder: "appeal", userId });

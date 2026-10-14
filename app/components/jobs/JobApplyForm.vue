@@ -203,7 +203,11 @@
           :disabled="isApplying"
           class="w-full sm:w-auto bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-primary/20 active:scale-95 disabled:opacity-50 flex-shrink-0"
         >
-          <span v-if="isApplying" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+          <span
+            v-if="isApplying"
+            class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
           <span v-else class="material-symbols-outlined text-sm">send</span>
           <span>{{
             isApplying
@@ -217,12 +221,15 @@
 </template>
 
 <script setup lang="ts">
+import type { Job } from "~/types";
+import type { Session } from "next-auth";
+
 const props = defineProps<{
-  job: any;
+  job: Job;
   jobId: string;
   hasApplied: boolean;
   isApplying: boolean;
-  session: any;
+  session: Session | null;
   profileCvUrl: string;
   profileCvName: string;
   coverLetterInput: string;
@@ -232,12 +239,12 @@ const props = defineProps<{
   selectedProfileDocs: string[];
 }>();
 
-const emit = defineEmits([
-  "easyApply",
-  "update:coverLetterInput",
-  "update:selectedProfileLinks",
-  "update:selectedProfileDocs",
-]);
+const emit = defineEmits<{
+  (e: "easyApply"): void;
+  (e: "update:coverLetterInput", value: string): void;
+  (e: "update:selectedProfileLinks", value: string[]): void;
+  (e: "update:selectedProfileDocs", value: string[]): void;
+}>();
 
 const updateLinksArray = (url: string, checked: boolean) => {
   let newLinks = [...props.selectedProfileLinks];

@@ -217,8 +217,6 @@
 </template>
 
 <script setup lang="ts">
-import AppAppealModal from "~/components/AppAppealModal.vue";
-
 useSeoMeta({
   title: "Mis Vacantes Publicadas - JobNet",
   description:

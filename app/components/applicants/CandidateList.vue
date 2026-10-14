@@ -128,7 +128,6 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick } from "vue";
 import { useApplicants } from "~/composables/useApplicants";
 import { useApplicantActions } from "~/composables/useApplicantActions";
 
@@ -142,7 +141,9 @@ const {
 } = useApplicants();
 const { getStatusBadgeClass, getStatusLabel } = useApplicantActions();
 
-const isSelectedCandidate = (c: any) => {
+import type { ApplicantCandidate } from "~/types";
+
+const isSelectedCandidate = (c: ApplicantCandidate | null) => {
   if (!selectedCandidate.value || !c) return false;
   return (
     selectedCandidate.value.id === c.id &&
@@ -150,7 +151,7 @@ const isSelectedCandidate = (c: any) => {
   );
 };
 
-const selectCandidate = (candidate: any) => {
+const selectCandidate = (candidate: ApplicantCandidate) => {
   console.log("ATS Candidate selected:", candidate);
   selectedCandidate.value = candidate;
   isMobileDetailModalOpen.value = true;

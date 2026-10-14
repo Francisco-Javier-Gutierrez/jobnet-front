@@ -1,5 +1,3 @@
-import { ref, watch, onMounted } from "vue";
-
 export interface TabItem {
   id: string;
   label: string;

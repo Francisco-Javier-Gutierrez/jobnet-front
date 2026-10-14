@@ -15,8 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import AppLocationMap from "~/components/common/AppLocationMap.vue";
-
 defineProps<{
   lat: number;
   lng: number;

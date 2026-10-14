@@ -1,7 +1,6 @@
-import { ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useRuntimeConfig } from "#app";
-// Assuming useAuth and useShare are available globally as auto-imports in Nuxt
+import type { CandidateProfile, Post } from "~/types";
 
 export function useCandidateProfile(candidateIdParam?: string) {
   const route = useRoute();
@@ -17,7 +16,7 @@ export function useCandidateProfile(candidateIdParam?: string) {
   const loading = ref(true);
   const error = ref(false);
   const errorMessage = ref("");
-  const profile = ref<Record<string, any>>({});
+  const profile = ref<CandidateProfile>({});
 
   // Doc Viewer State
   const selectedDocUrl = ref("");
@@ -32,7 +31,7 @@ export function useCandidateProfile(candidateIdParam?: string) {
 
   // --- Ownership Check ---
   const isOwner = computed(() => {
-    const user = authData.value?.user as any;
+    const user = authData.value?.user;
     if (!user) return false;
     return user.id === candidateId || user.email === candidateId;
   });
@@ -161,16 +160,23 @@ export function useCandidateProfile(candidateIdParam?: string) {
     errorMessage.value = "";
 
     try {
-      const res = await $fetch<any>(
-        `${config.public.apiUrl}/profile/${candidateId}`,
+      const { data, error: fetchError } = await useAsyncData(
+        `candidate-profile-${candidateId}`,
+        () => $fetch<any>(`${config.public.apiUrl}/profile/${candidateId}`),
       );
-      const data = typeof res === "string" ? JSON.parse(res) : res;
 
-      if (!data) {
+      if (fetchError.value) {
+        throw fetchError.value;
+      }
+
+      const parsedData =
+        typeof data.value === "string" ? JSON.parse(data.value) : data.value;
+
+      if (!parsedData) {
         throw new Error("Perfil no encontrado");
       }
 
-      profile.value = data;
+      profile.value = parsedData;
     } catch (e: any) {
       error.value = true;
       errorMessage.value =

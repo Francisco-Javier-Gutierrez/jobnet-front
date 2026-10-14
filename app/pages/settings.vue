@@ -20,7 +20,11 @@
         :disabled="isSaving"
         class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3 rounded-xl transition flex items-center gap-2 shadow-md active:scale-95 disabled:opacity-50"
       >
-        <span v-if="isSaving" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+        <span
+          v-if="isSaving"
+          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+          aria-hidden="true"
+        ></span>
         <span v-else class="material-symbols-outlined text-sm">save</span>
         <span>{{ isSaving ? "Guardando..." : "Guardar Cambios" }}</span>
       </button>
@@ -74,11 +78,11 @@
     <!-- Main Form Components Stack -->
     <div class="flex flex-col gap-6">
       <section v-show="activeTab === 'personales'" class="flex flex-col gap-6">
-      <SettingsPersonalInfo
-        v-model:name="formData.name"
-        v-model:bio="formData.bio"
-        v-model:fotoPerfil="formData.fotoPerfil"
-      />
+        <SettingsPersonalInfo
+          v-model:name="formData.name"
+          v-model:bio="formData.bio"
+          v-model:fotoPerfil="formData.fotoPerfil"
+        />
         <SettingsLocationMap
           v-model:lat="formData.lat"
           v-model:lng="formData.lng"
@@ -87,7 +91,7 @@
       </section>
 
       <section v-show="activeTab === 'profesional'" class="flex flex-col gap-6">
-      <SettingsExperienceList v-model:experiencia="formData.experiencia" />
+        <SettingsExperienceList v-model:experiencia="formData.experiencia" />
         <SettingsSectorsSection
           v-model:sectors="formData.sectores"
           :catalogSectors="catalogStore.sectors"
@@ -95,29 +99,31 @@
       </section>
 
       <section v-show="activeTab === 'habilidades'" class="flex flex-col gap-6">
-      <SettingsEducationList v-model:educacion="formData.educacion" />
-      <SettingsSkillsSection
-        v-model:skills="formData.skills"
-        :catalogSkills="catalogStore.skills"
-      />
+        <SettingsEducationList v-model:educacion="formData.educacion" />
+        <SettingsSkillsSection
+          v-model:skills="formData.skills"
+          :catalogSkills="catalogStore.skills"
+        />
       </section>
 
       <section v-show="activeTab === 'documentos'" class="flex flex-col gap-6">
-      <SettingsCvUploader
-        v-model:cvUrl="formData.cvUrl"
-        v-model:cvName="formData.cvName"
-      />
-      <SettingsAdditionalDocs
-        v-model:documentosAdicionales="formData.documentosAdicionales"
-      />
+        <SettingsCvUploader
+          v-model:cvUrl="formData.cvUrl"
+          v-model:cvName="formData.cvName"
+          :profile="formData"
+        />
+
+        <SettingsAdditionalDocs
+          v-model:documentosAdicionales="formData.documentosAdicionales"
+        />
       </section>
 
       <section v-show="activeTab === 'enlaces'" class="flex flex-col gap-6">
-      <SettingsWebLinks v-model:links="formData.links" />
+        <SettingsWebLinks v-model:links="formData.links" />
       </section>
 
       <section v-show="activeTab === 'seguridad'" class="flex flex-col gap-6">
-      <SettingsPasswordCard />
+        <SettingsPasswordCard />
       </section>
     </div>
 
@@ -129,7 +135,11 @@
         :disabled="isSaving"
         class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-8 py-3.5 rounded-2xl transition flex items-center gap-2 shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50"
       >
-        <span v-if="isSaving" class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+        <span
+          v-if="isSaving"
+          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+          aria-hidden="true"
+        ></span>
         <span v-else class="material-symbols-outlined text-sm">save</span>
         <span>{{
           isSaving ? "Guardando Perfil..." : "Guardar Cambios del Perfil"
@@ -140,7 +150,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useCatalogStore } from "~/stores/catalog";
 
@@ -151,14 +160,14 @@ definePageMeta({
 const { status, data: session } = useAuth();
 const isSaving = ref(false);
 
-const { showSuccess, showError } = useAppFeedback();
+const { showFeedback, showError } = useAppFeedback();
 const catalogStore = useCatalogStore();
 
 const activeTab = ref("personales");
 const tabItems = [
   { id: "personales", label: "Datos Personales", icon: "person" },
   { id: "profesional", label: "Experiencia", icon: "work" },
-  { id: "habilidades", label: "Educaci├│n", icon: "school" },
+  { id: "habilidades", label: "Educación", icon: "school" },
   { id: "documentos", label: "Documentos", icon: "description" },
   { id: "enlaces", label: "Enlaces", icon: "language" },
   { id: "seguridad", label: "Seguridad", icon: "shield_lock" },
@@ -250,6 +259,7 @@ async function saveProfile() {
       nombre: formData.value.name,
       location: formData.value.location,
       bio: formData.value.bio,
+      biografia: formData.value.bio,
       fotoPerfil: formData.value.fotoPerfil,
       experiencia: formData.value.experiencia,
       educacion: formData.value.educacion,
@@ -276,14 +286,23 @@ async function saveProfile() {
     });
 
     if (res.ok) {
-      showSuccess(
-        "Perfil Actualizado",
-        "Tus datos personales y profesionales han sido guardados exitosamente.",
-        3500,
-      );
+      showFeedback({
+        type: "success",
+        title: "Perfil Actualizado",
+        message:
+          "Tus datos personales y profesionales han sido guardados exitosamente.",
+        autoCloseTimeout: 3500,
+        onClose: () => {
+          navigateTo("/profile");
+        },
+      });
 
       const { setProfilePic } = useProfileState();
       setProfilePic(formData.value.fotoPerfil);
+
+      // Explicitly clear Nuxt cache for this profile to fetch fresh data on redirect
+      clearNuxtData(`candidate-profile-${userId}`);
+      clearNuxtData(); // Fallback to clear all payload caches if needed
 
       discardDraft();
     } else {

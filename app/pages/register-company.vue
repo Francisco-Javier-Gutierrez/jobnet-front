@@ -228,19 +228,23 @@
             class="text-xs text-on-surface-variant dark:text-slate-300 leading-normal"
           >
             Acepto los
-            <a
-              href="#"
-              class="text-primary hover:underline"
+            <button
+              type="button"
+              @click.prevent="showTermsModal = true"
+              class="text-primary hover:underline cursor-pointer"
               aria-label="Ver los Términos y Condiciones"
-              >Términos y Condiciones</a
             >
+              Términos y Condiciones
+            </button>
             y el
-            <a
-              href="#"
-              class="text-primary hover:underline"
+            <button
+              type="button"
+              @click.prevent="showTermsModal = true"
+              class="text-primary hover:underline cursor-pointer"
               aria-label="Ver el Aviso de Privacidad"
-              >Aviso de Privacidad</a
             >
+              Aviso de Privacidad
+            </button>
           </label>
         </div>
 
@@ -250,12 +254,27 @@
           :aria-busy="loading"
           class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm hover:shadow"
         >
-          <span v-if="loading" class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin" aria-hidden="true"></span>
+          <span
+            v-if="loading"
+            class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
           <span v-else>Registrar</span>
         </button>
       </form>
     </div>
   </div>
+
+  <!-- Terms Modal -->
+  <AppModal
+    v-model="showTermsModal"
+    title="Términos y Condiciones de Uso"
+    icon="gavel"
+    max-width="3xl"
+    @close="showTermsModal = false"
+  >
+    <AppTermsContent />
+  </AppModal>
 </template>
 
 <script setup lang="ts">
@@ -350,4 +369,5 @@ const handleRegister = async () => {
     loading.value = false;
   }
 };
+const showTermsModal = ref(false);
 </script>

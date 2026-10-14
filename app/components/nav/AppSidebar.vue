@@ -265,8 +265,8 @@ watchEffect(() => {
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
-  const user = data.value?.user as any;
-  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
+  const user = data.value?.user;
+  const tipo = (user?.tipoUsuario || "").toUpperCase();
   if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
   if (tipo === "ADMIN") return "admin";
   if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";

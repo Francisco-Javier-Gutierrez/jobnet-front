@@ -87,13 +87,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
 import { useSeoMeta } from "#imports";
-import ApplicantsKpiCards from "~/components/applicants/ApplicantsKpiCards.vue";
-import ApplicantsFilterBar from "~/components/applicants/ApplicantsFilterBar.vue";
-import CandidateList from "~/components/applicants/CandidateList.vue";
-import CandidateDetailPanel from "~/components/applicants/CandidateDetailPanel.vue";
-import CandidateModals from "~/components/applicants/CandidateModals.vue";
+
 import { useApplicants } from "~/composables/useApplicants";
 import { useApplicantActions } from "~/composables/useApplicantActions";
 
