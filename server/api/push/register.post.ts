@@ -13,8 +13,16 @@ export default defineEventHandler(async (event) => {
   // En desarrollo local fuera de Lambda, se guarda una copia opcional
   if (process.env.NODE_ENV !== "production") {
     try {
-      const filePath = path.resolve(process.cwd(), "..", ".push-subscription.json");
-      fs.writeFileSync(filePath, JSON.stringify(subscription, null, 2), "utf-8");
+      const filePath = path.resolve(
+        process.cwd(),
+        "..",
+        ".push-subscription.json",
+      );
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify(subscription, null, 2),
+        "utf-8",
+      );
       return { success: true, savedTo: filePath };
     } catch {
       // Silencioso si el filesystem no es escribible
@@ -23,4 +31,3 @@ export default defineEventHandler(async (event) => {
 
   return { success: true };
 });
-
