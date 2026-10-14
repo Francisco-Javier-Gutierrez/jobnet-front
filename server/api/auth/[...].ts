@@ -168,7 +168,7 @@ export default NuxtAuthHandler({
                   message: translateCognitoError(
                     errorCode,
                     responseData.message ||
-                    "Código de MFA incorrecto o expirado",
+                      "Código de MFA incorrecto o expirado",
                   ),
                 }),
               );
