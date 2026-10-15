@@ -398,6 +398,8 @@ export default NuxtAuthHandler({
                 tipoUsuario: "CANDIDATO",
                 estadoCuenta: "ACTIVO",
                 fotoPerfil: payload.picture || (user as any)?.image || "",
+                origenRegistro: "GOOGLE_OAUTH",
+                isFederated: true,
               },
             }).catch(() => null);
           }
@@ -578,6 +580,8 @@ export default NuxtAuthHandler({
               (Array.isArray(payload.identities) &&
                 payload.identities.some((i: any) => i.providerName === "Google"));
 
+            token.isFederated = Boolean(isGoogleFederated);
+
             const rawGroups = payload["cognito:groups"] || payload.groups || [];
             const groups = Array.isArray(rawGroups)
               ? rawGroups
@@ -706,6 +710,9 @@ export default NuxtAuthHandler({
         (session.user as any).id = token.id;
         (session.user as any).tipoUsuario = token.tipoUsuario;
         (session.user as any).role = token.tipoUsuario;
+        (session.user as any).isFederated = Boolean(token.isFederated);
+        (session.user as any).provider =
+          token.provider || (token.isFederated ? "cognito" : "credentials");
         if (token.name) session.user.name = token.name as string;
         if (token.email) session.user.email = token.email as string;
       }
