@@ -1,3 +1,5 @@
+import path from "node:path";
+
 export default defineNuxtConfig({
   components: [
     {
@@ -13,6 +15,10 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
   alias: {
     "vue-demi": "vue",
+    "@panva/hkdf": path.resolve("./server/shims/hkdf.cjs"),
+    "@babel/runtime/helpers/interopRequireDefault": path.resolve(
+      "./server/shims/interopRequireDefault.cjs",
+    ),
   },
   build: {
     transpile: [
@@ -84,6 +90,12 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: "aws-lambda",
+    alias: {
+      "@panva/hkdf": path.resolve("./server/shims/hkdf.cjs"),
+      "@babel/runtime/helpers/interopRequireDefault": path.resolve(
+        "./server/shims/interopRequireDefault.cjs",
+      ),
+    },
     externals: {
       inline: [
         "@babel/runtime",
