@@ -79,10 +79,22 @@ export default NuxtAuthHandler({
   providers: [
     CognitoProvider({
       clientId: process.env.COGNITO_CLIENT_ID || "4ef8k4tofjj4ounvo8nf7d9pep",
-      clientSecret: process.env.COGNITO_CLIENT_SECRET || "",
+      clientSecret: process.env.COGNITO_CLIENT_SECRET || undefined,
       issuer:
         process.env.COGNITO_ISSUER ||
         "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_trquL61F2",
+      client: {
+        token_endpoint_auth_method: process.env.COGNITO_CLIENT_SECRET
+          ? "client_secret_basic"
+          : "none",
+      },
+      checks: ["pkce", "state"],
+      authorization: {
+        params: {
+          identity_provider: "Google",
+          scope: "openid email profile",
+        },
+      },
     }),
     CredentialsProvider({
       id: "credentials",
@@ -261,19 +273,28 @@ export default NuxtAuthHandler({
       },
     }),
   ],
-  callbacks: {
-    async signIn({ user }) {
+    async signIn({ user, account, profile }: any) {
       if (user && (user as any).error) {
         throw new Error((user as any).error);
       }
 
-      if (user && (user as any).idToken) {
+      const idToken = (user as any)?.idToken || account?.id_token;
+
+      if (idToken) {
         try {
-          const payloadBase64 = (user as any).idToken.split(".")[1];
+          const payloadBase64 = idToken.split(".")[1];
           const payload = JSON.parse(
             Buffer.from(payloadBase64, "base64").toString("ascii"),
           );
           const userId = payload.sub || (user as any).id;
+
+          const isGoogleFederated =
+            account?.provider === "cognito" ||
+            payload["cognito:username"]?.toLowerCase().startsWith("google_") ||
+            (typeof payload.identities === "string" &&
+              payload.identities.includes("Google")) ||
+            (Array.isArray(payload.identities) &&
+              payload.identities.some((i: any) => i.providerName === "Google"));
 
           // Detect assigned Cognito Groups, Scopes or custom attributes in token
           const rawGroups = payload["cognito:groups"] || payload.groups || [];
@@ -336,6 +357,7 @@ export default NuxtAuthHandler({
           )
             cognitoRole = "ORGANIZACION";
           else if (
+            isGoogleFederated ||
             groups.some(
               (g: string) =>
                 g.toUpperCase() === "CANDIDATO" ||
@@ -350,19 +372,44 @@ export default NuxtAuthHandler({
             cognitoRole = "CANDIDATO";
 
           const config = useRuntimeConfig();
-          const profile: any = await $fetch(
+          let userProfile: any = await $fetch(
             `${config.public.apiUrl}/profile/${userId}`,
           ).catch(() => null);
 
-          if (profile) {
-            if (profile.estadoCuenta === "SUSPENDIDA") {
+          // Auto-provision profile for first-time Google Sign-In candidates
+          if (!userProfile && isGoogleFederated) {
+            const userName =
+              payload.name ||
+              (user as any)?.name ||
+              (payload.email || (user as any)?.email)?.split("@")[0] ||
+              "Candidato";
+            const userEmail = payload.email || (user as any)?.email;
+            userProfile = await $fetch(`${config.public.apiUrl}/profile/${userId}`, {
+              method: "POST",
+              headers: {
+                "x-user-id": userId,
+                "x-user-role": "CANDIDATO",
+              },
+              body: {
+                id: userId,
+                nombre: userName,
+                email: userEmail,
+                tipoUsuario: "CANDIDATO",
+                estadoCuenta: "ACTIVO",
+                fotoPerfil: payload.picture || (user as any)?.image || "",
+              },
+            }).catch(() => null);
+          }
+
+          if (userProfile) {
+            if (userProfile.estadoCuenta === "SUSPENDIDA") {
               throw new Error(
                 "Su cuenta ha sido suspendida definitivamente por infracción.",
               );
             }
-            if (profile.estadoCuenta === "SUSPENDIDA_TEMPORAL") {
-              const fin = profile.fechaFinSuspension
-                ? new Date(profile.fechaFinSuspension)
+            if (userProfile.estadoCuenta === "SUSPENDIDA_TEMPORAL") {
+              const fin = userProfile.fechaFinSuspension
+                ? new Date(userProfile.fechaFinSuspension)
                 : null;
               if (fin && new Date() < fin) {
                 const diasRestantes = Math.ceil(
@@ -391,9 +438,9 @@ export default NuxtAuthHandler({
             if (
               cognitoRole &&
               cognitoRole !== "CANDIDATO" &&
-              (profile.tipoUsuario === "PENDIENTE" ||
-                profile.estadoCuenta === "PENDIENTE_ROL" ||
-                profile.tipoUsuario !== cognitoRole)
+              (userProfile.tipoUsuario === "PENDIENTE" ||
+                userProfile.estadoCuenta === "PENDIENTE_ROL" ||
+                userProfile.tipoUsuario !== cognitoRole)
             ) {
               await $fetch(`${config.public.apiUrl}/profile/${userId}`, {
                 method: "POST",
@@ -406,23 +453,23 @@ export default NuxtAuthHandler({
                   estadoCuenta: "ACTIVO",
                 },
               }).catch(() => null);
-              profile.tipoUsuario = cognitoRole;
-              profile.estadoCuenta = "ACTIVO";
+              userProfile.tipoUsuario = cognitoRole;
+              userProfile.estadoCuenta = "ACTIVO";
             }
 
             // Block access for accounts in pending/neutral state until authorized by AWS account owner
             if (
-              profile.estadoCuenta === "PENDIENTE_ROL" ||
-              profile.tipoUsuario === "PENDIENTE" ||
+              userProfile.estadoCuenta === "PENDIENTE_ROL" ||
+              userProfile.tipoUsuario === "PENDIENTE" ||
               customRole === "BLANK" ||
               customRole === "UNASSIGNED" ||
               customRole.includes("PENDING") ||
               customRole.includes("ASPIRANT")
             ) {
               const isMod =
-                profile.solicitudRol === "MODERATOR" ||
+                userProfile.solicitudRol === "MODERATOR" ||
                 customRole.includes("MOD") ||
-                (profile.biografia && profile.biografia.includes("Moderador"));
+                (userProfile.biografia && userProfile.biografia.includes("Moderador"));
               const roleTitle = isMod ? "de moderación" : "administrativo";
 
               throw new Error(
@@ -492,6 +539,8 @@ export default NuxtAuthHandler({
       if (account) {
         token.idToken = account.id_token;
         token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.provider = account.provider;
       }
 
       if (user && !(user as any).error) {
@@ -518,6 +567,15 @@ export default NuxtAuthHandler({
             if (payload.name) {
               token.name = payload.name;
             }
+
+            const isGoogleFederated =
+              account?.provider === "cognito" ||
+              token.provider === "cognito" ||
+              payload["cognito:username"]?.toLowerCase().startsWith("google_") ||
+              (typeof payload.identities === "string" &&
+                payload.identities.includes("Google")) ||
+              (Array.isArray(payload.identities) &&
+                payload.identities.some((i: any) => i.providerName === "Google"));
 
             const rawGroups = payload["cognito:groups"] || payload.groups || [];
             const groups = Array.isArray(rawGroups)
@@ -578,6 +636,7 @@ export default NuxtAuthHandler({
             ) {
               token.tipoUsuario = "ORGANIZACION";
             } else if (
+              isGoogleFederated ||
               groups.some(
                 (g: string) =>
                   g.toUpperCase() === "CANDIDATO" ||
@@ -646,7 +705,8 @@ export default NuxtAuthHandler({
         (session.user as any).id = token.id;
         (session.user as any).tipoUsuario = token.tipoUsuario;
         (session.user as any).role = token.tipoUsuario;
-        session.user.name = token.name;
+        if (token.name) session.user.name = token.name as string;
+        if (token.email) session.user.email = token.email as string;
       }
       return session;
     },

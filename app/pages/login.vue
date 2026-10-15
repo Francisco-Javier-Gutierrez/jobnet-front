@@ -190,29 +190,34 @@ const loading = ref(false);
 const loadingGoogle = ref(false);
 const errorMessage = ref("");
 
+const route = useRoute();
 const router = useRouter();
 const { signIn, data: session } = useAuth();
+
+onMounted(() => {
+  if (route.query.error) {
+    const errorParam = String(route.query.error);
+    if (
+      errorParam === "OAuthCallback" ||
+      errorParam === "OAuthSignin" ||
+      errorParam === "OAuthCreateAccount"
+    ) {
+      errorMessage.value =
+        "No se pudo completar la autenticación con Google. Por favor, intenta de nuevo.";
+    } else if (errorParam !== "CredentialsSignin") {
+      errorMessage.value = errorParam;
+    }
+  }
+});
 
 const handleGoogleSignIn = async () => {
   loadingGoogle.value = true;
   errorMessage.value = "";
 
   try {
-    const clientId =
-      config.public.cognitoClientId || "4ef8k4tofjj4ounvo8nf7d9pep";
-    const cognitoDomain =
-      config.public.cognitoDomain ||
-      "jobnet-auth-prod.auth.us-east-1.amazoncognito.com";
-    const redirectUri =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/api/auth/callback/cognito`
-        : "https://jobnet.franciscojgh.com/api/auth/callback/cognito";
-
-    const cognitoGoogleUrl = `https://${cognitoDomain}/oauth2/authorize?identity_provider=Google&redirect_uri=${encodeURIComponent(
-      redirectUri,
-    )}&response_type=code&client_id=${clientId}&scope=email+openid+profile`;
-
-    window.location.href = cognitoGoogleUrl;
+    await signIn("cognito", {
+      callbackUrl: "/",
+    });
   } catch (err: any) {
     console.error("Error during Google OAuth sign-in:", err);
     errorMessage.value =
