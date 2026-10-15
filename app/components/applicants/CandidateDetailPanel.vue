@@ -298,10 +298,10 @@ watch(
 
 import type { ApplicantCandidate } from "~/types";
 
+const { openCandidateCv } = useApplicants();
+
 const openPdfViewer = (candidate: ApplicantCandidate) => {
-  selectedPdfUrl.value = candidate.cvUrl || "";
-  selectedPdfCandidateName.value = candidate.name || "";
-  isPdfViewerOpen.value = true;
+  openCandidateCv(candidate, "VIEW");
 };
 </script>
 

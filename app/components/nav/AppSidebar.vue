@@ -60,7 +60,7 @@
 
         <!-- User Profile & Logout (Authenticated) -->
         <div
-          v-if="status === 'authenticated'"
+          v-if="effectiveStatus === 'authenticated'"
           class="flex items-center justify-between px-3 py-2"
         >
           <NuxtLink
@@ -68,11 +68,11 @@
             class="flex items-center gap-3 overflow-hidden group min-w-0"
           >
             <div
-              v-if="profilePic"
+              v-if="userAvatar"
               class="w-8 h-8 rounded-full border border-primary/20 flex-shrink-0 group-hover:scale-105 transition overflow-hidden"
             >
               <img
-                :src="profilePic"
+                :src="userAvatar"
                 alt="Foto de perfil"
                 class="w-full h-full object-cover"
               />
@@ -204,7 +204,7 @@
 
           <!-- Authenticated Logout -->
           <button
-            v-if="status === 'authenticated'"
+            v-if="effectiveStatus === 'authenticated'"
             @click="onSignOut"
             class="w-full flex items-center justify-center gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-xl hover:bg-rose-100 transition"
           >
@@ -249,6 +249,10 @@ const { status, data, signOut } = useAuth();
 const { openProtectedModal } = useProtectedAction();
 const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
 
+const effectiveStatus = computed(() => {
+  return status.value;
+});
+
 watchEffect(() => {
   if (
     status.value === "authenticated" &&
@@ -273,10 +277,14 @@ const userRole = computed<string>(() => {
   return "candidate";
 });
 
-const userName = computed(
-  () => data.value?.user?.name || data.value?.user?.email || "Usuario",
-);
+const userName = computed(() => {
+  return data.value?.user?.name || data.value?.user?.email || "Usuario";
+});
 const userInitial = computed(() => userName.value.charAt(0).toUpperCase());
+
+const userAvatar = computed(() => {
+  return profilePic.value || data.value?.user?.image || "";
+});
 
 const roleBadge = computed(() => {
   switch (userRole.value) {
@@ -301,7 +309,7 @@ const isActive = (path: string): boolean => {
 };
 
 const handleNavClick = (item: NavItem) => {
-  if (status.value !== "authenticated" && item.protected) {
+  if (effectiveStatus.value !== "authenticated" && item.protected) {
     openProtectedModal();
     return;
   }
@@ -310,7 +318,7 @@ const handleNavClick = (item: NavItem) => {
 
 const handleMobileNavClick = (item: NavItem) => {
   closeMobileMenu();
-  if (status.value !== "authenticated" && item.protected) {
+  if (effectiveStatus.value !== "authenticated" && item.protected) {
     openProtectedModal();
     return;
   }
@@ -324,15 +332,15 @@ const navItems = computed<NavItem[]>(() => {
       return [
         { to: "/", icon: "home", label: "Inicio", protected: false },
         {
-          to: "/admin/organizations",
-          icon: "account_balance",
-          label: "Organizaciones",
+          to: "/admin/analytics",
+          icon: "insights",
+          label: "Analítica Avanzada",
           protected: true,
         },
         {
-          to: "/mod/incidents",
-          icon: "report_problem",
-          label: "Incidencias (Org/Vacantes)",
+          to: "/admin/organizations",
+          icon: "account_balance",
+          label: "Organizaciones",
           protected: true,
         },
         {
@@ -341,6 +349,12 @@ const navItems = computed<NavItem[]>(() => {
           label: "Crear Nuevo",
           protected: true,
         }, // CENTER
+        {
+          to: "/mod/incidents",
+          icon: "report_problem",
+          label: "Incidencias (Org/Vacantes)",
+          protected: true,
+        },
         {
           to: "/mod/appeals",
           icon: "gavel",
@@ -476,6 +490,12 @@ const navItems = computed<NavItem[]>(() => {
           to: "/notifications",
           icon: "notifications",
           label: "Notificaciones",
+          protected: true,
+        },
+        {
+          to: "/saved",
+          icon: "bookmark",
+          label: "Favoritos",
           protected: true,
         },
         {

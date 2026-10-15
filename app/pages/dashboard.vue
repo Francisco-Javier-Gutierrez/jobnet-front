@@ -6,19 +6,28 @@
       class="material-symbols-outlined text-4xl animate-spin text-primary mb-3"
       >sync</span
     >
-    <p class="text-sm font-medium">Redirigiendo al Tablero ATS...</p>
+    <p class="text-sm font-medium">Redirigiendo al panel correspondiente...</p>
   </div>
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  redirect: "/applicants",
+const route = useRoute();
+const { data: sessionData } = useAuth();
+
+const userRole = computed(() => {
+  return ((sessionData.value?.user as any)?.tipoUsuario || "").toUpperCase();
 });
 
-const route = useRoute();
+const targetPath =
+  userRole.value === "ADMIN"
+    ? "/admin/analytics"
+    : userRole.value === "MODERATOR" || userRole.value === "MODERADOR"
+      ? "/mod/incidents"
+      : "/applicants";
+
 await navigateTo(
   {
-    path: "/applicants",
+    path: targetPath,
     query: route.query,
   },
   { replace: true },

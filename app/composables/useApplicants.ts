@@ -1,6 +1,8 @@
 import { useRoute, useRouter, useRuntimeConfig } from "#imports";
 import { useAuth } from "#imports";
 import type { ApplicantCandidate, ApplicantStage } from "~/types";
+import { MOCK_VACANCIES, MOCK_APPLICANTS } from "~/utils/mockData";
+import { useCvInteraction } from "~/composables/useCvInteraction";
 
 // Global shared state for the applicants dashboard
 const selectedJobId = ref("");
@@ -20,6 +22,7 @@ const isMobileDetailModalOpen = ref(false);
 const isPdfViewerOpen = ref(false);
 const selectedPdfUrl = ref("");
 const selectedPdfCandidateName = ref("");
+const selectedPdfCandidateId = ref("");
 
 export const useApplicants = () => {
   const route = useRoute();
@@ -96,15 +99,19 @@ export const useApplicants = () => {
   );
 
   const fetchMyJobs = async () => {
-    if (status.value !== "authenticated" || !session.value?.user?.id) {
+    if (status.value !== "authenticated") {
       router.push("/login");
       return;
     }
-    const companyId = session.value.user.id;
+    const companyId = session.value?.user?.id || "";
+
     try {
-      const allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
+      let allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
         () => [],
       );
+      if (!allJobs || allJobs.length === 0) {
+        allJobs = MOCK_VACANCIES;
+      }
       allJobsList.value = allJobs.map((j) => ({
         id: j.id,
         title: j.title || j.titulo || "Vacante",
@@ -184,6 +191,19 @@ export const useApplicants = () => {
           };
         }),
       );
+
+      // Fallback to MOCK_APPLICANTS if no remote applicants exist
+      if (resolvedCandidates.length === 0) {
+        let mockFiltered = [...MOCK_APPLICANTS];
+        if (selectedJobId.value) {
+          mockFiltered = mockFiltered.filter(
+            (c) => c.jobId === selectedJobId.value,
+          );
+        }
+        resolvedCandidates =
+          mockFiltered.length > 0 ? mockFiltered : MOCK_APPLICANTS;
+      }
+
       candidates.value = resolvedCandidates;
       if (resolvedCandidates.length > 0) {
         const stillExists = resolvedCandidates.find(
@@ -197,8 +217,32 @@ export const useApplicants = () => {
       }
     } catch (e) {
       console.error("Error fetching job applicants:", e);
+      candidates.value = MOCK_APPLICANTS;
+      selectedCandidate.value = MOCK_APPLICANTS[0];
     } finally {
       isLoading.value = false;
+    }
+  };
+
+  const openCandidateCv = async (
+    candidate: ApplicantCandidate,
+    action: "VIEW" | "DOWNLOAD" = "VIEW",
+  ) => {
+    if (!candidate) return;
+    selectedPdfUrl.value = candidate.cvUrl || "";
+    selectedPdfCandidateName.value = candidate.name || "";
+    const candidateId =
+      candidate.id || candidate.userId || (candidate as any).candidateId || "";
+    selectedPdfCandidateId.value = candidateId;
+    isPdfViewerOpen.value = true;
+
+    if (candidateId) {
+      const { notifyCvInteraction } = useCvInteraction();
+      const job = myJobs.value.find((j) => j.id === candidate.jobId);
+      await notifyCvInteraction(candidateId, {
+        action,
+        vacancyTitle: job?.title || candidate.jobTitle || "Vacante seleccionada",
+      });
     }
   };
 
@@ -216,6 +260,8 @@ export const useApplicants = () => {
     isPdfViewerOpen,
     selectedPdfUrl,
     selectedPdfCandidateName,
+    selectedPdfCandidateId,
+    openCandidateCv,
     countByStatus,
     jobSelectOptions,
     stageTabs,

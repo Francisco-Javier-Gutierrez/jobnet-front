@@ -1,131 +1,190 @@
 <template>
   <div
-    class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-4 shadow-sm"
+    class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-6 flex flex-col gap-5 shadow-sm"
   >
-    <div class="flex items-center justify-between">
-      <h2
-        class="text-base font-bold text-on-background flex items-center gap-2"
-      >
-        <span class="material-symbols-outlined text-secondary"
-          >folder_open</span
-        >
-        Documentos Adicionales y Certificaciones
-      </h2>
-      <span
-        class="text-xs text-on-surface-variant font-medium bg-surface-container-low px-2.5 py-1 rounded-full border border-outline-variant/40"
-      >
-        {{ docList.length }}
-        {{ docList.length === 1 ? "documento" : "documentos" }}
-      </span>
-    </div>
-    <p
-      class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
-    >
-      Agrega certificaciones, títulos o constancias (Formato PDF, máx 5MB).
-      Puedes subir el archivo directamente a S3 o ingresar una URL de la nube.
-    </p>
-
-    <!-- Upload / Add Container -->
-    <div
-      class="bg-surface-container-low/40 dark:bg-slate-950 p-4 rounded-xl border border-outline-variant/40 space-y-4"
-    >
-      <div
-        class="flex items-center justify-between flex-wrap gap-2 border-b border-outline-variant/30 pb-3"
-      >
-        <h3
-          class="text-xs font-bold text-on-background flex items-center gap-1.5"
-        >
-          <span class="material-symbols-outlined text-sm text-primary"
-            >add_circle</span
-          >
-          Nuevo Documento
-        </h3>
-
-        <div
-          class="flex items-center gap-1 bg-surface-container-high/60 p-1 rounded-lg"
-        >
-          <button
-            type="button"
-            @click="inputMode = 'file'"
-            :class="
-              inputMode === 'file'
-                ? 'bg-primary text-white shadow-sm font-bold'
-                : 'text-on-surface-variant hover:text-on-background'
-            "
-            class="px-2.5 py-1 rounded-md text-[11px] transition flex items-center gap-1"
-          >
-            <span class="material-symbols-outlined text-xs">upload_file</span>
-            Subir Archivo (S3)
-          </button>
-          <button
-            type="button"
-            @click="inputMode = 'url'"
-            :class="
-              inputMode === 'url'
-                ? 'bg-primary text-white shadow-sm font-bold'
-                : 'text-on-surface-variant hover:text-on-background'
-            "
-            class="px-2.5 py-1 rounded-md text-[11px] transition flex items-center gap-1"
-          >
-            <span class="material-symbols-outlined text-xs">link</span>
-            Enlace URL (Nube)
-          </button>
-        </div>
-      </div>
-
-      <!-- Common Title Input -->
+    <!-- Header with Dynamic Counter -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <label
-          class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 block mb-1"
+        <h2
+          class="text-base font-bold text-on-background flex items-center gap-2"
         >
-          Nombre del Documento / Certificación
-        </label>
-        <input
-          v-model="newDocName"
-          type="text"
-          placeholder="Ej: Certificación AWS Cloud, Título Universitario..."
-          class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
-        />
+          <span class="material-symbols-outlined text-secondary"
+            >workspace_premium</span
+          >
+          Documentos y Certificaciones
+        </h2>
+        <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-0.5">
+          Adjunta certificaciones, diplomas y constancias profesionales en PDF (máximo 5 documentos, hasta 5 MB por archivo) o registra enlaces web externos verificables.
+        </p>
       </div>
 
-      <!-- Mode A: File Upload with Explicit Add Button -->
-      <div v-if="inputMode === 'file'" class="space-y-3">
+      <!-- Counter Badge -->
+      <div class="flex items-center gap-2">
+        <span
+          class="text-xs font-bold px-3 py-1 rounded-full border transition"
+          :class="[
+            pdfDocuments.length >= 5
+              ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30'
+              : 'bg-surface-container-low text-on-surface-variant border-outline-variant/40',
+          ]"
+        >
+          {{ pdfDocuments.length }} / 5 documentos PDF
+        </span>
+      </div>
+    </div>
+
+    <!-- Mode Selector Tabs: PDF en S3 vs Enlaces Verificables -->
+    <div
+      class="flex items-center gap-2 bg-surface-container-low/50 dark:bg-slate-950 p-1.5 rounded-xl border border-outline-variant/40"
+    >
+      <button
+        type="button"
+        @click="activeMode = 'pdf'"
+        :class="
+          activeMode === 'pdf'
+            ? 'bg-primary text-white shadow-sm font-bold'
+            : 'text-on-surface-variant hover:text-on-background font-medium'
+        "
+        class="flex-1 py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+      >
+        <span class="material-symbols-outlined text-base">upload_file</span>
+        <span>Subir Documento PDF (S3 Seguro)</span>
+      </button>
+
+      <button
+        type="button"
+        @click="activeMode = 'verifiable_link'"
+        :class="
+          activeMode === 'verifiable_link'
+            ? 'bg-primary text-white shadow-sm font-bold'
+            : 'text-on-surface-variant hover:text-on-background font-medium'
+        "
+        class="flex-1 py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+      >
+        <span class="material-symbols-outlined text-base">verified</span>
+        <span>Registrar Enlace Externo Verificable</span>
+      </button>
+    </div>
+
+    <!-- Mode 1: Subida de Documentos PDF a la Nube (S3) -->
+    <div
+      v-if="activeMode === 'pdf'"
+      class="bg-surface-container-low/30 dark:bg-slate-950/50 p-4 rounded-xl border border-outline-variant/40 space-y-4"
+    >
+      <!-- Alerta cuando se alcanza el límite de 5 documentos -->
+      <div
+        v-if="isPdfLimitReached"
+        class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-800 dark:text-amber-300 text-xs flex items-center gap-2"
+      >
+        <span class="material-symbols-outlined text-lg shrink-0">info</span>
+        <span>
+          Has alcanzado el límite máximo permitido de 5 documentos PDF. Si deseas adjuntar otro documento, elimina uno de los existentes en la lista inferior.
+        </span>
+      </div>
+
+      <div v-else class="space-y-4">
+        <!-- Campos de Metadatos del Documento -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label
+              class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 block mb-1"
+            >
+              Tipo de Documento *
+            </label>
+            <select
+              v-model="newDocType"
+              class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
+            >
+              <option value="CERTIFICACION">📜 Certificación Profesional</option>
+              <option value="DIPLOMA">🎓 Diploma de Especialización / Grado</option>
+              <option value="CONSTANCIA">📄 Constancia Laboral / Participación</option>
+              <option value="OTRO">📑 Otro Documento Profesional</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 block mb-1"
+            >
+              Nombre / Título del Documento *
+            </label>
+            <input
+              v-model="newDocName"
+              type="text"
+              placeholder="Ej: AWS Certified Solutions Architect, Título Profesional..."
+              class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
+            />
+          </div>
+        </div>
+
         <div>
           <label
             class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 block mb-1"
           >
-            Archivo Local PDF (Máx 5MB) *
+            Institución o Entidad Emisora (Opcional)
           </label>
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              @click="triggerFileSelect"
-              :disabled="isUploading"
-              class="flex-1 bg-surface border border-outline-variant/60 hover:border-primary text-primary text-xs font-bold py-2.5 px-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              <span
-                v-if="isUploading"
-                class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
-                aria-hidden="true"
-              ></span>
-              <span v-else class="material-symbols-outlined text-base"
-                >upload_file</span
-              >
-              <span class="truncate">{{
-                selectedFile
-                  ? selectedFile.name
-                  : "Seleccionar PDF de tu equipo"
-              }}</span>
-            </button>
-          </div>
+          <input
+            v-model="newDocIssuer"
+            type="text"
+            placeholder="Ej: Amazon Web Services, Universidad Autónoma, Scrum Alliance..."
+            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
+          />
         </div>
 
-        <div class="flex justify-end pt-1">
+        <!-- Zona Drag & Drop para PDF -->
+        <div
+          class="border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer transition select-none"
+          :class="[
+            isDragging
+              ? 'border-primary bg-primary/10 ring-2 ring-primary/30 scale-[1.01]'
+              : 'border-outline-variant/60 hover:border-primary/60 bg-surface hover:bg-primary/5',
+            isUploading ? 'opacity-60 pointer-events-none' : '',
+          ]"
+          @click="triggerFileSelect"
+          @dragover.prevent="isDragging = true"
+          @dragleave.prevent="isDragging = false"
+          @drop.prevent="onFileDrop"
+        >
+          <span class="material-symbols-outlined text-3xl text-primary"
+            >cloud_upload</span
+          >
+          <p class="text-xs font-bold text-on-background">
+            <span v-if="selectedFile">{{ selectedFile.name }}</span>
+            <span v-else-if="isDragging" class="text-primary"
+              >¡Suelta tu archivo PDF aquí!</span
+            >
+            <span v-else
+              >Arrastra tu archivo PDF aquí o haz clic para examinar</span
+            >
+          </p>
+          <p class="text-[11px] text-on-surface-variant dark:text-slate-400">
+            Formato: PDF exclusivamente · Peso máximo: 5 MB por archivo
+          </p>
+
+          <span
+            v-if="selectedFile"
+            class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-full"
+          >
+            Archivo listo: {{ (selectedFile.size / (1024 * 1024)).toFixed(2) }} MB
+          </span>
+        </div>
+
+        <!-- Botón de Confirmación de Carga -->
+        <div class="flex justify-end gap-2 pt-1">
+          <button
+            v-if="selectedFile"
+            type="button"
+            @click="clearSelectedFile"
+            class="px-3 py-2 text-xs font-semibold text-on-surface-variant hover:text-rose-500 transition cursor-pointer"
+          >
+            Cancelar
+          </button>
+
           <button
             type="button"
             @click="uploadAndAddFile"
             :disabled="!selectedFile || isUploading"
-            class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 text-xs font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+            class="bg-primary hover:bg-primary-container disabled:bg-primary/40 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
           >
             <span
               v-if="isUploading"
@@ -133,107 +192,233 @@
               aria-hidden="true"
             ></span>
             <span v-else class="material-symbols-outlined text-sm"
-              >add_circle</span
+              >check_circle</span
             >
             <span>{{
               isUploading
-                ? uploadProgress || "Subiendo archivo..."
-                : "Subir y Agregar a la Lista"
+                ? uploadProgress || "Subiendo archivo a la nube..."
+                : "Guardar Documento en la Nube"
             }}</span>
           </button>
         </div>
       </div>
+    </div>
 
-      <!-- Mode B: Direct URL Input with Add Button -->
-      <div v-else class="space-y-3">
+    <!-- Mode 2: Registrar Enlaces Web Externos Verificables -->
+    <div
+      v-else
+      class="bg-surface-container-low/30 dark:bg-slate-950/50 p-4 rounded-xl border border-outline-variant/40 space-y-4"
+    >
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label
             class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 block mb-1"
           >
-            Enlace URL del Documento (Google Drive, Dropbox, etc.) *
+            Nombre de la Credencial / Certificación *
           </label>
           <input
-            v-model="directUrl"
-            type="url"
-            placeholder="https://drive.google.com/file/d/..."
+            v-model="externalTitle"
+            type="text"
+            placeholder="Ej: Specialization in Deep Learning, Scrum Master..."
             class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
           />
         </div>
-        <div class="flex justify-end pt-1">
-          <button
-            type="button"
-            @click="addUrlDocument"
-            :disabled="!directUrl.trim()"
-            class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 text-xs font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+
+        <div>
+          <label
+            class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 block mb-1"
           >
-            <span class="material-symbols-outlined text-sm">add_link</span>
-            <span>Agregar Enlace a la Lista</span>
-          </button>
+            Plataforma / Institución Emisora *
+          </label>
+          <input
+            v-model="externalIssuer"
+            type="text"
+            placeholder="Ej: Coursera, Platzi, Credly, LinkedIn Learning..."
+            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
+          />
         </div>
       </div>
 
-      <!-- Error feedback -->
-      <p
-        v-if="docError"
-        class="text-xs text-rose-600 font-semibold bg-rose-500/10 p-2.5 rounded-lg border border-rose-500/20"
-      >
-        {{ docError }}
-      </p>
-
-      <input
-        type="file"
-        ref="fileInput"
-        @change="handleFileSelected"
-        accept="application/pdf"
-        class="hidden"
-      />
-    </div>
-
-    <!-- Uploaded Documents List -->
-    <div v-if="docList.length > 0" class="space-y-2 pt-1">
-      <h3
-        class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center justify-between"
-      >
-        <span>Documentos Registrados ({{ docList.length }})</span>
-        <span class="text-[10px] text-on-surface-variant font-normal"
-          >Pulsa "Guardar Cambios del Perfil" al finalizar</span
+      <div>
+        <label
+          class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 block mb-1"
         >
-      </h3>
+          Enlace Web de Verificación Externa *
+        </label>
+        <div class="relative">
+          <input
+            v-model="externalUrl"
+            type="url"
+            placeholder="https://www.credly.com/badges/... o https://coursera.org/verify/..."
+            class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition pr-9"
+          />
+          <span
+            class="material-symbols-outlined absolute right-2.5 top-2 text-sm text-on-surface-variant pointer-events-none"
+            >link</span
+          >
+        </div>
+        <p class="text-[10px] text-on-surface-variant dark:text-slate-400 mt-1">
+          Debe ser una URL pública donde reclutadores puedan corroborar la autenticidad de tu certificación.
+        </p>
+      </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <AppFileAttachment
-          v-for="(doc, index) in docList"
-          :key="doc.url || index"
-          :name="doc.name || doc.nombre || 'Documento Adicional'"
-          :type="
-            doc.type === 'pdf' || (doc.url && doc.url.includes('.pdf'))
-              ? 'pdf'
-              : 'image'
-          "
-          :show-preview="true"
-          :show-remove="true"
-          @preview="openPreview(doc)"
-          @remove="removeDocument(index)"
+      <div class="flex justify-end pt-1">
+        <button
+          type="button"
+          @click="addVerifiableLink"
+          :disabled="!externalTitle.trim() || !externalUrl.trim()"
+          class="bg-primary hover:bg-primary-container disabled:bg-primary/40 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
         >
-          <template #extra-actions>
-            <a
-              :href="doc.url"
-              target="_blank"
-              rel="noopener"
-              class="font-bold px-2 py-1.5 rounded-lg text-[11px] sm:text-xs transition flex items-center gap-1 text-on-surface-variant hover:text-primary hover:bg-primary/10 hover:underline cursor-pointer hidden sm:flex"
-              title="Abrir en pestaña nueva"
-            >
-              <span class="material-symbols-outlined text-[14px]"
-                >open_in_new</span
-              >
-              <span>Abrir</span>
-            </a>
-          </template>
-        </AppFileAttachment>
+          <span class="material-symbols-outlined text-sm">verified</span>
+          <span>Registrar Enlace Verificable</span>
+        </button>
       </div>
     </div>
 
-    <!-- Standardized PDF Preview Modal -->
+    <!-- Error Feedback -->
+    <div
+      v-if="docError"
+      class="text-xs text-rose-600 dark:text-rose-400 font-semibold bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl flex items-center gap-2"
+    >
+      <span class="material-symbols-outlined text-base">error</span>
+      <span>{{ docError }}</span>
+    </div>
+
+    <input
+      type="file"
+      ref="fileInput"
+      @change="handleFileSelected"
+      accept="application/pdf,.pdf"
+      class="hidden"
+    />
+
+    <!-- Listado de Documentos y Certificaciones Registradas -->
+    <div v-if="docList.length > 0" class="space-y-3 pt-2">
+      <div class="flex items-center justify-between border-b border-outline-variant/40 pb-2">
+        <h3
+          class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-sm text-primary">folder</span>
+          Documentos y Certificaciones Registradas ({{ docList.length }})
+        </h3>
+        <span class="text-[11px] text-on-surface-variant">
+          Pulsa "Guardar Cambios del Perfil" al finalizar
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div
+          v-for="(doc, index) in docList"
+          :key="doc.url || index"
+          class="bg-surface border border-outline-variant/60 hover:border-primary/50 rounded-xl p-3.5 flex flex-col justify-between gap-3 shadow-xs transition"
+        >
+          <div class="flex items-start gap-3 min-w-0">
+            <!-- Icono según tipo -->
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+              :class="
+                doc.esEnlaceExterno
+                  ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                  : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+              "
+            >
+              <span class="material-symbols-outlined text-xl">
+                {{ doc.esEnlaceExterno ? "verified" : "picture_as_pdf" }}
+              </span>
+            </div>
+
+            <!-- Información -->
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span
+                  v-if="doc.tipoDocumento"
+                  class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant"
+                >
+                  {{ formatDocType(doc.tipoDocumento) }}
+                </span>
+                <span
+                  v-if="doc.esEnlaceExterno"
+                  class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20"
+                >
+                  Enlace Verificable
+                </span>
+                <span
+                  v-else
+                  class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-0.5"
+                >
+                  <span class="material-symbols-outlined text-[10px]">lock_clock</span>
+                  Acceso seguro (1h)
+                </span>
+              </div>
+
+              <h4
+                class="text-xs font-bold text-on-background truncate mt-1"
+                :title="doc.name || doc.nombre"
+              >
+                {{ doc.name || doc.nombre || "Documento Adjunto" }}
+              </h4>
+
+              <p
+                v-if="doc.institucion"
+                class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate"
+              >
+                Emisor: {{ doc.institucion }}
+              </p>
+
+              <p
+                v-if="doc.tamano"
+                class="text-[10px] text-on-surface-variant/80 dark:text-slate-500"
+              >
+                Tamaño: {{ (doc.tamano / (1024 * 1024)).toFixed(2) }} MB
+              </p>
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div
+            class="flex items-center justify-between pt-2 border-t border-outline-variant/30 text-xs"
+          >
+            <!-- Acción de Verificación / Previsualización Segura -->
+            <template v-if="doc.esEnlaceExterno">
+              <a
+                :href="doc.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-blue-600 dark:text-blue-400 hover:underline font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+              >
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                <span>Verificar en Sitio Web</span>
+              </a>
+            </template>
+
+            <template v-else>
+              <button
+                type="button"
+                @click="openSecurePreview(doc)"
+                :disabled="loadingSecureUrl"
+                class="text-primary hover:underline font-bold text-[11px] flex items-center gap-1 cursor-pointer disabled:opacity-50"
+              >
+                <span class="material-symbols-outlined text-sm">visibility</span>
+                <span>Ver documento seguro</span>
+              </button>
+            </template>
+
+            <!-- Botón Eliminar -->
+            <button
+              type="button"
+              @click="removeDocument(index)"
+              class="text-rose-500 hover:text-rose-600 font-semibold text-[11px] flex items-center gap-0.5 transition cursor-pointer"
+              title="Eliminar documento"
+            >
+              <span class="material-symbols-outlined text-sm">delete</span>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Visualización Segura de PDF -->
     <AppPdfPreviewModal
       v-model="showPdfModal"
       :url="previewPdfUrl"
@@ -243,19 +428,12 @@
 </template>
 
 <script setup lang="ts">
-import { useUploadStore } from "~/stores/upload";
-import type { AdditionalDoc } from "~/types";
+import { useS3Upload } from "~/composables/useS3Upload";
+import { useAppFeedback } from "~/composables/useAppFeedback";
+import type { AdditionalDoc } from "~/types/candidate";
 
-const showPdfModal = ref(false);
-const previewPdfUrl = ref("");
-const previewPdfTitle = ref("");
-
-const openPreview = (doc: AdditionalDoc) => {
-  if (!doc.url) return;
-  previewPdfUrl.value = doc.url;
-  previewPdfTitle.value = doc.name || doc.nombre || "Documento Adicional";
-  showPdfModal.value = true;
-};
+const MAX_PDF_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_ADDITIONAL_PDFS = 5;
 
 const props = withDefaults(
   defineProps<{
@@ -270,17 +448,35 @@ const emit = defineEmits<{
   (e: "update:documentosAdicionales", value: AdditionalDoc[]): void;
 }>();
 
-const { data: session } = useAuth();
-const inputMode = ref<"file" | "url">("file");
-const fileInput = ref<HTMLInputElement | null>(null);
-const newDocName = ref("");
-const selectedFile = ref<File | null>(null);
-const directUrl = ref("");
-const docError = ref("");
-const isUploading = ref(false);
-const uploadProgress = ref("");
+const { isUploading, uploadFile, getSecureViewUrl } = useS3Upload();
+const { showError } = useAppFeedback();
 
-// Bulletproof array converter to guarantee iterability
+const activeMode = ref<"pdf" | "verifiable_link">("pdf");
+const fileInput = ref<HTMLInputElement | null>(null);
+const isDragging = ref(false);
+const docError = ref("");
+const uploadProgress = ref("");
+const loadingSecureUrl = ref(false);
+
+// Formulario Modo PDF
+const newDocType = ref<"CERTIFICACION" | "DIPLOMA" | "CONSTANCIA" | "OTRO">(
+  "CERTIFICACION",
+);
+const newDocName = ref("");
+const newDocIssuer = ref("");
+const selectedFile = ref<File | null>(null);
+
+// Formulario Modo Enlace Externo Verificable
+const externalTitle = ref("");
+const externalIssuer = ref("");
+const externalUrl = ref("");
+
+// Visor Modal
+const showPdfModal = ref(false);
+const previewPdfUrl = ref("");
+const previewPdfTitle = ref("");
+
+// Lista normalizada de documentos
 const docList = computed<AdditionalDoc[]>(() => {
   const raw = props.documentosAdicionales;
   if (Array.isArray(raw)) return raw;
@@ -291,40 +487,87 @@ const docList = computed<AdditionalDoc[]>(() => {
       url: typeof item === "string" ? item : item?.url || "",
       type: (typeof item === "string" ? item : item?.url || "").includes(".pdf")
         ? "pdf"
-        : "image",
+        : "link",
     }));
   }
   return [];
 });
 
+// Documentos PDF almacenados en S3 (excluye enlaces externos verificables)
+const pdfDocuments = computed(() => {
+  return docList.value.filter(
+    (d) =>
+      !d.esEnlaceExterno &&
+      (d.type === "pdf" || (d.url && d.url.toLowerCase().includes(".pdf"))),
+  );
+});
+
+// Condición de límite alcanzado (máximo 5 documentos PDF)
+const isPdfLimitReached = computed(() => {
+  return pdfDocuments.value.length >= MAX_ADDITIONAL_PDFS;
+});
+
+function formatDocType(type?: string): string {
+  switch (type) {
+    case "CERTIFICACION":
+      return "Certificación";
+    case "DIPLOMA":
+      return "Diploma";
+    case "CONSTANCIA":
+      return "Constancia";
+    case "OTRO":
+      return "Documento";
+    default:
+      return "Profesional";
+  }
+}
+
 function triggerFileSelect() {
-  if (isUploading.value) return;
+  if (isUploading.value || isPdfLimitReached.value) return;
   fileInput.value?.click();
+}
+
+function onFileDrop(e: DragEvent) {
+  isDragging.value = false;
+  if (isUploading.value || isPdfLimitReached.value) return;
+  const files = e.dataTransfer?.files;
+  if (!files || files.length === 0) return;
+  validateAndSelectFile(files[0]);
 }
 
 function handleFileSelected(e: Event) {
   const target = e.target as HTMLInputElement;
   if (!target.files || target.files.length === 0) return;
-  const file = target.files[0];
+  validateAndSelectFile(target.files[0]);
+}
+
+function validateAndSelectFile(file: File) {
   docError.value = "";
 
-  if (
-    file.type !== "application/pdf" &&
-    !file.name.toLowerCase().endsWith(".pdf")
-  ) {
+  if (isPdfLimitReached.value) {
+    docError.value =
+      "Has alcanzado el límite máximo de 5 documentos PDF permitidos.";
+    return;
+  }
+
+  const isPdf =
+    file.type === "application/pdf" ||
+    file.type === "application/x-pdf" ||
+    file.name.toLowerCase().endsWith(".pdf");
+
+  if (!isPdf) {
     docError.value = "Solo se permiten archivos en formato PDF.";
     selectedFile.value = null;
     if (fileInput.value) fileInput.value.value = "";
     return;
   }
 
-  if (file.size > 10 * 1024 * 1024) {
+  if (file.size > MAX_PDF_SIZE) {
     const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-    const msg = `El archivo PDF "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de 10MB.`;
+    const msg = `El archivo PDF "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de 5 MB.`;
     docError.value = msg;
     selectedFile.value = null;
     if (fileInput.value) fileInput.value.value = "";
-    const { showError } = useAppFeedback();
     showError("Límite de Tamaño Excedido", msg, null);
     return;
   }
@@ -335,84 +578,129 @@ function handleFileSelected(e: Event) {
   }
 }
 
+function clearSelectedFile() {
+  selectedFile.value = null;
+  if (fileInput.value) fileInput.value.value = "";
+}
+
 async function uploadAndAddFile() {
   if (!selectedFile.value) {
-    docError.value = "Por favor selecciona un archivo PDF o imagen primero.";
+    docError.value = "Por favor selecciona un archivo PDF primero.";
+    return;
+  }
+
+  if (isPdfLimitReached.value) {
+    docError.value =
+      "Has alcanzado el límite máximo de 5 documentos PDF adicionales.";
     return;
   }
 
   docError.value = "";
   const file = selectedFile.value;
-  const docTitle =
+  const title =
     newDocName.value.trim() || file.name.replace(/\.[^/.]+$/, "");
 
-  isUploading.value = true;
-  uploadProgress.value = "Subiendo archivo a S3...";
+  uploadProgress.value = "Subiendo archivo a S3 de forma segura...";
 
   try {
-    const uploadStore = useUploadStore();
-    const userId = session.value?.user?.id || "user";
-    const res = await uploadStore.uploadFile(file, "documents", userId);
+    const result = await uploadFile(file, {
+      folder: "documents",
+      contentType: "application/pdf",
+    });
 
-    if (res.success && res.url) {
-      const isPdf =
-        file.type === "application/pdf" ||
-        file.name.toLowerCase().endsWith(".pdf");
+    if (result?.url) {
       const newItem: AdditionalDoc = {
-        name: docTitle,
-        nombre: docTitle,
-        url: res.url,
-        type: isPdf ? "pdf" : "image",
+        id: `doc-${Date.now()}`,
+        name: title,
+        nombre: title,
+        url: result.url,
+        s3Key: result.key,
+        type: "pdf",
+        tipoDocumento: newDocType.value,
+        institucion: newDocIssuer.value.trim() || undefined,
+        tamano: file.size,
+        fechaSubida: new Date().toISOString(),
+        esEnlaceExterno: false,
       };
 
       const updated = [...docList.value, newItem];
       emit("update:documentosAdicionales", updated);
 
-      // Reset file input and state
+      // Limpiar formulario
       newDocName.value = "";
+      newDocIssuer.value = "";
       selectedFile.value = null;
       if (fileInput.value) fileInput.value.value = "";
     } else {
-      docError.value =
-        res.error || "No se pudo completar la carga del archivo a S3.";
+      docError.value = "Error al completar la carga segura a S3.";
     }
   } catch (err: any) {
-    docError.value = err.message || "Error durante la subida del documento.";
+    docError.value = err.message || "Error al subir el documento.";
   } finally {
-    isUploading.value = false;
     uploadProgress.value = "";
   }
 }
 
-function addUrlDocument() {
+function addVerifiableLink() {
   docError.value = "";
-  let url = directUrl.value.trim();
-  if (!url) return;
+  let url = externalUrl.value.trim();
+  const title = externalTitle.value.trim();
+  const issuer = externalIssuer.value.trim();
+
+  if (!title) {
+    docError.value = "El título de la certificación o credencial es requerido.";
+    return;
+  }
+
+  if (!url) {
+    docError.value = "La URL de verificación externa es requerida.";
+    return;
+  }
 
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     url = "https://" + url;
   }
 
-  const docTitle = newDocName.value.trim() || "Documento Web";
-  const isPdf = url.toLowerCase().includes(".pdf");
-
   const newItem: AdditionalDoc = {
-    name: docTitle,
-    nombre: docTitle,
+    id: `link-${Date.now()}`,
+    name: title,
+    nombre: title,
     url,
-    type: isPdf ? "pdf" : "image",
+    type: "link",
+    tipoDocumento: "CERTIFICACION",
+    institucion: issuer || undefined,
+    fechaSubida: new Date().toISOString(),
+    esEnlaceExterno: true,
   };
 
   const updated = [...docList.value, newItem];
   emit("update:documentosAdicionales", updated);
 
-  newDocName.value = "";
-  directUrl.value = "";
+  // Limpiar formulario
+  externalTitle.value = "";
+  externalIssuer.value = "";
+  externalUrl.value = "";
 }
 
 function removeDocument(index: number) {
   const updated = [...docList.value];
   updated.splice(index, 1);
   emit("update:documentosAdicionales", updated);
+}
+
+/**
+ * Abre el visor de PDF solicitando un enlace de acceso temporal y seguro (1h) en la nube
+ */
+async function openSecurePreview(doc: AdditionalDoc) {
+  if (!doc.url) return;
+  loadingSecureUrl.value = true;
+  try {
+    const secureUrl = await getSecureViewUrl(doc.s3Key || doc.url);
+    previewPdfUrl.value = secureUrl;
+    previewPdfTitle.value = doc.name || doc.nombre || "Documento Seguro";
+    showPdfModal.value = true;
+  } finally {
+    loadingSecureUrl.value = false;
+  }
 }
 </script>

@@ -79,6 +79,32 @@
       </NuxtLink>
     </div>
 
+    <!-- Vacancy Suspended State -->
+    <div
+      v-else-if="job.suspendida || job.estatus === 'Oculta'"
+      class="flex flex-col items-center justify-center py-20 text-center bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-3xl shadow-sm px-6"
+    >
+      <div
+        class="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-900 text-rose-600 flex items-center justify-center mb-4"
+      >
+        <span class="material-symbols-outlined text-[32px]">visibility_off</span>
+      </div>
+      <h2 class="text-lg font-bold text-on-background mb-2">
+        Vacante no disponible
+      </h2>
+      <p
+        class="text-on-surface-variant dark:text-slate-300 text-xs max-w-sm mb-6"
+      >
+        Esta oferta laboral ha sido ocultada automáticamente del portal debido a la suspensión de la organización publicadora.
+      </p>
+      <NuxtLink
+        to="/vacancies"
+        class="bg-primary text-white hover:bg-primary-container font-semibold text-xs px-5 py-2.5 rounded-xl transition"
+      >
+        Volver a la Bolsa de Trabajo
+      </NuxtLink>
+    </div>
+
     <!-- UNIFIED MASTER DETAIL CARD -->
     <div
       v-else
@@ -93,8 +119,10 @@
         :job="job"
         :hasApplied="hasApplied"
         :isApplying="isApplying"
+        :isBookmarked="isJobBookmarked"
         :formatSalaryDisplay="formatSalaryDisplay"
         @easyApply="handleEasyApplyClick"
+        @bookmark="toggleJobBookmark"
       />
 
       <hr class="border-outline-variant/30" />
@@ -127,6 +155,7 @@
         :candidateProfileDocs="candidateProfileDocs"
         v-model:selectedProfileLinks="selectedProfileLinks"
         v-model:selectedProfileDocs="selectedProfileDocs"
+        v-model:filterAnswers="filterAnswers"
         @easyApply="handleEasyApplyClick"
       />
 
@@ -246,6 +275,7 @@ const {
   selectedProfileDocs,
   candidateProfileLinks,
   candidateProfileDocs,
+  filterAnswers,
   isApplying,
   hasApplied,
   fetchCandidateProfile,
@@ -269,6 +299,40 @@ const {
   canDeleteComment,
   formatDate,
 } = useJobComments(jobId, job);
+
+const { status } = useAuth();
+const { openProtectedModal } = useProtectedAction();
+
+const currentUserId = computed(() => (session.value?.user as any)?.id || "");
+const isJobBookmarked = computed(() => {
+  if (!job.value || !currentUserId.value) return false;
+  const list = (job.value as any).bookmarksList || [];
+  return list.includes(currentUserId.value);
+});
+
+const toggleJobBookmark = async () => {
+  if (status.value !== "authenticated") {
+    openProtectedModal();
+    return;
+  }
+  if (!job.value || !currentUserId.value) return;
+  const j = job.value as any;
+  if (!j.bookmarksList) j.bookmarksList = [];
+  const idx = j.bookmarksList.indexOf(currentUserId.value);
+  if (idx !== -1) {
+    j.bookmarksList.splice(idx, 1);
+  } else {
+    j.bookmarksList.push(currentUserId.value);
+  }
+  try {
+    await $fetch(`/api/jobs/${jobId}/bookmark`, {
+      method: "POST",
+      body: { userUuid: currentUserId.value },
+    });
+  } catch (e) {
+    console.error("Error toggling job bookmark:", e);
+  }
+};
 
 useHead({
   link: [

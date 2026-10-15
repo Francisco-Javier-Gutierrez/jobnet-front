@@ -40,6 +40,11 @@ export default defineNuxtConfig({
       vapidPublicKey:
         process.env.NUXT_PUBLIC_VAPID_KEY ||
         "BOIrktuQCHHiOWcKICA7YEwdKJf8WNYCmBS_PI338wnaB9VqXPQfCRwTN5NLYokujXBp5pdD83av6DACG2rAYok",
+      cognitoClientId:
+        process.env.COGNITO_CLIENT_ID || "4ef8k4tofjj4ounvo8nf7d9pep",
+      cognitoDomain:
+        process.env.COGNITO_DOMAIN ||
+        "jobnet-auth-prod.auth.us-east-1.amazoncognito.com",
     },
   },
   app: {

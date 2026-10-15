@@ -143,20 +143,39 @@
 </template>
 
 <script setup lang="ts">
+import { useCvInteraction } from "~/composables/useCvInteraction";
+
 const props = defineProps<{
   modelValue: boolean;
   url: string;
   title?: string;
   fileName?: string;
+  candidateId?: string;
+  vacancyTitle?: string;
 }>();
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
 }>();
 
+const { notifyCvInteraction } = useCvInteraction();
+
 const close = () => {
   emit("update:modelValue", false);
 };
+
+// Notificación de Interacción con el CV al abrir el visor
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+    if (isOpen && props.candidateId) {
+      notifyCvInteraction(props.candidateId, {
+        action: "VIEW",
+        vacancyTitle: props.vacancyTitle,
+      });
+    }
+  },
+);
 
 const isImage = computed(() => {
   if (!props.url) return false;
@@ -180,6 +199,15 @@ const isDownloading = ref(false);
 
 const triggerDirectDownload = async () => {
   if (!props.url || isDownloading.value) return;
+
+  // Notificación de Interacción con el CV al descargar el documento
+  if (props.candidateId) {
+    notifyCvInteraction(props.candidateId, {
+      action: "DOWNLOAD",
+      vacancyTitle: props.vacancyTitle,
+    });
+  }
+
   isDownloading.value = true;
   try {
     const res = await fetch(props.url);

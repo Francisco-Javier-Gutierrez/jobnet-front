@@ -20,6 +20,19 @@
     </div>
 
     <div
+      v-else-if="job.estado === 'PAUSADA'"
+      class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-800 dark:text-amber-300 text-xs leading-relaxed space-y-1"
+    >
+      <p class="font-bold flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-base">pause_circle</span>
+        Postulaciones pausadas temporalmente
+      </p>
+      <p>
+        Esta oferta de empleo ha sido pausada temporalmente por la organización. No se admiten nuevas solicitudes de empleo por el momento.
+      </p>
+    </div>
+
+    <div
       v-else-if="hasApplied"
       class="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-3xl text-emerald-800 text-xs leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm"
     >
@@ -188,6 +201,49 @@
         </div>
       </div>
 
+      <!-- Preguntas Filtro de Precalificación Obligatorias -->
+      <div
+        v-if="screeningQuestions.length > 0"
+        class="space-y-3 bg-primary/5 border border-primary/20 p-4 rounded-2xl"
+      >
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <label class="text-xs font-bold text-on-background flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-primary">quiz</span>
+            Preguntas Filtro de la Empresa
+          </label>
+          <span class="text-[10px] font-bold text-rose-500 uppercase tracking-wider bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20">
+            * Respuestas Obligatorias ({{ screeningQuestions.length }})
+          </span>
+        </div>
+        <p class="text-[11px] text-on-surface-variant dark:text-slate-400">
+          La organización requiere que respondas a las siguientes preguntas para precalificar tu postulación:
+        </p>
+
+        <div class="space-y-3">
+          <div
+            v-for="(pregunta, idx) in screeningQuestions"
+            :key="idx"
+            class="space-y-1"
+          >
+            <label class="text-xs font-semibold text-on-background flex items-start gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-primary/10 text-primary font-bold text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5">
+                {{ idx + 1 }}
+              </span>
+              <span>{{ pregunta }}</span>
+              <span class="text-rose-500 font-bold">*</span>
+            </label>
+            <textarea
+              :value="(filterAnswers && filterAnswers[pregunta]) || ''"
+              @input="updateAnswer(pregunta, ($event.target as HTMLTextAreaElement).value)"
+              rows="2"
+              required
+              :placeholder="`Escribe tu respuesta a: ${pregunta}`"
+              class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl p-2.5 text-xs text-on-background outline-none transition placeholder-on-surface-variant/50 resize-none font-sans"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
       <div
         class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant/20"
       >
@@ -200,7 +256,7 @@
         <button
           type="button"
           @click="$emit('easyApply')"
-          :disabled="isApplying"
+          :disabled="isApplying || hasMissingFilterAnswers || job.estado === 'PAUSADA'"
           class="w-full sm:w-auto bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-primary/20 active:scale-95 disabled:opacity-50 flex-shrink-0"
         >
           <span
@@ -208,11 +264,16 @@
             class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
             aria-hidden="true"
           ></span>
+          <span v-else-if="job.estado === 'PAUSADA'" class="material-symbols-outlined text-sm">pause_circle</span>
           <span v-else class="material-symbols-outlined text-sm">send</span>
           <span>{{
             isApplying
               ? "Enviando Candidatura..."
-              : "Enviar Solicitud de Empleo"
+              : job.estado === "PAUSADA"
+                ? "Vacante Pausada"
+                : hasMissingFilterAnswers
+                  ? "Responde las Preguntas Filtro"
+                  : "Enviar Solicitud de Empleo"
           }}</span>
         </button>
       </div>
@@ -224,27 +285,50 @@
 import type { Job } from "~/types";
 import type { Session } from "next-auth";
 
-const props = defineProps<{
-  job: Job;
-  jobId: string;
-  hasApplied: boolean;
-  isApplying: boolean;
-  session: Session | null;
-  profileCvUrl: string;
-  profileCvName: string;
-  coverLetterInput: string;
-  candidateProfileLinks: { label: string; url: string }[];
-  candidateProfileDocs: { name: string; url: string }[];
-  selectedProfileLinks: string[];
-  selectedProfileDocs: string[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    job: Job;
+    jobId: string;
+    hasApplied: boolean;
+    isApplying: boolean;
+    session: Session | null;
+    profileCvUrl: string;
+    profileCvName: string;
+    coverLetterInput: string;
+    candidateProfileLinks: { label: string; url: string }[];
+    candidateProfileDocs: { name: string; url: string }[];
+    selectedProfileLinks: string[];
+    selectedProfileDocs: string[];
+    filterAnswers?: Record<string, string>;
+  }>(),
+  {
+    filterAnswers: () => ({}),
+  },
+);
 
 const emit = defineEmits<{
   (e: "easyApply"): void;
   (e: "update:coverLetterInput", value: string): void;
   (e: "update:selectedProfileLinks", value: string[]): void;
   (e: "update:selectedProfileDocs", value: string[]): void;
+  (e: "update:filterAnswers", value: Record<string, string>): void;
 }>();
+
+const screeningQuestions = computed(() => {
+  return props.job?.preguntasFiltro || props.job?.screeningQuestions || [];
+});
+
+const hasMissingFilterAnswers = computed(() => {
+  if (screeningQuestions.value.length === 0) return false;
+  return screeningQuestions.value.some(
+    (q) => !props.filterAnswers?.[q] || !props.filterAnswers[q].trim(),
+  );
+});
+
+const updateAnswer = (question: string, value: string) => {
+  const updated = { ...(props.filterAnswers || {}), [question]: value };
+  emit("update:filterAnswers", updated);
+};
 
 const updateLinksArray = (url: string, checked: boolean) => {
   let newLinks = [...props.selectedProfileLinks];

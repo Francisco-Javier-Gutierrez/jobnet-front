@@ -137,6 +137,8 @@
 </template>
 
 <script setup lang="ts">
+import { MOCK_VERIFICATIONS } from "~/utils/mockData";
+
 useSeoMeta({
   title: "Verificaciones Corporativas - JobNet",
   description:
@@ -153,9 +155,10 @@ const fetchRequests = async () => {
     const data = await $fetch<any[]>(
       `${config.public.apiUrl}/moderator/verifications`,
     );
-    requests.value = data || [];
+    requests.value = data && data.length > 0 ? data : MOCK_VERIFICATIONS;
   } catch (e) {
     console.error("Error loading verification requests:", e);
+    requests.value = MOCK_VERIFICATIONS;
   } finally {
     loading.value = false;
   }

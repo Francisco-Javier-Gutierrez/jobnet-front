@@ -26,12 +26,18 @@ export interface WebLinkItem {
 }
 
 export interface AdditionalDoc {
+  id?: string;
   name: string;
   nombre?: string;
   url: string;
+  s3Key?: string;
   type: "pdf" | "image" | string;
+  tipoDocumento?: "CERTIFICACION" | "DIPLOMA" | "CONSTANCIA" | "OTRO";
   meta?: string;
   fechaSubida?: string;
+  tamano?: number;
+  institucion?: string;
+  esEnlaceExterno?: boolean;
 }
 
 export interface CandidateProfile {

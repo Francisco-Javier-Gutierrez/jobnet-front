@@ -1,5 +1,6 @@
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import type { Appeal, AppealMessage, AppealAttachment } from "~/types";
+import { MOCK_APPEALS } from "~/utils/mockData";
 
 export const useAppeals = () => {
   const { showError, showSuccess, showInfo } = useAppFeedback();
@@ -74,7 +75,8 @@ export const useAppeals = () => {
         `${config.public.apiUrl}/moderator/appeals`,
       ).catch(() => []);
 
-      appeals.value = (data || []).map((item) => ({
+      const list = data && data.length > 0 ? data : MOCK_APPEALS;
+      appeals.value = (list || []).map((item) => ({
         ...item,
         messages: item.messages || [],
       }));
@@ -84,6 +86,10 @@ export const useAppeals = () => {
       }
     } catch (err) {
       console.error("Error fetching appeals:", err);
+      appeals.value = MOCK_APPEALS;
+      if (MOCK_APPEALS.length > 0 && !selectedAppealId.value) {
+        await selectAppeal(MOCK_APPEALS[0]);
+      }
     } finally {
       isLoading.value = false;
     }

@@ -89,6 +89,7 @@
       v-model="showDocViewer"
       :url="selectedDocUrl"
       :title="selectedDocTitle"
+      :candidate-id="isOwner ? undefined : candidateId"
     />
 
     <!-- Body Card -->
@@ -108,17 +109,22 @@
       <CandidateSkillsList :skills="skills" />
     </section>
 
-    <!-- Bottom Section Tabs: [Mis publicaciones] / [Guardados] -->
+    <!-- Bottom Section Tabs: [Mis publicaciones] / [Panel de Favoritos (Solo para el propietario)] -->
     <CandidateActivityTabs
       v-model="activeTab"
+      :is-owner="isOwner"
       :user-posts="userPosts"
       :bookmarked-posts="bookmarkedPosts"
+      :bookmarked-jobs="bookmarkedJobs"
       :loading-posts="loadingPosts"
       :auth-data="authData"
       :is-bookmarked="isBookmarked"
       @like="toggleLike"
       @bookmark="toggleBookmark"
       @share="sharePost"
+      @like-job="toggleJobLike"
+      @bookmark-job="toggleJobBookmark"
+      @share-job="shareJob"
     />
   </main>
 </template>
@@ -149,11 +155,16 @@ const {
   loadingPosts,
   userPosts,
   bookmarkedPosts,
+  bookmarkedJobs,
   toggleLike,
   toggleBookmark,
+  toggleJobLike,
+  toggleJobBookmark,
   isBookmarked,
   sharePost,
+  shareJob,
   authData,
+  candidateId,
 } = useCandidateProfile();
 
 // --- Init ---

@@ -300,7 +300,7 @@
                     class="flex items-center justify-between cursor-pointer"
                   >
                     <span class="text-on-background font-medium"
-                      >Resumen / Sobre Mí</span
+                      >Biografía / Resumen</span
                     >
                     <input
                       v-model="options.showBio"
@@ -379,56 +379,55 @@
                       class="accent-primary rounded w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
                     />
                   </label>
-                  <label
-                    class="flex items-center justify-between"
-                    :class="
-                      options.anonymousMode
-                        ? 'opacity-50 cursor-not-allowed'
-                        : 'cursor-pointer'
-                    "
-                  >
-                    <span
-                      class="text-on-background font-medium flex items-center gap-1.5"
+                  <!-- Contacto -->
+                  <div class="border-t border-outline-variant/30 pt-2 mt-1">
+                    <label
+                      class="flex items-center justify-between"
+                      :class="
+                        options.anonymousMode
+                          ? 'opacity-50 cursor-not-allowed'
+                          : 'cursor-pointer'
+                      "
                     >
-                      Mostrar Teléfono
                       <span
-                        v-if="options.anonymousMode"
-                        class="text-[9px] text-primary font-semibold"
-                        >(Oculto en anónimo)</span
+                        class="text-on-background font-medium flex items-center gap-1.5"
                       >
-                    </span>
-                    <input
-                      v-model="options.showPhone"
-                      :disabled="options.anonymousMode"
-                      type="checkbox"
-                      class="accent-primary rounded w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
-                    />
-                  </label>
-                  <label
-                    class="flex items-center justify-between"
-                    :class="
-                      options.anonymousMode
-                        ? 'opacity-50 cursor-not-allowed'
-                        : 'cursor-pointer'
-                    "
-                  >
-                    <span
-                      class="text-on-background font-medium flex items-center gap-1.5"
+                        Información de Contacto
+                        <span
+                          v-if="options.anonymousMode"
+                          class="text-[9px] text-primary font-semibold"
+                          >(Oculto en anónimo)</span
+                        >
+                      </span>
+                      <input
+                        v-model="contactToggle"
+                        :disabled="options.anonymousMode"
+                        type="checkbox"
+                        class="accent-primary rounded w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
+                      />
+                    </label>
+                    <div
+                      v-if="contactToggle && !options.anonymousMode"
+                      class="pl-4 pt-1.5 space-y-1.5 border-l-2 border-primary/20 ml-1.5 mt-1"
                     >
-                      Mostrar Correo
-                      <span
-                        v-if="options.anonymousMode"
-                        class="text-[9px] text-primary font-semibold"
-                        >(Oculto en anónimo)</span
-                      >
-                    </span>
-                    <input
-                      v-model="options.showEmail"
-                      :disabled="options.anonymousMode"
-                      type="checkbox"
-                      class="accent-primary rounded w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
-                    />
-                  </label>
+                      <label class="flex items-center justify-between cursor-pointer">
+                        <span class="text-on-surface-variant text-[11px]">Teléfono</span>
+                        <input
+                          v-model="options.showPhone"
+                          type="checkbox"
+                          class="accent-primary rounded w-3.5 h-3.5 cursor-pointer"
+                        />
+                      </label>
+                      <label class="flex items-center justify-between cursor-pointer">
+                        <span class="text-on-surface-variant text-[11px]">Correo Electrónico</span>
+                        <input
+                          v-model="options.showEmail"
+                          type="checkbox"
+                          class="accent-primary rounded w-3.5 h-3.5 cursor-pointer"
+                        />
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -656,31 +655,31 @@ const TEMPLATE_OPTIONS: Array<{
   },
   {
     id: "executive",
-    name: "Ejecutivo Clean",
+    name: "Ejecutivo",
     desc: "Diseño sobrio y formal para puestos de liderazgo y gestión.",
     icon: "corporate_fare",
   },
   {
     id: "creative",
-    name: "Creativo / Accent",
+    name: "Creativo",
     desc: "Encabezado moderno con degradado y badges dinámicos.",
     icon: "palette",
   },
   {
     id: "harvard-classic",
-    name: "Clásico Harvard",
+    name: "Harvard Clásico",
     desc: "Tipografía serif tradicional, 100% optimizado para ATS.",
     icon: "school",
   },
   {
     id: "compact-ats",
-    name: "Compacto 1 Pág.",
+    name: "Compacto ATS",
     desc: "Alta densidad para sintetizar todo en una sola hoja Carta.",
     icon: "density_medium",
   },
   {
     id: "modern-split",
-    name: "Split Dinámico",
+    name: "Moderno Dividido",
     desc: "Distribución en 2 columnas equilibradas con cards suaves.",
     icon: "splitscreen",
   },
@@ -709,6 +708,14 @@ const options = reactive<CvOptions>({
   showEducation: true,
   showExperience: true,
   fontSize: "base",
+});
+
+const contactToggle = computed({
+  get: () => options.showPhone || options.showEmail,
+  set: (val: boolean) => {
+    options.showPhone = val;
+    options.showEmail = val;
+  },
 });
 
 const savedPreferences = ref({

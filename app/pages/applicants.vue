@@ -82,6 +82,7 @@
       v-model="isPdfViewerOpen"
       :url="selectedPdfUrl"
       :title="`CV de ${selectedPdfCandidateName}`"
+      :candidate-id="selectedPdfCandidateId"
     />
   </div>
 </template>
@@ -108,6 +109,7 @@ const {
   isPdfViewerOpen,
   selectedPdfUrl,
   selectedPdfCandidateName,
+  selectedPdfCandidateId,
 } = applicants;
 const { successMsg } = actions;
 

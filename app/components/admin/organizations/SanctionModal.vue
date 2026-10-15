@@ -12,7 +12,7 @@
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-amber-500">gavel</span>
           <h3 class="text-md font-bold text-slate-900 dark:text-slate-100">
-            Sanciones Administrativas: {{ selectedOrg?.nombre }}
+            Sanciones Administrativas: {{ selectedOrg?.nombre || (selectedOrg as any)?.name }}
           </h3>
         </div>
         <button

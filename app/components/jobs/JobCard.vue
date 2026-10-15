@@ -296,6 +296,9 @@ const formattedTime = computed(() => {
 });
 
 const salaryDisplay = computed(() => {
+  if (props.job?.salarioConfidencial || props.job?.isSalaryConfidential) {
+    return "Salario confidencial";
+  }
   if (props.job?.salarioFormatted) return props.job.salarioFormatted;
   if (props.job?.salary) return props.job.salary;
   if (props.job?.salario)
