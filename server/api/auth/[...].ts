@@ -273,6 +273,7 @@ export default NuxtAuthHandler({
       },
     }),
   ],
+  callbacks: {
     async signIn({ user, account, profile }: any) {
       if (user && (user as any).error) {
         throw new Error((user as any).error);

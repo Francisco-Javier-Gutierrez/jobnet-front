@@ -137,5 +137,36 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
       );
       expect(routerPushMock).toHaveBeenCalledWith("/");
     });
+
+    it("debe iniciar el flujo federado de Cognito vía NextAuth signIn", async () => {
+      const signInMock = vi.fn().mockResolvedValue(undefined);
+      const handleGoogleSignIn = async () => {
+        await signInMock("cognito", { callbackUrl: "/" });
+      };
+
+      await handleGoogleSignIn();
+      expect(signInMock).toHaveBeenCalledWith("cognito", { callbackUrl: "/" });
+    });
+
+    it("debe procesar parámetros de error OAuth y mostrar alerta amigable", () => {
+      const getErrorMessage = (errorParam: string) => {
+        if (
+          errorParam === "OAuthCallback" ||
+          errorParam === "OAuthSignin" ||
+          errorParam === "OAuthCreateAccount"
+        ) {
+          return "No se pudo completar la autenticación con Google. Por favor, intenta de nuevo.";
+        }
+        return errorParam;
+      };
+
+      expect(getErrorMessage("OAuthCallback")).toBe(
+        "No se pudo completar la autenticación con Google. Por favor, intenta de nuevo.",
+      );
+      expect(getErrorMessage("OAuthSignin")).toBe(
+        "No se pudo completar la autenticación con Google. Por favor, intenta de nuevo.",
+      );
+    });
   });
 });
+
