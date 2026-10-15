@@ -1,6 +1,5 @@
 import { ref, computed } from "vue";
 import { useFetch, useAuth } from "#imports";
-import { useMockSession } from "./useMockSession";
 
 export interface SkillItem {
   name: string;
@@ -75,12 +74,8 @@ export function useAdminAnalytics() {
   const dismissedAnomalyIds = ref<string[]>([]);
 
   const { data: sessionData } = useAuth();
-  const { isMockEnabled, currentMockUser } = useMockSession();
 
   const userRole = computed(() => {
-    if (isMockEnabled.value && currentMockUser.value) {
-      return currentMockUser.value.tipoUsuario.toUpperCase();
-    }
     return ((sessionData.value?.user as any)?.tipoUsuario || "").toUpperCase();
   });
 

@@ -1,7 +1,6 @@
 import { ref, computed } from "vue";
 import type { Incident } from "~/types";
 import { useAuth, useRuntimeConfig } from "#imports";
-import { useMockSession } from "./useMockSession";
 
 export interface AuditMessage {
   id: string;
@@ -28,12 +27,8 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
   const errorMsg = ref("");
 
   const { data: sessionData } = useAuth();
-  const { isMockEnabled, currentMockUser } = useMockSession();
 
   const userRole = computed(() => {
-    if (isMockEnabled.value && currentMockUser.value) {
-      return currentMockUser.value.tipoUsuario.toUpperCase();
-    }
     return ((sessionData.value?.user as any)?.tipoUsuario || "").toUpperCase();
   });
 
