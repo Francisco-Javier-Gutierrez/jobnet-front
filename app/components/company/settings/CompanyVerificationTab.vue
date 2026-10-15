@@ -35,10 +35,17 @@
         >check_circle</span
       >
       <div>
-        <p class="font-bold text-sm">Organización Verificada</p>
-        <p class="text-xs">
-          Tu organización ya se encuentra verificada. Los candidatos verán la
-          insignia de verificación en tu perfil público.
+        <div class="flex items-center gap-2">
+          <p class="font-bold text-sm">Organización Verificada</p>
+          <span
+            class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white uppercase tracking-wider"
+          >
+            Cuenta Verificada
+          </span>
+        </div>
+        <p class="text-xs mt-1 text-slate-600 dark:text-slate-300">
+          Tu organización se encuentra verificada. Los candidatos verán la
+          insignia de verificación oficial en tu perfil y en todas tus vacantes activas.
         </p>
       </div>
     </div>

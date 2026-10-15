@@ -248,12 +248,8 @@ const router = useRouter();
 const { status, data, signOut } = useAuth();
 const { openProtectedModal } = useProtectedAction();
 const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
-const { isMockEnabled, currentMockUser, setMockRole } = useMockSession();
 
 const effectiveStatus = computed(() => {
-  if (isMockEnabled.value && currentMockUser.value) {
-    return "authenticated";
-  }
   return status.value;
 });
 
@@ -272,13 +268,6 @@ watchEffect(() => {
 });
 
 const userRole = computed<string>(() => {
-  if (isMockEnabled.value && currentMockUser.value) {
-    const tipo = currentMockUser.value.tipoUsuario.toUpperCase();
-    if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
-    if (tipo === "ADMIN") return "admin";
-    if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
-    return "candidate";
-  }
   if (status.value !== "authenticated") return "guest";
   const user = data.value?.user;
   const tipo = (user?.tipoUsuario || "").toUpperCase();
@@ -289,18 +278,12 @@ const userRole = computed<string>(() => {
 });
 
 const userName = computed(() => {
-  if (isMockEnabled.value && currentMockUser.value) {
-    return currentMockUser.value.name;
-  }
   return data.value?.user?.name || data.value?.user?.email || "Usuario";
 });
 const userInitial = computed(() => userName.value.charAt(0).toUpperCase());
 
 const userAvatar = computed(() => {
-  if (isMockEnabled.value && currentMockUser.value?.avatarUrl) {
-    return currentMockUser.value.avatarUrl;
-  }
-  return profilePic.value;
+  return profilePic.value || data.value?.user?.image || "";
 });
 
 const roleBadge = computed(() => {
@@ -349,15 +332,15 @@ const navItems = computed<NavItem[]>(() => {
       return [
         { to: "/", icon: "home", label: "Inicio", protected: false },
         {
-          to: "/admin/organizations",
-          icon: "account_balance",
-          label: "Organizaciones",
+          to: "/admin/analytics",
+          icon: "insights",
+          label: "Analítica Avanzada",
           protected: true,
         },
         {
-          to: "/mod/incidents",
-          icon: "report_problem",
-          label: "Incidencias (Org/Vacantes)",
+          to: "/admin/organizations",
+          icon: "account_balance",
+          label: "Organizaciones",
           protected: true,
         },
         {
@@ -366,6 +349,12 @@ const navItems = computed<NavItem[]>(() => {
           label: "Crear Nuevo",
           protected: true,
         }, // CENTER
+        {
+          to: "/mod/incidents",
+          icon: "report_problem",
+          label: "Incidencias (Org/Vacantes)",
+          protected: true,
+        },
         {
           to: "/mod/appeals",
           icon: "gavel",
@@ -504,6 +493,12 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         },
         {
+          to: "/saved",
+          icon: "bookmark",
+          label: "Favoritos",
+          protected: true,
+        },
+        {
           to: "/profile",
           icon: "account_circle",
           label: "Mi Perfil",
@@ -525,11 +520,6 @@ const closeMobileMenu = () => {
 
 const onSignOut = async () => {
   closeMobileMenu();
-  if (isMockEnabled.value && currentMockUser.value) {
-    setMockRole("GUEST");
-    router.push("/login");
-    return;
-  }
   await signOut({ callbackUrl: "/login" });
 };
 </script>

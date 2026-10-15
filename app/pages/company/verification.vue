@@ -16,9 +16,8 @@
           Verificación de Organización
         </h1>
         <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
-          Sube tu constancia de situación fiscal para validar la autenticidad de
-          tu empresa. Las organizaciones verificadas obtienen una insignia
-          especial y mayor visibilidad en JobNet.
+          Las organizaciones con correo de dominio corporativo se verifican automáticamente al registrarse.
+          Cuentas con correo de dominio público pueden certificar su identidad subiendo su constancia fiscal.
         </p>
       </div>
     </div>

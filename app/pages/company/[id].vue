@@ -57,86 +57,23 @@
       </div>
     </section>
 
-    <!-- About Us Skeleton -->
-    <section class="px-margin-mobile mb-10 space-y-6 animate-pulse">
-      <div
-        class="bg-surface-container-lowest dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-sm border border-outline-variant/40 space-y-6"
-      >
-        <div>
-          <!-- Section Heading -->
-          <div
-            class="h-6 w-48 bg-surface-variant/60 dark:bg-slate-800 rounded-lg mb-5"
-          ></div>
-
-          <!-- Paragraph Skeleton -->
-          <div class="space-y-3">
-            <div
-              class="h-4 w-full bg-surface-variant/40 dark:bg-slate-800/70 rounded-md"
-            ></div>
-            <div
-              class="h-4 w-11/12 bg-surface-variant/40 dark:bg-slate-800/70 rounded-md"
-            ></div>
-            <div
-              class="h-4 w-4/5 bg-surface-variant/40 dark:bg-slate-800/70 rounded-md"
-            ></div>
-            <div
-              class="h-4 w-5/6 bg-surface-variant/40 dark:bg-slate-800/70 rounded-md"
-            ></div>
-          </div>
-        </div>
-
-        <!-- Mision/Vision Grid Skeleton -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          <div
-            class="h-40 bg-surface-variant/30 dark:bg-slate-800/40 rounded-2xl border border-outline-variant/30 p-5 flex flex-col gap-3"
-          >
-            <div
-              class="h-5 w-24 bg-surface-variant/50 dark:bg-slate-800/60 rounded-md"
-            ></div>
-            <div
-              class="h-3 w-full bg-surface-variant/30 dark:bg-slate-800/40 rounded mt-2"
-            ></div>
-            <div
-              class="h-3 w-5/6 bg-surface-variant/30 dark:bg-slate-800/40 rounded"
-            ></div>
-            <div
-              class="h-3 w-4/5 bg-surface-variant/30 dark:bg-slate-800/40 rounded"
-            ></div>
-          </div>
-          <div
-            class="h-40 bg-surface-variant/30 dark:bg-slate-800/40 rounded-2xl border border-outline-variant/30 p-5 flex flex-col gap-3"
-          >
-            <div
-              class="h-5 w-24 bg-surface-variant/50 dark:bg-slate-800/60 rounded-md"
-            ></div>
-            <div
-              class="h-3 w-full bg-surface-variant/30 dark:bg-slate-800/40 rounded mt-2"
-            ></div>
-            <div
-              class="h-3 w-4/5 bg-surface-variant/30 dark:bg-slate-800/40 rounded"
-            ></div>
-            <div
-              class="h-3 w-11/12 bg-surface-variant/30 dark:bg-slate-800/40 rounded"
-            ></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Tabs and Content Skeleton -->
     <section class="px-margin-mobile mb-8 animate-pulse">
-      <!-- Tabs Navigation Skeleton -->
+      <!-- Tabs Navigation Skeleton (4 tabs) -->
       <div
-        class="flex items-center gap-4 border-b border-outline-variant/30 pb-4 overflow-x-auto hide-scrollbar mb-8"
+        class="flex items-center gap-3 border-b border-outline-variant/30 pb-4 overflow-x-auto hide-scrollbar mb-8"
       >
         <div
-          class="h-10 w-32 bg-surface-variant/60 dark:bg-slate-800 rounded-xl flex-shrink-0 border-b-2 border-primary/50"
-        ></div>
-        <div
-          class="h-10 w-40 bg-surface-variant/30 dark:bg-slate-800/50 rounded-xl flex-shrink-0"
+          class="h-10 w-36 bg-surface-variant/60 dark:bg-slate-800 rounded-xl flex-shrink-0 border-b-2 border-primary/50"
         ></div>
         <div
           class="h-10 w-36 bg-surface-variant/30 dark:bg-slate-800/50 rounded-xl flex-shrink-0"
+        ></div>
+        <div
+          class="h-10 w-36 bg-surface-variant/30 dark:bg-slate-800/50 rounded-xl flex-shrink-0"
+        ></div>
+        <div
+          class="h-10 w-44 bg-surface-variant/30 dark:bg-slate-800/50 rounded-xl flex-shrink-0"
         ></div>
       </div>
 
@@ -195,26 +132,111 @@
     v-else
     class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16"
   >
+    <!-- Feedback Alert Banner for Staff Sanction Operations -->
+    <div
+      v-if="successMsg"
+      class="mb-6 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 flex items-center justify-between gap-3 shadow-sm animate-fade-in"
+    >
+      <div class="flex items-center gap-2 text-sm font-semibold">
+        <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+        <span>{{ successMsg }}</span>
+      </div>
+      <button
+        @click="successMsg = ''"
+        class="text-emerald-600 hover:text-emerald-800 transition"
+      >
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </div>
+
+    <!-- Status Notice Banner: Revision State (Fase 1 / Fase 2) -->
+    <div
+      v-if="orgStatus === 'REVISION'"
+      class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm"
+    >
+      <div class="flex items-start sm:items-center gap-3">
+        <span class="material-symbols-outlined text-amber-600 text-2xl">warning</span>
+        <div>
+          <h4 class="font-bold text-sm">Organización en Estado de Revisión (Fase de Apelación)</h4>
+          <p class="text-xs text-amber-800/80 dark:text-amber-300/80">
+            Esta cuenta tiene una notificación de infracción en curso y se encuentra en periodo de gracia para apelar.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <NuxtLink
+          v-if="isOwner"
+          to="/support"
+          class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-[16px]">support_agent</span>
+          Enviar Apelación
+        </NuxtLink>
+        <NuxtLink
+          v-if="isStaff"
+          to="/mod/appeals"
+          class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-[16px]">forum</span>
+          Ver Canal de Apelación
+        </NuxtLink>
+        <button
+          v-if="isStaff"
+          @click="openSanctionModal(companyForSanction)"
+          class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-[16px]">gavel</span>
+          Emitir Dictamen
+        </button>
+      </div>
+    </div>
+
+    <!-- Status Notice Banner: Suspended State (Fase 3) -->
+    <div
+      v-else-if="orgStatus === 'SUSPENDIDA'"
+      class="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm"
+    >
+      <div class="flex items-start sm:items-center gap-3">
+        <span class="material-symbols-outlined text-rose-600 text-2xl">block</span>
+        <div>
+          <h4 class="font-bold text-sm">Cuenta Suspendida por Infracción</h4>
+          <p class="text-xs text-rose-800/80 dark:text-rose-300/80">
+            El acceso de inicio de sesión se encuentra bloqueado y sus ofertas han sido ocultadas del portal.
+          </p>
+        </div>
+      </div>
+      <div v-if="isStaff" class="flex items-center gap-2">
+        <button
+          @click="openSanctionModal(companyForSanction)"
+          class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-[16px]">gavel</span>
+          Reactivar Cuenta
+        </button>
+      </div>
+    </div>
+
     <CompanyHeaderProfile
       :company="company"
       :is-owner="isOwner"
+      :is-staff="isStaff"
+      :org-status="orgStatus"
       @report="showReportCompanyModal = true"
-    />
-
-    <CompanyAboutSection
-      :company="company"
-      :web-links="webLinks"
-      @preview-doc="previewCompanyDoc"
+      @open-sanction="openSanctionModal(companyForSanction)"
+      @select-tab="companyTab = $event"
     />
 
     <CompanyLists
       :company-tab="companyTab"
       :company="company"
+      :is-owner="isOwner"
+      :web-links="webLinks"
       :company-posts="companyPosts"
       :company-bookmarked-posts="companyBookmarkedPosts"
       :loading-company-posts="loadingCompanyPosts"
       :current-user-id="currentUserId"
       @update:company-tab="companyTab = $event"
+      @preview-doc="previewCompanyDoc"
       @like-job="toggleJobLike"
       @bookmark-job="toggleJobBookmark"
       @share-job="shareJob"
@@ -238,11 +260,24 @@
       :target-title="company.name"
       @close="showReportCompanyModal = false"
     />
+
+    <!-- Sanction Modal for Administrators / Moderators -->
+    <SanctionModal
+      v-model="isSanctionModalOpen"
+      :selected-org="selectedOrg"
+      :sanction-steps="sanctionSteps"
+      v-model:suspension-reason-input="suspensionReasonInput"
+      v-model:grace-days-input="graceDaysInput"
+      :get-org-status-key="getOrgStatusKey"
+      @apply-sanction="applySanction"
+    />
   </main>
 </template>
 
 <script setup lang="ts">
 import { useCompanyProfile } from "~/composables/useCompanyProfile";
+import { useOrgActions } from "~/composables/useOrgActions";
+import SanctionModal from "~/components/admin/organizations/SanctionModal.vue";
 
 const {
   companyId,
@@ -266,7 +301,43 @@ const {
   toggleJobBookmark,
   sharePost,
   shareJob,
+  refresh,
 } = useCompanyProfile();
+
+const { data: session } = useAuth();
+
+const isStaff = computed(() => {
+  const rawRole =
+    (session.value?.user as any)?.tipoUsuario ||
+    (session.value?.user as any)?.role;
+  const userRole = (rawRole || "").toUpperCase();
+  return (
+    userRole === "ADMIN" ||
+    userRole === "MODERATOR" ||
+    userRole === "MODERADOR"
+  );
+});
+
+const {
+  successMsg,
+  isSanctionModalOpen,
+  selectedOrg,
+  suspensionReasonInput,
+  graceDaysInput,
+  sanctionSteps,
+  getOrgStatusKey,
+  openSanctionModal,
+  applySanction,
+} = useOrgActions(refresh);
+
+const orgStatus = computed(() => getOrgStatusKey(company.value));
+
+const companyForSanction = computed(() => ({
+  ...company.value,
+  id: companyId,
+  companyId,
+  nombre: company.value.name || company.value.nombre || "Organización",
+}));
 
 useSeoMeta({
   title: `${company.value.name} - Perfil de Organización`,

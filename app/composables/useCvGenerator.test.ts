@@ -524,4 +524,47 @@ describe("useCvGenerator & RF-123 Anonymous Mode", () => {
       expect(res6.location).toBe("México");
     });
   });
+
+  describe("Generación Dinámica de CV Multiformato: Plantillas y Paletas", () => {
+    it("should provide exactly the 6 standardized color palettes", () => {
+      expect(CV_COLOR_THEMES).toHaveLength(6);
+      const paletteNames = CV_COLOR_THEMES.map((p) => p.name);
+      expect(paletteNames).toEqual([
+        "JobNet Indigo",
+        "Slate Modern",
+        "Azul Ejecutivo",
+        "Verde Esmeralda",
+        "Burdeos Elegante",
+        "Ámbar Cálido",
+      ]);
+    });
+
+    it("should mask candidate identity under alphanumeric identifier in anonymous mode", () => {
+      const { normalizeProfileToCvData } = useCvGenerator();
+      const profile: any = {
+        id: "usr-a1b2c3d4",
+        nombre: "Alejandro Morales",
+        email: "alejandro@test.com",
+        telefono: "+52 55 1111 2222",
+        biografia: "Desarrollador Full Stack con 5 años de experiencia.",
+        fotoPerfil: "https://jobnet.test/alex.png",
+        skills: ["Node.js", "Vue.js", "PostgreSQL"],
+      };
+
+      const anonData = normalizeProfileToCvData(profile, undefined, {
+        anonymousMode: true,
+        anonymousId: "usr-a1b2c3d4",
+      });
+
+      // Debe enmascarar bajo identificador alfanumérico
+      expect(anonData.name).toBe("Candidato #B2C3D4");
+      // Debe omitir datos personales que puedan generar sesgos
+      expect(anonData.photoUrl).toBe("");
+      expect(anonData.email).toBe("");
+      expect(anonData.phone).toBe("");
+      // Debe conservar biografía técnica y habilidades
+      expect(anonData.bio).toBe("Desarrollador Full Stack con 5 años de experiencia.");
+      expect(anonData.skills).toEqual(["Node.js", "Vue.js", "PostgreSQL"]);
+    });
+  });
 });

@@ -44,8 +44,13 @@ export const formatSalaryDisplay = (job?: {
   salario?: number | string;
   salarioMinimo?: number;
   salarioMaximo?: number;
+  salarioConfidencial?: boolean;
+  isSalaryConfidential?: boolean;
 }): string | null => {
   if (!job) return null;
+  if (job.salarioConfidencial || job.isSalaryConfidential) {
+    return "Salario confidencial";
+  }
   const min = job.salarioMinimo ? Number(job.salarioMinimo) : 0;
   const max = job.salarioMaximo ? Number(job.salarioMaximo) : 0;
   const single = job.salario ? Number(job.salario) : 0;

@@ -30,17 +30,37 @@
       >
         {{ company.name }}
       </h1>
-      <div
-        v-if="company.verified"
-        class="flex items-center gap-1 bg-surface-container-high text-primary px-3 py-1 rounded-full mb-4"
-      >
-        <span class="material-symbols-outlined text-[16px] text-secondary"
-          >verified</span
+      <div class="flex flex-wrap items-center justify-center gap-2 mb-4">
+        <div
+          v-if="company.verified"
+          @click="$emit('selectTab', 'verification')"
+          class="flex items-center gap-1 bg-surface-container-high text-primary px-3 py-1 rounded-full cursor-pointer hover:bg-surface-container-highest transition-colors active:scale-95"
+          role="button"
+          tabindex="0"
+          title="Consultar detalles del distintivo oficial de verificación"
         >
-        <span
-          class="font-label-sm text-label-sm font-semibold text-on-surface-variant dark:text-slate-300"
-          >Organización Verificada</span
+          <span class="material-symbols-outlined text-[16px] text-secondary"
+            >verified</span
+          >
+          <span
+            class="font-label-sm text-label-sm font-semibold text-on-surface-variant dark:text-slate-300"
+            >Organización Verificada</span
+          >
+        </div>
+        <div
+          v-if="orgStatus === 'REVISION'"
+          class="flex items-center gap-1.5 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 px-3 py-1 rounded-full font-bold text-xs"
         >
+          <span class="material-symbols-outlined text-[16px]">warning</span>
+          <span>En Periodo de Revisión / Apelación</span>
+        </div>
+        <div
+          v-else-if="orgStatus === 'SUSPENDIDA'"
+          class="flex items-center gap-1.5 bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/30 px-3 py-1 rounded-full font-bold text-xs"
+        >
+          <span class="material-symbols-outlined text-[16px]">block</span>
+          <span>Cuenta Suspendida</span>
+        </div>
       </div>
       <p
         class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 mb-6 max-w-lg"
@@ -48,10 +68,10 @@
         {{ company.sector }}
       </p>
       <div
-        class="flex flex-col sm:flex-row justify-center gap-4 w-full max-w-md"
+        class="flex flex-col sm:flex-row flex-wrap justify-center gap-3 w-full max-w-2xl"
       >
         <a
-          class="flex items-center gap-2 font-label-md text-label-md text-primary bg-surface-container hover:bg-surface-container-high transition-colors px-4 py-2 rounded-lg w-full justify-center"
+          class="flex items-center gap-2 font-label-md text-label-md text-primary bg-surface-container hover:bg-surface-container-high transition-colors px-4 py-2 rounded-lg flex-1 min-w-[140px] justify-center"
           :href="company.website"
           target="_blank"
           rel="noopener"
@@ -60,7 +80,7 @@
           {{ company.websiteDisplay }}
         </a>
         <div
-          class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant dark:text-slate-300 border border-outline-variant px-4 py-2 rounded-lg w-full justify-center"
+          class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant dark:text-slate-300 border border-outline-variant px-4 py-2 rounded-lg flex-1 min-w-[140px] justify-center"
         >
           <span class="material-symbols-outlined text-[20px]">location_on</span>
           {{ company.location }}
@@ -68,11 +88,20 @@
         <button
           v-if="!isOwner"
           @click="$emit('report')"
-          class="flex items-center gap-2 font-label-md text-label-md text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors px-4 py-2 rounded-lg w-full justify-center font-bold"
+          class="flex items-center gap-2 font-label-md text-label-md text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors px-4 py-2 rounded-lg flex-1 min-w-[140px] justify-center font-bold"
           title="Reportar esta organización"
         >
           <span class="material-symbols-outlined text-[20px]">flag</span>
-          Reportar organización
+          Reportar
+        </button>
+        <button
+          v-if="isStaff"
+          @click="$emit('open-sanction')"
+          class="flex items-center gap-2 font-label-md text-label-md text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors px-4 py-2 rounded-lg flex-1 min-w-[160px] justify-center font-bold shadow-sm"
+          title="Gestionar sanción administrativa por infracción"
+        >
+          <span class="material-symbols-outlined text-[20px]">gavel</span>
+          Gestionar Sanción
         </button>
       </div>
 
@@ -103,12 +132,22 @@
 <script setup lang="ts">
 import type { CompanyProfile } from "~/types";
 
-defineProps<{
-  company: CompanyProfile;
-  isOwner: boolean;
-}>();
+withDefaults(
+  defineProps<{
+    company: CompanyProfile;
+    isOwner: boolean;
+    isStaff?: boolean;
+    orgStatus?: string;
+  }>(),
+  {
+    isStaff: false,
+    orgStatus: "ACTIVO",
+  },
+);
 
 defineEmits<{
   (e: "report"): void;
+  (e: "open-sanction"): void;
+  (e: "selectTab", tab: string): void;
 }>();
 </script>

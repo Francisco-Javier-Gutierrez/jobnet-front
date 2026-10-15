@@ -40,17 +40,41 @@ export function useOrgActions(refreshData: () => Promise<void>) {
     graceDaysInput.value = 4;
   };
 
+  const getOrgStatusKey = (
+    org: any | null,
+  ): "ACTIVO" | "REVISION" | "SUSPENDIDA" => {
+    if (!org) return "ACTIVO";
+    const statusStr = [org.suspensionStatus, org.estatus, org.estadoCuenta]
+      .filter(Boolean)
+      .join(" ")
+      .toUpperCase();
+
+    if (
+      statusStr.includes("REVISI") ||
+      statusStr.includes("REVISION") ||
+      statusStr.includes("IN_REVIEW")
+    ) {
+      return "REVISION";
+    }
+    if (statusStr.includes("SUSPEND") || statusStr.includes("BLOQUEAD")) {
+      return "SUSPENDIDA";
+    }
+    return "ACTIVO";
+  };
+
   const applySanction = async (
     actionType: "INITIATE" | "CANCEL" | "CONFIRM",
     reason?: string,
   ) => {
     if (!selectedOrg.value) return;
     const org = selectedOrg.value;
+    const orgId = org.id || org.companyId;
+    const orgName = org.nombre || org.name || "la organización";
 
     try {
       if (actionType === "INITIATE") {
         await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${org.id}/initiate-suspension`,
+          `${config.public.apiUrl}/moderator/organizations/${orgId}/initiate-suspension`,
           {
             method: "POST",
             body: {
@@ -62,10 +86,10 @@ export function useOrgActions(refreshData: () => Promise<void>) {
             },
           },
         );
-        successMsg.value = `Fase 1 completada: Notificación enviada a ${org.nombre}. Cuenta en revisión (${graceDaysInput.value || 4} días de gracia).`;
+        successMsg.value = `Fase 1 completada: Notificación enviada a ${orgName}. Cuenta en revisión (${graceDaysInput.value || 4} días de gracia).`;
       } else if (actionType === "CANCEL") {
         await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${org.id}/cancel-suspension`,
+          `${config.public.apiUrl}/moderator/organizations/${orgId}/cancel-suspension`,
           {
             method: "POST",
             body: {
@@ -74,10 +98,10 @@ export function useOrgActions(refreshData: () => Promise<void>) {
             },
           },
         );
-        successMsg.value = `Apelación aprobada. Cuenta de ${org.nombre} restablecida.`;
+        successMsg.value = `Apelación aprobada. Cuenta de ${orgName} restablecida.`;
       } else if (actionType === "CONFIRM") {
         await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${org.id}/confirm-suspension`,
+          `${config.public.apiUrl}/moderator/organizations/${orgId}/confirm-suspension`,
           {
             method: "POST",
             body: {
@@ -87,7 +111,7 @@ export function useOrgActions(refreshData: () => Promise<void>) {
             },
           },
         );
-        successMsg.value = `Dictamen desfavorable emitido. Cuenta de ${org.nombre} suspendida.`;
+        successMsg.value = `Dictamen desfavorable emitido. Cuenta de ${orgName} suspendida.`;
       }
 
       isSanctionModalOpen.value = false;
@@ -106,6 +130,7 @@ export function useOrgActions(refreshData: () => Promise<void>) {
     suspensionReasonInput,
     graceDaysInput,
     sanctionSteps,
+    getOrgStatusKey,
     toggleVerification,
     openSanctionModal,
     applySanction,

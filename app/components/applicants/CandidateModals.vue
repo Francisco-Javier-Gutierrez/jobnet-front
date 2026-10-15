@@ -220,14 +220,53 @@
     <div class="space-y-4">
       <div>
         <label
-          class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1"
-          >Motivo de Rechazo:</label
+          class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5"
         >
+          Motivos Estandarizados de Descarte:
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+          <button
+            type="button"
+            @click="
+              rejectionReason =
+                'Perfil cubierto: La posición ha sido cubierta por otro candidato que completó el proceso.'
+            "
+            class="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-rose-400 bg-slate-50 dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300 transition text-left cursor-pointer"
+          >
+            👤 Perfil cubierto
+          </button>
+          <button
+            type="button"
+            @click="
+              rejectionReason =
+                'Experiencia requerida: El perfil no cumple con los años o especialidad técnica requerida para el puesto.'
+            "
+            class="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-rose-400 bg-slate-50 dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300 transition text-left cursor-pointer"
+          >
+            💼 Experiencia requerida
+          </button>
+          <button
+            type="button"
+            @click="
+              rejectionReason =
+                'Pretensión salarial: La expectativa económica del candidato excede el rango presupuestado para la vacante.'
+            "
+            class="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-rose-400 bg-slate-50 dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300 transition text-left cursor-pointer"
+          >
+            💰 Pretensión salarial
+          </button>
+        </div>
+
+        <label
+          class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1"
+        >
+          Detalle del Motivo / Mensaje Constructivo:
+        </label>
         <textarea
           v-model="rejectionReason"
-          rows="4"
+          rows="3"
           class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-rose-500 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-100 outline-none transition"
-          placeholder="Ej: Agradecemos tu participación en el proceso, pero hemos decidido avanzar con perfiles que se alinean más estrechamente con la experiencia requerida."
+          placeholder="Selecciona uno de los motivos estandarizados o redacta una retroalimentación constructiva..."
         ></textarea>
       </div>
     </div>
@@ -278,9 +317,9 @@ const {
 
 import type { ApplicantCandidate } from "~/types";
 
+const { openCandidateCv } = useApplicants();
+
 const openPdfViewer = (candidate: ApplicantCandidate) => {
-  selectedPdfUrl.value = candidate.cvUrl || "";
-  selectedPdfCandidateName.value = candidate.name || "";
-  isPdfViewerOpen.value = true;
+  openCandidateCv(candidate, "VIEW");
 };
 </script>

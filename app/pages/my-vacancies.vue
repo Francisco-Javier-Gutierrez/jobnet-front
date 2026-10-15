@@ -85,7 +85,14 @@
                 {{ job.title }}
               </h2>
               <span
-                v-if="job.estado === 'EVALUACION' || job.estado === 'APELADA'"
+                v-if="job.estado === 'PAUSADA'"
+                class="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-[12px]">pause_circle</span>
+                Pausada
+              </span>
+              <span
+                v-else-if="job.estado === 'EVALUACION' || job.estado === 'APELADA'"
                 :class="[
                   'px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border',
                   job.estado === 'EVALUACION'
@@ -101,6 +108,26 @@
                     ? "Bajo Evaluación"
                     : "Apelación en curso"
                 }}
+              </span>
+
+              <!-- Badge Alta Demanda (50+ postulantes) -->
+              <span
+                v-if="(job.postulantesCount || 0) >= 50"
+                class="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20 flex items-center gap-1"
+                title="Esta oferta ha recibido 50 o más postulantes"
+              >
+                <span class="material-symbols-outlined text-[12px]">trending_up</span>
+                Alta demanda
+              </span>
+
+              <!-- Badge Caducidad / Vencimiento Próximo (3 días o menos) -->
+              <span
+                v-if="job.diasParaVencer !== undefined && job.diasParaVencer <= 3 && job.diasParaVencer >= 0 && job.estado !== 'PAUSADA' && job.estado !== 'CERRADA'"
+                class="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-700 dark:text-orange-300 border border-orange-500/20 flex items-center gap-1"
+                :title="job.fechaCierre ? `Fecha de cierre: ${new Date(job.fechaCierre).toLocaleDateString()}` : undefined"
+              >
+                <span class="material-symbols-outlined text-[12px]">timer</span>
+                {{ job.diasParaVencer === 0 ? 'Vence hoy' : `Cierre en ${job.diasParaVencer} día${job.diasParaVencer > 1 ? 's' : ''}` }}
               </span>
             </div>
             <div
@@ -218,7 +245,6 @@
 
 <script setup lang="ts">
 import { MOCK_VACANCIES } from "~/utils/mockData";
-import { useMockSession } from "~/composables/useMockSession";
 
 useSeoMeta({
   title: "Mis Vacantes Publicadas - JobNet",
@@ -228,14 +254,11 @@ useSeoMeta({
 
 const config = useRuntimeConfig();
 const { data: session, status } = useAuth();
-const { isMockEnabled, currentMockUser } = useMockSession();
 const router = useRouter();
 
 const companyId = computed(
   () =>
-    currentMockUser.value?.id ||
-    (session.value?.user as any)?.id ||
-    "org-techsolutions-01",
+    (session.value?.user as any)?.id || "",
 );
 
 const loading = ref(true);
@@ -251,11 +274,7 @@ const openAppealModal = (jobId: string) => {
 };
 
 const fetchVacancies = async () => {
-  const effectiveAuthenticated =
-    (isMockEnabled.value && !!currentMockUser.value) ||
-    status.value === "authenticated";
-
-  if (!effectiveAuthenticated) {
+  if (status.value !== "authenticated") {
     router.push("/login");
     return;
   }
@@ -264,9 +283,9 @@ const fetchVacancies = async () => {
   loading.value = true;
 
   try {
-    let allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
-      () => [],
-    );
+    let allJobs = await $fetch<any[]>(
+      `${config.public.apiUrl}/jobs?companyId=${encodeURIComponent(targetCompanyId)}`,
+    ).catch(() => []);
     if (!allJobs || allJobs.length === 0) {
       allJobs = MOCK_VACANCIES;
     }
@@ -304,6 +323,18 @@ const fetchVacancies = async () => {
       maxPostulantes: j.maxPostulantes || null,
       createdAt: j.createdAt || new Date().toISOString(),
       postulantesCount: j.postulantesCount,
+      fechaCierre: j.fechaCierre,
+      diasParaVencer:
+        j.diasParaVencer !== undefined
+          ? j.diasParaVencer
+          : j.fechaCierre
+            ? Math.ceil(
+                (new Date(j.fechaCierre).getTime() - Date.now()) /
+                  (24 * 60 * 60 * 1000),
+              )
+            : undefined,
+      alertaCaducidadEnviada: j.alertaCaducidadEnviada,
+      alertaAltaDemandaEnviada: j.alertaAltaDemandaEnviada,
     }));
   } catch (e) {
     console.error("Error loading vacancies list:", e);

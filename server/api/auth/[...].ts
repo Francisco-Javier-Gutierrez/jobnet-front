@@ -168,7 +168,7 @@ export default NuxtAuthHandler({
                   message: translateCognitoError(
                     errorCode,
                     responseData.message ||
-                    "Código de MFA incorrecto o expirado",
+                      "Código de MFA incorrecto o expirado",
                   ),
                 }),
               );
@@ -273,7 +273,15 @@ export default NuxtAuthHandler({
           const payload = JSON.parse(
             Buffer.from(payloadBase64, "base64").toString("ascii"),
           );
-          // Detect assigned Cognito Scopes or custom attributes in token
+          const userId = payload.sub || (user as any).id;
+
+          // Detect assigned Cognito Groups, Scopes or custom attributes in token
+          const rawGroups = payload["cognito:groups"] || payload.groups || [];
+          const groups = Array.isArray(rawGroups)
+            ? rawGroups
+            : typeof rawGroups === "string"
+              ? [rawGroups]
+              : [];
           const rawScope = payload.scope || payload.scp || "";
           const scopes = Array.isArray(rawScope)
             ? rawScope
@@ -283,6 +291,7 @@ export default NuxtAuthHandler({
           const customRole = (
             payload["custom:role"] ||
             payload["custom:tipoUsuario"] ||
+            payload["custom:groups"] ||
             ""
           )
             .toString()
@@ -290,11 +299,20 @@ export default NuxtAuthHandler({
 
           let cognitoRole = "";
           if (
+            groups.some(
+              (g: string) =>
+                g.toUpperCase() === "ADMIN" || g.toUpperCase().includes("ADMIN"),
+            ) ||
             scopes.some((s: string) => s.includes("admin")) ||
             customRole === "ADMIN"
           )
             cognitoRole = "ADMIN";
           else if (
+            groups.some(
+              (g: string) =>
+                g.toUpperCase() === "MODERATOR" ||
+                g.toUpperCase().includes("MOD"),
+            ) ||
             scopes.some(
               (s: string) => s.includes("moderator") || s.includes("mod"),
             ) ||
@@ -302,6 +320,12 @@ export default NuxtAuthHandler({
           )
             cognitoRole = "MODERATOR";
           else if (
+            groups.some(
+              (g: string) =>
+                g.toUpperCase() === "ORGANIZACION" ||
+                g.toUpperCase() === "EMPRESA" ||
+                g.toUpperCase() === "COMPANY",
+            ) ||
             scopes.some(
               (s: string) =>
                 s.includes("organization") || s.includes("empresa"),
@@ -312,6 +336,11 @@ export default NuxtAuthHandler({
           )
             cognitoRole = "ORGANIZACION";
           else if (
+            groups.some(
+              (g: string) =>
+                g.toUpperCase() === "CANDIDATO" ||
+                g.toUpperCase() === "CANDIDATE",
+            ) ||
             scopes.some(
               (s: string) => s.includes("candidate") || s.includes("candidato"),
             ) ||
@@ -346,6 +375,10 @@ export default NuxtAuthHandler({
                 // Suspension expired, automatically restore profile status to ACTIVO!
                 await $fetch(`${config.public.apiUrl}/profile/${userId}`, {
                   method: "POST",
+                  headers: {
+                    "x-user-id": userId,
+                    "x-user-role": cognitoRole || "CANDIDATO",
+                  },
                   body: {
                     estadoCuenta: "ACTIVO",
                     fechaFinSuspension: null,
@@ -354,27 +387,86 @@ export default NuxtAuthHandler({
               }
             }
 
-            // Automatic reconciliation: If user was a blank user (PENDIENTE) and Admin assigned Cognito Group, sync DynamoDB!
+            // Automatic reconciliation: If user was a blank user (PENDIENTE) and Admin assigned role in Cognito, sync DynamoDB!
             if (
               cognitoRole &&
+              cognitoRole !== "CANDIDATO" &&
               (profile.tipoUsuario === "PENDIENTE" ||
                 profile.estadoCuenta === "PENDIENTE_ROL" ||
                 profile.tipoUsuario !== cognitoRole)
             ) {
               await $fetch(`${config.public.apiUrl}/profile/${userId}`, {
                 method: "POST",
+                headers: {
+                  "x-user-id": userId,
+                  "x-user-role": cognitoRole,
+                },
                 body: {
                   tipoUsuario: cognitoRole,
                   estadoCuenta: "ACTIVO",
                 },
               }).catch(() => null);
+              profile.tipoUsuario = cognitoRole;
+              profile.estadoCuenta = "ACTIVO";
+            }
+
+            // Block access for accounts in pending/neutral state until authorized by AWS account owner
+            if (
+              profile.estadoCuenta === "PENDIENTE_ROL" ||
+              profile.tipoUsuario === "PENDIENTE" ||
+              customRole === "BLANK" ||
+              customRole === "UNASSIGNED" ||
+              customRole.includes("PENDING") ||
+              customRole.includes("ASPIRANT")
+            ) {
+              const isMod =
+                profile.solicitudRol === "MODERATOR" ||
+                customRole.includes("MOD") ||
+                (profile.biografia && profile.biografia.includes("Moderador"));
+              const roleTitle = isMod ? "de moderación" : "administrativo";
+
+              throw new Error(
+                JSON.stringify({
+                  code: "AccountInactive",
+                  message:
+                    `Su cuenta se encuentra en estado inactivo neutral. El titular de AWS Cognito debe autorizar y asignar explícitamente el rol ${roleTitle} para habilitar el acceso.`,
+                }),
+              );
+            }
+          }
+
+          // Fallback check if profile could not be loaded but token indicates blank/pending role without assigned cognito role
+          if (!cognitoRole) {
+            if (
+              customRole === "BLANK" ||
+              customRole === "UNASSIGNED" ||
+              customRole.includes("PENDING") ||
+              customRole.includes("ASPIRANT")
+            ) {
+              const isMod = customRole.includes("MOD");
+              throw new Error(
+                JSON.stringify({
+                  code: "AccountInactive",
+                  message:
+                    `Su cuenta se encuentra en estado inactivo neutral. El titular de AWS Cognito debe autorizar y asignar explícitamente el rol ${isMod ? "de moderación" : "administrativo"} para habilitar el acceso.`,
+                }),
+              );
             }
           }
         } catch (e: any) {
-          if (e.message && e.message.includes("suspendida")) {
+          if (
+            e.message &&
+            (e.message.includes("suspendida") ||
+              e.message.includes("AccountInactive") ||
+              e.message.includes("inactivo") ||
+              e.message.includes("neutral") ||
+              e.message.includes("autorizar") ||
+              e.message.includes("Cognito") ||
+              e.message.includes("PENDIENTE"))
+          ) {
             throw e;
           }
-          console.error("Error checking account suspension on login:", e);
+          console.error("Error checking account status on login:", e);
         }
       }
       return true;
@@ -427,6 +519,12 @@ export default NuxtAuthHandler({
               token.name = payload.name;
             }
 
+            const rawGroups = payload["cognito:groups"] || payload.groups || [];
+            const groups = Array.isArray(rawGroups)
+              ? rawGroups
+              : typeof rawGroups === "string"
+                ? [rawGroups]
+                : [];
             const rawScope = payload.scope || payload.scp || "";
             const scopes = Array.isArray(rawScope)
               ? rawScope
@@ -436,17 +534,27 @@ export default NuxtAuthHandler({
             const customRole = (
               payload["custom:role"] ||
               payload["custom:tipoUsuario"] ||
+              payload["custom:groups"] ||
               ""
             )
               .toString()
               .toUpperCase();
 
             if (
+              groups.some(
+                (g: string) =>
+                  g.toUpperCase() === "ADMIN" || g.toUpperCase().includes("ADMIN"),
+              ) ||
               scopes.some((s: string) => s.includes("admin")) ||
               customRole === "ADMIN"
             ) {
               token.tipoUsuario = "ADMIN";
             } else if (
+              groups.some(
+                (g: string) =>
+                  g.toUpperCase() === "MODERATOR" ||
+                  g.toUpperCase().includes("MOD"),
+              ) ||
               scopes.some(
                 (s: string) => s.includes("moderator") || s.includes("mod"),
               ) ||
@@ -454,6 +562,12 @@ export default NuxtAuthHandler({
             ) {
               token.tipoUsuario = "MODERATOR";
             } else if (
+              groups.some(
+                (g: string) =>
+                  g.toUpperCase() === "ORGANIZACION" ||
+                  g.toUpperCase() === "EMPRESA" ||
+                  g.toUpperCase() === "COMPANY",
+              ) ||
               scopes.some(
                 (s: string) =>
                   s.includes("organization") || s.includes("empresa"),
@@ -463,8 +577,31 @@ export default NuxtAuthHandler({
               customRole === "COMPANY"
             ) {
               token.tipoUsuario = "ORGANIZACION";
-            } else {
+            } else if (
+              groups.some(
+                (g: string) =>
+                  g.toUpperCase() === "CANDIDATO" ||
+                  g.toUpperCase() === "CANDIDATE",
+              ) ||
+              scopes.some(
+                (s: string) =>
+                  s.includes("candidate") || s.includes("candidato"),
+              ) ||
+              customRole === "CANDIDATO" ||
+              customRole === "CANDIDATE"
+            ) {
               token.tipoUsuario = "CANDIDATO";
+            } else if (
+              customRole === "BLANK" ||
+              customRole === "UNASSIGNED" ||
+              customRole === "PENDIENTE" ||
+              customRole.includes("PENDING") ||
+              customRole.includes("ASPIRANT")
+            ) {
+              token.tipoUsuario = "PENDIENTE";
+            } else {
+              // Crucial: Do not fallback to CANDIDATO without explicit role assignment
+              token.tipoUsuario = "PENDIENTE";
             }
 
             // Check if Cognito idToken is expired or expiring in < 300 seconds

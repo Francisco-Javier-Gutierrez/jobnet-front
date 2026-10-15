@@ -81,18 +81,18 @@ export const useUploadStore = defineStore("upload", {
         }
       }
 
-      // 2. Size limit check: 10MB for PDF, 5MB for Images/Others
+      // 2. Size limit check: Strict 5MB limit
       const isPdf =
         file.type === "application/pdf" ||
         file.type === "application/x-pdf" ||
         file.name.toLowerCase().endsWith(".pdf");
 
-      const maxAllowedSize = isPdf ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
-      const limitMb = isPdf ? 10 : 5;
+      const maxAllowedSize = 5 * 1024 * 1024;
+      const limitMb = 5;
 
       if (file.size > maxAllowedSize) {
         const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-        const fileTypeLabel = isPdf ? "documento PDF" : "archivo de imagen";
+        const fileTypeLabel = isPdf ? "documento PDF" : "archivo";
         this.uploadError = `El ${fileTypeLabel} "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de ${limitMb}MB.`;
         const { showError } = useAppFeedback();
         showError("Límite de Tamaño Excedido", this.uploadError, null);
@@ -170,5 +170,32 @@ export const useUploadStore = defineStore("upload", {
     clearError() {
       this.uploadError = "";
     },
+
+    /**
+     * Obtains a secure temporary presigned GET URL (1h) from the backend
+     */
+    async getSecureViewUrl(keyOrUrl: string): Promise<string> {
+      if (!keyOrUrl) return "";
+      // If it's a mock or data URL or blob, return directly
+      if (keyOrUrl.startsWith("data:") || keyOrUrl.startsWith("blob:")) {
+        return keyOrUrl;
+      }
+      try {
+        const config = useRuntimeConfig();
+        const res = await $fetch<{ url: string }>(
+          `${config.public.apiUrl}/view-url`,
+          {
+            params: {
+              url: keyOrUrl,
+            },
+          },
+        );
+        return res?.url || keyOrUrl;
+      } catch (e) {
+        console.warn("Could not retrieve presigned view URL, using fallback:", e);
+        return keyOrUrl;
+      }
+    },
   },
 });
+

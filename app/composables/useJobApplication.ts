@@ -14,6 +14,7 @@ export function useJobApplication(jobId: string, jobRef: any) {
   const coverLetterInput = ref("");
   const selectedProfileLinks = ref<string[]>([]);
   const selectedProfileDocs = ref<string[]>([]);
+  const filterAnswers = ref<Record<string, string>>({});
 
   const isApplying = ref(false);
   const hasApplied = ref(false);
@@ -108,6 +109,23 @@ export function useJobApplication(jobId: string, jobRef: any) {
       showMissingCvModal.value = true;
       return;
     }
+
+    const screeningQuestions: string[] =
+      jobRef.value?.preguntasFiltro || jobRef.value?.screeningQuestions || [];
+    if (Array.isArray(screeningQuestions) && screeningQuestions.length > 0) {
+      const missing = screeningQuestions.some(
+        (q: string) => !filterAnswers.value[q] || !filterAnswers.value[q].trim(),
+      );
+      if (missing) {
+        showWarning(
+          "Preguntas Obligatorias",
+          "Debes responder todas las preguntas filtro de precalificación antes de enviar tu candidatura.",
+          4000,
+        );
+        return;
+      }
+    }
+
     submitEasyApplication();
   };
 
@@ -116,6 +134,23 @@ export function useJobApplication(jobId: string, jobRef: any) {
       showMissingCvModal.value = true;
       return;
     }
+
+    const screeningQuestions: string[] =
+      jobRef.value?.preguntasFiltro || jobRef.value?.screeningQuestions || [];
+    if (Array.isArray(screeningQuestions) && screeningQuestions.length > 0) {
+      const missing = screeningQuestions.some(
+        (q: string) => !filterAnswers.value[q] || !filterAnswers.value[q].trim(),
+      );
+      if (missing) {
+        showWarning(
+          "Preguntas Obligatorias",
+          "Debes responder todas las preguntas filtro de precalificación antes de enviar tu candidatura.",
+          4000,
+        );
+        return;
+      }
+    }
+
     isApplying.value = true;
 
     try {
@@ -132,6 +167,19 @@ export function useJobApplication(jobId: string, jobRef: any) {
       let finalMessage = coverLetterInput.value.trim()
         ? coverLetterInput.value.trim()
         : `Hola, mi nombre es ${candidateName}. Me complace presentar mi candidatura a la vacante de ${jobRef.value?.title || "Empleo"} en ${jobRef.value?.company || "su organización"}. Adjunto mi Currículum Vitae cargado en mi perfil.`;
+
+      const respuestasFiltro = screeningQuestions.map((q: string) => ({
+        pregunta: q,
+        respuesta: (filterAnswers.value[q] || "").trim(),
+      }));
+
+      if (respuestasFiltro.length > 0) {
+        finalMessage +=
+          `\n\n📋 Respuestas a Preguntas de Precalificación:\n` +
+          respuestasFiltro
+            .map((item, idx) => `P${idx + 1}: ${item.pregunta}\nR: ${item.respuesta}`)
+            .join("\n\n");
+      }
 
       if (selectedProfileLinks.value.length > 0) {
         finalMessage +=
@@ -152,6 +200,7 @@ export function useJobApplication(jobId: string, jobRef: any) {
           coverLetter: finalMessage,
           cvUrl: profileCvUrl.value,
           cvFileName: profileCvName.value,
+          respuestasFiltro,
         },
       });
 
@@ -189,6 +238,7 @@ export function useJobApplication(jobId: string, jobRef: any) {
     selectedProfileDocs,
     candidateProfileLinks,
     candidateProfileDocs,
+    filterAnswers,
     isApplying,
     hasApplied,
     fetchCandidateProfile,

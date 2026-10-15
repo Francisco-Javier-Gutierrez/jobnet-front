@@ -7299,3 +7299,11 @@ export function getNearestValidPoint(
   }
   return { lat: closestCenter[1], lng: closestCenter[0] };
 }
+
+export const EDO_MEX_MUNICIPALITIES: string[] = Array.from(
+  new Set(
+    EDO_MEX_FEATURES.map((m) =>
+      m.name.replace(", Estado de México", "").trim(),
+    ),
+  ),
+).sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));

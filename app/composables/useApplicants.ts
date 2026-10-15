@@ -2,7 +2,7 @@ import { useRoute, useRouter, useRuntimeConfig } from "#imports";
 import { useAuth } from "#imports";
 import type { ApplicantCandidate, ApplicantStage } from "~/types";
 import { MOCK_VACANCIES, MOCK_APPLICANTS } from "~/utils/mockData";
-import { useMockSession } from "~/composables/useMockSession";
+import { useCvInteraction } from "~/composables/useCvInteraction";
 
 // Global shared state for the applicants dashboard
 const selectedJobId = ref("");
@@ -22,6 +22,7 @@ const isMobileDetailModalOpen = ref(false);
 const isPdfViewerOpen = ref(false);
 const selectedPdfUrl = ref("");
 const selectedPdfCandidateName = ref("");
+const selectedPdfCandidateId = ref("");
 
 export const useApplicants = () => {
   const route = useRoute();
@@ -98,19 +99,11 @@ export const useApplicants = () => {
   );
 
   const fetchMyJobs = async () => {
-    const { isMockEnabled, currentMockUser } = useMockSession();
-    const effectiveAuthenticated =
-      (isMockEnabled.value && !!currentMockUser.value) ||
-      status.value === "authenticated";
-
-    if (!effectiveAuthenticated) {
+    if (status.value !== "authenticated") {
       router.push("/login");
       return;
     }
-    const companyId =
-      currentMockUser.value?.id ||
-      session.value?.user?.id ||
-      "org-techsolutions-01";
+    const companyId = session.value?.user?.id || "";
 
     try {
       let allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
@@ -231,6 +224,28 @@ export const useApplicants = () => {
     }
   };
 
+  const openCandidateCv = async (
+    candidate: ApplicantCandidate,
+    action: "VIEW" | "DOWNLOAD" = "VIEW",
+  ) => {
+    if (!candidate) return;
+    selectedPdfUrl.value = candidate.cvUrl || "";
+    selectedPdfCandidateName.value = candidate.name || "";
+    const candidateId =
+      candidate.id || candidate.userId || (candidate as any).candidateId || "";
+    selectedPdfCandidateId.value = candidateId;
+    isPdfViewerOpen.value = true;
+
+    if (candidateId) {
+      const { notifyCvInteraction } = useCvInteraction();
+      const job = myJobs.value.find((j) => j.id === candidate.jobId);
+      await notifyCvInteraction(candidateId, {
+        action,
+        vacancyTitle: job?.title || candidate.jobTitle || "Vacante seleccionada",
+      });
+    }
+  };
+
   return {
     selectedJobId,
     myJobs,
@@ -245,6 +260,8 @@ export const useApplicants = () => {
     isPdfViewerOpen,
     selectedPdfUrl,
     selectedPdfCandidateName,
+    selectedPdfCandidateId,
+    openCandidateCv,
     countByStatus,
     jobSelectOptions,
     stageTabs,

@@ -6,7 +6,6 @@
     <ClientOnly>
       <AppProtectedModal />
       <AppFeedbackModal />
-      <DevMockToolbar />
     </ClientOnly>
   </div>
 </template>

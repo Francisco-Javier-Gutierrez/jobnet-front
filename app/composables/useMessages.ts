@@ -108,15 +108,11 @@ export const useMessages = () => {
 
   // Fetch active chats from API
   const fetchConversations = async () => {
-    const { isMockEnabled, currentMockUser } = useMockSession();
-    const effectiveAuthenticated =
-      (isMockEnabled.value && !!currentMockUser.value) ||
-      status.value === "authenticated";
-    if (!effectiveAuthenticated) return;
+    if (status.value !== "authenticated") return;
     isLoadingChats.value = true;
 
     try {
-      const list: any[] = [];
+      let list: any[] = [];
       const allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
         () => [],
       );
