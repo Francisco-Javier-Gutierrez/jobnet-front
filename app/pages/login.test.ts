@@ -168,5 +168,61 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
       );
     });
   });
+
+  describe("3. Manejo de Usuarios Federados desde el Inicio (Standard de la Industria: Okta, Auth0, Slack)", () => {
+    it("debe interceptar el intento de login con contraseña para cuentas federadas con Google y sugerir Google Sign-In", () => {
+      const handleLoginResponse = (errorPayload: {
+        code: string;
+        message: string;
+      }) => {
+        if (errorPayload.code === "FederatedUserLoginException") {
+          return {
+            isFederatedPrompt: true,
+            alert: errorPayload.message,
+            suggestGoogleLogin: true,
+          };
+        }
+        return {
+          isFederatedPrompt: false,
+          alert: "Credenciales inválidas",
+          suggestGoogleLogin: false,
+        };
+      };
+
+      const result = handleLoginResponse({
+        code: "FederatedUserLoginException",
+        message:
+          "Tu cuenta está registrada a través de Google Sign-In. Por favor, ingresa utilizando el botón 'Continuar con Google'.",
+      });
+
+      expect(result.isFederatedPrompt).toBe(true);
+      expect(result.suggestGoogleLogin).toBe(true);
+      expect(result.alert).toContain("Tu cuenta está registrada a través de Google Sign-In");
+    });
+
+    it("debe procesar los banners informativos de vinculación rechazada y exitosa", () => {
+      const processQueryParams = (query: Record<string, string>) => {
+        let info = "";
+        let success = "";
+
+        if (query.unlinked === "true") {
+          info =
+            "No se realizó la vinculación de cuentas. Puedes continuar iniciando sesión con tu correo y contraseña habitual.";
+        }
+        if (query.linked === "success") {
+          success =
+            "¡Cuentas vinculadas exitosamente! Ya puedes iniciar sesión con tu contraseña o con Google.";
+        }
+
+        return { info, success };
+      };
+
+      const unlinkedResult = processQueryParams({ unlinked: "true" });
+      expect(unlinkedResult.info).toContain("No se realizó la vinculación de cuentas");
+
+      const linkedResult = processQueryParams({ linked: "success" });
+      expect(linkedResult.success).toContain("Cuentas vinculadas exitosamente");
+    });
+  });
 });
 

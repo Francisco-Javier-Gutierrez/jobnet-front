@@ -123,6 +123,10 @@
       </section>
 
       <section v-show="activeTab === 'seguridad'" class="flex flex-col gap-6">
+        <SettingsLinkedAccountsCard
+          :is-federated="isFederatedUser"
+          :user-email="(session?.user as any)?.email || formData.email"
+        />
         <MfaSettingsCard
           :user-id="(session?.user as any)?.id || ''"
           :initial-mfa-state="formData.mfaEnabled"

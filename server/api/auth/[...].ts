@@ -227,6 +227,49 @@ export default NuxtAuthHandler({
               const errorCode = responseData.__type
                 ? responseData.__type.split("#")[1]
                 : "AuthError";
+
+              // Standard de la industria (Auth0, Okta, Firebase, Slack):
+              // Si el usuario intenta iniciar sesión con contraseña pero su cuenta fue creada
+              // mediante Google Sign-In y no tiene contraseña local, interceptar para orientarlo claramente.
+              if (
+                errorCode === "NotAuthorizedException" ||
+                errorCode === "UserNotFoundException"
+              ) {
+                try {
+                  const config = useRuntimeConfig();
+                  const profiles: any[] = await $fetch(
+                    `${config.public.apiUrl}/profiles`,
+                  ).catch(() => []);
+                  const matching = profiles.filter(
+                    (p) =>
+                      p.email &&
+                      p.email.toLowerCase() === credentials.email.toLowerCase(),
+                  );
+                  const isOnlyGoogle =
+                    matching.length > 0 &&
+                    matching.every((p) => p.origenRegistro === "GOOGLE_OAUTH") &&
+                    !matching.some(
+                      (p) =>
+                        p.origenRegistro === "LINKED_GOOGLE" ||
+                        p.linkedGoogleSub,
+                    );
+
+                  if (isOnlyGoogle) {
+                    throw new Error(
+                      JSON.stringify({
+                        code: "FederatedUserLoginException",
+                        message:
+                          "Tu cuenta está registrada a través de Google Sign-In. Por favor, ingresa utilizando el botón 'Continuar con Google'.",
+                      }),
+                    );
+                  }
+                } catch (lookupErr: any) {
+                  if (lookupErr.message?.includes("FederatedUserLoginException")) {
+                    throw lookupErr;
+                  }
+                }
+              }
+
               throw new Error(
                 JSON.stringify({
                   code: errorCode,
@@ -373,8 +416,56 @@ export default NuxtAuthHandler({
             cognitoRole = "CANDIDATO";
 
           const config = useRuntimeConfig();
+          const userEmail = payload.email || (user as any)?.email;
+          let effectiveUserId = userId;
+
+          // Interceptor de vinculación de cuentas:
+          // Si el usuario ingresa con Google pero ya posee una cuenta nativa (correo + contraseña)
+          // que no ha sido vinculada, interceptamos el flujo y redirigimos a /link-account
+          if (isGoogleFederated && userEmail) {
+            const allProfiles: any[] = await $fetch(
+              `${config.public.apiUrl}/profiles`,
+            ).catch(() => []);
+
+            const matching = allProfiles.filter(
+              (p) =>
+                p.email &&
+                p.email.toLowerCase() === userEmail.toLowerCase(),
+            );
+
+            const alreadyLinked = matching.find(
+              (p) =>
+                p.linkedGoogleSub === userId ||
+                (p.origenRegistro === "LINKED_GOOGLE" &&
+                  (p.id !== userId && p.PK !== `USER#${userId}`)),
+            );
+
+            const nativeAccount = matching.find(
+              (p) =>
+                p.origenRegistro !== "GOOGLE_OAUTH" &&
+                p.origenRegistro !== "LINKED_GOOGLE" &&
+                p.linkedGoogleSub !== userId,
+            );
+
+            if (nativeAccount && !alreadyLinked) {
+              const userName =
+                payload.name ||
+                (user as any)?.name ||
+                userEmail.split("@")[0] ||
+                "";
+              return `/link-account?email=${encodeURIComponent(userEmail)}&googleSub=${encodeURIComponent(userId)}&name=${encodeURIComponent(userName)}`;
+            }
+
+            if (alreadyLinked) {
+              effectiveUserId =
+                alreadyLinked.id ||
+                alreadyLinked.PK?.replace("USER#", "") ||
+                userId;
+            }
+          }
+
           let userProfile: any = await $fetch(
-            `${config.public.apiUrl}/profile/${userId}`,
+            `${config.public.apiUrl}/profile/${effectiveUserId}`,
           ).catch(() => null);
 
           // Auto-provision profile for first-time Google Sign-In candidates
@@ -384,15 +475,14 @@ export default NuxtAuthHandler({
               (user as any)?.name ||
               (payload.email || (user as any)?.email)?.split("@")[0] ||
               "Candidato";
-            const userEmail = payload.email || (user as any)?.email;
-            userProfile = await $fetch(`${config.public.apiUrl}/profile/${userId}`, {
+            userProfile = await $fetch(`${config.public.apiUrl}/profile/${effectiveUserId}`, {
               method: "POST",
               headers: {
-                "x-user-id": userId,
+                "x-user-id": effectiveUserId,
                 "x-user-role": "CANDIDATO",
               },
               body: {
-                id: userId,
+                id: effectiveUserId,
                 nombre: userName,
                 email: userEmail,
                 tipoUsuario: "CANDIDATO",
@@ -581,6 +671,35 @@ export default NuxtAuthHandler({
                 payload.identities.some((i: any) => i.providerName === "Google"));
 
             token.isFederated = Boolean(isGoogleFederated);
+
+            if (isGoogleFederated) {
+              try {
+                const config = useRuntimeConfig();
+                const allProfiles: any[] = await $fetch(
+                  `${config.public.apiUrl}/profiles`,
+                ).catch(() => []);
+                const linked = allProfiles.find(
+                  (p) =>
+                    p.linkedGoogleSub === payload.sub ||
+                    (p.origenRegistro === "LINKED_GOOGLE" &&
+                      p.email &&
+                      token.email &&
+                      p.email.toLowerCase() ===
+                        (token.email as string).toLowerCase()),
+                );
+                if (linked) {
+                  token.id =
+                    linked.id ||
+                    linked.PK?.replace("USER#", "") ||
+                    token.id;
+                  if (linked.tipoUsuario)
+                    token.tipoUsuario = linked.tipoUsuario;
+                  if (linked.nombre) token.name = linked.nombre;
+                }
+              } catch {
+                // Fallback a token.id existente
+              }
+            }
 
             const rawGroups = payload["cognito:groups"] || payload.groups || [];
             const groups = Array.isArray(rawGroups)
