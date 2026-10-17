@@ -8,17 +8,14 @@
       <div class="px-2 pt-1 pb-1">
         <NuxtLink
           to="/"
-          aria-label="Inicio de JobNet"
+          aria-label="Inicio"
           class="flex items-center gap-3 group"
         >
           <img
             src="/logo.svg"
-            alt="JobNet Logo"
+            alt="Logo"
             class="h-10 w-10 filter brightness-100 dark:brightness-0 dark:invert transition-transform group-hover:scale-105"
           />
-          <span class="font-extrabold text-xl tracking-tight text-on-surface dark:text-slate-100">
-            Job<span class="text-primary dark:text-indigo-400">Net</span>
-          </span>
         </NuxtLink>
       </div>
 
