@@ -16,14 +16,9 @@
             alt="JobNet Logo"
             class="h-10 w-10 filter brightness-100 dark:brightness-0 dark:invert transition-transform group-hover:scale-105"
           />
-          <div class="flex flex-col">
-            <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-primary to-indigo-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-              JobNet
-            </span>
-            <span class="text-[10px] font-semibold text-on-surface-variant/70 dark:text-slate-400 tracking-wider uppercase -mt-0.5">
-              Portal de Empleo
-            </span>
-          </div>
+          <span class="font-extrabold text-xl tracking-tight text-on-surface dark:text-slate-100">
+            Job<span class="text-primary dark:text-indigo-400">Net</span>
+          </span>
         </NuxtLink>
       </div>
 

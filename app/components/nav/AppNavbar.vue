@@ -2,7 +2,7 @@
   <div class="md:hidden">
     <!-- Fixed Mobile Top Header -->
     <header
-      class="fixed top-0 w-full z-50 bg-surface/95 dark:bg-slate-900/95 backdrop-blur-lg border-b border-outline-variant/60 dark:border-slate-800 h-16 flex items-center justify-between px-4 transition-transform duration-300 ease-in-out select-none"
+      class="fixed top-0 w-full z-50 bg-white dark:bg-slate-950 border-b border-outline-variant/60 dark:border-slate-800 h-16 flex items-center justify-between px-4 transition-transform duration-300 ease-in-out select-none shadow-xs"
       :class="headerVisibilityClass"
       role="banner"
     >
@@ -124,7 +124,7 @@
     >
       <div
         v-if="isMobileMenuOpen"
-        class="fixed inset-0 top-16 bg-slate-950/50 backdrop-blur-xs z-40"
+        class="fixed inset-0 top-16 bg-black/60 z-40"
         @click="closeMenu"
       />
     </Transition>
@@ -140,7 +140,7 @@
     >
       <nav
         v-if="isMobileMenuOpen"
-        class="fixed top-16 inset-x-0 bottom-0 z-40 bg-surface-container-lowest/98 dark:bg-slate-900/98 backdrop-blur-2xl flex flex-col justify-between p-4 overflow-y-auto border-t border-outline-variant/40 dark:border-slate-800 shadow-2xl select-none"
+        class="fixed top-16 inset-x-0 bottom-0 z-40 bg-white dark:bg-slate-950 flex flex-col justify-between p-4 overflow-y-auto border-t border-outline-variant/40 dark:border-slate-800 shadow-2xl select-none"
         aria-label="Menú desplegable móvil"
       >
         <div class="flex-1 space-y-4 pb-4">
@@ -206,7 +206,7 @@
         </div>
 
         <!-- Bottom Actions (Theme Toggle & Account Management) -->
-        <div class="flex-shrink-0 pt-3 border-t border-outline-variant/60 dark:border-slate-800 space-y-3 mt-auto bg-surface-container-lowest/90 dark:bg-slate-900/90">
+        <div class="flex-shrink-0 pt-3 border-t border-outline-variant/60 dark:border-slate-800 space-y-3 mt-auto bg-white dark:bg-slate-950">
           <!-- Appearance Toggle -->
           <div class="flex items-center justify-between px-3 py-2 bg-surface-container/50 dark:bg-slate-800/60 rounded-xl">
             <span class="text-xs font-semibold text-on-surface-variant dark:text-slate-400">Apariencia</span>
