@@ -118,12 +118,25 @@
             <span class="truncate">{{ option.label }}</span>
           </div>
 
-          <span
-            v-if="isSelected(option.value)"
-            class="material-symbols-outlined text-sm text-primary font-bold flex-shrink-0"
-          >
-            check
-          </span>
+          <div class="flex items-center gap-1.5 flex-shrink-0 ml-auto">
+            <span
+              v-if="option.badge !== undefined && option.badge !== null"
+              class="text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors"
+              :class="
+                isSelected(option.value)
+                  ? 'bg-primary text-white'
+                  : 'bg-surface-container dark:bg-slate-800 text-on-surface-variant dark:text-slate-400 border border-outline-variant/40'
+              "
+            >
+              {{ option.badge }}
+            </span>
+            <span
+              v-if="isSelected(option.value)"
+              class="material-symbols-outlined text-sm text-primary font-bold flex-shrink-0"
+            >
+              check
+            </span>
+          </div>
         </div>
 
         <div
@@ -150,6 +163,7 @@ export interface SelectOption {
   label: string;
   icon?: string;
   disabled?: boolean;
+  badge?: string | number;
 }
 
 const props = withDefaults(
@@ -198,6 +212,7 @@ const normalizedOptions = computed<SelectOption[]>(() => {
         label: opt.label,
         icon: opt.icon,
         disabled: opt.disabled || false,
+        badge: (opt as any).badge,
       };
     }
     return {

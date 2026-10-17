@@ -7,6 +7,7 @@
     :icon-bg-class="iconBgClass"
     max-width="sm"
     @close="$emit('cancel')"
+    z-index-class="z-[99990]"
   >
     <p
       class="text-sm text-on-surface-variant dark:text-slate-300 leading-relaxed"
@@ -45,6 +46,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+import AppModal from "./AppModal.vue";
+
 const props = withDefaults(
   defineProps<{
     modelValue: boolean;

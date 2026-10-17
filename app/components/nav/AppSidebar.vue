@@ -21,6 +21,24 @@
           </NuxtLink>
         </div>
 
+        <!-- Quick Omnibox Search Trigger (Ctrl+K) -->
+        <div class="px-1">
+          <button
+            type="button"
+            @click="openCommandPalette"
+            class="w-full flex items-center justify-between px-3 py-2 text-xs text-on-surface-variant dark:text-slate-400 bg-surface-container/60 hover:bg-surface-container dark:bg-slate-800/60 dark:hover:bg-slate-800 rounded-xl border border-outline-variant/40 dark:border-slate-700/60 transition group cursor-pointer shadow-2xs"
+            title="Abrir buscador global y comandos (Ctrl+K)"
+          >
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px] text-primary group-hover:scale-110 transition-transform">search</span>
+              <span class="font-medium text-on-surface-variant dark:text-slate-300">Buscar...</span>
+            </div>
+            <kbd class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-surface dark:bg-slate-900 rounded border border-outline-variant/60 dark:border-slate-700 text-on-surface-variant dark:text-slate-400">
+              Ctrl K
+            </kbd>
+          </button>
+        </div>
+
         <!-- Navigation Links -->
         <nav class="space-y-1" aria-label="Navegación principal">
           <a
@@ -168,6 +186,21 @@
             </button>
           </div>
 
+          <!-- Quick Omnibox Search (Mobile Drawer) -->
+          <div class="px-1">
+            <button
+              type="button"
+              @click="closeMobileMenu(); openCommandPalette();"
+              class="w-full flex items-center justify-between px-3 py-2 text-xs text-on-surface-variant dark:text-slate-400 bg-surface-container/60 hover:bg-surface-container dark:bg-slate-800/60 rounded-xl border border-outline-variant/40 dark:border-slate-700/60 transition cursor-pointer"
+            >
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-primary">search</span>
+                <span class="font-medium text-on-surface-variant dark:text-slate-300">Buscar o comando...</span>
+              </div>
+              <span class="material-symbols-outlined text-sm text-primary">arrow_forward</span>
+            </button>
+          </div>
+
           <nav class="space-y-1">
             <a
               v-for="item in navItems"
@@ -248,6 +281,7 @@ const router = useRouter();
 const { status, data, signOut } = useAuth();
 const { openProtectedModal } = useProtectedAction();
 const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
+const { openCommandPalette } = useCommandPalette();
 
 const effectiveStatus = computed(() => {
   return status.value;
@@ -493,21 +527,15 @@ const navItems = computed<NavItem[]>(() => {
           protected: true,
         },
         {
+          to: "/candidate/cv-templates",
+          icon: "auto_stories",
+          label: "Plantillas de CV",
+          protected: true,
+        },
+        {
           to: "/saved",
           icon: "bookmark",
           label: "Favoritos",
-          protected: true,
-        },
-        {
-          to: "/profile",
-          icon: "account_circle",
-          label: "Mi Perfil",
-          protected: true,
-        },
-        {
-          to: "/settings",
-          icon: "settings",
-          label: "Configuración",
           protected: true,
         },
       ];

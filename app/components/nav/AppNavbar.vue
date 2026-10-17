@@ -6,19 +6,14 @@
   >
     <!-- Left side: Search & Theme Toggle -->
     <div class="flex items-center gap-2 flex-shrink-0">
-      <NuxtLink
-        v-if="searchRoute"
-        :to="searchRoute"
-        class="transition p-2 flex items-center justify-center rounded-xl"
-        :class="[
-          isActive(searchRoute)
-            ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-bold'
-            : 'text-on-surface-variant dark:text-slate-300 hover:text-primary',
-        ]"
-        aria-label="Buscar"
+      <button
+        type="button"
+        @click="openCommandPalette"
+        class="transition p-2 flex items-center justify-center rounded-xl text-on-surface-variant dark:text-slate-300 hover:text-primary active:scale-95 cursor-pointer"
+        aria-label="Abrir buscador global y comandos (Ctrl+K)"
       >
         <span class="material-symbols-outlined text-[24px]">search</span>
-      </NuxtLink>
+      </button>
       <ThemeToggle />
     </div>
 
@@ -112,6 +107,7 @@ const props = defineProps<{
 const route = useRoute();
 const { status, data, signOut } = useAuth();
 const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
+const { openCommandPalette } = useCommandPalette();
 
 watchEffect(() => {
   if (

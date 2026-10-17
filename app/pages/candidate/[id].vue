@@ -79,6 +79,8 @@
       :location-text="locationText"
       :is-owner="isOwner"
       :web-links="webLinks"
+      @profile-updated="fetchProfile"
+      @cv-updated="fetchProfile"
     />
 
     <!-- Documents Horizontal Scroll -->

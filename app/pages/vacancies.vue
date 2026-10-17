@@ -1,15 +1,40 @@
 <template>
   <div
-    class="max-w-4xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+    class="mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-all duration-200"
+    :class="viewMode === 'split' ? 'max-w-7xl' : 'max-w-4xl'"
   >
-    <!-- Page Header -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-on-background mb-1">
-        Explorar Vacantes
-      </h1>
-      <p class="text-on-surface-variant dark:text-slate-300 text-sm">
-        Busca y filtra oportunidades profesionales relevantes para tu perfil.
-      </p>
+    <!-- Page Header & View Toggle -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-on-background mb-1">
+          Explorar Vacantes
+        </h1>
+        <p class="text-on-surface-variant dark:text-slate-300 text-sm">
+          Busca y filtra oportunidades profesionales relevantes para tu perfil en el Estado de México y remotas.
+        </p>
+      </div>
+
+      <!-- View Mode Segmented Controls -->
+      <div class="flex items-center p-1 bg-surface-container dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-xl self-start sm:self-auto shadow-2xs">
+        <button
+          type="button"
+          @click="viewMode = 'list'"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
+          :class="viewMode === 'list' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant dark:text-slate-400 hover:text-on-surface'"
+        >
+          <span class="material-symbols-outlined text-base">format_list_bulleted</span>
+          <span>Lista</span>
+        </button>
+        <button
+          type="button"
+          @click="viewMode = 'split'"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
+          :class="viewMode === 'split' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant dark:text-slate-400 hover:text-on-surface'"
+        >
+          <span class="material-symbols-outlined text-base">splitscreen_left</span>
+          <span>Split Mapa</span>
+        </button>
+      </div>
     </div>
 
     <!-- Search & Filters Panel -->
@@ -52,6 +77,35 @@
           <span>Buscar</span>
         </button>
       </form>
+
+      <!-- Quick Modality Facet Chips with Live Badges -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <button
+          v-for="mod in modalitySelectOptions"
+          :key="mod.value"
+          type="button"
+          @click="filterModality = filterModality === mod.value ? '' : String(mod.value)"
+          class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border"
+          :class="
+            (filterModality === mod.value) || (!filterModality && mod.value === '')
+              ? 'bg-primary text-white border-primary shadow-xs'
+              : 'bg-surface-container dark:bg-slate-800 border-outline-variant/40 text-on-surface dark:text-slate-200 hover:bg-surface-container-high'
+          "
+        >
+          <span v-if="mod.icon" class="material-symbols-outlined text-sm">{{ mod.icon }}</span>
+          <span>{{ mod.label }}</span>
+          <span
+            class="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+            :class="
+              (filterModality === mod.value) || (!filterModality && mod.value === '')
+                ? 'bg-white/20 text-white'
+                : 'bg-surface-container-high dark:bg-slate-700 text-on-surface-variant dark:text-slate-300'
+            "
+          >
+            {{ mod.badge }}
+          </span>
+        </button>
+      </div>
 
       <!-- Filter Toggle -->
       <button
@@ -127,20 +181,8 @@
             <AppSelect
               v-model="filterModality"
               label="Modalidad"
-              :options="[
-                { value: '', label: 'Todas' },
-                { value: 'Remoto', label: 'Remoto', icon: 'laptop' },
-                {
-                  value: 'Híbrido',
-                  label: 'Híbrido',
-                  icon: 'domain_verification',
-                },
-                {
-                  value: 'Presencial',
-                  label: 'Presencial',
-                  icon: 'location_city',
-                },
-              ]"
+              label-icon="laptop"
+              :options="modalitySelectOptions"
             />
           </div>
 
@@ -149,13 +191,8 @@
             <AppSelect
               v-model="filterSector"
               label="Sector"
-              :options="[
-                { value: '', label: 'Todos' },
-                ...catalogStore.sectors.map((s) => ({
-                  value: s.name,
-                  label: s.name,
-                })),
-              ]"
+              label-icon="domain"
+              :options="sectorSelectOptions"
             />
           </div>
 
@@ -323,22 +360,60 @@
       </p>
     </div>
 
-    <!-- Jobs List using Post-Style JobCard -->
-    <div
-      v-else
-      class="grid grid-cols-1 gap-4"
-      aria-label="Listado de vacantes de empleo"
-    >
-      <JobCard
-        v-for="job in filteredJobs"
-        :key="job.id || job.uniqueId"
-        :job="job"
-        :current-user-id="(session?.user as any)?.id || ''"
-        @like="toggleJobLike"
-        @bookmark="toggleJobBookmark"
-        @share="handleShareJob"
-        @navigate="(id) => $router.push(`/jobs/${id}`)"
-      />
+    <!-- Results: Split View or Standard List View -->
+    <div v-else>
+      <!-- SPLIT VIEW MODE (List + Leaflet Multi-pin Map) -->
+      <div v-if="viewMode === 'split'" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Left Side: Interactive Job Cards (7 columns) -->
+        <div class="lg:col-span-7 space-y-4">
+          <div
+            v-for="job in filteredJobs"
+            :key="job.id || (job as any).uniqueId"
+            :id="`job-card-${job.id || (job as any).uniqueId}`"
+            @mouseenter="hoveredJobId = job.id || (job as any).uniqueId"
+            @mouseleave="hoveredJobId = null"
+            class="transition-all duration-200 rounded-2xl"
+            :class="hoveredJobId === (job.id || (job as any).uniqueId) ? 'ring-2 ring-primary dark:ring-indigo-500 shadow-md -translate-y-0.5' : ''"
+          >
+            <JobCard
+              :job="job"
+              :current-user-id="(session?.user as any)?.id || ''"
+              @like="toggleJobLike"
+              @bookmark="toggleJobBookmark"
+              @share="handleShareJob"
+              @navigate="(id) => $router.push(`/jobs/${id}`)"
+            />
+          </div>
+        </div>
+
+        <!-- Right Side: Sticky Multi-pin Map (5 columns) -->
+        <div class="lg:col-span-5 sticky top-20">
+          <VacanciesSplitMap
+            :jobs="filteredJobs"
+            :highlighted-job-id="hoveredJobId"
+            @hover-job="(id) => hoveredJobId = id"
+            @select-job="handleMapJobSelect"
+          />
+        </div>
+      </div>
+
+      <!-- STANDARD FULL LIST MODE -->
+      <div
+        v-else
+        class="grid grid-cols-1 gap-4"
+        aria-label="Listado de vacantes de empleo"
+      >
+        <JobCard
+          v-for="job in filteredJobs"
+          :key="job.id || job.uniqueId"
+          :job="job"
+          :current-user-id="(session?.user as any)?.id || ''"
+          @like="toggleJobLike"
+          @bookmark="toggleJobBookmark"
+          @share="handleShareJob"
+          @navigate="(id) => $router.push(`/jobs/${id}`)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -346,6 +421,7 @@
 <script setup lang="ts">
 import { useJobsStore, type Job } from "../stores/jobs";
 import { useCatalogStore } from "../stores/catalog";
+import VacanciesSplitMap from "../components/vacancies/VacanciesSplitMap.vue";
 
 useSeoMeta({
   title: "Explorar Vacantes - JobNet",
@@ -358,6 +434,74 @@ const catalogStore = useCatalogStore();
 const { data: session } = useAuth();
 const { shareJob } = useShare();
 const router = useRouter();
+
+// View Mode (List vs Split Map)
+const viewMode = ref<"list" | "split">("list");
+const hoveredJobId = ref<string | null>(null);
+
+const handleMapJobSelect = (job: Job) => {
+  const jobId = job.id || (job as any).uniqueId;
+  hoveredJobId.value = jobId;
+  if (process.client) {
+    const cardEl = document.getElementById(`job-card-${jobId}`);
+    if (cardEl) {
+      cardEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+};
+
+// Faceted options with live counters
+const allJobs = computed(() => jobsStore.jobs || []);
+
+const modalitySelectOptions = computed(() => {
+  const total = allJobs.value.length;
+  const counts = {
+    Remoto: allJobs.value.filter((j) => (j.modalidad || "").toLowerCase() === "remoto").length,
+    Híbrido: allJobs.value.filter(
+      (j) =>
+        (j.modalidad || "").toLowerCase() === "híbrido" ||
+        (j.modalidad || "").toLowerCase() === "hibrido",
+    ).length,
+    Presencial: allJobs.value.filter(
+      (j) => (j.modalidad || "").toLowerCase() === "presencial",
+    ).length,
+  };
+
+  return [
+    { value: "", label: "Todas", badge: total },
+    { value: "Remoto", label: "Remoto", icon: "laptop", badge: counts.Remoto },
+    {
+      value: "Híbrido",
+      label: "Híbrido",
+      icon: "domain_verification",
+      badge: counts.Híbrido,
+    },
+    {
+      value: "Presencial",
+      label: "Presencial",
+      icon: "location_city",
+      badge: counts.Presencial,
+    },
+  ];
+});
+
+const sectorSelectOptions = computed(() => {
+  const total = allJobs.value.length;
+  return [
+    { value: "", label: "Todos", badge: total },
+    ...catalogStore.sectors.map((s) => {
+      const count = allJobs.value.filter(
+        (j) =>
+          j.sector === s.name || (j.sectores && j.sectores.includes(s.name)),
+      ).length;
+      return {
+        value: s.name,
+        label: s.name,
+        badge: count,
+      };
+    }),
+  ];
+});
 
 // Search state
 const searchInput = ref("");
