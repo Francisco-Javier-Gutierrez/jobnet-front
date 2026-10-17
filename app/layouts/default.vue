@@ -6,7 +6,10 @@
     <AppSidebar v-model:isMobileMenuOpen="isMobileMenuOpen" />
 
     <!-- Modular Mobile Top Header Navbar -->
-    <AppNavbar :is-visible="isHeaderVisible" />
+    <AppNavbar
+      :is-visible="isHeaderVisible"
+      @toggle-menu="isMobileMenuOpen = !isMobileMenuOpen"
+    />
 
     <!-- Main Content Area -->
     <main

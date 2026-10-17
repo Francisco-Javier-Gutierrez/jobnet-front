@@ -1,75 +1,69 @@
 <template>
   <header
-    class="md:hidden fixed top-0 w-full z-50 bg-surface/90 dark:bg-slate-900/90 backdrop-blur-lg border-b border-outline-variant/60 dark:border-slate-800 h-16 flex items-center justify-between px-4 transition-transform duration-300 ease-in-out transition-colors duration-200"
+    class="md:hidden fixed top-0 w-full z-50 bg-surface/90 dark:bg-slate-900/90 backdrop-blur-lg border-b border-outline-variant/60 dark:border-slate-800 h-16 flex items-center justify-between px-4 transition-transform duration-300 ease-in-out transition-colors duration-200 select-none"
     :class="isVisible ? 'translate-y-0' : '-translate-y-full'"
     role="banner"
   >
-    <!-- Left side: Search & Theme Toggle -->
-    <div class="flex items-center gap-2 flex-shrink-0">
+    <!-- Left side: Hamburger Button + Brand Logo + App Name -->
+    <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+      <button
+        type="button"
+        @click="$emit('toggle-menu')"
+        class="w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container/60 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer"
+        aria-label="Abrir menú de navegación"
+        title="Menú"
+      >
+        <span class="material-symbols-outlined text-[24px]">menu</span>
+      </button>
+
+      <NuxtLink
+        to="/"
+        class="flex items-center gap-2 group"
+        aria-label="Inicio de JobNet"
+      >
+        <img
+          src="/logo.svg"
+          alt="JobNet Logo"
+          class="h-8 w-8 filter brightness-100 dark:brightness-0 dark:invert transition-transform group-hover:scale-105"
+        />
+        <span class="font-extrabold text-base tracking-tight text-on-surface dark:text-slate-100">
+          Job<span class="text-primary dark:text-indigo-400">Net</span>
+        </span>
+      </NuxtLink>
+    </div>
+
+    <!-- Right side: Clean, un-crowded action cluster -->
+    <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+      <!-- Search (Omnibox Trigger) -->
       <button
         type="button"
         @click="openCommandPalette"
-        class="transition p-2 flex items-center justify-center rounded-xl text-on-surface-variant dark:text-slate-300 hover:text-primary active:scale-95 cursor-pointer"
+        class="w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container/60 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer"
         aria-label="Abrir buscador global y comandos (Ctrl+K)"
+        title="Buscar (Ctrl+K)"
       >
-        <span class="material-symbols-outlined text-[24px]">search</span>
+        <span class="material-symbols-outlined text-[22px]">search</span>
       </button>
-      <ThemeToggle />
-    </div>
 
-    <!-- Center: Logo -->
-    <NuxtLink
-      to="/"
-      class="flex items-center justify-center absolute left-1/2 -translate-x-1/2"
-      aria-label="Inicio de JobNet"
-    >
-      <img
-        src="/logo.svg"
-        alt="JobNet Logo"
-        class="h-14 w-14 filter brightness-100 dark:brightness-0 dark:invert transition-all hover:scale-105"
-      />
-    </NuxtLink>
+      <!-- Theme Toggle -->
+      <ThemeToggle mode="icon" />
 
-    <!-- Right side: Profile & Actions -->
-    <div class="flex items-center gap-2 flex-shrink-0">
+      <!-- Authenticated Profile & Notifications -->
       <template v-if="status === 'authenticated'">
-        <NuxtLink
-          v-if="userRole === 'organization'"
-          to="/company/edit"
-          class="text-on-surface-variant dark:text-slate-300 hover:text-primary transition p-2 flex items-center justify-center rounded-xl"
-          :class="[
-            isActive('/company/edit')
-              ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-bold'
-              : '',
-          ]"
-          aria-label="Configuración"
-        >
-          <span class="material-symbols-outlined text-[22px]">settings</span>
-        </NuxtLink>
+        <!-- Notifications with active indicator -->
         <NuxtLink
           to="/notifications"
-          class="text-on-surface-variant dark:text-slate-300 hover:text-primary transition p-2 flex items-center justify-center rounded-xl"
-          :class="[
-            isActive('/notifications')
-              ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-bold'
-              : '',
-          ]"
+          class="w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container/60 dark:hover:bg-slate-800 transition active:scale-95 relative"
+          :class="[isActive('/notifications') ? 'text-primary bg-primary/10 dark:bg-indigo-950/60 font-bold' : '']"
           aria-label="Notificaciones"
         >
-          <span class="material-symbols-outlined text-[22px]"
-            >notifications</span
-          >
+          <span class="material-symbols-outlined text-[22px]">notifications</span>
         </NuxtLink>
-        <button
-          @click="onSignOut"
-          class="text-on-surface-variant dark:text-slate-300 hover:text-rose-600 transition p-2 flex items-center justify-center"
-          aria-label="Cerrar sesión"
-        >
-          <span class="material-symbols-outlined text-[22px]">logout</span>
-        </button>
+
+        <!-- User Profile Avatar Pill -->
         <NuxtLink
           :to="profileRoute"
-          class="w-8 h-8 rounded-full border transition flex items-center justify-center text-xs font-bold shadow-sm active:scale-95 overflow-hidden"
+          class="w-8 h-8 rounded-full border transition flex items-center justify-center text-xs font-bold shadow-xs active:scale-95 overflow-hidden ml-0.5"
           :class="[
             isActive(profileRoute)
               ? 'bg-primary text-white border-primary ring-2 ring-primary/30 dark:ring-indigo-400/40'
@@ -86,10 +80,12 @@
           <span v-else>{{ userInitial }}</span>
         </NuxtLink>
       </template>
+
+      <!-- Guest Login Button -->
       <template v-else>
         <NuxtLink
           to="/login"
-          class="text-xs bg-primary hover:bg-primary-container text-white px-3 py-1.5 rounded-lg font-medium transition"
+          class="text-xs bg-primary hover:bg-primary-container text-white px-3.5 py-1.5 rounded-xl font-bold transition shadow-xs active:scale-95 ml-1"
           aria-label="Iniciar sesión"
         >
           Entrar
@@ -100,8 +96,17 @@
 </template>
 
 <script setup lang="ts">
+import { computed, watchEffect } from "vue";
+import { useRoute } from "vue-router";
+import { useCommandPalette } from "~/composables/useCommandPalette";
+import { useProfileState } from "~/composables/useProfileState";
+
 const props = defineProps<{
   isVisible?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "toggle-menu"): void;
 }>();
 
 const route = useRoute();
@@ -143,9 +148,7 @@ const isActive = (path: string | null): boolean => {
 const searchRoute = computed(() => {
   switch (userRole.value) {
     case "admin":
-      return null;
     case "moderator":
-      return null;
     case "organization":
       return null;
     default:

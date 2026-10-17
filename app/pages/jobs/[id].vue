@@ -1,6 +1,6 @@
 <template>
   <div
-    class="max-w-4xl mx-auto px-4 py-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
+    class="max-w-4xl mx-auto px-4 py-8 pb-28 md:pb-8 w-full bg-background dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200"
   >
     <!-- Top Breadcrumb -->
     <div class="mb-6 flex items-center justify-between">
@@ -177,6 +177,79 @@
         @submitReply="submitReply"
       />
     </div>
+
+    <!-- Mobile Sticky Apply Bar -->
+    <div
+      v-if="job && !job.suspendida && job.estatus !== 'Oculta'"
+      class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-outline-variant/60 dark:border-slate-800 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] shadow-2xl flex items-center justify-between gap-3 transition-transform duration-200"
+      aria-label="Barra de postulación rápida"
+    >
+      <!-- Left: Salary & Company/Location -->
+      <div class="min-w-0 flex-1">
+        <p class="text-xs font-extrabold text-on-surface dark:text-slate-100 truncate">
+          {{ formatSalaryDisplay(job) }}
+        </p>
+        <p class="text-[10px] text-on-surface-variant dark:text-slate-400 truncate flex items-center gap-1">
+          <span class="material-symbols-outlined text-[13px] text-primary">apartment</span>
+          <span>{{ job.empresaNombre || (job as any).companyName || 'Empresa' }}</span>
+          <span v-if="(job as any).modalidad || (job as any).modality" class="text-outline-variant">·</span>
+          <span v-if="(job as any).modalidad || (job as any).modality">{{ (job as any).modalidad || (job as any).modality }}</span>
+        </p>
+      </div>
+
+      <!-- Right: Bookmark + Apply Actions -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <!-- Bookmark Toggle -->
+        <button
+          type="button"
+          @click="toggleJobBookmark"
+          class="w-10 h-10 rounded-xl border border-outline-variant/60 dark:border-slate-800 flex items-center justify-center transition active:scale-95 cursor-pointer"
+          :class="[
+            isJobBookmarked
+              ? 'bg-primary/10 border-primary/30 text-primary dark:text-indigo-400'
+              : 'bg-surface-container/60 dark:bg-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-primary'
+          ]"
+          :aria-label="isJobBookmarked ? 'Eliminar de favoritos' : 'Guardar vacante en favoritos'"
+          :title="isJobBookmarked ? 'Guardada' : 'Guardar'"
+        >
+          <span
+            class="material-symbols-outlined text-[20px]"
+            :class="{ 'font-fill-1 text-primary dark:text-indigo-400': isJobBookmarked }"
+          >
+            {{ isJobBookmarked ? 'bookmark' : 'bookmark_border' }}
+          </span>
+        </button>
+
+        <!-- Applied State -->
+        <div
+          v-if="hasApplied"
+          class="h-10 px-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-[18px]">check_circle</span>
+          <span>Postulado</span>
+        </div>
+
+        <!-- Paused State -->
+        <div
+          v-else-if="job.estado === 'PAUSADA' || job.estado === 'EVALUACION'"
+          class="h-10 px-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-300 font-bold text-xs flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-[18px]">pause_circle</span>
+          <span>Pausada</span>
+        </div>
+
+        <!-- Apply CTA Button -->
+        <button
+          v-else
+          type="button"
+          @click="scrollToApplySection"
+          class="h-10 px-4 rounded-xl bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/95 text-white font-bold text-xs shadow-md shadow-primary/20 flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+        >
+          <span>Postularme</span>
+          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal de Reporte -->
@@ -331,6 +404,15 @@ const toggleJobBookmark = async () => {
     });
   } catch (e) {
     console.error("Error toggling job bookmark:", e);
+  }
+};
+
+const scrollToApplySection = () => {
+  if (process.client) {
+    const el = document.getElementById("apply-section");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 };
 

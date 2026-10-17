@@ -1,58 +1,51 @@
 <template>
   <nav
-    class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-outline-variant/60 dark:border-slate-800 z-50 transition-transform duration-300 ease-in-out transition-colors duration-200 select-none"
+    v-if="!isJobDetailPage"
+    class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-outline-variant/60 dark:border-slate-800 z-50 transition-transform duration-300 ease-in-out transition-colors duration-200 select-none pb-[env(safe-area-inset-bottom,0px)]"
     :class="isVisible ? 'translate-y-0' : 'translate-y-full'"
     aria-label="Navegación inferior móvil"
   >
-    <div
-      class="flex items-center justify-around h-16 px-2 max-w-lg mx-auto relative"
-    >
+    <div class="flex items-center justify-between h-16 max-w-md mx-auto px-2 relative">
       <template v-for="(item, index) in footerItems" :key="item.to">
-        <!-- Central Floating Plus Action Button -->
-        <a
-          v-if="index === 2"
-          href="#"
-          @click.prevent="handleFooterClick(item)"
-          class="flex items-center justify-center -mt-6 w-14 h-14 rounded-full bg-primary dark:bg-indigo-600 text-white shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-transform duration-200 z-10"
-          :aria-label="item.label"
-        >
-          <span class="material-symbols-outlined text-3xl font-bold">add</span>
-        </a>
+        <!-- Central Primary Quick Action Button (Index 2) -->
+        <div v-if="index === 2" class="flex-1 flex items-center justify-center -mt-5">
+          <button
+            type="button"
+            @click.prevent="handleFooterClick(item)"
+            class="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-indigo-600 text-white shadow-lg shadow-primary/30 ring-4 ring-surface dark:ring-slate-900 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform duration-150 cursor-pointer"
+            :aria-label="item.label"
+            :title="item.label"
+          >
+            <span class="material-symbols-outlined text-[26px] font-bold">add</span>
+          </button>
+        </div>
 
         <!-- Standard Bottom Bar Icon Link -->
         <a
           v-else
           href="#"
           @click.prevent="handleFooterClick(item)"
-          class="flex flex-col items-center justify-center flex-1 h-full py-1 transition-all duration-200 relative group"
+          class="flex flex-col items-center justify-center flex-1 h-full py-1 transition-all duration-150 relative group cursor-pointer"
           :class="[
             isActive(item.to)
               ? 'text-primary dark:text-indigo-400 font-bold'
               : 'text-on-surface-variant dark:text-slate-400 hover:text-on-surface',
           ]"
         >
-          <!-- Active Top Indicator Pill -->
+          <!-- Active Dot Indicator -->
           <span
             v-if="isActive(item.to)"
-            class="absolute top-0 w-8 h-1 bg-primary dark:bg-indigo-400 rounded-full animate-fade-in shadow-sm"
+            class="absolute top-1.5 w-1 h-1 bg-primary dark:bg-indigo-400 rounded-full animate-fade-in"
           ></span>
 
-          <div
-            :class="[
-              isActive(item.to)
-                ? 'bg-primary/10 dark:bg-indigo-950/60 px-3 py-1 rounded-full'
-                : 'px-2 py-1',
-            ]"
-            class="flex flex-col items-center justify-center transition-all duration-200"
-          >
+          <div class="flex flex-col items-center justify-center gap-0.5">
             <span
               class="material-symbols-outlined text-[22px] transition-transform duration-150"
-              :class="{ 'font-fill-1 scale-105': isActive(item.to) }"
-              >{{ item.icon }}</span
+              :class="{ 'font-fill-1 scale-105 text-primary dark:text-indigo-400': isActive(item.to) }"
             >
-            <span
-              class="text-[10px] tracking-tight leading-tight mt-0.5 truncate max-w-[64px] text-center"
-            >
+              {{ item.icon }}
+            </span>
+            <span class="text-[10px] tracking-tight leading-none text-center truncate max-w-[60px]">
               {{ item.shortLabel || item.label }}
             </span>
           </div>
@@ -63,6 +56,11 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAuth } from "#imports";
+import { useProtectedAction } from "~/composables/useProtectedAction";
+
 interface FooterItem {
   to: string;
   icon: string;
@@ -79,6 +77,8 @@ const route = useRoute();
 const router = useRouter();
 const { status, data } = useAuth();
 const { openProtectedModal } = useProtectedAction();
+
+const isJobDetailPage = computed(() => /^\/jobs\/[^\/]+$/.test(route.path));
 
 const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
@@ -123,7 +123,7 @@ const footerItems = computed<FooterItem[]>(() => {
         },
         {
           to: "/create",
-          icon: "add_circle",
+          icon: "add",
           label: "Crear Nuevo",
           shortLabel: "Crear",
           protected: true,
@@ -139,7 +139,7 @@ const footerItems = computed<FooterItem[]>(() => {
           to: "/notifications",
           icon: "notifications",
           label: "Notificaciones",
-          shortLabel: "Notif.",
+          shortLabel: "Notif",
           protected: true,
         },
       ];
@@ -162,7 +162,7 @@ const footerItems = computed<FooterItem[]>(() => {
         },
         {
           to: "/create",
-          icon: "add_circle",
+          icon: "add",
           label: "Crear Nuevo",
           shortLabel: "Crear",
           protected: true,
@@ -171,7 +171,7 @@ const footerItems = computed<FooterItem[]>(() => {
           to: "/mod/verifications",
           icon: "verified",
           label: "Verificaciones",
-          shortLabel: "Verif.",
+          shortLabel: "Verif",
           protected: true,
         },
         {
@@ -201,9 +201,9 @@ const footerItems = computed<FooterItem[]>(() => {
         },
         {
           to: "/create",
-          icon: "add_circle",
-          label: "Crear Nuevo",
-          shortLabel: "Crear",
+          icon: "add",
+          label: "Publicar Oferta",
+          shortLabel: "Publicar",
           protected: true,
         },
         {
@@ -240,9 +240,9 @@ const footerItems = computed<FooterItem[]>(() => {
         },
         {
           to: "/create",
-          icon: "add_circle",
+          icon: "add",
           label: "Crear Publicación",
-          shortLabel: "Crear",
+          shortLabel: "Publicar",
           protected: true,
         },
         {
@@ -256,7 +256,7 @@ const footerItems = computed<FooterItem[]>(() => {
           to: "/notifications",
           icon: "notifications",
           label: "Notificaciones",
-          shortLabel: "Notif.",
+          shortLabel: "Notif",
           protected: true,
         },
       ];
@@ -266,10 +266,6 @@ const footerItems = computed<FooterItem[]>(() => {
 
 <style scoped>
 .font-fill-1 {
-  font-variation-settings:
-    "FILL" 1,
-    "wght" 600,
-    "GRAD" 0,
-    "opsz" 24;
+  font-variation-settings: "FILL" 1;
 }
 </style>

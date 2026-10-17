@@ -2,22 +2,30 @@
   <div>
     <!-- Desktop Sidebar -->
     <aside
-      class="hidden md:flex flex-col fixed top-0 left-0 h-screen w-64 bg-surface-container-lowest dark:bg-slate-900 border-r border-outline-variant/60 dark:border-slate-800 z-40 p-4 transition-colors duration-200 select-none"
+      class="hidden md:flex flex-col fixed top-0 left-0 h-screen w-64 bg-surface-container-lowest dark:bg-slate-900 border-r border-outline-variant/60 dark:border-slate-800 z-40 p-4 transition-colors duration-200 select-none shadow-xs"
     >
       <!-- Top Brand & Navigation Section (Scrollable if height is small) -->
-      <div class="flex-1 overflow-y-auto min-h-0 space-y-6 pr-1">
-        <!-- Brand Logo -->
-        <div class="flex items-center justify-center px-3 py-1">
+      <div class="flex-1 overflow-y-auto min-h-0 space-y-4 pr-1">
+        <!-- Brand Logo & Title -->
+        <div class="px-2 pt-1 pb-1">
           <NuxtLink
             to="/"
             aria-label="Inicio de JobNet"
-            class="flex items-center justify-center"
+            class="flex items-center gap-3 group"
           >
             <img
               src="/logo.svg"
               alt="JobNet Logo"
-              class="h-16 w-16 filter brightness-100 dark:brightness-0 dark:invert transition-all hover:scale-105"
+              class="h-10 w-10 filter brightness-100 dark:brightness-0 dark:invert transition-transform group-hover:scale-105"
             />
+            <div class="flex flex-col">
+              <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-primary to-indigo-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+                JobNet
+              </span>
+              <span class="text-[10px] font-semibold text-on-surface-variant/70 dark:text-slate-400 tracking-wider uppercase -mt-0.5">
+                Portal de Empleo
+              </span>
+            </div>
           </NuxtLink>
         </div>
 
@@ -39,25 +47,51 @@
           </button>
         </div>
 
-        <!-- Navigation Links -->
-        <nav class="space-y-1" aria-label="Navegación principal">
-          <a
-            v-for="item in navItems"
-            :key="item.to"
-            href="#"
-            @click.prevent="handleNavClick(item)"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150"
-            :class="[
-              isActive(item.to)
-                ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-semibold shadow-sm'
-                : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container dark:hover:bg-slate-800 hover:text-on-surface',
-            ]"
+        <!-- Primary Action CTA Button (Standalone & Prominent) -->
+        <div v-if="primaryAction" class="px-1">
+          <button
+            type="button"
+            @click="handleNavClick(primaryAction)"
+            class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/95 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all duration-200 cursor-pointer active:scale-[0.98]"
           >
-            <span class="material-symbols-outlined text-[22px]">{{
-              item.icon
-            }}</span>
-            <span>{{ item.label }}</span>
-          </a>
+            <span class="material-symbols-outlined text-[18px] font-bold">add</span>
+            <span>{{ primaryAction.label }}</span>
+          </button>
+        </div>
+
+        <!-- Categorized Navigation Sections -->
+        <nav class="space-y-4 pt-1" aria-label="Navegación principal">
+          <div
+            v-for="section in navSections"
+            :key="section.title"
+            class="space-y-1"
+          >
+            <p class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant/60 dark:text-slate-500 select-none">
+              {{ section.title }}
+            </p>
+            <div class="space-y-0.5">
+              <a
+                v-for="item in section.items"
+                :key="item.to"
+                href="#"
+                @click.prevent="handleNavClick(item)"
+                class="flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-xs transition-all duration-150 group"
+                :class="[
+                  isActive(item.to)
+                    ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-semibold shadow-2xs'
+                    : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container dark:hover:bg-slate-800 hover:text-on-surface dark:hover:text-white',
+                ]"
+              >
+                <span
+                  class="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110"
+                  :class="isActive(item.to) ? 'text-primary dark:text-indigo-400' : 'text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-indigo-400'"
+                >
+                  {{ item.icon }}
+                </span>
+                <span class="truncate">{{ item.label }}</span>
+              </a>
+            </div>
+          </div>
         </nav>
       </div>
 
@@ -116,7 +150,7 @@
           </NuxtLink>
           <button
             @click="onSignOut"
-            class="text-on-surface-variant dark:text-slate-400 hover:text-rose-600 transition p-1.5 rounded-lg flex items-center justify-center flex-shrink-0"
+            class="text-on-surface-variant dark:text-slate-400 hover:text-rose-600 transition p-1.5 rounded-lg flex items-center justify-center flex-shrink-0 cursor-pointer"
             title="Cerrar sesión"
             aria-label="Cerrar sesión"
           >
@@ -163,26 +197,33 @@
     >
       <div
         v-if="isMobileMenuOpen"
-        class="fixed top-0 left-0 h-full w-4/5 max-w-xs bg-surface-container-lowest dark:bg-slate-900 border-r border-outline-variant/60 dark:border-slate-800 z-50 p-4 flex flex-col justify-between md:hidden select-none"
+        class="fixed top-0 left-0 h-full w-4/5 max-w-xs bg-surface-container-lowest dark:bg-slate-900 border-r border-outline-variant/60 dark:border-slate-800 z-50 p-4 flex flex-col justify-between md:hidden select-none shadow-2xl"
       >
-        <div class="flex-1 overflow-y-auto min-h-0 space-y-6">
-          <div class="flex items-center justify-between px-2">
+        <div class="flex-1 overflow-y-auto min-h-0 space-y-4">
+          <!-- Mobile Drawer Header -->
+          <div class="flex items-center justify-between px-2 pt-1">
             <NuxtLink
               to="/"
               aria-label="Inicio de JobNet"
-              class="flex items-center gap-2"
+              class="flex items-center gap-2.5"
+              @click="closeMobileMenu"
             >
               <img
                 src="/logo.svg"
                 alt="JobNet Logo"
-                class="h-10 w-10 filter brightness-100 dark:brightness-0 dark:invert transition-all"
+                class="h-9 w-9 filter brightness-100 dark:brightness-0 dark:invert transition-all"
               />
+              <span class="font-extrabold text-base tracking-tight bg-gradient-to-r from-primary to-indigo-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+                JobNet
+              </span>
             </NuxtLink>
             <button
+              type="button"
               @click="closeMobileMenu"
-              class="text-on-surface-variant dark:text-slate-300 p-1"
+              class="text-on-surface-variant dark:text-slate-300 hover:text-on-surface p-1.5 rounded-lg hover:bg-surface-container dark:hover:bg-slate-800 transition cursor-pointer"
+              aria-label="Cerrar menú"
             >
-              <span class="material-symbols-outlined">close</span>
+              <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
 
@@ -191,7 +232,7 @@
             <button
               type="button"
               @click="closeMobileMenu(); openCommandPalette();"
-              class="w-full flex items-center justify-between px-3 py-2 text-xs text-on-surface-variant dark:text-slate-400 bg-surface-container/60 hover:bg-surface-container dark:bg-slate-800/60 rounded-xl border border-outline-variant/40 dark:border-slate-700/60 transition cursor-pointer"
+              class="w-full flex items-center justify-between px-3 py-2 text-xs text-on-surface-variant dark:text-slate-400 bg-surface-container/60 hover:bg-surface-container dark:bg-slate-800/60 rounded-xl border border-outline-variant/40 dark:border-slate-700/60 transition cursor-pointer shadow-2xs"
             >
               <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px] text-primary">search</span>
@@ -201,27 +242,55 @@
             </button>
           </div>
 
-          <nav class="space-y-1">
-            <a
-              v-for="item in navItems"
-              :key="item.to"
-              href="#"
-              @click.prevent="handleMobileNavClick(item)"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all"
-              :class="[
-                isActive(item.to)
-                  ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-semibold'
-                  : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container dark:hover:bg-slate-800',
-              ]"
+          <!-- Primary Action CTA Button (Mobile Drawer) -->
+          <div v-if="primaryAction" class="px-1">
+            <button
+              type="button"
+              @click="handleMobileNavClick(primaryAction)"
+              class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/95 text-white text-xs font-bold shadow-md shadow-primary/20 transition-all duration-200 cursor-pointer active:scale-[0.98]"
             >
-              <span class="material-symbols-outlined text-[22px]">{{
-                item.icon
-              }}</span>
-              <span>{{ item.label }}</span>
-            </a>
+              <span class="material-symbols-outlined text-[18px] font-bold">add</span>
+              <span>{{ primaryAction.label }}</span>
+            </button>
+          </div>
+
+          <!-- Categorized Navigation Sections (Mobile Drawer) -->
+          <nav class="space-y-4 pt-1" aria-label="Navegación móvil">
+            <div
+              v-for="section in navSections"
+              :key="section.title"
+              class="space-y-1"
+            >
+              <p class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant/60 dark:text-slate-500 select-none">
+                {{ section.title }}
+              </p>
+              <div class="space-y-0.5">
+                <a
+                  v-for="item in section.items"
+                  :key="item.to"
+                  href="#"
+                  @click.prevent="handleMobileNavClick(item)"
+                  class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-xs transition-all duration-150"
+                  :class="[
+                    isActive(item.to)
+                      ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400 font-semibold shadow-2xs'
+                      : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container dark:hover:bg-slate-800',
+                  ]"
+                >
+                  <span
+                    class="material-symbols-outlined text-[20px]"
+                    :class="isActive(item.to) ? 'text-primary dark:text-indigo-400' : 'text-on-surface-variant dark:text-slate-400'"
+                  >
+                    {{ item.icon }}
+                  </span>
+                  <span>{{ item.label }}</span>
+                </a>
+              </div>
+            </div>
           </nav>
         </div>
 
+        <!-- Mobile Drawer Bottom Actions -->
         <div
           class="flex-shrink-0 pt-3 border-t border-outline-variant/60 dark:border-slate-800 space-y-3 mt-auto bg-surface-container-lowest dark:bg-slate-900"
         >
@@ -239,7 +308,7 @@
           <button
             v-if="effectiveStatus === 'authenticated'"
             @click="onSignOut"
-            class="w-full flex items-center justify-center gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-xl hover:bg-rose-100 transition"
+            class="w-full flex items-center justify-center gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/60 transition cursor-pointer"
           >
             <span class="material-symbols-outlined text-[18px]">logout</span>
             Cerrar sesión
@@ -263,11 +332,23 @@
 </template>
 
 <script setup lang="ts">
+import { computed, watchEffect } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAuth } from "#imports";
+import { useProtectedAction } from "~/composables/useProtectedAction";
+import { useProfileState } from "~/composables/useProfileState";
+import { useCommandPalette } from "~/composables/useCommandPalette";
+
 interface NavItem {
   to: string;
   icon: string;
   label: string;
   protected?: boolean;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
 }
 
 const props = defineProps<{
@@ -293,10 +374,6 @@ watchEffect(() => {
     data.value?.user?.id &&
     !hasFetched.value
   ) {
-    console.log(
-      "AppSidebar: trigger fetchProfilePic for user",
-      data.value.user.id,
-    );
     fetchProfilePic(data.value.user.id as string);
   }
 });
@@ -359,187 +436,261 @@ const handleMobileNavClick = (item: NavItem) => {
   router.push(item.to);
 };
 
-// 8 items per role menu, with "Crear Nuevo / Publicar Vacante / Crear Publicación" EXACTLY in 4th place (index 3)
-const navItems = computed<NavItem[]>(() => {
+// Prominent Action CTA Button per Role
+const primaryAction = computed<NavItem | null>(() => {
+  switch (userRole.value) {
+    case "organization":
+      return {
+        to: "/create",
+        icon: "add_circle",
+        label: "Publicar Oferta",
+        protected: true,
+      };
+    case "admin":
+    case "moderator":
+      return {
+        to: "/create",
+        icon: "add_circle",
+        label: "Crear Nuevo",
+        protected: true,
+      };
+    default:
+      return {
+        to: "/create",
+        icon: "add_circle",
+        label: "Crear Publicación",
+        protected: true,
+      };
+  }
+});
+
+// Categorized Navigation Sections (Eliminates flat list crowding)
+const navSections = computed<NavSection[]>(() => {
   switch (userRole.value) {
     case "admin":
       return [
-        { to: "/", icon: "home", label: "Inicio", protected: false },
         {
-          to: "/admin/analytics",
-          icon: "insights",
-          label: "Analítica Avanzada",
-          protected: true,
+          title: "Administración",
+          items: [
+            { to: "/", icon: "home", label: "Inicio", protected: false },
+            {
+              to: "/admin/analytics",
+              icon: "insights",
+              label: "Analítica Avanzada",
+              protected: true,
+            },
+            {
+              to: "/admin/organizations",
+              icon: "account_balance",
+              label: "Organizaciones",
+              protected: true,
+            },
+            {
+              to: "/admin/catalog",
+              icon: "layers",
+              label: "Catálogo Maestro",
+              protected: true,
+            },
+          ],
         },
         {
-          to: "/admin/organizations",
-          icon: "account_balance",
-          label: "Organizaciones",
-          protected: true,
-        },
-        {
-          to: "/create",
-          icon: "add_circle",
-          label: "Crear Nuevo",
-          protected: true,
-        }, // CENTER
-        {
-          to: "/mod/incidents",
-          icon: "report_problem",
-          label: "Incidencias (Org/Vacantes)",
-          protected: true,
-        },
-        {
-          to: "/mod/appeals",
-          icon: "gavel",
-          label: "Canales Apelación",
-          protected: true,
-        },
-        {
-          to: "/notifications",
-          icon: "notifications",
-          label: "Notificaciones",
-          protected: true,
-        },
-        {
-          to: "/admin/catalog",
-          icon: "layers",
-          label: "Catálogo Maestro",
-          protected: true,
+          title: "Moderación & Auditoría",
+          items: [
+            {
+              to: "/mod/incidents",
+              icon: "report_problem",
+              label: "Incidencias",
+              protected: true,
+            },
+            {
+              to: "/mod/appeals",
+              icon: "gavel",
+              label: "Canales Apelación",
+              protected: true,
+            },
+            {
+              to: "/notifications",
+              icon: "notifications",
+              label: "Notificaciones",
+              protected: true,
+            },
+          ],
         },
       ];
 
     case "moderator":
       return [
-        { to: "/", icon: "home", label: "Inicio", protected: false },
         {
-          to: "/mod/incidents",
-          icon: "report_problem",
-          label: "Incidencias",
-          protected: true,
+          title: "Supervisión",
+          items: [
+            { to: "/", icon: "home", label: "Inicio", protected: false },
+            {
+              to: "/mod/incidents",
+              icon: "report_problem",
+              label: "Incidencias",
+              protected: true,
+            },
+            {
+              to: "/mod/appeals",
+              icon: "gavel",
+              label: "Canales Apelación",
+              protected: true,
+            },
+            {
+              to: "/mod/verifications",
+              icon: "verified",
+              label: "Verificaciones",
+              protected: true,
+            },
+          ],
         },
         {
-          to: "/mod/appeals",
-          icon: "gavel",
-          label: "Canales Apelación",
-          protected: true,
-        },
-        {
-          to: "/create",
-          icon: "add_circle",
-          label: "Crear Nuevo",
-          protected: true,
-        }, // CENTER
-        {
-          to: "/notifications",
-          icon: "notifications",
-          label: "Notificaciones",
-          protected: true,
-        },
-        {
-          to: "/mod/support",
-          icon: "contact_support",
-          label: "Soporte Directo",
-          protected: true,
-        },
-        {
-          to: "/mod/verifications",
-          icon: "verified",
-          label: "Verificaciones",
-          protected: true,
-        },
-        {
-          to: "/mod/skills",
-          icon: "psychology",
-          label: "Habilidades",
-          protected: true,
+          title: "Gestión & Soporte",
+          items: [
+            {
+              to: "/notifications",
+              icon: "notifications",
+              label: "Notificaciones",
+              protected: true,
+            },
+            {
+              to: "/mod/support",
+              icon: "contact_support",
+              label: "Soporte Directo",
+              protected: true,
+            },
+            {
+              to: "/mod/skills",
+              icon: "psychology",
+              label: "Habilidades",
+              protected: true,
+            },
+          ],
         },
       ];
 
     case "organization":
       return [
-        { to: "/", icon: "home", label: "Inicio", protected: false },
         {
-          to: "/applicants",
-          icon: "dashboard_customize",
-          label: "Tablero ATS",
-          protected: true,
+          title: "Gestión de Talento",
+          items: [
+            { to: "/", icon: "home", label: "Inicio", protected: false },
+            {
+              to: "/applicants",
+              icon: "dashboard_customize",
+              label: "Tablero ATS",
+              protected: true,
+            },
+            {
+              to: "/my-vacancies",
+              icon: "work",
+              label: "Mis Vacantes",
+              protected: true,
+            },
+          ],
         },
         {
-          to: "/my-vacancies",
-          icon: "work",
-          label: "Mis Vacantes",
-          protected: true,
+          title: "Comunicación",
+          items: [
+            {
+              to: "/messages",
+              icon: "forum",
+              label: "Mensajes",
+              protected: true,
+            },
+            {
+              to: "/notifications",
+              icon: "notifications",
+              label: "Notificaciones",
+              protected: true,
+            },
+          ],
         },
         {
-          to: "/create",
-          icon: "add_circle",
-          label: "Crear Nuevo",
-          protected: true,
-        }, // CENTER
-        {
-          to: "/notifications",
-          icon: "notifications",
-          label: "Notificaciones",
-          protected: true,
-        },
-        {
-          to: "/company/verification",
-          icon: "verified",
-          label: "Verificación",
-          protected: true,
-        },
-        { to: "/messages", icon: "forum", label: "Mensajes", protected: true },
-        {
-          to: "/support",
-          icon: "gavel",
-          label: "Soporte y Apelaciones",
-          protected: true,
+          title: "Empresa & Soporte",
+          items: [
+            {
+              to: "/company/verification",
+              icon: "verified",
+              label: "Verificación",
+              protected: true,
+            },
+            {
+              to: "/support",
+              icon: "gavel",
+              label: "Soporte y Apelaciones",
+              protected: true,
+            },
+          ],
         },
       ];
 
-    default: // CANDIDATO or GUEST
+    default: // CANDIDATE or GUEST
       return [
-        { to: "/", icon: "home", label: "Inicio", protected: false },
         {
-          to: "/vacancies",
-          icon: "work",
-          label: "Explorar Vacantes",
-          protected: false,
+          title: "Explorar & Empleos",
+          items: [
+            { to: "/", icon: "home", label: "Inicio", protected: false },
+            {
+              to: "/vacancies",
+              icon: "work",
+              label: "Explorar Vacantes",
+              protected: false,
+            },
+            {
+              to: "/companies",
+              icon: "domain",
+              label: "Directorio de Organizaciones",
+              protected: false,
+            },
+          ],
         },
         {
-          to: "/companies",
-          icon: "domain",
-          label: "Directorio de Organizaciones",
-          protected: false,
+          title: "Comunidad & Red",
+          items: [
+            {
+              to: "/messages",
+              icon: "forum",
+              label: "Mensajes",
+              protected: true,
+            },
+            {
+              to: "/notifications",
+              icon: "notifications",
+              label: "Notificaciones",
+              protected: true,
+            },
+          ],
         },
         {
-          to: "/create",
-          icon: "add_circle",
-          label: "Crear Publicación",
-          protected: true,
-        }, // CENTER
-        { to: "/messages", icon: "forum", label: "Mensajes", protected: true },
-        {
-          to: "/notifications",
-          icon: "notifications",
-          label: "Notificaciones",
-          protected: true,
-        },
-        {
-          to: "/candidate/cv-templates",
-          icon: "auto_stories",
-          label: "Plantillas de CV",
-          protected: true,
-        },
-        {
-          to: "/saved",
-          icon: "bookmark",
-          label: "Favoritos",
-          protected: true,
+          title: "Mi Actividad",
+          items: [
+            {
+              to: "/candidate/cv-templates",
+              icon: "auto_stories",
+              label: "Plantillas de CV",
+              protected: true,
+            },
+            {
+              to: "/saved",
+              icon: "bookmark",
+              label: "Favoritos",
+              protected: true,
+            },
+          ],
         },
       ];
   }
+});
+
+// Backwards-compatible flat navItems
+const navItems = computed<NavItem[]>(() => {
+  const items: NavItem[] = [];
+  if (primaryAction.value) items.push(primaryAction.value);
+  for (const section of navSections.value) {
+    items.push(...section.items);
+  }
+  return items;
 });
 
 const closeMobileMenu = () => {
