@@ -159,7 +159,7 @@ export const useCompanyProfile = () => {
       const targetId = effectiveBookmarkUserId.value;
       const uid = currentUserId.value;
       return $fetch(
-        `${config.public.apiUrl}/profile/${encodeURIComponent(targetId)}/bookmarks`,
+        `/api/profile/${encodeURIComponent(targetId)}/bookmarks?userId=${encodeURIComponent(uid)}`,
         {
           headers: uid ? { "x-user-id": uid } : {},
         },

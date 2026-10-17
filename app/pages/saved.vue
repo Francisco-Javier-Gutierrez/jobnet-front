@@ -235,7 +235,7 @@ const { data: bookmarksData, pending, refresh } = useLazyAsyncData(
   async () => {
     if (!currentUserId.value) return { data: [], posts: [], jobs: [] };
     return $fetch<any>(
-      `${config.public.apiUrl}/profile/${encodeURIComponent(currentUserId.value)}/bookmarks`,
+      `/api/profile/${encodeURIComponent(currentUserId.value)}/bookmarks?userId=${encodeURIComponent(currentUserId.value)}`,
       {
         headers: { "x-user-id": currentUserId.value },
       },

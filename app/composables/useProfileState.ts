@@ -14,16 +14,15 @@ export const useProfileState = () => {
         config.public.apiUrl ||
         config.public.apiBase ||
         "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
-      const profile: any = await $fetch(`${apiBase}/profile/${userId}`);
-      if (profile && (profile.fotoPerfil || profile.avatarUrl)) {
-        profilePic.value = profile.fotoPerfil || profile.avatarUrl;
-        console.log("Profile picture resolved:", profilePic.value);
+      const res = await $fetch(`${apiBase}/profile/${userId}`).catch(() => null);
+      const profile: any = typeof res === "string" ? JSON.parse(res) : res;
+      if (profile && (profile.fotoPerfil || profile.avatarUrl || profile.logo || profile.image)) {
+        profilePic.value = profile.fotoPerfil || profile.avatarUrl || profile.logo || profile.image;
       } else {
-        profilePic.value = ""; // Default or empty
-        console.log("No profile picture found in DB for user.");
+        profilePic.value = "";
       }
-    } catch (e) {
-      console.warn("Error fetching profile picture:", e);
+    } catch {
+      profilePic.value = "";
     } finally {
       isFetching.value = false;
       hasFetched.value = true;
