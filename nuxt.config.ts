@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     appManifest: false,
   },
   devtools: { enabled: false },
-  css: ["~/assets/css/main.css"],
+  css: ["material-symbols/outlined.css", "~/assets/css/main.css"],
   alias: {
     "vue-demi": "vue",
     "@panva/hkdf": path.resolve("./server/shims/hkdf.cjs"),
@@ -65,10 +65,6 @@ export default defineNuxtConfig({
         {
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap",
-        },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
         },
       ],
     },
