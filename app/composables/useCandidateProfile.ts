@@ -41,9 +41,22 @@ export function useCandidateProfile(candidateIdParam?: string) {
 
   // --- Ownership Check ---
   const isOwner = computed(() => {
-    const user = authData.value?.user;
+    const user = authData.value?.user as any;
     if (!user) return false;
-    return user.id === candidateId || user.email === candidateId;
+    const uid = user.id ? String(user.id).toLowerCase() : "";
+    const uemail = user.email ? String(user.email).toLowerCase() : "";
+    const candIdLower = String(candidateId || "").toLowerCase();
+    const profId = profile.value.id ? String(profile.value.id).toLowerCase() : "";
+    const profEmail = profile.value.email ? String(profile.value.email).toLowerCase() : "";
+    const profUuid = profile.value.usuarioUuid ? String(profile.value.usuarioUuid).toLowerCase() : "";
+
+    return (
+      (uid && uid === candIdLower) ||
+      (uemail && uemail === candIdLower) ||
+      (profId && uid === profId) ||
+      (profUuid && uid === profUuid) ||
+      (profEmail && uemail === profEmail)
+    );
   });
 
   // --- Computed from profile data ---
@@ -241,21 +254,46 @@ export function useCandidateProfile(candidateIdParam?: string) {
   const allBookmarkedPosts = ref<any[]>([]);
   const allBookmarkedJobs = ref<any[]>([]);
 
-  const { data: bookmarksData, pending: bookmarksPending } = useLazyAsyncData(
+  const currentUserId = computed(() => {
+    const user = authData.value?.user as any;
+    return user?.id || user?.email || "";
+  });
+
+  const effectiveBookmarkUserId = computed(() => {
+    if (isOwner.value && currentUserId.value) return currentUserId.value;
+    return candidateId;
+  });
+
+  const {
+    data: bookmarksData,
+    pending: bookmarksPending,
+    refresh: refreshBookmarks,
+  } = useLazyAsyncData(
     `candidate-bookmarks-${candidateId}`,
     () => {
       // Directiva de privacidad: los elementos guardados solo son accesibles por el propio usuario
-      if (!isOwner.value) {
+      if (!isOwner.value || !currentUserId.value) {
         return Promise.resolve({ data: [], posts: [], jobs: [] });
       }
-      const currentUserId = (authData.value?.user as any)?.id || "";
-      return $fetch(`${config.public.apiUrl}/profile/${candidateId}/bookmarks`, {
-        headers: currentUserId ? { "x-user-id": currentUserId } : {},
-      })
+      const targetId = effectiveBookmarkUserId.value;
+      const uid = currentUserId.value;
+      return $fetch(
+        `${config.public.apiUrl}/profile/${encodeURIComponent(targetId)}/bookmarks`,
+        {
+          headers: uid ? { "x-user-id": uid } : {},
+        },
+      )
         .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
         .catch(() => ({ data: [], posts: [], jobs: [] }));
     },
+    { watch: [isOwner, effectiveBookmarkUserId] },
   );
+
+  watch([isOwner, currentUserId], ([owner, uid]) => {
+    if (owner && uid) {
+      refreshBookmarks();
+    }
+  });
 
   watch(
     postsData,
@@ -269,21 +307,33 @@ export function useCandidateProfile(candidateIdParam?: string) {
     bookmarksData,
     (val: any) => {
       if (val) {
-        if (Array.isArray(val.posts)) {
-          allBookmarkedPosts.value = val.posts;
-        } else if (Array.isArray(val.data)) {
-          allBookmarkedPosts.value = val.data.filter(
-            (i: any) => i.uniqueId || (i.content && !i.modalidad),
-          );
-        }
+        const posts =
+          Array.isArray(val.posts) && val.posts.length > 0
+            ? val.posts
+            : Array.isArray(val.data)
+              ? val.data.filter(
+                  (i: any) =>
+                    (i.PK && i.PK.startsWith("POST#")) ||
+                    i.uniqueId ||
+                    (i.content && !i.modalidad),
+                )
+              : [];
+        allBookmarkedPosts.value = posts;
 
-        if (Array.isArray(val.jobs)) {
-          allBookmarkedJobs.value = val.jobs;
-        } else if (Array.isArray(val.data)) {
-          allBookmarkedJobs.value = val.data.filter(
-            (i: any) => i.empresaUuid !== undefined || i.modalidad !== undefined || i.salario !== undefined,
-          );
-        }
+        const jobs =
+          Array.isArray(val.jobs) && val.jobs.length > 0
+            ? val.jobs
+            : Array.isArray(val.data)
+              ? val.data.filter(
+                  (i: any) =>
+                    (i.PK && i.PK.startsWith("VACANCY#")) ||
+                    i.empresaUuid !== undefined ||
+                    i.modalidad !== undefined ||
+                    i.salario !== undefined ||
+                    i.title !== undefined,
+                )
+              : [];
+        allBookmarkedJobs.value = jobs;
       }
     },
     { immediate: true },

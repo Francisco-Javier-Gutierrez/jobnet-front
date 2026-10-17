@@ -19,62 +19,6 @@ export const useCompanyProfile = () => {
   const { sharePost, shareJob } = useShare();
 
   const companyId = route.params.id as string;
-  const isOwner = computed(() => authData.value?.user?.id === companyId);
-  const currentUserId = computed(() => authData.value?.user?.id || "");
-
-  // Fetch data
-  const {
-    data: profileData,
-    pending: profilePending,
-    refresh: refreshProfile,
-  } = useLazyAsyncData(
-    `company-profile-${companyId}`,
-    () =>
-      $fetch(`${config.public.apiUrl}/profile/${companyId}`)
-        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-        .catch(() => null),
-  );
-
-  const {
-    data: vacanciesData,
-    pending: vacanciesPending,
-    refresh: refreshVacancies,
-  } = useLazyAsyncData(
-    `company-vacancies-${companyId}`,
-    () =>
-      $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
-        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-        .catch(() => ({ data: [] })),
-  );
-
-  const { data: postsData, pending: postsPending } = useLazyAsyncData(
-    `company-posts-${companyId}`,
-    () =>
-      $fetch(`${config.public.apiUrl}/profile/${companyId}/posts`)
-        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-        .catch(() => ({ data: [] })),
-  );
-
-  const { data: bookmarksData, pending: bookmarksPending } = useLazyAsyncData(
-    `company-bookmarks-${companyId}`,
-    () => {
-      // Directiva de privacidad: los elementos guardados son estrictamente privados del propietario
-      if (!isOwner.value) return Promise.resolve({ data: [] });
-      const currentUserId = authData.value?.user?.id || "";
-      return $fetch(`${config.public.apiUrl}/profile/${companyId}/bookmarks`, {
-        headers: currentUserId ? { "x-user-id": currentUserId } : {},
-      })
-        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-        .catch(() => ({ data: [] }));
-    },
-  );
-
-  const loading = computed(
-    () => profilePending.value || vacanciesPending.value,
-  );
-  const loadingCompanyPosts = computed(
-    () => postsPending.value || bookmarksPending.value,
-  );
 
   // State
   const company = ref({
@@ -138,6 +82,106 @@ export const useCompanyProfile = () => {
     estatus: "",
     estadoCuenta: "",
   });
+
+  const isOwner = computed(() => {
+    const user = authData.value?.user as any;
+    if (!user) return false;
+    const uid = user.id ? String(user.id).toLowerCase() : "";
+    const uemail = user.email ? String(user.email).toLowerCase() : "";
+    const cidLower = String(companyId || "").toLowerCase();
+    const compId = company.value.id ? String(company.value.id).toLowerCase() : "";
+    const compEmail = company.value.email ? String(company.value.email).toLowerCase() : "";
+    const compUuid = (company.value as any)?.usuarioUuid
+      ? String((company.value as any).usuarioUuid).toLowerCase()
+      : "";
+
+    return (
+      (uid && uid === cidLower) ||
+      (uemail && uemail === cidLower) ||
+      (compId && uid === compId) ||
+      (compUuid && uid === compUuid) ||
+      (compEmail && uemail === compEmail)
+    );
+  });
+  const currentUserId = computed(() => authData.value?.user?.id || "");
+  const effectiveBookmarkUserId = computed(() => {
+    const user = authData.value?.user as any;
+    return (
+      user?.id ||
+      (company.value as any)?.usuarioUuid ||
+      company.value.id ||
+      companyId
+    );
+  });
+
+  // Fetch data
+  const {
+    data: profileData,
+    pending: profilePending,
+    refresh: refreshProfile,
+  } = useLazyAsyncData(
+    `company-profile-${companyId}`,
+    () =>
+      $fetch(`${config.public.apiUrl}/profile/${companyId}`)
+        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+        .catch(() => null),
+  );
+
+  const {
+    data: vacanciesData,
+    pending: vacanciesPending,
+    refresh: refreshVacancies,
+  } = useLazyAsyncData(
+    `company-vacancies-${companyId}`,
+    () =>
+      $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
+        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+        .catch(() => ({ data: [] })),
+  );
+
+  const { data: postsData, pending: postsPending } = useLazyAsyncData(
+    `company-posts-${companyId}`,
+    () =>
+      $fetch(`${config.public.apiUrl}/profile/${companyId}/posts`)
+        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+        .catch(() => ({ data: [] })),
+  );
+
+  const {
+    data: bookmarksData,
+    pending: bookmarksPending,
+    refresh: refreshBookmarks,
+  } = useLazyAsyncData(
+    `company-bookmarks-${companyId}`,
+    () => {
+      // Directiva de privacidad: los elementos guardados son estrictamente privados del propietario
+      if (!isOwner.value || !currentUserId.value) return Promise.resolve({ data: [] });
+      const targetId = effectiveBookmarkUserId.value;
+      const uid = currentUserId.value;
+      return $fetch(
+        `${config.public.apiUrl}/profile/${encodeURIComponent(targetId)}/bookmarks`,
+        {
+          headers: uid ? { "x-user-id": uid } : {},
+        },
+      )
+        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+        .catch(() => ({ data: [] }));
+    },
+    { watch: [isOwner, effectiveBookmarkUserId] },
+  );
+
+  watch([isOwner, currentUserId], ([owner, uid]) => {
+    if (owner && uid) {
+      refreshBookmarks();
+    }
+  });
+
+  const loading = computed(
+    () => profilePending.value || vacanciesPending.value,
+  );
+  const loadingCompanyPosts = computed(
+    () => postsPending.value || bookmarksPending.value,
+  );
 
   const webLinks = computed(() => {
     const result: Array<{ name: string; url: string; icon: string }> = [];
@@ -281,8 +325,14 @@ export const useCompanyProfile = () => {
   watch(
     bookmarksData,
     (val: any) => {
-      if (val?.data) {
-        allCompanyBookmarkedPosts.value = val.data;
+      if (val) {
+        if (Array.isArray(val.posts) && val.posts.length > 0) {
+          allCompanyBookmarkedPosts.value = val.posts;
+        } else if (Array.isArray(val.data)) {
+          allCompanyBookmarkedPosts.value = val.data;
+        } else {
+          allCompanyBookmarkedPosts.value = [];
+        }
       }
     },
     { immediate: true },
@@ -310,7 +360,7 @@ export const useCompanyProfile = () => {
     try {
       const res = await $fetch<any>(`/api/posts/${postId}/like`, {
         method: "POST",
-        body: { userId: currentUserId.value },
+        body: { userUuid: currentUserId.value, userId: currentUserId.value },
       });
       const targetPost = allCompanyPosts.value.find(
         (p) => p.uniqueId === postId,
@@ -340,7 +390,7 @@ export const useCompanyProfile = () => {
     try {
       const res = await $fetch<any>(`/api/posts/${postId}/bookmark`, {
         method: "POST",
-        body: { userId: currentUserId.value },
+        body: { userUuid: currentUserId.value, userId: currentUserId.value },
       });
       const targetPost = allCompanyPosts.value.find(
         (p) => p.uniqueId === postId,
@@ -382,7 +432,7 @@ export const useCompanyProfile = () => {
     try {
       await $fetch(`/api/jobs/${job.id}/like`, {
         method: "POST",
-        body: { userId: currentUserId.value },
+        body: { userUuid: currentUserId.value, userId: currentUserId.value },
       });
     } catch (e) {
       // Local optimistic state preserved
@@ -403,7 +453,7 @@ export const useCompanyProfile = () => {
     try {
       await $fetch(`/api/jobs/${job.id}/bookmark`, {
         method: "POST",
-        body: { userId: currentUserId.value },
+        body: { userUuid: currentUserId.value, userId: currentUserId.value },
       });
     } catch (e) {
       // Local optimistic state preserved
@@ -411,7 +461,11 @@ export const useCompanyProfile = () => {
   };
 
   const refresh = async () => {
-    await Promise.all([refreshProfile(), refreshVacancies()]);
+    await Promise.all([
+      refreshProfile(),
+      refreshVacancies(),
+      refreshBookmarks(),
+    ]);
   };
 
   return {

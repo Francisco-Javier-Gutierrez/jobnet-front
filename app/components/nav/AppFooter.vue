@@ -246,17 +246,17 @@ const footerItems = computed<FooterItem[]>(() => {
           protected: true,
         },
         {
+          to: "/saved",
+          icon: "bookmark",
+          label: "Guardados",
+          shortLabel: "Guardados",
+          protected: true,
+        },
+        {
           to: "/messages",
           icon: "forum",
           label: "Mensajes",
           shortLabel: "Mensajes",
-          protected: true,
-        },
-        {
-          to: "/notifications",
-          icon: "notifications",
-          label: "Notificaciones",
-          shortLabel: "Notif",
           protected: true,
         },
       ];

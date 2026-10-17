@@ -514,6 +514,12 @@ const navSections = computed<NavSection[]>(() => {
               label: "Notificaciones",
               protected: true,
             },
+            {
+              to: "/saved",
+              icon: "bookmark",
+              label: "Guardados",
+              protected: true,
+            },
           ],
         },
       ];
@@ -554,6 +560,12 @@ const navSections = computed<NavSection[]>(() => {
               protected: true,
             },
             {
+              to: "/saved",
+              icon: "bookmark",
+              label: "Guardados",
+              protected: true,
+            },
+            {
               to: "/mod/support",
               icon: "contact_support",
               label: "Soporte Directo",
@@ -590,7 +602,7 @@ const navSections = computed<NavSection[]>(() => {
           ],
         },
         {
-          title: "Comunicación",
+          title: "Comunicación & Guardados",
           items: [
             {
               to: "/messages",
@@ -602,6 +614,12 @@ const navSections = computed<NavSection[]>(() => {
               to: "/notifications",
               icon: "notifications",
               label: "Notificaciones",
+              protected: true,
+            },
+            {
+              to: "/saved",
+              icon: "bookmark",
+              label: "Guardados",
               protected: true,
             },
           ],
@@ -674,7 +692,7 @@ const navSections = computed<NavSection[]>(() => {
             {
               to: "/saved",
               icon: "bookmark",
-              label: "Favoritos",
+              label: "Guardados",
               protected: true,
             },
           ],

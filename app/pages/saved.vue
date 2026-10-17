@@ -15,10 +15,10 @@
           </div>
           <div>
             <h1 class="text-2xl font-extrabold text-on-surface tracking-tight flex items-center gap-2">
-              Panel Personal de Favoritos
+              Guardados
             </h1>
             <p class="text-xs text-on-surface-variant dark:text-slate-400">
-              Colección privada de publicaciones y ofertas laborales de tu interés.
+              Tu colección privada de vacantes y publicaciones guardadas en JobNet.
             </p>
           </div>
         </div>
@@ -248,20 +248,32 @@ watch(
   bookmarksData,
   (val: any) => {
     if (val) {
-      if (Array.isArray(val.posts)) {
+      if (Array.isArray(val.posts) && val.posts.length > 0) {
         bookmarkedPosts.value = val.posts;
       } else if (Array.isArray(val.data)) {
         bookmarkedPosts.value = val.data.filter(
-          (i: any) => i.uniqueId || (i.content && !i.modalidad),
+          (i: any) =>
+            (i.PK && i.PK.startsWith("POST#")) ||
+            i.uniqueId ||
+            (i.content && !i.modalidad),
         );
+      } else {
+        bookmarkedPosts.value = [];
       }
 
-      if (Array.isArray(val.jobs)) {
+      if (Array.isArray(val.jobs) && val.jobs.length > 0) {
         bookmarkedJobs.value = val.jobs;
       } else if (Array.isArray(val.data)) {
         bookmarkedJobs.value = val.data.filter(
-          (i: any) => i.empresaUuid !== undefined || i.modalidad !== undefined || i.salario !== undefined,
+          (i: any) =>
+            (i.PK && i.PK.startsWith("VACANCY#")) ||
+            i.empresaUuid !== undefined ||
+            i.modalidad !== undefined ||
+            i.salario !== undefined ||
+            i.title !== undefined,
         );
+      } else {
+        bookmarkedJobs.value = [];
       }
     }
   },

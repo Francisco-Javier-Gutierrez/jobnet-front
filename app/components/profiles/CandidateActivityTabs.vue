@@ -17,7 +17,7 @@
         <span>Mis publicaciones ({{ userPosts.length }})</span>
       </button>
 
-      <!-- Panel Personal de Favoritos: estrictamente privado para el propio usuario -->
+      <!-- Guardados: estrictamente privado para el propio usuario -->
       <button
         v-if="isOwner"
         type="button"
@@ -30,7 +30,7 @@
         class="px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-2 active:scale-95"
       >
         <span class="material-symbols-outlined text-base">bookmark</span>
-        <span>Panel de Favoritos ({{ totalBookmarked }})</span>
+        <span>Guardados ({{ totalBookmarked }})</span>
       </button>
     </div>
 
@@ -65,16 +65,25 @@
       </div>
     </div>
 
-    <!-- Tab Content 2: Panel Personal de Favoritos (Estrictamente confidencial y privado) -->
+    <!-- Tab Content 2: Guardados (Estrictamente confidencial y privado) -->
     <div v-if="activeTab === 'bookmarks' && isOwner" class="space-y-5">
       <!-- Directiva de privacidad y confidencialidad -->
       <div
-        class="flex items-center gap-3 p-3.5 bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 rounded-xl text-xs text-indigo-900 dark:text-indigo-200"
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 rounded-xl text-xs text-indigo-900 dark:text-indigo-200"
       >
-        <span class="material-symbols-outlined text-indigo-600 text-lg flex-shrink-0">lock</span>
-        <span>
-          <strong>Directiva de Privacidad:</strong> Tus publicaciones y vacantes guardadas se conservan de forma estrictamente privada y confidencial. Solo tú puedes acceder a este panel.
-        </span>
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-indigo-600 text-lg flex-shrink-0">lock</span>
+          <span>
+            <strong>Privacidad de Guardados:</strong> Tus vacantes y publicaciones guardadas son estrictamente confidenciales. Solo tú puedes verlas.
+          </span>
+        </div>
+        <NuxtLink
+          to="/saved"
+          class="inline-flex items-center gap-1 font-bold text-primary dark:text-indigo-400 hover:underline flex-shrink-0"
+        >
+          <span>Página completa</span>
+          <span class="material-symbols-outlined text-sm">open_in_new</span>
+        </NuxtLink>
       </div>
 
       <!-- Filtro rápido de tipo de favorito -->

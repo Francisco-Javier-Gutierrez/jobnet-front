@@ -337,8 +337,31 @@ const bookmarksList = computed<string[]>(() => {
 
 const effectiveIsBookmarked = computed(() => {
   if (props.isBookmarked !== undefined) return props.isBookmarked;
-  if (!props.currentUserId) return false;
-  return bookmarksList.value.includes(props.currentUserId);
+
+  const authUser = session.value?.user as any;
+  const loggedEmail = authUser?.email?.toLowerCase();
+  const loggedId = authUser?.id ? String(authUser.id).toLowerCase() : "";
+  const passedUserId = props.currentUserId ? String(props.currentUserId).toLowerCase() : "";
+
+  const bookmarks =
+    props.job?.bookmarksList ||
+    (props.job as any)?.savedBy ||
+    (props.job as any)?.bookmarks ||
+    [];
+
+  if (Array.isArray(bookmarks)) {
+    const found = bookmarks.some((item: unknown) => {
+      const s = String(item).toLowerCase();
+      return (
+        (passedUserId && s === passedUserId) ||
+        (loggedEmail && s === loggedEmail) ||
+        (loggedId && s === loggedId)
+      );
+    });
+    if (found) return true;
+  }
+
+  return Boolean((props.job as any)?.isBookmarked || (props.job as any)?.bookmarked);
 });
 
 // Comments count
