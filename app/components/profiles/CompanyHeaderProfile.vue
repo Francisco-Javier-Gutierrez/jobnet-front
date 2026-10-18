@@ -92,7 +92,7 @@
           title="Reportar esta organización"
         >
           <span class="material-symbols-outlined text-[20px]">flag</span>
-          Reportar
+          Reportar Organización
         </button>
         <button
           v-if="isStaff"

@@ -86,20 +86,12 @@
         <!-- Campos de Metadatos del Documento -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label
-              class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 block mb-1"
-            >
-              Tipo de Documento *
-            </label>
-            <select
+            <AppSelect
               v-model="newDocType"
-              class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
-            >
-              <option value="CERTIFICACION">📜 Certificación Profesional</option>
-              <option value="DIPLOMA">🎓 Diploma de Especialización / Grado</option>
-              <option value="CONSTANCIA">📄 Constancia Laboral / Participación</option>
-              <option value="OTRO">📑 Otro Documento Profesional</option>
-            </select>
+              :options="docTypeOptions"
+              label="Tipo de Documento *"
+              placeholder="Seleccionar tipo..."
+            />
           </div>
 
           <div>
@@ -462,6 +454,12 @@ const loadingSecureUrl = ref(false);
 const newDocType = ref<"CERTIFICACION" | "DIPLOMA" | "CONSTANCIA" | "OTRO">(
   "CERTIFICACION",
 );
+const docTypeOptions = [
+  { value: "CERTIFICACION", label: "📜 Certificación Profesional" },
+  { value: "DIPLOMA", label: "🎓 Diploma de Especialización / Grado" },
+  { value: "CONSTANCIA", label: "📄 Constancia Laboral / Participación" },
+  { value: "OTRO", label: "📑 Otro Documento Profesional" },
+];
 const newDocName = ref("");
 const newDocIssuer = ref("");
 const selectedFile = ref<File | null>(null);

@@ -640,24 +640,14 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <!-- Municipio Dropdown -->
-            <div class="flex flex-col gap-1.5 sm:col-span-1">
-              <label class="text-[10px] font-bold text-on-surface-variant dark:text-slate-300" for="municipio-select">
-                Municipio (EdoMéx)
-              </label>
-              <select
-                id="municipio-select"
-                :value="state.form.municipio"
-                @change="state.setMunicipio(($event.target as HTMLSelectElement).value)"
-                class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
-              >
-                <option
-                  v-for="muni in state.EDO_MEX_MUNICIPALITIES"
-                  :key="muni"
-                  :value="muni"
-                >
-                  {{ muni }}
-                </option>
-              </select>
+            <div class="flex flex-col sm:col-span-1">
+              <AppSelect
+                :model-value="state.form.municipio"
+                @update:model-value="state.setMunicipio($event)"
+                :options="state.EDO_MEX_MUNICIPALITIES"
+                label="Municipio (EdoMéx)"
+                placeholder="Seleccionar municipio..."
+              />
             </div>
 
             <!-- Latitud -->

@@ -3,29 +3,14 @@
     class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4"
   >
     <!-- Region Selector -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-2.5">
-      <label class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1">
-        <span class="material-symbols-outlined text-[18px] text-primary">location_on</span>
-        <span>Región Geográfica:</span>
-      </label>
-      <div class="relative">
-        <select
-          :value="modelValue"
-          @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
-          class="bg-[#F1F5F9] dark:bg-slate-800 border border-outline-variant/50 dark:border-slate-700 text-on-surface dark:text-slate-100 text-xs font-semibold rounded-xl px-3.5 py-2.5 pr-8 appearance-none focus:outline-none focus:border-primary cursor-pointer transition shadow-sm w-full sm:w-auto"
-        >
-          <option
-            v-for="region in regions"
-            :key="region"
-            :value="region"
-          >
-            {{ region }}
-          </option>
-        </select>
-        <span class="material-symbols-outlined text-sm absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-          expand_more
-        </span>
-      </div>
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 min-w-[280px]">
+      <AppSelect
+        :model-value="modelValue"
+        @update:model-value="$emit('update:modelValue', $event)"
+        :options="regions"
+        label="Región Geográfica"
+        placeholder="Seleccionar región..."
+      />
     </div>
 
     <!-- Actions (Sync & Export) -->

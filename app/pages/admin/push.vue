@@ -245,34 +245,20 @@
 
           <!-- Role Filter -->
           <div class="md:col-span-3">
-            <select
+            <AppSelect
               v-model="filterRole"
-              class="w-full px-3 py-2 bg-surface-container-low dark:bg-slate-800/80 border border-outline-variant/60 dark:border-slate-700 rounded-xl text-xs text-on-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
-            >
-              <option value="ALL">Todos los roles</option>
-              <option value="CANDIDATO">Candidatos</option>
-              <option value="EMPRESA">Empresas</option>
-              <option value="MODERATOR">Moderadores</option>
-              <option value="ADMIN">Administradores</option>
-              <option value="PENDIENTE">Pendientes de Rol</option>
-            </select>
+              :options="roleFilterOptions"
+              placeholder="Filtrar por rol..."
+            />
           </div>
 
           <!-- Device/Browser Filter -->
           <div class="md:col-span-3">
-            <select
+            <AppSelect
               v-model="filterDevice"
-              class="w-full px-3 py-2 bg-surface-container-low dark:bg-slate-800/80 border border-outline-variant/60 dark:border-slate-700 rounded-xl text-xs text-on-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
-            >
-              <option value="ALL">Todos los navegadores</option>
-              <option value="Chrome">Chrome</option>
-              <option value="Edge">Edge</option>
-              <option value="Firefox">Firefox</option>
-              <option value="Safari">Safari</option>
-              <option value="Windows">Windows</option>
-              <option value="Android">Android</option>
-              <option value="macOS">macOS</option>
-            </select>
+              :options="deviceFilterOptions"
+              placeholder="Filtrar por navegador..."
+            />
           </div>
         </div>
 
@@ -1030,6 +1016,26 @@ const loadingSubscribers = ref(false);
 const searchQuery = ref("");
 const filterRole = ref("ALL");
 const filterDevice = ref("ALL");
+
+const roleFilterOptions = [
+  { value: "ALL", label: "Todos los roles" },
+  { value: "CANDIDATO", label: "Candidatos" },
+  { value: "EMPRESA", label: "Empresas" },
+  { value: "MODERATOR", label: "Moderadores" },
+  { value: "ADMIN", label: "Administradores" },
+  { value: "PENDIENTE", label: "Pendientes de Rol" },
+];
+
+const deviceFilterOptions = [
+  { value: "ALL", label: "Todos los navegadores" },
+  { value: "Chrome", label: "Chrome" },
+  { value: "Edge", label: "Edge" },
+  { value: "Firefox", label: "Firefox" },
+  { value: "Safari", label: "Safari" },
+  { value: "Windows", label: "Windows" },
+  { value: "Android", label: "Android" },
+  { value: "macOS", label: "macOS" },
+];
 const selectedUserIds = ref<string[]>([]);
 
 const activeTab = ref<"subscribers" | "composer">("subscribers");
