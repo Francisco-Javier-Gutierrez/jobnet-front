@@ -4,7 +4,7 @@
       class="w-full max-w-2xl bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] transition-all duration-200"
       role="dialog"
       aria-modal="true"
-      aria-label="Paleta de Comandos de JobNet"
+      aria-label="Paleta de Comandos"
     >
       <!-- Top Search Header -->
       <div class="p-3.5 border-b border-outline-variant/50 dark:border-slate-800 flex items-center gap-3 bg-surface-container-low/40 dark:bg-slate-900/60">
@@ -15,7 +15,7 @@
           ref="searchInputRef"
           v-model="searchQuery"
           type="text"
-          placeholder="Escribe un comando o busca vacantes, plantillas y páginas..."
+          :placeholder="searchPlaceholder"
           class="flex-1 bg-transparent text-sm sm:text-base text-on-surface dark:text-slate-100 placeholder-on-surface-variant/60 dark:placeholder-slate-500 outline-none font-medium"
           @keydown.down.prevent="navigateDown"
           @keydown.up.prevent="navigateUp"
@@ -45,7 +45,7 @@
           <span class="material-symbols-outlined text-4xl text-on-surface-variant/60 dark:text-slate-500">search_off</span>
           <p class="text-sm font-bold text-on-surface dark:text-slate-200">No se encontraron resultados</p>
           <p class="text-xs text-on-surface-variant dark:text-slate-400 max-w-sm mx-auto">
-            Prueba buscando con otros términos como "vacantes", "cv", "remoto", "perfil" o "tema".
+            {{ emptyStateTip }}
           </p>
         </div>
 
@@ -122,7 +122,7 @@
           </span>
         </div>
         <div class="hidden sm:flex items-center gap-1 text-[10px] font-semibold text-primary dark:text-indigo-400">
-          <span>JobNet Omnibox</span>
+          <span>{{ roleLabel }}</span>
         </div>
       </div>
     </div>
@@ -153,7 +153,7 @@ interface CommandItem {
 const { isOpen, closeCommandPalette } = useCommandPalette();
 const router = useRouter();
 const { toggleTheme, isDark } = useTheme();
-const { data: session, signOut } = useAuth();
+const { status, data: session, signOut } = useAuth();
 const jobsStore = useJobsStore();
 const { filteredTemplates: communityTemplates, fetchTemplates } = useCommunityCvTemplates();
 
@@ -162,62 +162,125 @@ const activeIndex = ref(0);
 const searchInputRef = ref<HTMLInputElement | null>(null);
 const resultsContainerRef = ref<HTMLElement | null>(null);
 
-const currentRole = computed(() => {
-  return (
-    (session.value?.user as any)?.role ||
-    (session.value?.user as any)?.tipoUsuario ||
-    "CANDIDATO"
-  ).toUpperCase();
-});
-
-const profileRoute = computed(() => {
+const userRole = computed<"guest" | "candidate" | "organization" | "admin" | "moderator">(() => {
+  if (status.value !== "authenticated") return "guest";
   const user = session.value?.user as any;
-  if (!user) return "/login";
-  if (currentRole.value === "ORGANIZATION" || currentRole.value === "EMPRESA") {
-    return "/company/profile";
-  }
-  return `/candidate/${user.id || user.uuid || "me"}`;
+  const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
+  if (tipo === "ORGANIZACION" || tipo === "ORGANIZATION" || tipo === "EMPRESA") return "organization";
+  if (tipo === "ADMIN") return "admin";
+  if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
+  return "candidate";
 });
 
-// Standard static commands and navigation links
+const roleLabel = computed(() => {
+  switch (userRole.value) {
+    case "organization":
+      return "Organización";
+    case "admin":
+      return "Administrador";
+    case "moderator":
+      return "Moderación";
+    case "candidate":
+      return "Candidato";
+    default:
+      return "Visitante";
+  }
+});
+
+const searchPlaceholder = computed(() => {
+  switch (userRole.value) {
+    case "organization":
+      return "Escribe un comando, publicar vacante, ATS, perfil o ajustes...";
+    case "admin":
+      return "Escribe un comando, analítica, catálogo, auditoría u organizaciones...";
+    case "moderator":
+      return "Escribe un comando, incidencias, apelaciones o verificaciones...";
+    default:
+      return "Escribe un comando o busca vacantes, plantillas y páginas...";
+  }
+});
+
+const emptyStateTip = computed(() => {
+  switch (userRole.value) {
+    case "organization":
+      return "Prueba buscando con términos como 'publicar', 'ats', 'vacantes', 'verificación' o 'tema'.";
+    case "admin":
+    case "moderator":
+      return "Prueba buscando con términos como 'analítica', 'incidencias', 'organizaciones' o 'tema'.";
+    default:
+      return "Prueba buscando con términos como 'vacantes', 'cv', 'remoto', 'perfil' o 'tema'.";
+  }
+});
+
+const userName = computed(() => {
+  return session.value?.user?.name || session.value?.user?.email || "Usuario";
+});
+
+// Standard static commands and navigation links tailored strictly by role
 const staticItems = computed<CommandItem[]>(() => {
-  const items: CommandItem[] = [
-    // Acciones
-    {
-      id: "action-toggle-theme",
-      title: isDark.value ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro",
-      subtitle: "Alternar la apariencia visual entre claro y oscuro",
-      icon: isDark.value ? "light_mode" : "dark_mode",
-      group: "Acciones Rápidas",
-      badge: "Tema",
-      badgeVariant: "accent",
-      keywords: ["tema", "oscuro", "claro", "dark", "light", "modo", "color"],
-      action: () => toggleTheme(),
-    },
-    {
-      id: "action-cv-templates",
-      title: "Explorar Comunidad de Plantillas CV",
-      subtitle: "Ver plantillas validadas por profesionales y ATS",
-      icon: "auto_stories",
-      group: "Acciones Rápidas",
-      badge: "Comunidad",
-      badgeVariant: "primary",
-      keywords: ["cv", "curriculum", "plantillas", "templates", "ats", "habilidades", "rol"],
-      action: () => router.push("/candidate/cv-templates"),
-    },
-    {
-      id: "action-map",
-      title: "Abrir Mapa Interactivo de Empleos",
-      subtitle: "Explorar vacantes geolocalizadas en el Estado de México",
-      icon: "map",
-      group: "Acciones Rápidas",
-      badge: "Edoméx",
-      badgeVariant: "secondary",
-      keywords: ["mapa", "geolocalizacion", "edomex", "ubicacion", "distancia", "gps", "toluca"],
-      action: () => router.push("/map"),
-    },
-    // Navegación principal
-    {
+  const role = userRole.value;
+  const quickActions: CommandItem[] = [];
+  const navigationItems: CommandItem[] = [];
+
+  // ==========================================
+  // 1. UNIVERSALES (Para todos los usuarios y roles)
+  // ==========================================
+  // Acción rápida universal: Tema Claro / Oscuro
+  quickActions.push({
+    id: "action-toggle-theme",
+    title: isDark.value ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro",
+    subtitle: "Alternar la apariencia visual entre claro y oscuro",
+    icon: isDark.value ? "light_mode" : "dark_mode",
+    group: "Acciones Rápidas",
+    badge: "Tema",
+    badgeVariant: "accent",
+    keywords: ["tema", "oscuro", "claro", "dark", "light", "modo", "color", "apariencia"],
+    action: () => toggleTheme(),
+  });
+
+  // ==========================================
+  // 2. ACCIONES RÁPIDAS Y NAVEGACIÓN SEGÚN EL ROL
+  // ==========================================
+  if (role === "guest") {
+    // Guest Quick Actions
+    quickActions.push(
+      {
+        id: "action-login",
+        title: "Iniciar Sesión",
+        subtitle: "Acceder a tu cuenta con correo o proveedor",
+        icon: "login",
+        group: "Acciones Rápidas",
+        badge: "Cuenta",
+        badgeVariant: "primary",
+        keywords: ["login", "entrar", "ingresar", "iniciar", "sesion", "cuenta"],
+        action: () => router.push("/login"),
+      },
+      {
+        id: "action-register",
+        title: "Registrarse como Candidato",
+        subtitle: "Crear perfil profesional para postularte a vacantes",
+        icon: "person_add",
+        group: "Acciones Rápidas",
+        badge: "Registro",
+        badgeVariant: "secondary",
+        keywords: ["registro", "registrarme", "cuenta", "nuevo", "candidato", "postulante"],
+        action: () => router.push("/register"),
+      },
+      {
+        id: "action-register-company",
+        title: "Registrar Organización o Empresa",
+        subtitle: "Publicar ofertas laborales y captar talento",
+        icon: "domain_add",
+        group: "Acciones Rápidas",
+        badge: "Empresas",
+        badgeVariant: "neutral",
+        keywords: ["empresa", "organizacion", "corporativo", "reclutador", "registro empresa"],
+        action: () => router.push("/register-company"),
+      }
+    );
+
+    // Guest Navigation
+    navigationItems.push({
       id: "nav-vacancies",
       title: "Explorar Vacantes",
       subtitle: "Buscar empleos, filtrar por modalidad y salario",
@@ -227,62 +290,370 @@ const staticItems = computed<CommandItem[]>(() => {
       badgeVariant: "neutral",
       keywords: ["vacantes", "empleos", "trabajo", "jobs", "remoto", "hibrido", "ofertas"],
       action: () => router.push("/vacancies"),
-    },
-    {
-      id: "nav-profile",
-      title: "Mi Perfil Profesional",
-      subtitle: "Ver y actualizar tus datos, experiencia y habilidades",
-      icon: "account_circle",
-      group: "Navegación",
-      badge: "Perfil",
-      badgeVariant: "neutral",
-      keywords: ["perfil", "cuenta", "usuario", "cv", "habilidades", "experiencia"],
-      action: () => router.push(profileRoute.value),
-    },
-    {
-      id: "nav-messages",
-      title: "Mensajes y Chat",
-      subtitle: "Bandeja de entrada y conversaciones con empresas",
-      icon: "chat",
-      group: "Navegación",
-      badge: "Chat",
-      badgeVariant: "neutral",
-      keywords: ["mensajes", "chat", "inbox", "conversaciones", "contacto"],
-      action: () => router.push("/messages"),
-    },
-    {
-      id: "nav-saved",
-      title: "Vacantes Guardadas",
-      subtitle: "Tus ofertas y publicaciones en marcadores",
-      icon: "bookmark",
-      group: "Navegación",
-      badge: "Guardados",
-      badgeVariant: "neutral",
-      keywords: ["guardados", "favoritos", "bookmarks", "marcadores"],
-      action: () => router.push("/saved"),
-    },
-  ];
-
-  // Specific role actions
-  if (currentRole.value === "ORGANIZATION" || currentRole.value === "EMPRESA" || currentRole.value === "ADMIN") {
-    items.unshift({
-      id: "action-create-vacancy",
-      title: "Publicar Nueva Oferta de Empleo",
-      subtitle: "Crear una vacante con geolocalización y requisitos",
-      icon: "add_circle",
-      group: "Acciones Rápidas",
-      badge: "Empresa",
-      badgeVariant: "primary",
-      keywords: ["crear", "publicar", "nueva", "vacante", "oferta", "reclutar"],
-      action: () => router.push("/create-vacancy"),
     });
+  } else if (role === "candidate") {
+    // Candidate Quick Actions
+    quickActions.push(
+      {
+        id: "action-my-applications",
+        title: "Ver Mis Postulaciones",
+        subtitle: "Consultar el estado y seguimiento de tus candidaturas",
+        icon: "assignment_turned_in",
+        group: "Acciones Rápidas",
+        badge: "Postulaciones",
+        badgeVariant: "primary",
+        keywords: ["postulaciones", "candidaturas", "mis aplicaciones", "seguimiento", "estado"],
+        action: () => router.push("/candidate/my-applications"),
+      },
+      {
+        id: "action-cv-templates",
+        title: "Comunidad de Plantillas de CV",
+        subtitle: "Formatos profesionales y optimizados para filtros ATS",
+        icon: "auto_stories",
+        group: "Acciones Rápidas",
+        badge: "Comunidad",
+        badgeVariant: "secondary",
+        keywords: ["cv", "curriculum", "plantillas", "templates", "ats", "habilidades", "rol"],
+        action: () => router.push("/candidate/cv-templates"),
+      },
+      {
+        id: "action-saved",
+        title: "Vacantes Guardadas",
+        subtitle: "Tus ofertas y publicaciones en marcadores",
+        icon: "bookmark",
+        group: "Acciones Rápidas",
+        badge: "Guardados",
+        badgeVariant: "neutral",
+        keywords: ["guardados", "favoritos", "bookmarks", "marcadores", "guardar"],
+        action: () => router.push("/saved"),
+      }
+    );
+
+    // Candidate Navigation
+    navigationItems.push(
+      {
+        id: "nav-vacancies",
+        title: "Explorar Vacantes",
+        subtitle: "Buscar empleos, filtrar por modalidad y salario",
+        icon: "work",
+        group: "Navegación",
+        badge: "Empleos",
+        badgeVariant: "neutral",
+        keywords: ["vacantes", "empleos", "trabajo", "jobs", "remoto", "hibrido", "ofertas"],
+        action: () => router.push("/vacancies"),
+      },
+      {
+        id: "nav-profile",
+        title: "Mi Perfil Profesional",
+        subtitle: "Gestionar tu experiencia, habilidades y CV",
+        icon: "account_circle",
+        group: "Navegación",
+        badge: "Perfil",
+        badgeVariant: "neutral",
+        keywords: ["perfil", "cuenta", "usuario", "cv", "habilidades", "experiencia"],
+        action: () => router.push("/profile"),
+      },
+      {
+        id: "nav-messages",
+        title: "Mensajes y Chat",
+        subtitle: "Bandeja de mensajes directos con empresas",
+        icon: "chat",
+        group: "Navegación",
+        badge: "Chat",
+        badgeVariant: "neutral",
+        keywords: ["mensajes", "chat", "inbox", "conversaciones", "contacto"],
+        action: () => router.push("/messages"),
+      },
+      {
+        id: "nav-notifications",
+        title: "Notificaciones",
+        subtitle: "Alertas y actualizaciones de tus postulaciones",
+        icon: "notifications",
+        group: "Navegación",
+        badge: "Alertas",
+        badgeVariant: "neutral",
+        keywords: ["notificaciones", "avisos", "alertas", "novedades"],
+        action: () => router.push("/notifications"),
+      }
+    );
+  } else if (role === "organization") {
+    // Organization Quick Actions
+    quickActions.push(
+      {
+        id: "action-create-vacancy",
+        title: "Publicar Oferta de Empleo",
+        subtitle: "Crear una nueva vacante con requisitos y sueldo",
+        icon: "add_circle",
+        group: "Acciones Rápidas",
+        badge: "Empresa",
+        badgeVariant: "primary",
+        keywords: ["crear", "publicar", "nueva", "vacante", "oferta", "reclutar", "empleo"],
+        action: () => router.push("/create-vacancy"),
+      },
+      {
+        id: "action-applicants",
+        title: "Tablero ATS de Postulantes",
+        subtitle: "Gestionar candidatos en el embudo de contratación",
+        icon: "dashboard_customize",
+        group: "Acciones Rápidas",
+        badge: "ATS",
+        badgeVariant: "secondary",
+        keywords: ["ats", "postulantes", "candidatos", "embudo", "talento", "revision"],
+        action: () => router.push("/applicants"),
+      },
+      {
+        id: "action-my-vacancies",
+        title: "Mis Vacantes Activas",
+        subtitle: "Monitorear, editar o cerrar ofertas publicadas",
+        icon: "work",
+        group: "Acciones Rápidas",
+        badge: "Gestión",
+        badgeVariant: "neutral",
+        keywords: ["mis vacantes", "activas", "ofertas publicadas", "gestionar vacantes"],
+        action: () => router.push("/my-vacancies"),
+      },
+      {
+        id: "action-company-verification",
+        title: "Estatus de Verificación",
+        subtitle: "Validar documentación fiscal y legal",
+        icon: "verified",
+        group: "Acciones Rápidas",
+        badge: "Validación",
+        badgeVariant: "neutral",
+        keywords: ["verificacion", "validar", "documentos", "rfc", "estatus"],
+        action: () => router.push("/company/verification"),
+      }
+    );
+
+    // Organization Navigation
+    navigationItems.push(
+      {
+        id: "nav-company-profile",
+        title: "Perfil de la Organización",
+        subtitle: "Información corporativa, logotipo y cultura",
+        icon: "business",
+        group: "Navegación",
+        badge: "Empresa",
+        badgeVariant: "neutral",
+        keywords: ["perfil empresa", "organizacion", "logo", "datos fiscales"],
+        action: () => router.push("/company/profile"),
+      },
+      {
+        id: "nav-messages",
+        title: "Bandeja de Mensajes",
+        subtitle: "Conversaciones con candidatos",
+        icon: "chat",
+        group: "Navegación",
+        badge: "Chat",
+        badgeVariant: "neutral",
+        keywords: ["mensajes", "chat", "inbox", "candidatos"],
+        action: () => router.push("/messages"),
+      },
+      {
+        id: "nav-notifications",
+        title: "Notificaciones",
+        subtitle: "Avisos de postulaciones y actividad",
+        icon: "notifications",
+        group: "Navegación",
+        badge: "Alertas",
+        badgeVariant: "neutral",
+        keywords: ["notificaciones", "avisos", "alertas"],
+        action: () => router.push("/notifications"),
+      },
+      {
+        id: "nav-support",
+        title: "Soporte y Apelaciones",
+        subtitle: "Canal de soporte y resolución de controversias",
+        icon: "gavel",
+        group: "Navegación",
+        badge: "Soporte",
+        badgeVariant: "neutral",
+        keywords: ["soporte", "apelaciones", "ayuda", "contacto"],
+        action: () => router.push("/support"),
+      }
+    );
+  } else if (role === "admin") {
+    // Admin Quick Actions
+    quickActions.push(
+      {
+        id: "action-admin-analytics",
+        title: "Métricas y Analítica Global",
+        subtitle: "Estadísticas de usuarios, vacantes y actividad",
+        icon: "insights",
+        group: "Acciones Rápidas",
+        badge: "Admin",
+        badgeVariant: "primary",
+        keywords: ["analitica", "metricas", "kpi", "estadisticas", "admin"],
+        action: () => router.push("/admin/analytics"),
+      },
+      {
+        id: "action-admin-orgs",
+        title: "Gestión de Organizaciones",
+        subtitle: "Supervisar y auditar empresas registradas",
+        icon: "account_balance",
+        group: "Acciones Rápidas",
+        badge: "Admin",
+        badgeVariant: "secondary",
+        keywords: ["organizaciones", "empresas", "gestion", "auditoria"],
+        action: () => router.push("/admin/organizations"),
+      },
+      {
+        id: "action-admin-catalog",
+        title: "Catálogo Maestro",
+        subtitle: "Habilidades, rubros y datos maestros del sistema",
+        icon: "layers",
+        group: "Acciones Rápidas",
+        badge: "Catálogo",
+        badgeVariant: "neutral",
+        keywords: ["catalogo", "habilidades", "skills", "maestro"],
+        action: () => router.push("/admin/catalog"),
+      },
+      {
+        id: "action-admin-fraud",
+        title: "Auditoría de Seguridad y Fraude",
+        subtitle: "Supervisar alertas y comportamientos anómalos",
+        icon: "security",
+        group: "Acciones Rápidas",
+        badge: "Seguridad",
+        badgeVariant: "accent",
+        keywords: ["fraude", "seguridad", "anomalias", "auditoria"],
+        action: () => router.push("/admin/fraud"),
+      }
+    );
+
+    // Admin Navigation
+    navigationItems.push(
+      {
+        id: "nav-admin-push",
+        title: "Campañas de Notificaciones Push",
+        subtitle: "Envío y difusión masiva de alertas",
+        icon: "campaign",
+        group: "Navegación",
+        badge: "Push",
+        badgeVariant: "neutral",
+        keywords: ["push", "notificaciones", "difusion", "campana"],
+        action: () => router.push("/admin/push"),
+      },
+      {
+        id: "nav-notifications",
+        title: "Notificaciones del Sistema",
+        subtitle: "Bandeja de avisos administrativos",
+        icon: "notifications",
+        group: "Navegación",
+        badge: "Alertas",
+        badgeVariant: "neutral",
+        keywords: ["notificaciones", "alertas"],
+        action: () => router.push("/notifications"),
+      }
+    );
+  } else if (role === "moderator") {
+    // Moderator Quick Actions
+    quickActions.push(
+      {
+        id: "action-mod-incidents",
+        title: "Centro de Incidencias",
+        subtitle: "Reportes de vacantes y usuarios en revisión",
+        icon: "report_problem",
+        group: "Acciones Rápidas",
+        badge: "Moderación",
+        badgeVariant: "primary",
+        keywords: ["incidencias", "reportes", "quejas", "moderacion"],
+        action: () => router.push("/mod/incidents"),
+      },
+      {
+        id: "action-mod-appeals",
+        title: "Canales de Apelación",
+        subtitle: "Atención de controversias y apelaciones",
+        icon: "gavel",
+        group: "Acciones Rápidas",
+        badge: "Apelaciones",
+        badgeVariant: "secondary",
+        keywords: ["apelaciones", "disputas", "revision"],
+        action: () => router.push("/mod/appeals"),
+      },
+      {
+        id: "action-mod-verifications",
+        title: "Verificaciones Pendientes",
+        subtitle: "Revisar documentos y sellos de empresas",
+        icon: "verified",
+        group: "Acciones Rápidas",
+        badge: "Verificación",
+        badgeVariant: "neutral",
+        keywords: ["verificaciones", "empresas", "aprobar"],
+        action: () => router.push("/mod/verifications"),
+      },
+      {
+        id: "action-mod-support",
+        title: "Soporte a Usuarios",
+        subtitle: "Tickets y asistencia directa de moderación",
+        icon: "contact_support",
+        group: "Acciones Rápidas",
+        badge: "Soporte",
+        badgeVariant: "neutral",
+        keywords: ["soporte", "tickets", "asistencia"],
+        action: () => router.push("/mod/support"),
+      }
+    );
+
+    // Moderator Navigation
+    navigationItems.push(
+      {
+        id: "nav-mod-skills",
+        title: "Taxonomía de Habilidades",
+        subtitle: "Normalización de skills reportadas",
+        icon: "psychology",
+        group: "Navegación",
+        badge: "Habilidades",
+        badgeVariant: "neutral",
+        keywords: ["habilidades", "skills", "taxonomia"],
+        action: () => router.push("/mod/skills"),
+      },
+      {
+        id: "nav-notifications",
+        title: "Notificaciones",
+        subtitle: "Alertas operativas de moderación",
+        icon: "notifications",
+        group: "Navegación",
+        badge: "Alertas",
+        badgeVariant: "neutral",
+        keywords: ["notificaciones", "alertas"],
+        action: () => router.push("/notifications"),
+      }
+    );
   }
 
-  if (session.value?.user) {
-    items.push({
+  // Universal Navigation Items (Accessible to all roles)
+  navigationItems.push(
+    {
+      id: "nav-map",
+      title: "Mapa Interactivo de Empleos",
+      subtitle: "Explorar vacantes geolocalizadas en el Estado de México",
+      icon: "map",
+      group: "Navegación",
+      badge: "Edoméx",
+      badgeVariant: "secondary",
+      keywords: ["mapa", "geolocalizacion", "edomex", "ubicacion", "distancia", "gps", "toluca"],
+      action: () => router.push("/map"),
+    },
+    {
+      id: "nav-companies",
+      title: "Directorio de Organizaciones",
+      subtitle: "Consultar empresas e instituciones registradas",
+      icon: "domain",
+      group: "Navegación",
+      badge: "Empresas",
+      badgeVariant: "neutral",
+      keywords: ["empresas", "organizaciones", "directorio", "empleadores", "companias"],
+      action: () => router.push("/companies"),
+    }
+  );
+
+  // Logout action for any authenticated user
+  if (status.value === "authenticated") {
+    quickActions.push({
       id: "action-logout",
       title: "Cerrar Sesión",
-      subtitle: `Salir de la cuenta de ${session.value.user.name || "JobNet"}`,
+      subtitle: `Cerrar la sesión de ${userName.value}`,
       icon: "logout",
       group: "Acciones Rápidas",
       badge: "Sesión",
@@ -292,19 +663,19 @@ const staticItems = computed<CommandItem[]>(() => {
     });
   }
 
-  return items;
+  return [...quickActions, ...navigationItems];
 });
 
 // Filtered and Search Results
 const filteredItems = computed<CommandItem[]>(() => {
   const query = searchQuery.value.toLowerCase().trim();
 
-  // If query is empty, return static actions and navigation
+  // If query is empty, return static actions and navigation tailored for role
   if (!query) {
     return staticItems.value;
   }
 
-  // 1. Filter static items
+  // 1. Filter role-scoped static items
   const matchingStatic = staticItems.value.filter((item) => {
     const inTitle = item.title.toLowerCase().includes(query);
     const inSubtitle = (item.subtitle || "").toLowerCase().includes(query);
@@ -312,47 +683,52 @@ const filteredItems = computed<CommandItem[]>(() => {
     return inTitle || inSubtitle || inKeywords;
   });
 
-  // 2. Dynamic Vacancies matches
-  const matchingJobs: CommandItem[] = (jobsStore.jobs || [])
-    .filter((job) => {
-      const inTitle = (job.title || "").toLowerCase().includes(query);
-      const inCompany = (job.company || "").toLowerCase().includes(query);
-      const inDesc = (job.descripcion || "").toLowerCase().includes(query);
-      const inSkills = (job.habilidadesRequeridas || []).some((s) => s.toLowerCase().includes(query));
-      return inTitle || inCompany || inDesc || inSkills;
-    })
-    .slice(0, 5)
-    .map((job) => ({
-      id: `job-${job.id || (job as any).uniqueId}`,
-      title: job.title || "Vacante",
-      subtitle: `${job.company || "Empresa"} · ${job.modalidad || "Modalidad"}`,
-      icon: "work_outline",
-      group: "Vacantes",
-      badge: job.modalidad || "Vacante",
-      badgeVariant: "primary",
-      action: () => router.push(`/vacancies`),
-    }));
+  // 2. Dynamic Vacancies matches (ONLY for candidates and guests searching for jobs)
+  const isCandidateOrGuest = userRole.value === "candidate" || userRole.value === "guest";
+  const matchingJobs: CommandItem[] = isCandidateOrGuest
+    ? (jobsStore.jobs || [])
+        .filter((job) => {
+          const inTitle = (job.title || "").toLowerCase().includes(query);
+          const inCompany = (job.company || "").toLowerCase().includes(query);
+          const inDesc = (job.descripcion || "").toLowerCase().includes(query);
+          const inSkills = (job.habilidadesRequeridas || []).some((s) => s.toLowerCase().includes(query));
+          return inTitle || inCompany || inDesc || inSkills;
+        })
+        .slice(0, 5)
+        .map((job) => ({
+          id: `job-${job.id || (job as any).uniqueId}`,
+          title: job.title || "Vacante",
+          subtitle: `${job.company || "Empresa"} · ${job.modalidad || "Modalidad"}`,
+          icon: "work_outline",
+          group: "Vacantes",
+          badge: job.modalidad || "Vacante",
+          badgeVariant: "primary",
+          action: () => router.push(`/vacancies`),
+        }))
+    : [];
 
-  // 3. Dynamic CV Templates matches
-  const matchingTemplates: CommandItem[] = (communityTemplates.value || [])
-    .filter((tpl) => {
-      const inTitle = (tpl.titulo || "").toLowerCase().includes(query);
-      const inRole = (tpl.rol || "").toLowerCase().includes(query);
-      const inSkills = (tpl.habilidadesClave || []).some((s) => s.toLowerCase().includes(query));
-      const inTags = (tpl.tags || []).some((t) => t.toLowerCase().includes(query));
-      return inTitle || inRole || inSkills || inTags;
-    })
-    .slice(0, 5)
-    .map((tpl) => ({
-      id: `tpl-${tpl.id}`,
-      title: tpl.titulo,
-      subtitle: `${tpl.rol} · Nivel ${tpl.nivel.toUpperCase()}`,
-      icon: "description",
-      group: "Plantillas de CV",
-      badge: tpl.idioma === "en" ? "EN" : tpl.idioma === "bilingual" ? "Bilingüe" : "ES",
-      badgeVariant: "secondary",
-      action: () => router.push("/candidate/cv-templates"),
-    }));
+  // 3. Dynamic CV Templates matches (ONLY for candidates and guests)
+  const matchingTemplates: CommandItem[] = isCandidateOrGuest
+    ? (communityTemplates.value || [])
+        .filter((tpl) => {
+          const inTitle = (tpl.titulo || "").toLowerCase().includes(query);
+          const inRole = (tpl.rol || "").toLowerCase().includes(query);
+          const inSkills = (tpl.habilidadesClave || []).some((s) => s.toLowerCase().includes(query));
+          const inTags = (tpl.tags || []).some((t) => t.toLowerCase().includes(query));
+          return inTitle || inRole || inSkills || inTags;
+        })
+        .slice(0, 5)
+        .map((tpl) => ({
+          id: `tpl-${tpl.id}`,
+          title: tpl.titulo,
+          subtitle: `${tpl.rol} · Nivel ${tpl.nivel.toUpperCase()}`,
+          icon: "description",
+          group: "Plantillas de CV",
+          badge: tpl.idioma === "en" ? "EN" : tpl.idioma === "bilingual" ? "Bilingüe" : "ES",
+          badgeVariant: "secondary",
+          action: () => router.push("/candidate/cv-templates"),
+        }))
+    : [];
 
   return [...matchingStatic, ...matchingJobs, ...matchingTemplates];
 });
@@ -457,10 +833,12 @@ watch(isOpen, async (opened) => {
   if (opened) {
     activeIndex.value = 0;
     searchQuery.value = "";
-    if (jobsStore.jobs.length === 0) {
-      jobsStore.fetchJobs();
+    if (userRole.value === "candidate" || userRole.value === "guest") {
+      if (jobsStore.jobs.length === 0) {
+        jobsStore.fetchJobs();
+      }
+      fetchTemplates();
     }
-    fetchTemplates();
     await nextTick();
     searchInputRef.value?.focus();
   }
