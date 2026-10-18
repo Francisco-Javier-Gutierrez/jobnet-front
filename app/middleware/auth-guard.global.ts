@@ -87,7 +87,7 @@ export default defineNuxtRouteMiddleware((to) => {
       return navigateTo("/login");
     }
     if (userRole === "ADMIN") {
-      return navigateTo("/admin/analytics");
+      return navigateTo("/admin");
     }
     if (userRole === "ORGANIZACION" || userRole === "EMPRESA") {
       return navigateTo("/applicants");

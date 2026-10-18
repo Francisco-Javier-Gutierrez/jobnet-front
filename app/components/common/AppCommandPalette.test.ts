@@ -169,6 +169,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
     const renderedText = wrapper.text();
 
     // Admin specific quick actions and navigation
+    expect(renderedText).toContain("Panel Principal y Monitoreo");
     expect(renderedText).toContain("Métricas y Analítica Global");
     expect(renderedText).toContain("Gestión de Organizaciones");
     expect(renderedText).toContain("Catálogo Maestro");

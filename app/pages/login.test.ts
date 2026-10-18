@@ -34,6 +34,8 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
             routerPushMock("/");
           } else if (userRole === "EMPRESA") {
             routerPushMock("/applicants");
+          } else if (userRole === "ADMIN") {
+            routerPushMock("/admin");
           }
           return { success: true };
         }
@@ -48,6 +50,10 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
         redirect: false,
       });
       expect(routerPushMock).toHaveBeenCalledWith("/");
+
+      const adminResult = await performLogin("admin@jobnet.mx", "AdminSecret#123", "ADMIN");
+      expect(adminResult.success).toBe(true);
+      expect(routerPushMock).toHaveBeenCalledWith("/admin");
     });
 
     it("debe desplegar mensaje de alerta de 'Credenciales inválidas' ante datos incorrectos", async () => {

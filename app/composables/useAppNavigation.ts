@@ -125,6 +125,12 @@ export const useAppNavigation = () => {
             items: [
               { to: "/", icon: "home", label: "Inicio", protected: false },
               {
+                to: "/admin",
+                icon: "dashboard",
+                label: "Panel Principal",
+                protected: true,
+              },
+              {
                 to: "/admin/analytics",
                 icon: "insights",
                 label: "Analítica Avanzada",
@@ -140,6 +146,12 @@ export const useAppNavigation = () => {
                 to: "/admin/catalog",
                 icon: "layers",
                 label: "Catálogo Maestro",
+                protected: true,
+              },
+              {
+                to: "/admin/push",
+                icon: "campaign",
+                label: "Notificaciones Push",
                 protected: true,
               },
             ],

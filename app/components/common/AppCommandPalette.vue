@@ -476,14 +476,25 @@ const staticItems = computed<CommandItem[]>(() => {
     // Admin Quick Actions
     quickActions.push(
       {
-        id: "action-admin-analytics",
-        title: "Métricas y Analítica Global",
-        subtitle: "Estadísticas de usuarios, vacantes y actividad",
-        icon: "insights",
+        id: "action-admin-dashboard",
+        title: "Panel Principal y Monitoreo",
+        subtitle: "Métricas del sistema, salud de infraestructura y resumen general",
+        icon: "dashboard",
         group: "Acciones Rápidas",
         badge: "Admin",
         badgeVariant: "primary",
-        keywords: ["analitica", "metricas", "kpi", "estadisticas", "admin"],
+        keywords: ["admin", "dashboard", "panel", "monitoreo", "metricas", "sistema", "salud"],
+        action: () => router.push("/admin"),
+      },
+      {
+        id: "action-admin-analytics",
+        title: "Métricas y Analítica Global",
+        subtitle: "Habilidades en demanda, distribución geográfica y postulaciones",
+        icon: "insights",
+        group: "Acciones Rápidas",
+        badge: "Analítica",
+        badgeVariant: "secondary",
+        keywords: ["analitica", "metricas", "kpi", "estadisticas", "habilidades", "mercado"],
         action: () => router.push("/admin/analytics"),
       },
       {
@@ -523,6 +534,17 @@ const staticItems = computed<CommandItem[]>(() => {
 
     // Admin Navigation
     navigationItems.push(
+      {
+        id: "nav-admin-dashboard",
+        title: "Panel Principal",
+        subtitle: "Monitoreo y métricas operativas",
+        icon: "dashboard",
+        group: "Navegación",
+        badge: "Admin",
+        badgeVariant: "neutral",
+        keywords: ["inicio", "panel", "dashboard", "admin"],
+        action: () => router.push("/admin"),
+      },
       {
         id: "nav-admin-push",
         title: "Campañas de Notificaciones Push",

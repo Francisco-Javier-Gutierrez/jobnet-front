@@ -410,7 +410,7 @@ const handleLogin = async () => {
       ) {
         router.push("/applicants");
       } else if (userRole?.toUpperCase() === "ADMIN") {
-        router.push("/admin/organizations");
+        router.push("/admin");
       } else if (userRole?.toUpperCase() === "MODERATOR") {
         router.push("/mod/incidents");
       } else {
