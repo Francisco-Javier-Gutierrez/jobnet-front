@@ -129,14 +129,21 @@
 
       <!-- 5. Location Map Section -->
       <div v-if="job && job.lat && job.lng" class="space-y-3 text-left">
-        <AppLocationMap
-          :lat="job.lat"
-          :lng="job.lng"
-          :draggable="false"
-          label="Ubicación de la Oferta"
-          height="280px"
-          :show-use-current-location="false"
-        />
+        <ClientOnly>
+          <AppLocationMap
+            :lat="job.lat"
+            :lng="job.lng"
+            :draggable="false"
+            label="Ubicación de la Oferta"
+            height="280px"
+            :show-use-current-location="false"
+          />
+          <template #fallback>
+            <div class="h-[280px] w-full rounded-2xl bg-surface-container-low/40 dark:bg-slate-900/60 border border-outline-variant/40 animate-pulse flex items-center justify-center">
+              <span class="text-xs text-on-surface-variant dark:text-slate-400">Cargando mapa de ubicación...</span>
+            </div>
+          </template>
+        </ClientOnly>
       </div>
 
       <hr v-if="job && job.lat && job.lng" class="border-outline-variant/30" />

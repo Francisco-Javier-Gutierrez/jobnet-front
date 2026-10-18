@@ -24,12 +24,19 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2">
-          <AppLocationMap
-            v-model:lat="initialLat"
-            v-model:lng="initialLng"
-            label="Filtro Geográfico — Estado de México"
-            height="550px"
-          />
+          <ClientOnly>
+            <AppLocationMap
+              v-model:lat="initialLat"
+              v-model:lng="initialLng"
+              label="Filtro Geográfico — Estado de México"
+              height="550px"
+            />
+            <template #fallback>
+              <div class="h-[550px] w-full rounded-2xl bg-surface-container-low/40 dark:bg-slate-900/60 border border-outline-variant/40 animate-pulse flex items-center justify-center">
+                <span class="text-xs text-on-surface-variant dark:text-slate-400">Cargando mapa interactivo...</span>
+              </div>
+            </template>
+          </ClientOnly>
         </div>
 
         <!-- Vacantes en el área -->

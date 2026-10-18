@@ -96,8 +96,6 @@
 </template>
 
 <script setup lang="ts">
-import * as turf from "@turf/turf";
-
 useHead({
   link: [
     {
@@ -161,26 +159,9 @@ let resizeObserver: ResizeObserver | null = null;
 import {
   getNativeLocationName,
   isInsideEdoMex,
+  getNearestValidPoint,
   EDO_MEX_FEATURES,
 } from "~/utils/edoMexGeoJSON";
-
-function getNearestValidPoint(
-  latVal: number,
-  lngVal: number,
-): { lat: number; lng: number } {
-  const point = turf.point([lngVal, latVal]);
-  let closestCenter = [-99.6557, 19.2826]; // Toluca default
-  let minDistance = Infinity;
-  for (const muni of EDO_MEX_FEATURES) {
-    const centerPt = turf.point(muni.center);
-    const dist = turf.distance(point, centerPt, { units: "kilometers" });
-    if (dist < minDistance) {
-      minDistance = dist;
-      closestCenter = muni.center;
-    }
-  }
-  return { lat: closestCenter[1], lng: closestCenter[0] };
-}
 
 /**
  * Resolves location name natively using Turf.js spatial index
