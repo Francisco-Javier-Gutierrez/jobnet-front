@@ -514,9 +514,13 @@ const publishPost = async () => {
       method: "POST",
       body: newPostPayload,
     });
-  } catch (e) {
+  } catch (e: any) {
     console.error("Error creating post on server:", e);
-    showError("Error", "Error al publicar en el servidor de AWS.");
+    const serverMsg =
+      e?.data?.error ||
+      e?.response?._data?.error ||
+      "Error al publicar en el servidor de AWS.";
+    showError("Publicación rechazada", serverMsg);
     isPublishing.value = false;
     return;
   }

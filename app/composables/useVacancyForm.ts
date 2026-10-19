@@ -525,9 +525,12 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
       }
     } catch (error: any) {
       console.error("Error creating/updating vacancy:", error);
-      errorMessage.value = options.isEdit
-        ? "Ocurrió un error al intentar actualizar la vacante."
-        : "Ocurrió un error al intentar publicar la vacante.";
+      errorMessage.value =
+        error?.data?.error ||
+        error?.response?._data?.error ||
+        (options.isEdit
+          ? "Ocurrió un error al intentar actualizar la vacante."
+          : "Ocurrió un error al intentar publicar la vacante.");
     } finally {
       submitting.value = false;
     }
