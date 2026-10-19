@@ -1,5 +1,9 @@
 <template>
-  <div class="fixed bottom-4 right-4 z-[99999] select-none font-sans">
+  <div
+    v-if="!shouldHideToolbar"
+    id="dev-mock-toolbar"
+    class="dev-mock-toolbar fixed bottom-4 right-4 z-[99999] select-none font-sans"
+  >
     <!-- Collapsed Floating Launcher Button -->
     <button
       v-if="!isOpen"
@@ -203,6 +207,14 @@ import { useMockSession, type MockRole } from "~/composables/useMockSession";
 const router = useRouter();
 const route = useRoute();
 const { mockRole, currentMockUser, setMockRole, availableRoles } = useMockSession();
+
+const shouldHideToolbar = computed(() => {
+  return (
+    route.query.clean === "true" ||
+    route.query.hideToolbar === "true" ||
+    route.query.capture === "true"
+  );
+});
 
 const isOpen = ref(false);
 const selectedRoute = ref("");
