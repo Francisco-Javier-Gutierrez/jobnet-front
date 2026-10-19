@@ -88,7 +88,7 @@ export default NuxtAuthHandler({
           ? "client_secret_basic"
           : "none",
       },
-      checks: ["pkce", "state"],
+      checks: ["nonce"],
       authorization: {
         params: {
           identity_provider: "Google",
