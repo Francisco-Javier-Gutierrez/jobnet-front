@@ -341,6 +341,7 @@ useSeoMeta({
 });
 
 const { data: session, status } = useAuth();
+const { isMockEnabled, currentMockUser } = useMockSession();
 const config = useRuntimeConfig();
 const router = useRouter();
 
@@ -411,14 +412,17 @@ const MOCK_MY_APPLICATIONS = [
 ];
 
 const fetchApplications = async () => {
-  if (status.value !== "authenticated") {
+  if (!isMockEnabled.value && status.value !== "authenticated") {
     router.push("/login");
     return;
   }
 
   loading.value = true;
   try {
-    const candidateId = session.value?.user?.id || "";
+    const candidateId =
+      (isMockEnabled.value && currentMockUser.value?.id) ||
+      session.value?.user?.id ||
+      "";
 
     const apps = await $fetch<any[]>(
       `${config.public.apiUrl}/applications?candidateId=${candidateId}`,

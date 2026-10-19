@@ -103,7 +103,11 @@ export const useApplicants = () => {
       router.push("/login");
       return;
     }
-    const companyId = session.value?.user?.id || "";
+    const { isMockEnabled, currentMockUser } = useMockSession();
+    const companyId =
+      (isMockEnabled.value && currentMockUser.value?.companyId) ||
+      session.value?.user?.id ||
+      "";
 
     try {
       let allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(

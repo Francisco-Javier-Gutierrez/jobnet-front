@@ -7,6 +7,7 @@
       <AppProtectedModal />
       <AppFeedbackModal />
       <AppCommandPalette />
+      <DevMockToolbar />
     </ClientOnly>
   </div>
 </template>

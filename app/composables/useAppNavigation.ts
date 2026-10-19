@@ -20,10 +20,15 @@ export const useAppNavigation = () => {
   const route = useRoute();
   const router = useRouter();
   const { status, data, signOut } = useAuth();
+  const { isMockEnabled, currentMockUser, mockRole } = useMockSession();
   const { openProtectedModal } = useProtectedAction();
   const { profilePic, hasFetched, fetchProfilePic } = useProfileState();
 
-  const effectiveStatus = computed(() => status.value);
+  const effectiveStatus = computed(() => {
+    if (isMockEnabled.value && mockRole.value === "GUEST") return "unauthenticated";
+    if (isMockEnabled.value && currentMockUser.value) return "authenticated";
+    return status.value;
+  });
 
   watchEffect(() => {
     if (
@@ -36,6 +41,18 @@ export const useAppNavigation = () => {
   });
 
   const userRole = computed<string>(() => {
+    if (isMockEnabled.value) {
+      if (mockRole.value === "GUEST" || !currentMockUser.value) return "guest";
+      const tipo = (
+        currentMockUser.value.tipoUsuario ||
+        currentMockUser.value.role ||
+        ""
+      ).toUpperCase();
+      if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
+      if (tipo === "ADMIN") return "admin";
+      if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
+      return "candidate";
+    }
     if (status.value !== "authenticated") return "guest";
     const user = data.value?.user;
     const tipo = (user?.tipoUsuario || "").toUpperCase();
@@ -46,12 +63,22 @@ export const useAppNavigation = () => {
   });
 
   const userName = computed(() => {
+    if (isMockEnabled.value && currentMockUser.value) {
+      return (
+        currentMockUser.value.name ||
+        currentMockUser.value.email ||
+        "Usuario"
+      );
+    }
     return data.value?.user?.name || data.value?.user?.email || "Usuario";
   });
 
   const userInitial = computed(() => userName.value.charAt(0).toUpperCase());
 
   const userAvatar = computed(() => {
+    if (isMockEnabled.value && currentMockUser.value?.avatarUrl) {
+      return currentMockUser.value.avatarUrl;
+    }
     return profilePic.value || data.value?.user?.image || "";
   });
 

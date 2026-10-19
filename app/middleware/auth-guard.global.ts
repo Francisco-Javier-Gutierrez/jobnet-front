@@ -1,10 +1,22 @@
 export default defineNuxtRouteMiddleware((to) => {
   const { status, data } = useAuth();
+  const { isMockEnabled, currentMockUser, mockRole } = useMockSession();
+  const mockUser = currentMockUser.value;
 
-  const effectiveStatus = status.value;
+  const effectiveStatus =
+    isMockEnabled.value && mockRole.value === "GUEST"
+      ? "unauthenticated"
+      : isMockEnabled.value && mockUser
+        ? "authenticated"
+        : status.value;
+
   const rawRole =
-    (data.value?.user as any)?.tipoUsuario ||
-    (data.value?.user as any)?.role;
+    isMockEnabled.value && mockUser
+      ? mockUser.tipoUsuario || mockUser.role
+      : isMockEnabled.value && mockRole.value === "GUEST"
+        ? ""
+        : (data.value?.user as any)?.tipoUsuario ||
+          (data.value?.user as any)?.role;
   const userRole = (rawRole || "").toUpperCase();
 
   const path = to.path.toLowerCase();

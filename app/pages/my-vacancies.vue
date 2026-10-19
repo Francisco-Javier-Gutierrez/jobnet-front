@@ -254,10 +254,12 @@ useSeoMeta({
 
 const config = useRuntimeConfig();
 const { data: session, status } = useAuth();
+const { isMockEnabled, currentMockUser } = useMockSession();
 const router = useRouter();
 
 const companyId = computed(
   () =>
+    (isMockEnabled.value && currentMockUser.value?.companyId) ||
     (session.value?.user as any)?.id || "",
 );
 
@@ -274,7 +276,7 @@ const openAppealModal = (jobId: string) => {
 };
 
 const fetchVacancies = async () => {
-  if (status.value !== "authenticated") {
+  if (!isMockEnabled.value && status.value !== "authenticated") {
     router.push("/login");
     return;
   }

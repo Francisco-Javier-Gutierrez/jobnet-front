@@ -204,6 +204,7 @@
 <script setup lang="ts">
 import { useAuth, useRuntimeConfig, useLazyAsyncData, useSeoMeta, useRouter } from "#imports";
 import { useShare } from "~/composables/useShare";
+import { MOCK_POSTS, MOCK_VACANCIES } from "~/utils/mockData";
 
 useSeoMeta({
   title: "Panel Personal de Favoritos - JobNet",
@@ -211,17 +212,23 @@ useSeoMeta({
 });
 
 const { data: session, status } = useAuth();
+const { isMockEnabled, currentMockUser } = useMockSession();
 const router = useRouter();
 const config = useRuntimeConfig();
 const { sharePost, shareJob } = useShare();
 
 const currentUserId = computed(() => {
-  return (session.value?.user as any)?.id || session.value?.user?.email || "";
+  return (
+    (isMockEnabled.value && currentMockUser.value?.id) ||
+    (session.value?.user as any)?.id ||
+    session.value?.user?.email ||
+    ""
+  );
 });
 
 // Guard: Redirigir si no está autenticado
 watchEffect(() => {
-  if (status.value === "unauthenticated") {
+  if (!isMockEnabled.value && status.value === "unauthenticated") {
     router.replace("/login");
   }
 });
@@ -250,20 +257,22 @@ watch(
     if (val) {
       if (Array.isArray(val.posts) && val.posts.length > 0) {
         bookmarkedPosts.value = val.posts;
-      } else if (Array.isArray(val.data)) {
+      } else if (Array.isArray(val.data) && val.data.length > 0) {
         bookmarkedPosts.value = val.data.filter(
           (i: any) =>
             (i.PK && i.PK.startsWith("POST#")) ||
             i.uniqueId ||
             (i.content && !i.modalidad),
         );
+      } else if (isMockEnabled.value) {
+        bookmarkedPosts.value = MOCK_POSTS.slice(0, 1);
       } else {
         bookmarkedPosts.value = [];
       }
 
       if (Array.isArray(val.jobs) && val.jobs.length > 0) {
         bookmarkedJobs.value = val.jobs;
-      } else if (Array.isArray(val.data)) {
+      } else if (Array.isArray(val.data) && val.data.length > 0) {
         bookmarkedJobs.value = val.data.filter(
           (i: any) =>
             (i.PK && i.PK.startsWith("VACANCY#")) ||
@@ -272,6 +281,8 @@ watch(
             i.salario !== undefined ||
             i.title !== undefined,
         );
+      } else if (isMockEnabled.value) {
+        bookmarkedJobs.value = MOCK_VACANCIES.slice(0, 2);
       } else {
         bookmarkedJobs.value = [];
       }
