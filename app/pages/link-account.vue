@@ -194,9 +194,10 @@ useSeoMeta({
 const route = useRoute();
 const router = useRouter();
 const { signIn } = useAuth();
+const { isMockEnabled } = useMockSession();
 
-const email = computed(() => String(route.query.email || ""));
-const googleSub = computed(() => String(route.query.googleSub || ""));
+const email = computed(() => String(route.query.email || (isMockEnabled.value ? "juan.perez.mock@jobnet-demo.test" : "")));
+const googleSub = computed(() => String(route.query.googleSub || (isMockEnabled.value ? "google-oauth2|mock-123456789" : "")));
 
 const password = ref("");
 const showPassword = ref(false);
@@ -205,6 +206,7 @@ const errorMessage = ref("");
 const successMessage = ref("");
 
 onMounted(() => {
+  if (isMockEnabled.value) return;
   if (!email.value || !googleSub.value) {
     router.replace("/login");
   }

@@ -244,6 +244,8 @@
 </template>
 
 <script setup lang="ts">
+import { MOCK_NOTIFICATIONS } from "~/utils/mockData";
+import { useMockSession } from "~/composables/useMockSession";
 useSeoMeta({
   title: "Notificaciones - JobNet",
   description:
@@ -274,6 +276,7 @@ interface NotificationItem {
 const loading = ref(true);
 const notifications = ref<NotificationItem[]>([]);
 const filterState = ref<"all" | "unread" | "read">("all");
+const { isMockEnabled } = useMockSession();
 
 const filterOptions = [
   { label: "Todas", value: "all", icon: "notifications" },
@@ -312,7 +315,11 @@ const getIconName = (type: NotificationItem["type"]) => {
     case "comment":
       return "forum";
     case "application":
+    case "APPLICATION_STAGE_CHANGED":
+    case "JOB_RECOMMENDED":
       return "work";
+    case "NEW_MESSAGE":
+      return "chat";
     case "SUSPENSION_NOTICE":
       return "warning";
     case "SUSPENSION_CANCELLED":
@@ -378,6 +385,11 @@ const formatTime = (isoDate: string) => {
 };
 
 const loadNotifications = async () => {
+  if (isMockEnabled.value) {
+    notifications.value = JSON.parse(JSON.stringify(MOCK_NOTIFICATIONS));
+    loading.value = false;
+    return;
+  }
   if (!userId.value) {
     loading.value = false;
     return;

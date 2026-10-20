@@ -138,6 +138,7 @@
 
 <script setup lang="ts">
 import { MOCK_VERIFICATIONS } from "~/utils/mockData";
+import { useMockSession } from "~/composables/useMockSession";
 
 useSeoMeta({
   title: "Verificaciones Corporativas - JobNet",
@@ -151,6 +152,12 @@ const loading = ref(true);
 
 const fetchRequests = async () => {
   loading.value = true;
+  const { isMockEnabled } = useMockSession();
+  if (isMockEnabled.value) {
+    requests.value = MOCK_VERIFICATIONS;
+    loading.value = false;
+    return;
+  }
   try {
     const data = await $fetch<any[]>(
       `${config.public.apiUrl}/moderator/verifications`,

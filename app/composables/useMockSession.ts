@@ -21,8 +21,8 @@ export const MOCK_ROLE_USERS: Record<Exclude<MockRole, "GUEST">, MockUserSession
   CANDIDATO: {
     id: "candidate-francisco-gomez",
     candidateId: "candidate-francisco-gomez",
-    name: "Francisco Gómez",
-    email: "francisco.gomez@gmail.com",
+    name: "[DEMO] Juan Pérez (Candidato Mock)",
+    email: "juan.perez.mock@jobnet-demo.test",
     tipoUsuario: "CANDIDATO",
     role: "CANDIDATO",
     avatarUrl:
@@ -31,9 +31,9 @@ export const MOCK_ROLE_USERS: Record<Exclude<MockRole, "GUEST">, MockUserSession
   EMPRESA: {
     id: "org-techsolutions-01",
     companyId: "org-techsolutions-01",
-    name: "TechSolutions México",
-    nombreComercial: "TechSolutions México",
-    email: "contacto@techsolutions.mx",
+    name: "[MOCK] Acme Corp",
+    nombreComercial: "[MOCK] Acme Corp",
+    email: "contacto@mock-acmeweb.test",
     tipoUsuario: "EMPRESA",
     role: "EMPRESA",
     avatarUrl:
@@ -41,16 +41,16 @@ export const MOCK_ROLE_USERS: Record<Exclude<MockRole, "GUEST">, MockUserSession
   },
   MODERATOR: {
     id: "mod-official",
-    name: "Moderador Oficial",
-    email: "moderador@jobnet.com.mx",
+    name: "[DEMO] Moderador de Pruebas",
+    email: "moderador.demo@jobnet-mock.test",
     tipoUsuario: "MODERATOR",
     role: "MODERATOR",
     avatarUrl: "/logo.svg",
   },
   ADMIN: {
     id: "admin-official",
-    name: "Administrador General",
-    email: "admin@jobnet.com.mx",
+    name: "[DEMO] Administrador General (Mock)",
+    email: "admin.demo@jobnet-mock.test",
     tipoUsuario: "ADMIN",
     role: "ADMIN",
     avatarUrl: "/logo.svg",

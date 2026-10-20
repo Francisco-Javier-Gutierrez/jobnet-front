@@ -230,6 +230,10 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
   });
 
   const fetchCompanyName = async () => {
+    if (isMockEnabled.value) {
+      companyName.value = currentMockUser.value?.name || "[MOCK] Acme Corp";
+      return;
+    }
     if (status.value !== "authenticated" || !session.value?.user?.id) {
       router.push("/login");
       return;

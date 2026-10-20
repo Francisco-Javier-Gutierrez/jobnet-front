@@ -347,6 +347,18 @@ watch(
 );
 
 const fetchCompanyProfile = async () => {
+  if (isMockEnabled.value) {
+    companyId.value = "org-techsolutions-01";
+    nombreComercial.value = "[MOCK] Acme Corporation";
+    sector.value = "Tecnología y Software";
+    descripcion.value = "[MOCK] Empresa líder en soluciones de reclutamiento y talento regional.";
+    mision.value = "Conectar talento regional con oportunidades reales.";
+    vision.value = "Ser la plataforma de referencia en México.";
+    beneficios.value = "Home office, seguro de gastos médicos mayores, fondo de ahorro.";
+    taxId.value = "XAXX010101000";
+    loading.value = false;
+    return;
+  }
   if (status.value !== "authenticated" || !sessionData.value?.user?.id) {
     router.push("/login");
     return;

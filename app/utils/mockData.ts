@@ -12,28 +12,28 @@ import type {
 } from "~/types";
 
 // ============================================================================
-// 1. EMPRESAS Y ORGANIZACIONES REGISTRADAS
+// 1. EMPRESAS Y ORGANIZACIONES REGISTRADAS (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_COMPANIES: CompanyProfile[] = [
   {
     id: "org-techsolutions-01",
     companyId: "org-techsolutions-01",
     userId: "user-empresa-techsolutions",
-    nombre: "TechSolutions México S.A. de C.V.",
-    nombreComercial: "TechSolutions México",
-    razonSocial: "TechSolutions México S.A. de C.V.",
-    rfc: "TSM190412KL1",
-    email: "contacto@techsolutions.mx",
-    telefono: "+52 722 456 7890",
-    sitioWeb: "https://techsolutions.mx",
-    descripcion: "Empresa líder especializada en arquitectura cloud, microservicios y soluciones digitales de alto impacto para el sector empresarial y financiero.",
-    biografia: "Fundada en 2019 en Toluca, TechSolutions ha desarrollado plataformas críticas para más de 40 corporativos en México y Latinoamérica.",
+    nombre: "[MOCK] Acme Corporation S.A. de C.V.",
+    nombreComercial: "[MOCK] Acme Corp",
+    razonSocial: "[MOCK] Acme Corporation S.A. de C.V.",
+    rfc: "XAXX010101000",
+    email: "contacto@mock-acmeweb.test",
+    telefono: "+52 (000) 123-4567",
+    sitioWeb: "https://mock.acme-corp.test",
+    descripcion: "[DEMO MOCK] Empresa ficticia de desarrollo de software y servicios cloud para testing y validación de plataforma JobNet.",
+    biografia: "[MOCK DATA] Organización de demostración creada para validar el flujo completo de reclutamiento ATS, publicaciones y perfiles corporativos.",
     logoUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
     fotoPerfil: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
     bannerUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&auto=format&fit=crop&q=80",
-    ubicacion: "Toluca, Estado de México, México",
-    sector: "Tecnología y Software",
-    tamanoEmpresa: "51-200 empleados",
+    ubicacion: "Toluca, Edo. Méx. (Zona Mock/Demo)",
+    sector: "Tecnología y Software [MOCK]",
+    tamanoEmpresa: "51-200 empleados [MOCK]",
     organizacionVerificada: true,
     estatusVerificacion: "VERIFICADA",
     estatus: "ACTIVO",
@@ -41,7 +41,7 @@ export const MOCK_COMPANIES: CompanyProfile[] = [
     vacantesActivas: 3,
     documentosVerificacion: [
       {
-        nombre: "Constancia_Situacion_Fiscal_SAT_TSM.pdf",
+        nombre: "Constancia_Situacion_Fiscal_SAT_Mock.pdf",
         url: "/docs/sample-sat-constancia.pdf",
         tipo: "SAT_RFC",
         fecha: "2026-01-15"
@@ -52,21 +52,21 @@ export const MOCK_COMPANIES: CompanyProfile[] = [
     id: "org-innovatech-02",
     companyId: "org-innovatech-02",
     userId: "user-empresa-innovatech",
-    nombre: "Innovatech Global Solutions S. de R.L.",
-    nombreComercial: "Innovatech Global",
-    razonSocial: "Innovatech Global Solutions S. de R.L.",
-    rfc: "IGS200115MN8",
-    email: "talento@innovatech.com",
-    telefono: "+52 33 1234 5678",
-    sitioWeb: "https://innovatech.com",
-    descripcion: "Pioneros en inteligencia artificial aplicada, visión computacional y modelos predictivos para logística y comercio electrónico.",
-    biografia: "Equipo multidisciplinario distribuido en Guadalajara, Metepec y Ciudad de México.",
+    nombre: "[MOCK] Globex Technologies S. de R.L.",
+    nombreComercial: "[MOCK] Globex Tech",
+    razonSocial: "[MOCK] Globex Technologies S. de R.L.",
+    rfc: "MOCK200101XYZ",
+    email: "talento@mock-globex.test",
+    telefono: "+52 (000) 234-5678",
+    sitioWeb: "https://mock.globex.test",
+    descripcion: "[DEMO MOCK] Organización de prueba para validación de algoritmos de matching de candidatos y vacantes inteligentes.",
+    biografia: "[MOCK DATA] Entidad simulada para pruebas de reclutamiento e inteligencia artificial aplicada en entorno de pruebas.",
     logoUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=150&auto=format&fit=crop&q=80",
     fotoPerfil: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=150&auto=format&fit=crop&q=80",
     bannerUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&auto=format&fit=crop&q=80",
-    ubicacion: "Metepec, Estado de México, México",
-    sector: "Inteligencia Artificial y Fintech",
-    tamanoEmpresa: "201-500 empleados",
+    ubicacion: "Metepec, Edo. Méx. (Entorno Pruebas)",
+    sector: "Inteligencia Artificial y Cloud [MOCK]",
+    tamanoEmpresa: "201-500 empleados [MOCK]",
     organizacionVerificada: true,
     estatusVerificacion: "VERIFICADA",
     estatus: "ACTIVO",
@@ -74,7 +74,7 @@ export const MOCK_COMPANIES: CompanyProfile[] = [
     vacantesActivas: 2,
     documentosVerificacion: [
       {
-        nombre: "Constancia_SAT_Innovatech.pdf",
+        nombre: "Constancia_SAT_Globex_Mock.pdf",
         url: "/docs/sample-sat-constancia.pdf",
         tipo: "SAT_RFC",
         fecha: "2026-02-10"
@@ -85,19 +85,19 @@ export const MOCK_COMPANIES: CompanyProfile[] = [
     id: "org-biosalud-03",
     companyId: "org-biosalud-03",
     userId: "user-empresa-biosalud",
-    nombre: "BioSalud Farmacéutica de México S.A.",
-    nombreComercial: "BioSalud México",
-    razonSocial: "BioSalud Farmacéutica de México S.A.",
-    rfc: "BFM180820PR3",
-    email: "rh@biosalud.com.mx",
-    telefono: "+52 442 889 0011",
-    sitioWeb: "https://biosalud.com.mx",
-    descripcion: "Corporativo de biotecnología aplicada, ensayos clínicos y software biomédico con estrictos estándares de calidad internacional.",
+    nombre: "[MOCK] Initech Labs de México S.A.",
+    nombreComercial: "[MOCK] Initech Labs",
+    razonSocial: "[MOCK] Initech Labs de México S.A.",
+    rfc: "TEST180820ABC",
+    email: "rh@mock-initech.test",
+    telefono: "+52 (000) 345-6789",
+    sitioWeb: "https://mock.initech.test",
+    descripcion: "[DEMO MOCK] Corporativo simulado de biotecnología aplicada y desarrollo biomédico para pruebas de sistema.",
     logoUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=150&auto=format&fit=crop&q=80",
     fotoPerfil: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=150&auto=format&fit=crop&q=80",
-    ubicacion: "Querétaro, QRO / Naucalpan, Edo. Méx.",
-    sector: "Salud y Biotecnología",
-    tamanoEmpresa: "500+ empleados",
+    ubicacion: "Lerma, Edo. Méx. (Zona Demo)",
+    sector: "Biotecnología y Salud [MOCK]",
+    tamanoEmpresa: "500+ empleados [MOCK]",
     organizacionVerificada: true,
     estatusVerificacion: "VERIFICADA",
     estatus: "ACTIVO",
@@ -108,19 +108,19 @@ export const MOCK_COMPANIES: CompanyProfile[] = [
     id: "org-starlight-04",
     companyId: "org-starlight-04",
     userId: "user-empresa-starlight",
-    nombre: "Starlight Logistics Express S.A. de C.V.",
-    nombreComercial: "Starlight Logistics",
-    razonSocial: "Starlight Logistics Express S.A. de C.V.",
-    rfc: "SLE170510TR2",
-    email: "empleos@starlightlogistics.com",
-    telefono: "+52 55 9988 7766",
-    sitioWeb: "https://starlightlogistics.com",
-    descripcion: "Operador logístico internacional multimodal enfocado en automatización de almacenes, seguimiento satelital e IoT.",
+    nombre: "[MOCK] Umbrella Logistics Express S.A.",
+    nombreComercial: "[MOCK] Umbrella Logistics",
+    razonSocial: "[MOCK] Umbrella Logistics Express S.A.",
+    rfc: "MOCK170510LOG",
+    email: "empleos@mock-umbrella.test",
+    telefono: "+52 (000) 456-7890",
+    sitioWeb: "https://mock.umbrella-logistics.test",
+    descripcion: "[DEMO MOCK] Operador logístico ficticio multimodal enfocado en automatización y trazabilidad para testing.",
     logoUrl: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=150&auto=format&fit=crop&q=80",
     fotoPerfil: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=150&auto=format&fit=crop&q=80",
-    ubicacion: "Lerma, Estado de México, México",
-    sector: "Logística y Cadena de Suministro",
-    tamanoEmpresa: "201-500 empleados",
+    ubicacion: "Naucalpan, Edo. Méx. (Zona Mock)",
+    sector: "Logística y Cadena de Suministro [MOCK]",
+    tamanoEmpresa: "201-500 empleados [MOCK]",
     organizacionVerificada: true,
     estatusVerificacion: "VERIFICADA",
     estatus: "ACTIVO",
@@ -131,19 +131,19 @@ export const MOCK_COMPANIES: CompanyProfile[] = [
     id: "org-metropolitana-05",
     companyId: "org-metropolitana-05",
     userId: "user-empresa-metropolitana",
-    nombre: "Consultoría & Tecnología Metropolitana S.A.S.",
-    nombreComercial: "Consultoría Metropolitana",
-    razonSocial: "Consultoría & Tecnología Metropolitana S.A.S.",
-    rfc: "CTM210908KL3",
-    email: "administracion@ctmconsultoria.com.mx",
-    telefono: "+52 722 334 1122",
-    sitioWeb: "https://ctmconsultoria.com.mx",
-    descripcion: "Consultoría especializada en digitalización para PYMES del Valle de Toluca, migración cloud e infraestructura de redes seguras.",
+    nombre: "[MOCK] Wayne Consultores TI S.A.S.",
+    nombreComercial: "[MOCK] Wayne Ind.",
+    razonSocial: "[MOCK] Wayne Consultores TI S.A.S.",
+    rfc: "DEMO210908KL3",
+    email: "verificacion@mock-wayne.test",
+    telefono: "+52 (000) 567-8901",
+    sitioWeb: "https://mock.wayne-ind.test",
+    descripcion: "[DEMO MOCK] Organización simulada en proceso de validación KYC para verificar bandeja de moderación.",
     logoUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&auto=format&fit=crop&q=80",
     fotoPerfil: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&auto=format&fit=crop&q=80",
-    ubicacion: "Metepec, Estado de México, México",
-    sector: "Consultoría y Servicios TI",
-    tamanoEmpresa: "11-50 empleados",
+    ubicacion: "Metepec, Edo. Méx. (Pruebas)",
+    sector: "Consultoría y Auditoría TI [MOCK]",
+    tamanoEmpresa: "11-50 empleados [MOCK]",
     organizacionVerificada: false,
     estatusVerificacion: "PENDIENTE",
     estatus: "REVISION",
@@ -151,7 +151,7 @@ export const MOCK_COMPANIES: CompanyProfile[] = [
     vacantesActivas: 1,
     documentosVerificacion: [
       {
-        nombre: "Constancia_Situacion_Fiscal_SAT_CTM_2026.pdf",
+        nombre: "Constancia_SAT_Demo_Wayne_2026.pdf",
         url: "/docs/sample-sat-constancia.pdf",
         tipo: "SAT_RFC",
         fecha: "2026-10-12"
@@ -162,19 +162,19 @@ export const MOCK_COMPANIES: CompanyProfile[] = [
     id: "org-nexgen-06",
     companyId: "org-nexgen-06",
     userId: "user-empresa-nexgen",
-    nombre: "NexGen Retail Cloud S.A.P.I. de C.V.",
-    nombreComercial: "NexGen Retail",
-    razonSocial: "NexGen Retail Cloud S.A.P.I. de C.V.",
-    rfc: "NRC220314HY7",
-    email: "jobs@nexgenretail.io",
-    telefono: "+52 55 4433 2211",
-    sitioWeb: "https://nexgenretail.io",
-    descripcion: "Plataforma SaaS omnicanal de e-commerce y pasarelas de pago para retail con más de 1 millón de transacciones diarias.",
+    nombre: "[MOCK] Cyberdyne Retail Cloud S.A.",
+    nombreComercial: "[MOCK] Cyberdyne Tech",
+    razonSocial: "[MOCK] Cyberdyne Retail Cloud S.A.",
+    rfc: "MOCK220314HY7",
+    email: "jobs@mock-cyberdyne.test",
+    telefono: "+52 (000) 678-9012",
+    sitioWeb: "https://mock.cyberdyne.test",
+    descripcion: "[DEMO MOCK] Plataforma SaaS simulada para pruebas de pasarelas de pago y arquitectura en la nube.",
     logoUrl: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=150&auto=format&fit=crop&q=80",
     fotoPerfil: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=150&auto=format&fit=crop&q=80",
-    ubicacion: "Naucalpan de Juárez, Estado de México",
-    sector: "E-Commerce y Retail Tech",
-    tamanoEmpresa: "51-200 empleados",
+    ubicacion: "Tlalnepantla, Edo. Méx. (Mock Env)",
+    sector: "E-Commerce & SaaS [MOCK]",
+    tamanoEmpresa: "51-200 empleados [MOCK]",
     organizacionVerificada: true,
     estatusVerificacion: "VERIFICADA",
     estatus: "ACTIVO",
@@ -184,80 +184,73 @@ export const MOCK_COMPANIES: CompanyProfile[] = [
 ];
 
 // ============================================================================
-// 2. CANDIDATOS Y PERFILES
+// 2. CANDIDATOS Y PERFILES (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_CANDIDATE_DEMO: CandidateProfile = {
   id: "candidate-francisco-gomez",
   userId: "user-francisco-gomez",
-  nombre: "Francisco Javier Gómez Hernández",
-  name: "Francisco Gómez",
-  email: "francisco.gomez@gmail.com",
-  telefono: "+52 722 456 7890",
-  phone: "+52 722 456 7890",
+  nombre: "[DEMO] Juan Pérez (Candidato Mock)",
+  name: "[DEMO] Juan Pérez",
+  email: "juan.perez.mock@jobnet-demo.test",
+  telefono: "+52 (000) 987-6543",
+  phone: "+52 (000) 987-6543",
   fotoPerfil: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
   avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-  titularProfesional: "Ingeniero Full Stack Senior (Vue 3, Nuxt, TypeScript & AWS)",
-  bio: "Desarrollador de software con más de 5 años de trayectoria diseñando aplicaciones web de alto rendimiento, microservicios serverless en AWS y arquitecturas frontend escalables con Tailwind CSS y Vue 3.",
-  descripcion: "Especialista en desarrollo frontend y cloud nativo. Apasionado por la experiencia de usuario (UX), el código limpio y la integración continua.",
-  ubicacion: "Toluca, Estado de México, México",
+  titularProfesional: "[MOCK] Desarrollador Full Stack Senior (Vue 3 / TypeScript / Nuxt)",
+  biografia: "[PERFIL DE PRUEBA] Especialista simulado en desarrollo web de alto rendimiento, microservicios y testing automatizado en la nube para JobNet.",
+  bio: "[PERFIL DE PRUEBA] Perfil simulado para pruebas de plataforma JobNet. Experiencia ficticia en desarrollo web, arquitecturas modernas y validación de componentes.",
+  descripcion: "[MOCK DATA] Especialista en desarrollo frontend y cloud nativo. Datos ficticios generados exclusivamente para testing y validación de interfaz de usuario.",
+  ubicacion: "Toluca, Edo. Méx. (Zona Demo)",
   habilidades: [
-    "Vue.js 3", "Nuxt 3", "TypeScript", "Tailwind CSS", "Node.js", 
-    "AWS Lambda", "DynamoDB", "Pinia", "Git & CI/CD", "Docker"
+    "Vue.js 3 [MOCK]", "Nuxt 3 [MOCK]", "TypeScript", "Tailwind CSS", "Node.js", 
+    "AWS Cloud", "Pinia", "Docker [MOCK]", "Git & CI/CD"
   ],
   skills: [
-    "Vue.js 3", "Nuxt 3", "TypeScript", "Tailwind CSS", "Node.js", 
-    "AWS Lambda", "DynamoDB", "Pinia", "Git & CI/CD", "Docker"
+    "Vue.js 3 [MOCK]", "Nuxt 3 [MOCK]", "TypeScript", "Tailwind CSS", "Node.js", 
+    "AWS Cloud", "Pinia", "Docker [MOCK]", "Git & CI/CD"
   ],
-  sectores: ["Tecnología", "Desarrollo de Software", "Cloud Computing"],
+  sectores: ["Tecnología [MOCK]", "Desarrollo Web [MOCK]", "Cloud Computing [MOCK]"],
   experiencia: [
     {
-      empresa: "Soluciones Cloud México",
-      puesto: "Lead Frontend Engineer",
+      empresa: "[MOCK] Acme Corp",
+      puesto: "[MOCK] Líder Frontend (Pruebas)",
       anoInicio: "2023",
       anoFin: "Presente",
       actualmente: true,
-      descripcion: "Liderazgo de equipo frontend en la migración a Nuxt 3 y Tailwind CSS, reduciendo tiempos de carga en un 42% y mejorando la tasa de conversión en un 18%."
+      descripcion: "[DATOS DE PRUEBA] Liderazgo técnico de frontend simulado, optimizaciones de interfaz y componentes UI en Nuxt 3."
     },
     {
-      empresa: "Digital Dynamics Toluca",
-      puesto: "Full Stack Developer",
-      anoInicio: "2021",
+      empresa: "[MOCK] Consultora Ejemplo S.A.",
+      puesto: "[MOCK] Desarrollador Web Jr.",
+      anoInicio: "2020",
       anoFin: "2023",
       actualmente: false,
-      descripcion: "Desarrollo de módulos de facturación electrónica y portales de autogestión de usuarios utilizando Vue 2/3, Express.js y bases de datos relacionales y NoSQL."
-    },
-    {
-      empresa: "Innovación Tecnológica UAEM",
-      puesto: "Desarrollador Web Junior",
-      anoInicio: "2019",
-      anoFin: "2021",
-      actualmente: false,
-      descripcion: "Diseño y mantenimiento de sistemas escolares universitarios y APIs RESTful."
+      descripcion: "[DATOS DE PRUEBA] Desarrollo de componentes web reutilizables y pruebas de integración."
     }
   ],
   educacion: [
     {
-      institucion: "Universidad Autónoma del Estado de México (UAEMéx)",
-      titulo: "Licenciatura en Ingeniería en Computación",
-      campoEstudio: "Ciencias de la Computación",
+      institucion: "[DEMO] Universidad Tecnológica Simulada",
+      titulo: "Licenciatura en Sistemas Computacionales (Mock)",
+      campoEstudio: "Ingeniería de Software",
       anoInicio: "2016",
       anoFin: "2021",
       actualmente: false,
-      descripcion: "Graduado con mención por proyecto de desarrollo de software distribuido."
+      descripcion: "[MOCK DATA] Titulación simulada con mención en desarrollo distribuido."
     }
   ],
   links: [
-    { label: "GitHub", url: "https://github.com/francisco-gomez" },
-    { label: "LinkedIn", url: "https://linkedin.com/in/francisco-gomez-dev" },
-    { label: "Portafolio Web", url: "https://franciscogomez.dev" }
+    { label: "GitHub [MOCK]", url: "https://github.com/mock-user-demo" },
+    { label: "LinkedIn [MOCK]", url: "https://linkedin.com/in/mock-user-demo" },
+    { label: "Portafolio [DEMO]", url: "https://mock-portfolio.test" }
   ],
   enlacesWeb: {
-    github: "https://github.com/francisco-gomez",
-    linkedin: "https://linkedin.com/in/francisco-gomez-dev",
-    portfolio: "https://franciscogomez.dev"
+    github: "https://github.com/mock-user-demo",
+    linkedin: "https://linkedin.com/in/mock-user-demo",
+    portfolio: "https://mock-portfolio.test"
   },
-  cvUrl: "/sample-cv-francisco-gomez.pdf",
-  cvFileName: "CV_Francisco_Gomez_FullStack_2026.pdf"
+  cvUrl: "/sample-cv-mock-demo.pdf",
+  cvFileName: "CV_Mock_Juan_Perez_Demo.pdf"
 };
 
 export const MOCK_CANDIDATES: CandidateProfile[] = [
@@ -265,91 +258,89 @@ export const MOCK_CANDIDATES: CandidateProfile[] = [
   {
     id: "candidate-mariana-dominguez",
     userId: "user-mariana-dominguez",
-    nombre: "Mariana Domínguez",
-    name: "Mariana Domínguez",
-    email: "mariana.dominguez@gmail.com",
-    telefono: "+52 55 1234 9876",
-    titularProfesional: "Desarrolladora Frontend Vue & UI Specialist",
-    bio: "Enfocada en diseño de interfaces accesibles, componentes reutilizables y sistemas de diseño con Figma y Tailwind.",
-    ubicacion: "Metepec, Estado de México",
-    habilidades: ["Vue.js", "JavaScript", "HTML/CSS", "Figma", "Tailwind CSS"],
-    skills: ["Vue.js", "JavaScript", "HTML/CSS", "Figma", "Tailwind CSS"],
-    cvUrl: "/sample-cv-mariana.pdf"
+    nombre: "[DEMO] Jane Doe (Diseñadora UI/UX Mock)",
+    name: "[DEMO] Jane Doe",
+    email: "jane.doe.mock@jobnet-demo.test",
+    telefono: "+52 (000) 876-5432",
+    titularProfesional: "[MOCK] Diseñadora UI/UX & Sistemas de Diseño",
+    bio: "[MOCK DATA] Diseñadora de interfaces y experiencia de usuario para prototipado y validación de componentes.",
+    ubicacion: "Metepec, Edo. Méx. (Entorno Pruebas)",
+    habilidades: ["Figma [MOCK]", "UI/UX", "Design Systems", "HTML/CSS", "Tailwind CSS"],
+    skills: ["Figma [MOCK]", "UI/UX", "Design Systems", "HTML/CSS", "Tailwind CSS"],
+    cvUrl: "/sample-cv-jane-doe-mock.pdf"
   },
   {
     id: "candidate-carlos-ramirez",
     userId: "user-carlos-ramirez",
-    nombre: "Carlos Ramírez Soto",
-    name: "Carlos Ramírez Soto",
-    email: "carlos.ramirez@gmail.com",
-    telefono: "+52 722 456 7890",
-    titularProfesional: "Especialista DevOps & Cloud AWS",
-    bio: "Más de 6 años automatizando despliegues CI/CD con Terraform, Serverless Framework y Docker en AWS.",
-    ubicacion: "Toluca, Estado de México",
-    habilidades: ["AWS", "Docker", "Terraform", "CI/CD", "Node.js", "Linux"],
-    skills: ["AWS", "Docker", "Terraform", "CI/CD", "Node.js", "Linux"],
-    cvUrl: "/sample-cv-carlos.pdf"
+    nombre: "[DEMO] Carlos Test (DevOps Cloud Mock)",
+    name: "[DEMO] Carlos Test",
+    email: "carlos.test.mock@jobnet-demo.test",
+    telefono: "+52 (000) 765-4321",
+    titularProfesional: "[MOCK] Especialista DevOps & AWS (Pruebas)",
+    bio: "[MOCK DATA] Automatización de pipelines y configuración de infraestructura simulada.",
+    ubicacion: "Toluca, Edo. Méx. (Zona Demo)",
+    habilidades: ["AWS Cloud", "Docker [MOCK]", "Terraform [MOCK]", "CI/CD", "Linux"],
+    skills: ["AWS Cloud", "Docker [MOCK]", "Terraform [MOCK]", "CI/CD", "Linux"],
+    cvUrl: "/sample-cv-carlos-test-mock.pdf"
   },
   {
     id: "candidate-sofia-albarran",
     userId: "user-sofia-albarran",
-    nombre: "Sofía Albarrán Morales",
-    name: "Sofía Albarrán Morales",
-    email: "sofia.albarran@design.mx",
-    telefono: "+52 55 6789 0123",
-    titularProfesional: "Diseñadora de Producto Senior (UI/UX)",
-    bio: "Especialista en investigación de usuarios, wireframes de alta fidelidad, prototipado y pruebas de usabilidad.",
-    ubicacion: "Naucalpan, Estado de México",
-    habilidades: ["UI/UX Design", "Figma", "Design Systems", "User Research", "Prototyping"],
-    skills: ["UI/UX Design", "Figma", "Design Systems", "User Research", "Prototyping"]
+    nombre: "[DEMO] Sofía Mock (Product Designer)",
+    name: "[DEMO] Sofía Mock",
+    email: "sofia.mock@jobnet-demo.test",
+    telefono: "+52 (000) 654-3210",
+    titularProfesional: "[MOCK] Diseñadora de Producto UI/UX",
+    bio: "[MOCK DATA] Especialista en pruebas de usabilidad y wireframing técnico.",
+    ubicacion: "Naucalpan, Edo. Méx. (Zona Mock)",
+    habilidades: ["UI/UX [MOCK]", "Figma", "User Testing", "Prototipado"],
+    skills: ["UI/UX [MOCK]", "Figma", "User Testing", "Prototipado"]
   }
 ];
 
 // ============================================================================
-// 3. VACANTES Y OFERTAS DE EMPLEO
+// 3. VACANTES Y OFERTAS DE EMPLEO (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_VACANCIES: Job[] = [
   {
     id: "vac-frontend-sr-01",
     uniqueId: "vac-frontend-sr-01",
-    title: "Ingeniero Frontend Senior (Vue 3 / Nuxt / Tailwind)",
-    titulo: "Ingeniero Frontend Senior (Vue 3 / Nuxt / Tailwind)",
-    company: "TechSolutions México",
-    empresaNombre: "TechSolutions México S.A. de C.V.",
+    title: "[VACANTE DEMO #01] Desarrollador Frontend Sr. (Vue 3 / Nuxt 3)",
+    titulo: "[VACANTE DEMO #01] Desarrollador Frontend Sr. (Vue 3 / Nuxt 3)",
+    company: "[MOCK] Acme Corp",
+    empresaNombre: "[MOCK] Acme Corporation S.A. de C.V.",
     empresaUuid: "org-techsolutions-01",
     companyId: "org-techsolutions-01",
     companyLogo: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
     lat: 19.2826,
-    lng: -99.6557, // Toluca
-    location: "Toluca, Estado de México (Modalidad Híbrida)",
-    modalidad: "Híbrido",
-    type: "Tiempo Completo",
+    lng: -99.6557,
+    location: "Toluca, Edo. Méx. (Modalidad Demo Híbrida)",
+    modalidad: "Híbrido [MOCK]",
+    type: "Tiempo Completo [MOCK]",
     salario: 45000,
-    salarioMinimo: 38000,
-    salarioMaximo: 48000,
-    salarioFormatted: "$38,000 - $48,000 MXN",
-    salary: "$38,000 - $48,000 MXN mensuales",
+    salarioMinimo: 40000,
+    salarioMaximo: 50000,
+    salarioFormatted: "$40,000 - $50,000 MXN (Mock Data)",
+    salary: "$40,000 - $50,000 MXN mensuales (Mock Data)",
     experienciaAnos: 4,
-    sector: "Tecnología",
-    sectores: ["Tecnología", "Desarrollo Web"],
+    sector: "Tecnología [MOCK]",
+    sectores: ["Tecnología [MOCK]", "Desarrollo Web [MOCK]"],
     vacantesDisponibles: 2,
     estado: "ACTIVO",
-    descripcion: `TechSolutions México busca un **Ingeniero Frontend Senior** para liderar la arquitectura cliente de nuestra suite cloud.
+    descripcion: `[DATOS DE PRUEBA / MOCK DATA] Esta oferta laboral es una simulación generada exclusivamente con fines de prueba y demostración del sistema JobNet. Todos los requisitos y beneficios son datos ficticios.
 
-### Requisitos Principales:
-* Experiencia mínima de 4 años en desarrollo frontend moderno con Vue 3 (Composition API) y Nuxt 3.
-* Dominio avanzado de TypeScript, Tailwind CSS y gestión de estado con Pinia.
-* Experiencia integrando APIs REST y WebSockets para datos en tiempo real.
-* Conocimiento de buenas prácticas de testing (Vitest / Playwright).
+### Requisitos Mock de Ejemplo:
+* Experiencia simulada en Vue 3 y Nuxt 3 Composition API.
+* Dominio de TypeScript y Tailwind CSS para diseño responsivo.
+* Integración de endpoints REST y WebSockets simulados.
+* Buenas prácticas de componentes y testing con Playwright.
 
-### Prestaciones y Beneficios:
-* Salario competitivo en nómina 100%.
-* Fondo de ahorro (13%) y vales de despensa mensuales ($3,500 MXN).
-* Seguro de Gastos Médicos Mayores (SGMM) familiar.
-* 20 días de vacaciones desde el primer año.
-* Presupuesto anual de $25,000 MXN para certificaciones y cursos.`,
-    habilidadesRequeridas: ["Vue 3", "Nuxt 3", "TypeScript", "Tailwind CSS", "Pinia", "AWS"],
-    aptitudes: "Liderazgo técnico, proactividad, trabajo en equipo y enfoque a calidad.",
+### Beneficios de Demostración:
+* Prestaciones simuladas superiores a las de ley.
+* Modalidad remota / híbrida en entorno de pruebas.
+* Presupuesto de capacitación y certificación de testing.`,
+    habilidadesRequeridas: ["Vue 3 [MOCK]", "Nuxt 3 [MOCK]", "TypeScript", "Tailwind CSS", "Pinia", "AWS Cloud"],
+    aptitudes: "Proactividad mock, trabajo en equipo simulado y enfoque a calidad.",
     createdAt: "2026-10-12T14:30:00Z",
     likes: 42,
     likesCount: 42,
@@ -359,35 +350,35 @@ export const MOCK_VACANCIES: Job[] = [
   {
     id: "vac-devops-aws-02",
     uniqueId: "vac-devops-aws-02",
-    title: "Especialista Cloud AWS & DevOps Platform",
-    titulo: "Especialista Cloud AWS & DevOps Platform",
-    company: "Innovatech Global",
-    empresaNombre: "Innovatech Global Solutions S. de R.L.",
+    title: "[VACANTE DEMO #02] Especialista Cloud DevOps AWS (Mock Position)",
+    titulo: "[VACANTE DEMO #02] Especialista Cloud DevOps AWS (Mock Position)",
+    company: "[MOCK] Globex Tech",
+    empresaNombre: "[MOCK] Globex Technologies S. de R.L.",
     empresaUuid: "org-innovatech-02",
     companyId: "org-innovatech-02",
     companyLogo: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=150&auto=format&fit=crop&q=80",
     lat: 19.2564,
-    lng: -99.6047, // Metepec
-    location: "Metepec, Estado de México (100% Remoto Nacional)",
-    modalidad: "Remoto",
-    type: "Tiempo Completo",
+    lng: -99.6047,
+    location: "Metepec, Edo. Méx. (100% Remoto Mock)",
+    modalidad: "Remoto [MOCK]",
+    type: "Tiempo Completo [MOCK]",
     salario: 52000,
-    salarioMinimo: 45000,
+    salarioMinimo: 48000,
     salarioMaximo: 58000,
-    salarioFormatted: "$45,000 - $58,000 MXN",
-    salary: "$45,000 - $58,000 MXN mensuales",
+    salarioFormatted: "$48,000 - $58,000 MXN (Mock Data)",
+    salary: "$48,000 - $58,000 MXN mensuales (Mock Data)",
     experienciaAnos: 5,
-    sector: "Tecnología",
-    sectores: ["Cloud", "DevOps"],
+    sector: "Tecnología [MOCK]",
+    sectores: ["Cloud [MOCK]", "DevOps [MOCK]"],
     vacantesDisponibles: 1,
     estado: "ACTIVO",
-    descripcion: `Buscamos un Ingeniero DevOps para implementar pipelines de CI/CD automatizados y optimizar nuestra infraestructura Serverless en Amazon Web Services (AWS).
+    descripcion: `[DATOS DE PRUEBA / MOCK DATA] Posición simulada de ingeniería de infraestructura en la nube para testing de vacantes remotas en JobNet.
 
-### Responsabilidades:
-* Automatización de infraestructura con Terraform y CloudFormation.
-* Configuración de monitoreo con CloudWatch, Datadog y trazabilidad distribuida.
-* Gestión de clusters Kubernetes (EKS) y arquitecturas basadas en eventos (EventBridge, SQS).`,
-    habilidadesRequeridas: ["AWS", "Terraform", "Docker", "Kubernetes", "CI/CD", "Linux"],
+### Responsabilidades Simuladas:
+* Automatización de infraestructura con Terraform de prueba.
+* Configuración de monitoreo y alertas simuladas.
+* Despliegues continuos sobre contenedores en AWS.`,
+    habilidadesRequeridas: ["AWS Cloud", "Terraform [MOCK]", "Docker [MOCK]", "Linux", "CI/CD"],
     createdAt: "2026-10-10T10:00:00Z",
     likes: 28,
     likesCount: 28,
@@ -397,35 +388,30 @@ export const MOCK_VACANCIES: Job[] = [
   {
     id: "vac-ui-ux-designer-03",
     uniqueId: "vac-ui-ux-designer-03",
-    title: "Diseñador de Producto Digital (UI / UX)",
-    titulo: "Diseñador de Producto Digital (UI / UX)",
-    company: "TechSolutions México",
-    empresaNombre: "TechSolutions México S.A. de C.V.",
+    title: "[VACANTE DEMO #03] Diseñador de Producto Digital (UI / UX Mock)",
+    titulo: "[VACANTE DEMO #03] Diseñador de Producto Digital (UI / UX Mock)",
+    company: "[MOCK] Acme Corp",
+    empresaNombre: "[MOCK] Acme Corporation S.A. de C.V.",
     empresaUuid: "org-techsolutions-01",
     companyId: "org-techsolutions-01",
     companyLogo: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
     lat: 19.2826,
     lng: -99.6557,
-    location: "Toluca, Estado de México",
-    modalidad: "Híbrido",
-    type: "Tiempo Completo",
-    salario: 34000,
-    salarioMinimo: 30000,
-    salarioMaximo: 38000,
-    salarioFormatted: "$30,000 - $38,000 MXN",
-    salary: "$30,000 - $38,000 MXN mensuales",
+    location: "Toluca, Edo. Méx. (Zona Mock)",
+    modalidad: "Híbrido [MOCK]",
+    type: "Tiempo Completo [MOCK]",
+    salario: 35000,
+    salarioMinimo: 32000,
+    salarioMaximo: 40000,
+    salarioFormatted: "$32,000 - $40,000 MXN (Mock Data)",
+    salary: "$32,000 - $40,000 MXN mensuales (Mock Data)",
     experienciaAnos: 3,
-    sector: "Diseño y Creatividad",
-    sectores: ["Diseño", "UI/UX"],
+    sector: "Diseño [MOCK]",
+    sectores: ["Diseño UI/UX [MOCK]"],
     vacantesDisponibles: 1,
     estado: "ACTIVO",
-    descripcion: `Diseño y optimización de flujos de interacción de usuarios para plataformas web y móviles empresariales.
-
-### Requisitos:
-* Portafolio comprobable con casos de estudio y métricas de éxito.
-* Dominio absoluto de Figma, diseño con auto-layout y variables.
-* Capacidad de colaborar cercanamente con ingenieros frontend.`,
-    habilidadesRequeridas: ["Figma", "UI/UX", "Design Systems", "Prototipado", "User Testing"],
+    descripcion: `[DATOS DE PRUEBA / MOCK DATA] Oferta ficticia de diseño de interfaces web para validar el flujo de postulación y pruebas de usuario.`,
+    habilidadesRequeridas: ["Figma [MOCK]", "UI/UX", "Design Systems", "Prototipado"],
     createdAt: "2026-10-09T18:15:00Z",
     likes: 19,
     likesCount: 19,
@@ -435,30 +421,30 @@ export const MOCK_VACANCIES: Job[] = [
   {
     id: "vac-qa-automation-04",
     uniqueId: "vac-qa-automation-04",
-    title: "Analista QA Automation (Playwright & TypeScript)",
-    titulo: "Analista QA Automation (Playwright & TypeScript)",
-    company: "Starlight Logistics",
-    empresaNombre: "Starlight Logistics Express S.A. de C.V.",
-    empresaUuid: "org-starlight-04",
-    companyId: "org-starlight-04",
+    title: "[VACANTE DEMO #04] Analista QA Automation (Testing Mock)",
+    titulo: "[VACANTE DEMO #04] Analista QA Automation (Testing Mock)",
+    company: "[MOCK] Initech Labs",
+    empresaNombre: "[MOCK] Initech Labs de México S.A.",
+    empresaUuid: "org-biosalud-03",
+    companyId: "org-biosalud-03",
     companyLogo: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=150&auto=format&fit=crop&q=80",
     lat: 19.2905,
-    lng: -99.5115, // Lerma
-    location: "Parque Industrial Lerma, Estado de México",
-    modalidad: "Presencial",
-    type: "Tiempo Completo",
-    salario: 32000,
-    salarioMinimo: 28000,
-    salarioMaximo: 35000,
-    salarioFormatted: "$28,000 - $35,000 MXN",
-    salary: "$28,000 - $35,000 MXN mensuales",
+    lng: -99.5115,
+    location: "Lerma, Edo. Méx. (Parque Industrial Mock)",
+    modalidad: "Presencial [MOCK]",
+    type: "Tiempo Completo [MOCK]",
+    salario: 34000,
+    salarioMinimo: 30000,
+    salarioMaximo: 38000,
+    salarioFormatted: "$30,000 - $38,000 MXN (Mock Data)",
+    salary: "$30,000 - $38,000 MXN mensuales (Mock Data)",
     experienciaAnos: 3,
-    sector: "Logística y TI",
-    sectores: ["Calidad de Software", "Testing"],
+    sector: "Calidad de Software [MOCK]",
+    sectores: ["Calidad de Software [MOCK]", "Testing [MOCK]"],
     vacantesDisponibles: 1,
     estado: "ACTIVO",
-    descripcion: `Responsable de crear y mantener suites de pruebas end-to-end automatizadas para nuestra plataforma de seguimiento logístico.`,
-    habilidadesRequeridas: ["Playwright", "TypeScript", "Jest", "CI/CD", "API Testing"],
+    descripcion: `[DATOS DE PRUEBA / MOCK DATA] Oferta de prueba para evaluar suites de pruebas automáticas con Playwright.`,
+    habilidadesRequeridas: ["Playwright [MOCK]", "TypeScript", "Jest", "CI/CD"],
     createdAt: "2026-10-11T09:20:00Z",
     likes: 14,
     likesCount: 14,
@@ -468,30 +454,30 @@ export const MOCK_VACANCIES: Job[] = [
   {
     id: "vac-backend-go-05",
     uniqueId: "vac-backend-go-05",
-    title: "Desarrollador Backend Senior (Go / Microservicios)",
-    titulo: "Desarrollador Backend Senior (Go / Microservicios)",
-    company: "NexGen Retail",
-    empresaNombre: "NexGen Retail Cloud S.A.P.I. de C.V.",
+    title: "[VACANTE DEMO #05] Desarrollador Backend Go (Vacante Simulación)",
+    titulo: "[VACANTE DEMO #05] Desarrollador Backend Go (Vacante Simulación)",
+    company: "[MOCK] Cyberdyne Tech",
+    empresaNombre: "[MOCK] Cyberdyne Retail Cloud S.A.",
     empresaUuid: "org-nexgen-06",
     companyId: "org-nexgen-06",
     companyLogo: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=150&auto=format&fit=crop&q=80",
     lat: 19.4785,
-    lng: -99.2396, // Naucalpan
-    location: "Naucalpan de Juárez, Estado de México",
-    modalidad: "Híbrido",
-    type: "Tiempo Completo",
-    salario: 60000,
-    salarioMinimo: 50000,
+    lng: -99.2396,
+    location: "Tlalnepantla, Edo. Méx. (Mock Env)",
+    modalidad: "Híbrido [MOCK]",
+    type: "Tiempo Completo [MOCK]",
+    salario: 58000,
+    salarioMinimo: 52000,
     salarioMaximo: 65000,
-    salarioFormatted: "$50,000 - $65,000 MXN",
-    salary: "$50,000 - $65,000 MXN mensuales",
+    salarioFormatted: "$52,000 - $65,000 MXN (Mock Data)",
+    salary: "$52,000 - $65,000 MXN mensuales (Mock Data)",
     experienciaAnos: 5,
-    sector: "Comercio Electrónico",
-    sectores: ["Backend", "Golang"],
+    sector: "Comercio Electrónico [MOCK]",
+    sectores: ["Backend [MOCK]", "Golang [MOCK]"],
     vacantesDisponibles: 2,
     estado: "ACTIVO",
-    descripcion: `Desarrollo de servicios de procesamiento transaccional de pagos y sincronización de inventario en tiempo real con Golang y gRPC.`,
-    habilidadesRequeridas: ["Golang", "gRPC", "PostgreSQL", "Redis", "Kafka", "Docker"],
+    descripcion: `[DATOS DE PRUEBA / MOCK DATA] Vacante simulada para microservicios y arquitectura backend en alta concurrencia.`,
+    habilidadesRequeridas: ["Golang [MOCK]", "PostgreSQL", "Redis", "Docker", "gRPC"],
     createdAt: "2026-10-13T11:00:00Z",
     likes: 31,
     likesCount: 31,
@@ -501,129 +487,129 @@ export const MOCK_VACANCIES: Job[] = [
 ];
 
 // ============================================================================
-// 4. POSTULACIONES Y EVALUACIONES ATS
+// 4. POSTULACIONES Y EVALUACIONES ATS (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_APPLICANTS: ApplicantCandidate[] = [
   {
     id: "candidate-francisco-gomez",
-    name: "Francisco Javier Gómez Hernández",
-    email: "francisco.gomez@gmail.com",
-    titularProfesional: "Ingeniero Full Stack Senior (Vue 3 / Nuxt / TypeScript)",
-    phone: "+52 722 456 7890",
-    bio: "Más de 5 años diseñando SPAs de alto impacto con Vue y Nuxt. Gran experiencia en arquitecturas serverless sobre AWS.",
-    skills: ["Vue 3", "Nuxt 3", "TypeScript", "Tailwind CSS", "AWS Lambda", "DynamoDB"],
+    name: "[DEMO] Juan Pérez (Candidato Mock)",
+    email: "juan.perez.mock@jobnet-demo.test",
+    titularProfesional: "[MOCK] Desarrollador Full Stack Senior (Vue 3 / TypeScript / Nuxt)",
+    phone: "+52 (000) 987-6543",
+    bio: "[PERFIL DE PRUEBA] Perfil simulado para pruebas de plataforma JobNet.",
+    skills: ["Vue 3 [MOCK]", "Nuxt 3 [MOCK]", "TypeScript", "Tailwind CSS", "AWS Cloud"],
     experience: [
       {
-        empresa: "Soluciones Cloud México",
-        puesto: "Lead Frontend Engineer",
+        empresa: "[MOCK] Acme Corp",
+        puesto: "[MOCK] Líder Frontend (Pruebas)",
         anoInicio: "2023",
         anoFin: "Presente",
         actualmente: true,
-        descripcion: "Migración a Nuxt 3 y reducción de tiempos de carga."
+        descripcion: "Migración simulada a Nuxt 3 y optimizaciones de componentes."
       }
     ],
     education: [
       {
-        institucion: "Universidad Autónoma del Estado de México (UAEMéx)",
-        titulo: "Ingeniería en Computación",
+        institucion: "[DEMO] Universidad Tecnológica Simulada",
+        titulo: "Ingeniería en Computación (Mock)",
         anoInicio: "2016",
         anoFin: "2021"
       }
     ],
-    job: "Ingeniero Frontend Senior (Vue 3 / Nuxt / Tailwind)",
+    job: "[VACANTE DEMO #01] Desarrollador Frontend Sr. (Vue 3 / Nuxt 3)",
     jobId: "vac-frontend-sr-01",
     status: "EN_CONTACTO",
-    matchScore: 94,
-    coverLetter: "Estimado equipo de TechSolutions: Cuento con más de 5 años desarrollando aplicaciones empresariales de gran escala con Vue 3 y Nuxt. Mi experiencia liderando la arquitectura de componentes y optimizaciones de rendimiento me permitirá aportar valor inmediato a su plataforma cloud.",
+    matchScore: 95,
+    coverLetter: "[CARTA DE PRESENTACIÓN MOCK] Estimado equipo de recursos humanos demo: Adjunto mi postulación de prueba para validar el flujo completo del tablero ATS y la trazabilidad de postulantes.",
     time: "12/10/2026",
-    cvUrl: "/sample-cv-francisco-gomez.pdf"
+    cvUrl: "/sample-cv-mock-demo.pdf"
   },
   {
     id: "candidate-carlos-ramirez",
-    name: "Carlos Ramírez Soto",
-    email: "carlos.ramirez@gmail.com",
-    titularProfesional: "DevOps & Cloud Architect",
-    phone: "+52 722 456 7890",
-    bio: "Especialista en infraestructura como código y automatización continua.",
-    skills: ["AWS", "Docker", "Terraform", "CI/CD", "Linux"],
-    job: "Especialista Cloud AWS & DevOps Platform",
+    name: "[DEMO] Carlos Test (DevOps Cloud Mock)",
+    email: "carlos.test.mock@jobnet-demo.test",
+    titularProfesional: "[MOCK] Especialista DevOps & AWS (Pruebas)",
+    phone: "+52 (000) 765-4321",
+    bio: "[MOCK DATA] Especialista en infraestructura como código simulada.",
+    skills: ["AWS Cloud", "Docker [MOCK]", "Terraform [MOCK]", "CI/CD"],
+    job: "[VACANTE DEMO #02] Especialista Cloud DevOps AWS (Mock Position)",
     jobId: "vac-devops-aws-02",
     status: "SELECCIONADO",
     matchScore: 91,
-    coverLetter: "Hola, me interesa participar en la expansión de su infraestructura en la nube. Cuento con 4 certificaciones oficiales de AWS y amplia experiencia con Terraform.",
+    coverLetter: "[CARTA MOCK] Postulación simulada para validación de pipelines de candidatos seleccionados.",
     time: "10/10/2026",
-    cvUrl: "/sample-cv-carlos.pdf"
+    cvUrl: "/sample-cv-carlos-test-mock.pdf"
   },
   {
     id: "candidate-mariana-dominguez",
-    name: "Mariana Domínguez",
-    email: "mariana.dominguez@gmail.com",
-    titularProfesional: "Frontend Developer & UI Specialist",
-    phone: "+52 55 1234 9876",
-    bio: "Diseñadora y desarrolladora de interfaces atractivas y accesibles.",
-    skills: ["Vue.js", "JavaScript", "HTML/CSS", "Figma", "Tailwind CSS"],
-    job: "Ingeniero Frontend Senior (Vue 3 / Nuxt / Tailwind)",
+    name: "[DEMO] Jane Doe (Diseñadora UI/UX Mock)",
+    email: "jane.doe.mock@jobnet-demo.test",
+    titularProfesional: "[MOCK] Diseñadora UI/UX & Sistemas de Diseño",
+    phone: "+52 (000) 876-5432",
+    bio: "[MOCK DATA] Diseñadora de interfaces y experiencia de usuario.",
+    skills: ["Figma [MOCK]", "UI/UX", "Design Systems", "HTML/CSS"],
+    job: "[VACANTE DEMO #01] Desarrollador Frontend Sr. (Vue 3 / Nuxt 3)",
     jobId: "vac-frontend-sr-01",
     status: "PENDIENTE",
-    matchScore: 82,
-    coverLetter: "Hola equipo, me apasiona el ecosistema Vue y el diseño con Tailwind. Me encantaría formar parte de su equipo y contribuir a las nuevas funcionalidades.",
+    matchScore: 84,
+    coverLetter: "[CARTA MOCK] Postulación de prueba para el estado pendiente de evaluación.",
     time: "11/10/2026",
-    cvUrl: "/sample-cv-mariana.pdf"
+    cvUrl: "/sample-cv-jane-doe-mock.pdf"
   },
   {
     id: "candidate-sofia-albarran",
-    name: "Sofía Albarrán Morales",
-    email: "sofia.albarran@design.mx",
-    titularProfesional: "Product Designer UI/UX",
-    phone: "+52 55 6789 0123",
-    bio: "Enfocada en diseño centrado en el usuario y sistemas de diseño escalables.",
-    skills: ["UI/UX Design", "Figma", "Design Systems", "User Research"],
-    job: "Diseñador de Producto Digital (UI / UX)",
+    name: "[DEMO] Sofía Mock (Product Designer)",
+    email: "sofia.mock@jobnet-demo.test",
+    titularProfesional: "[MOCK] Diseñadora de Producto UI/UX",
+    phone: "+52 (000) 654-3210",
+    bio: "[MOCK DATA] Especialista en wireframing técnico.",
+    skills: ["UI/UX [MOCK]", "Figma", "Design Systems"],
+    job: "[VACANTE DEMO #03] Diseñador de Producto Digital (UI / UX Mock)",
     jobId: "vac-ui-ux-designer-03",
     status: "CONTRATADO",
-    matchScore: 96,
-    coverLetter: "Comparto mi portafolio con casos de estudio en fintech y SaaS B2B.",
+    matchScore: 97,
+    coverLetter: "[CARTA MOCK] Caso de contratación exitosa simulada.",
     time: "08/10/2026"
   }
 ];
 
 // ============================================================================
-// 5. PUBLICACIONES DEL FEED (COMUNIDAD)
+// 5. PUBLICACIONES DEL FEED (COMUNIDAD DEMO)
 // ============================================================================
 export const MOCK_POSTS: Post[] = [
   {
     id: "post-techsolutions-hiring",
     uniqueId: "post-techsolutions-hiring",
-    title: "¡Buscamos talento Frontend en Toluca y Metepec!",
-    content: "¡Nueva vacante abierta en TechSolutions México! Buscamos un **Ingeniero Frontend Senior (Vue 3 / Nuxt / Tailwind)** para sumarse a nuestro equipo en modalidad híbrida o remota nacional. Ofrecemos prestaciones superiores y excelente ambiente de trabajo. ¡Postúlate hoy mismo!",
-    author: "TechSolutions México",
+    title: "[PUBLICACIÓN DEMO] Convocatoria simulada de talento Frontend",
+    content: "[DATOS DE PRUEBA] ¡Bienvenidos a la demostración de JobNet! Esta es una publicación simulada en el muro de la comunidad para verificar la interacción social, comentarios y vacantes vinculadas en el feed interactivo.",
+    author: "[MOCK] Acme Corp",
     authorId: "org-techsolutions-01",
     authorAvatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
     fotoPerfil: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
     tipoAutor: "EMPRESA",
     createdAt: "2026-10-13T16:20:00Z",
-    timeAgo: "Hace 2 horas",
+    timeAgo: "Hace 2 horas (Mock)",
     likes: 38,
     likesCount: 38,
     commentsCount: 6,
     sharesCount: 12,
     hasJobLinked: true,
     jobId: "vac-frontend-sr-01",
-    jobTitle: "Ingeniero Frontend Senior (Vue 3 / Nuxt / Tailwind)",
-    jobSalary: "$38,000 - $48,000 MXN mensuales",
+    jobTitle: "[VACANTE DEMO #01] Desarrollador Frontend Sr. (Vue 3 / Nuxt 3)",
+    jobSalary: "$40,000 - $50,000 MXN (Mock Data)",
     comments: [
       {
         commentId: "c-1",
-        author: "Francisco Gómez",
+        author: "[DEMO] Juan Pérez (Candidato Mock)",
         authorId: "candidate-francisco-gomez",
-        content: "¡Excelente oportunidad! Acabo de enviar mi postulación y CV adjunto. Saludos.",
+        content: "[COMENTARIO MOCK] Postulación simulada enviada correctamente para testing de flujo.",
         createdAt: "2026-10-13T16:45:00Z"
       },
       {
         commentId: "c-2",
-        author: "Mariana Domínguez",
+        author: "[DEMO] Jane Doe (Diseñadora UI/UX Mock)",
         authorId: "candidate-mariana-dominguez",
-        content: "¿La modalidad remota está disponible para otros estados de la República?",
+        content: "[COMENTARIO MOCK] Validando visualización de respuestas en el muro social.",
         createdAt: "2026-10-13T17:10:00Z"
       }
     ]
@@ -631,19 +617,19 @@ export const MOCK_POSTS: Post[] = [
   {
     id: "post-community-tips",
     uniqueId: "post-community-tips",
-    title: "5 Consejos para optimizar tu perfil técnico en JobNet",
-    content: `¿Sabías que un perfil con certificaciones verificadas y portafolio interactivo tiene un **85% más de contacto** por parte de reclutadores?
+    title: "[GUÍA DE PRUEBA] Consejos simulados para testing de candidatos",
+    content: `[MOCK TIPS] Esta publicación ejemplifica cómo los administradores y la comunidad difunden guías de buenas prácticas y plantillas en el feed interactivo.
 
-1. Mantén tus habilidades técnicas acotadas a tu especialidad principal.
-2. Agrega enlaces a repositorios reales en GitHub con código limpio.
-3. Redacta logros cuantitativos en tus puestos previos (ej. "reducción de latencia en 30%").
-4. Genera tu CV con nuestra herramienta integrada para pasar filtros ATS.`,
-    author: "Comunidad JobNet",
+1. Validar perfiles con datos mock estructurados y auto-contenidos.
+2. Comprobar reactividad de filtros, búsquedas y paginación.
+3. Verificar renderizado en vista desktop completa con sidebar visible.
+4. Exportar evidencias limpias sin componentes de depuración.`,
+    author: "[SISTEMA DEMO] Soporte JobNet",
     authorId: "jobnet-official",
     authorAvatar: "/logotipo.svg",
     tipoAutor: "ADMIN",
     createdAt: "2026-10-12T11:00:00Z",
-    timeAgo: "Ayer",
+    timeAgo: "Ayer (Mock)",
     likes: 85,
     likesCount: 85,
     commentsCount: 14,
@@ -652,18 +638,18 @@ export const MOCK_POSTS: Post[] = [
 ];
 
 // ============================================================================
-// 6. CHATS Y MENSAJERÍA
+// 6. CHATS Y MENSAJERÍA (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_CHATS: ChatConversation[] = [
   {
     id: "chat-techsolutions-francisco",
     jobId: "vac-frontend-sr-01",
     candidateId: "candidate-francisco-gomez",
-    name: "TechSolutions México (Reclutamiento)",
+    name: "[RECLUTADOR DEMO] Acme Corp - RH",
     avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
-    jobTitle: "Ingeniero Frontend Senior (Vue 3)",
-    status: "En línea",
-    lastMessage: "Hola Francisco, revisamos tu perfil y carta. Nos gustaría agendar una entrevista técnica...",
+    jobTitle: "[VACANTE DEMO #01] Desarrollador Frontend Sr.",
+    status: "En línea (Demo)",
+    lastMessage: "[MENSAJE MOCK] Hola Juan, revisamos tu perfil demo y confirmamos la cita técnica de prueba...",
     time: "10:45 AM",
     unreadCount: 1
   },
@@ -671,11 +657,11 @@ export const MOCK_CHATS: ChatConversation[] = [
     id: "chat-innovatech-carlos",
     jobId: "vac-devops-aws-02",
     candidateId: "candidate-carlos-ramirez",
-    name: "Innovatech Global Talent",
+    name: "[TALENTO MOCK] Globex Tech",
     avatar: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=150&auto=format&fit=crop&q=80",
-    jobTitle: "Especialista Cloud AWS & DevOps",
+    jobTitle: "[VACANTE DEMO #02] Especialista Cloud DevOps AWS",
     status: "Desconectado",
-    lastMessage: "Muchas gracias por compartir tus certificaciones de AWS. En breve te contactamos.",
+    lastMessage: "[MENSAJE MOCK] Agradecemos el envío de tus certificaciones simuladas.",
     time: "Ayer",
     unreadCount: 0
   }
@@ -685,9 +671,9 @@ export const MOCK_MESSAGES_TECHSOLUTIONS: ChatMessage[] = [
   {
     id: "m-1",
     senderId: "org-techsolutions-01",
-    senderName: "Lic. Roberto Gómez (Reclutador)",
+    senderName: "[RECLUTADOR DEMO] Lic. Roberto (Mock RH)",
     senderAvatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
-    text: "Hola Francisco, buenos días. Revisamos tu perfil y experiencia en Nuxt 3. Cumples ampliamente con los requerimientos de la vacante.",
+    text: "[MENSAJE MOCK] Hola Juan, buenos días. Revisamos tu perfil de prueba en Nuxt 3. Cumples ampliamente con los requerimientos demo de la vacante.",
     timestamp: "2026-10-13T10:30:00Z",
     read: true,
     status: "read"
@@ -695,8 +681,8 @@ export const MOCK_MESSAGES_TECHSOLUTIONS: ChatMessage[] = [
   {
     id: "m-2",
     senderId: "candidate-francisco-gomez",
-    senderName: "Francisco Gómez",
-    text: "Muchas gracias Roberto. Me interesa mucho la propuesta y los retos de arquitectura cloud que tienen.",
+    senderName: "[DEMO] Juan Pérez (Candidato Mock)",
+    text: "[MENSAJE MOCK] Muchas gracias Roberto. Me interesa validar la interacción del chat en tiempo real y la trazabilidad de mensajes.",
     timestamp: "2026-10-13T10:35:00Z",
     read: true,
     status: "read"
@@ -704,8 +690,8 @@ export const MOCK_MESSAGES_TECHSOLUTIONS: ChatMessage[] = [
   {
     id: "m-3",
     senderId: "org-techsolutions-01",
-    senderName: "Lic. Roberto Gómez (Reclutador)",
-    text: "Excelente. ¿Tendrías disponibilidad para una videollamada técnica este jueves a las 11:00 AM vía Google Meet?",
+    senderName: "[RECLUTADOR DEMO] Lic. Roberto (Mock RH)",
+    text: "[MENSAJE MOCK] Excelente. ¿Tendrías disponibilidad para una videollamada de prueba este jueves a las 11:00 AM vía Google Meet simulado?",
     timestamp: "2026-10-13T10:45:00Z",
     read: false,
     status: "delivered"
@@ -713,63 +699,63 @@ export const MOCK_MESSAGES_TECHSOLUTIONS: ChatMessage[] = [
 ];
 
 // ============================================================================
-// 7. NOTIFICACIONES
+// 7. NOTIFICACIONES (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_NOTIFICATIONS = [
   {
     id: "notif-1",
     type: "APPLICATION_STAGE_CHANGED",
-    title: "¡Avance en tu postulación!",
-    message: "TechSolutions México actualizó tu postulación a: 'En Contacto / Entrevista'.",
+    title: "[NOTIFICACIÓN DEMO] Avance en tu postulación simulada",
+    message: "[MOCK] Acme Corp actualizó tu postulación a: 'En Contacto / Entrevista de Prueba'.",
     link: "/candidate/my-applications",
     icon: "handshake",
     read: false,
     createdAt: "2026-10-13T10:46:00Z",
-    timeAgo: "Hace 15 minutos"
+    timeAgo: "Hace 15 minutos (Mock)"
   },
   {
     id: "notif-2",
     type: "NEW_MESSAGE",
-    title: "Nuevo mensaje de reclutador",
-    message: "Lic. Roberto Gómez te ha enviado una invitación a entrevista por el chat privado.",
+    title: "[MENSAJE MOCK] Nuevo mensaje del reclutador demo",
+    message: "[MOCK] Lic. Roberto te ha enviado un mensaje simulado en el chat privado.",
     link: "/messages",
     icon: "chat",
     read: false,
     createdAt: "2026-10-13T10:45:00Z",
-    timeAgo: "Hace 20 minutos"
+    timeAgo: "Hace 20 minutos (Mock)"
   },
   {
     id: "notif-3",
     type: "JOB_RECOMMENDED",
-    title: "Nueva vacante afín a tu perfil",
-    message: "Innovatech Global publicó 'Especialista Cloud AWS' con 91% de afinidad según tus skills.",
+    title: "[ALERTA DEMO] Nueva vacante afín a tu perfil mock",
+    message: "[MOCK] Globex Tech publicó '[VACANTE DEMO #02] DevOps AWS' con 95% de afinidad según tus skills.",
     link: "/jobs/vac-devops-aws-02",
     icon: "work",
     read: true,
     createdAt: "2026-10-10T11:00:00Z",
-    timeAgo: "Hace 3 días"
+    timeAgo: "Hace 3 días (Mock)"
   }
 ];
 
 // ============================================================================
-// 8. INCIDENCIAS Y MODERACIÓN
+// 8. INCIDENCIAS Y MODERACIÓN (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_INCIDENTS: Incident[] = [
   {
     id: "inc-001",
     targetType: "VACANTE",
     targetId: "vac-frontend-sr-01",
-    targetTitle: "Capturista de Datos desde Casa ($15,000 Semanales)",
-    jobTitle: "Capturista de Datos desde Casa ($15,000 Semanales)",
+    targetTitle: "[INCIDENTE DEMO #001] Vacante de prueba reportada para auditoría",
+    jobTitle: "[INCIDENTE DEMO #001] Vacante de prueba reportada para auditoría",
     jobId: "vac-frontend-sr-01",
     companyId: "org-scam-01",
-    companyName: "FastHiring Express S.A.S.",
+    companyName: "[MOCK] FastHiring Express S.A.S.",
     candidateId: "cand-carlos-12",
-    candidateName: "Carlos Gómez",
+    candidateName: "[DEMO] Carlos Test",
     reporterId: "user-candidato-report",
-    reporterEmail: "candidato.alerta@gmail.com",
-    reporter: "candidato.alerta@gmail.com",
-    reason: "La empresa solicita en el canal privado un depósito previo de $1,850 MXN por seguro de equipo de cómputo. Presunta estafa laboral.",
+    reporterEmail: "candidato.alerta.mock@jobnet-test.mx",
+    reporter: "candidato.alerta.mock@jobnet-test.mx",
+    reason: "[DATOS DE PRUEBA] Simulación de reporte por solicitud de anticipo monetario para validar panel de incidentes.",
     infraccion: "FRAUDE",
     severity: "ALTA",
     severidad: "ALTA",
@@ -783,12 +769,12 @@ export const MOCK_INCIDENTS: Incident[] = [
     id: "inc-002",
     targetType: "POST",
     targetId: "post-spam-01",
-    targetTitle: "Venta de diplomas y certificados express",
+    targetTitle: "[INCIDENTE DEMO #002] Publicación en revisión por moderador",
     postId: "post-techsolutions-hiring",
     reporterId: "user-moderador-audit",
-    reporterEmail: "alguienn340@gmail.com",
-    reporter: "alguienn340@gmail.com",
-    reason: "Publicación comercial de servicios ilegales en el muro comunitario.",
+    reporterEmail: "moderador.demo@jobnet-mock.test",
+    reporter: "moderador.demo@jobnet-mock.test",
+    reason: "[DATOS DE PRUEBA] Simulación de detección automática de spam en el muro comunitario.",
     infraccion: "SPAM",
     severity: "MEDIA",
     severidad: "MEDIA",
@@ -801,17 +787,17 @@ export const MOCK_INCIDENTS: Incident[] = [
     id: "inc-003",
     targetType: "VACANTE",
     targetId: "vac-frontend-sr-01",
-    targetTitle: "Frontend Senior (Vue 3 / TypeScript)",
-    jobTitle: "Frontend Senior (Vue 3 / TypeScript)",
+    targetTitle: "[INCIDENTE DEMO #003] Reporte de discrepancia salarial simulada",
+    jobTitle: "[INCIDENTE DEMO #003] Reporte de discrepancia salarial simulada",
     jobId: "vac-frontend-sr-01",
     companyId: "org-recruiter-99",
-    companyName: "Tech Corp Latam",
+    companyName: "[MOCK] Tech Corp Latam",
     candidateId: "cand-maria-77",
-    candidateName: "María Fernández",
+    candidateName: "[DEMO] Jane Doe",
     reporterId: "cand-maria-77",
-    reporterEmail: "maria.fernandez@devmail.com",
-    reporter: "maria.fernandez@devmail.com",
-    reason: "Discrepancia salarial flagrante: La oferta anunciaba $45,000 MXN mensuales y en la mensajería privada el reclutador exigió aceptar $18,000 brutos sin prestaciones.",
+    reporterEmail: "jane.doe.mock@devmail.test",
+    reporter: "jane.doe.mock@devmail.test",
+    reason: "[DATOS DE PRUEBA] Reporte simulado de discrepancia entre salario ofertado y monto en entrevista para pruebas de dictamen.",
     infraccion: "DISCREPANCIA_SALARIAL",
     severity: "CRITICA",
     severidad: "CRITICA",
@@ -825,17 +811,17 @@ export const MOCK_INCIDENTS: Incident[] = [
     id: "inc-004",
     targetType: "VACANTE",
     targetId: "vac-ux-lead-02",
-    targetTitle: "Diseñadora UI/UX Lead",
-    jobTitle: "Diseñadora UI/UX Lead",
+    targetTitle: "[INCIDENTE DEMO #004] Solicitud de moderación preventiva",
+    jobTitle: "[INCIDENTE DEMO #004] Solicitud de moderación preventiva",
     jobId: "vac-ux-lead-02",
     companyId: "org-inapropiado-22",
-    companyName: "Agencia Creativa Vanguardia",
+    companyName: "[MOCK] Agencia Creativa",
     candidateId: "cand-ana-33",
-    candidateName: "Ana Sofía R.",
+    candidateName: "[DEMO] Ana Mock",
     reporterId: "cand-ana-33",
-    reporterEmail: "ana.sofia.ux@gmail.com",
-    reporter: "ana.sofia.ux@gmail.com",
-    reason: "Acoso en postulación: Durante el proceso de entrevista en el chat, el reclutador solicitó fotografías personales y realizó comentarios inapropiados fuera de lugar.",
+    reporterEmail: "ana.mock.demo@gmail.test",
+    reporter: "ana.mock.demo@gmail.test",
+    reason: "[DATOS DE PRUEBA] Caso simulado para verificar el panel de dictámenes de moderación y auditoría.",
     infraccion: "ACOSO",
     severity: "CRITICA",
     severidad: "CRITICA",
@@ -848,22 +834,22 @@ export const MOCK_INCIDENTS: Incident[] = [
 ];
 
 // ============================================================================
-// 9. VERIFICACIONES SAT KYC (MODERADOR)
+// 9. VERIFICACIONES SAT KYC (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_VERIFICATIONS = [
   {
     id: "verif-ctm-01",
     companyId: "org-metropolitana-05",
-    companyName: "Consultoría & Tecnología Metropolitana S.A.S.",
-    razonSocial: "Consultoría & Tecnología Metropolitana S.A.S.",
-    rfc: "CTM210908KL3",
-    representanteLegal: "Mtro. Fernando Vega Salinas",
-    email: "administracion@ctmconsultoria.com.mx",
-    telefono: "+52 722 334 1122",
+    companyName: "[MOCK] Wayne Consultores TI S.A.S.",
+    razonSocial: "[MOCK] Wayne Consultores TI S.A.S.",
+    rfc: "DEMO210908KL3",
+    representanteLegal: "[DEMO] Lic. Bruce W. (Representante Mock)",
+    email: "verificacion@mock-wayne.test",
+    telefono: "+52 (000) 567-8901",
     fechaSolicitud: "2026-10-12",
     status: "PENDIENTE",
     documentoPdf: {
-      nombre: "Constancia_Situacion_Fiscal_SAT_CTM_2026.pdf",
+      nombre: "Constancia_SAT_Demo_Wayne_2026.pdf",
       url: "/docs/sample-sat-constancia.pdf",
       tamano: "485 KB",
       validoSat: true
@@ -872,16 +858,16 @@ export const MOCK_VERIFICATIONS = [
 ];
 
 // ============================================================================
-// 10. APELACIONES Y DISPUTAS (MODERADOR)
+// 10. APELACIONES Y DISPUTAS (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_APPEALS: Appeal[] = [
   {
     id: "appeal-translog-01",
     companyId: "org-starlight-04",
-    companyName: "Starlight Logistics Express",
+    companyName: "[MOCK] Umbrella Logistics Express",
     incidentId: "inc-suspension-starlight",
-    motivo: "Suspensión temporal por reporte erróneo de duplicidad de vacante",
-    descripcion: "Nuestra vacante de Analista QA fue reportada erróneamente como duplicada, sin embargo se trata de dos posiciones distintas para dos plantas (Toluca y Lerma). Adjuntamos los códigos de centro de costos autorizados.",
+    motivo: "[APELACIÓN DEMO #01] Disputa simulada por aclaración de vacante",
+    descripcion: "[DATOS DE PRUEBA] Solicitud formal de apelación simulada para verificar el panel de resolución de disputas de moderadores en JobNet.",
     estado: "PENDIENTE",
     createdAt: "2026-10-11T12:00:00Z",
     evidenciaUrl: "/docs/centro_costos_autorizado.pdf",
@@ -890,14 +876,14 @@ export const MOCK_APPEALS: Appeal[] = [
         id: "app-msg-1",
         senderId: "org-starlight-04",
         senderRole: "ORGANIZACION",
-        text: "Estimados moderadores: Solicitamos la revisión de la suspensión temporal. Hemos adjuntado la justificación de ambos puestos.",
+        text: "[MENSAJE MOCK] Estimados moderadores: Solicitamos la revisión de la suspensión temporal demo. Adjuntamos justificación de pruebas.",
         timestamp: "2026-10-11T12:05:00Z"
       },
       {
         id: "app-msg-2",
         senderId: "mod-official",
         senderRole: "MODERADOR",
-        text: "Buen día. Estamos cotejando la información proporcionada con el departamento de auditoría corporativa. Le notificaremos en un lapso de 24 horas.",
+        text: "[MENSAJE MOCK] Buen día. Estamos cotejando los datos simulados con la bitácora de auditoría. Se emitirá dictamen demo a la brevedad.",
         timestamp: "2026-10-11T14:30:00Z"
       }
     ]
@@ -905,51 +891,49 @@ export const MOCK_APPEALS: Appeal[] = [
 ];
 
 // ============================================================================
-// 11. CATÁLOGO MAESTRO (ADMIN)
+// 11. CATÁLOGO MAESTRO (DATOS MOCK / DEMO)
 // ============================================================================
 export const MOCK_CATALOG = {
   skills: [
-    { id: "sk-vue", name: "Vue.js", category: "Frontend", vacanciesCount: 8 },
-    { id: "sk-nuxt", name: "Nuxt 3", category: "Frontend", vacanciesCount: 6 },
-    { id: "sk-ts", name: "TypeScript", category: "Lenguajes", vacanciesCount: 12 },
-    { id: "sk-tailwind", name: "Tailwind CSS", category: "Frontend", vacanciesCount: 10 },
-    { id: "sk-node", name: "Node.js", category: "Backend", vacanciesCount: 9 },
-    { id: "sk-aws", name: "AWS Cloud", category: "DevOps & Cloud", vacanciesCount: 7 },
-    { id: "sk-docker", name: "Docker", category: "DevOps & Cloud", vacanciesCount: 5 },
-    { id: "sk-go", name: "Golang", category: "Backend", vacanciesCount: 3 },
-    { id: "sk-figma", name: "Figma", category: "Diseño UI/UX", vacanciesCount: 4 }
+    { id: "sk-vue", name: "Vue.js 3 [MOCK]", category: "Frontend", vacanciesCount: 8 },
+    { id: "sk-nuxt", name: "Nuxt 3 [MOCK]", category: "Frontend", vacanciesCount: 6 },
+    { id: "sk-ts", name: "TypeScript [MOCK]", category: "Lenguajes", vacanciesCount: 12 },
+    { id: "sk-tailwind", name: "Tailwind CSS [MOCK]", category: "Frontend", vacanciesCount: 10 },
+    { id: "sk-node", name: "Node.js [MOCK]", category: "Backend", vacanciesCount: 9 },
+    { id: "sk-aws", name: "AWS Cloud [MOCK]", category: "DevOps & Cloud", vacanciesCount: 7 },
+    { id: "sk-docker", name: "Docker [MOCK]", category: "DevOps & Cloud", vacanciesCount: 5 },
+    { id: "sk-go", name: "Golang [MOCK]", category: "Backend", vacanciesCount: 3 },
+    { id: "sk-figma", name: "Figma [MOCK]", category: "Diseño UI/UX", vacanciesCount: 4 }
   ],
   categories: [
-    { id: "cat-dev", name: "Desarrollo de Software", vacanciesCount: 15 },
-    { id: "cat-cloud", name: "Cloud & DevOps", vacanciesCount: 7 },
-    { id: "cat-design", name: "Diseño UI/UX", vacanciesCount: 4 },
-    { id: "cat-qa", name: "Calidad de Software (QA)", vacanciesCount: 3 },
-    { id: "cat-logistics", name: "Logística y Operaciones", vacanciesCount: 2 }
+    { id: "cat-dev", name: "Desarrollo de Software [MOCK]", vacanciesCount: 15 },
+    { id: "cat-cloud", name: "Cloud & DevOps [MOCK]", vacanciesCount: 7 },
+    { id: "cat-design", name: "Diseño UI/UX [MOCK]", vacanciesCount: 4 },
+    { id: "cat-qa", name: "Calidad de Software [MOCK]", vacanciesCount: 3 },
+    { id: "cat-logistics", name: "Logística y Operaciones [MOCK]", vacanciesCount: 2 }
   ],
   locations: [
-    { id: "loc-toluca", name: "Toluca", state: "Estado de México", vacanciesCount: 6 },
-    { id: "loc-metepec", name: "Metepec", state: "Estado de México", vacanciesCount: 4 },
-    { id: "loc-lerma", name: "Lerma", state: "Estado de México", vacanciesCount: 2 },
-    { id: "loc-naucalpan", name: "Naucalpan de Juárez", state: "Estado de México", vacanciesCount: 3 },
-    { id: "loc-remoto", name: "Remoto Nacional", state: "México", vacanciesCount: 8 }
+    { id: "loc-toluca", name: "Toluca (Zona Demo)", state: "Estado de México", vacanciesCount: 6 },
+    { id: "loc-metepec", name: "Metepec (Zona Pruebas)", state: "Estado de México", vacanciesCount: 4 },
+    { id: "loc-lerma", name: "Lerma (Zona Mock)", state: "Estado de México", vacanciesCount: 2 },
+    { id: "loc-naucalpan", name: "Naucalpan (Entorno Demo)", state: "Estado de México", vacanciesCount: 3 },
+    { id: "loc-remoto", name: "Remoto Nacional (Mock)", state: "México", vacanciesCount: 8 }
   ]
 };
 
 export const MOCK_CATALOG_ITEMS = [
-  { id: "sk-1", name: "Vue.js / Nuxt 3", category: "Habilidad" as const, createdAt: "2026-09-01T10:00:00Z" },
-  { id: "sk-2", name: "TypeScript", category: "Habilidad" as const, createdAt: "2026-09-01T10:00:00Z" },
-  { id: "sk-3", name: "Tailwind CSS", category: "Habilidad" as const, createdAt: "2026-09-02T11:00:00Z" },
-  { id: "sk-4", name: "Node.js & Express", category: "Habilidad" as const, createdAt: "2026-09-02T12:00:00Z" },
-  { id: "sk-5", name: "AWS Cloud (Lambda, DynamoDB)", category: "Habilidad" as const, createdAt: "2026-09-03T10:00:00Z" },
-  { id: "sk-6", name: "Docker & Kubernetes", category: "Habilidad" as const, createdAt: "2026-09-04T09:00:00Z" },
-  { id: "sk-7", name: "Go (Golang)", category: "Habilidad" as const, createdAt: "2026-09-05T08:00:00Z" },
-  { id: "sk-8", name: "Figma & UI Design", category: "Habilidad" as const, createdAt: "2026-09-05T14:00:00Z" },
-  { id: "sk-9", name: "Playwright & QA Automation", category: "Habilidad" as const, createdAt: "2026-09-06T15:00:00Z" },
-  { id: "sec-1", name: "Tecnología y Desarrollo de Software", category: "Sector" as const, createdAt: "2026-09-01T10:00:00Z" },
-  { id: "sec-2", name: "Cloud Computing y DevOps", category: "Sector" as const, createdAt: "2026-09-01T10:00:00Z" },
-  { id: "sec-3", name: "Diseño Digital y UX/UI", category: "Sector" as const, createdAt: "2026-09-02T10:00:00Z" },
-  { id: "sec-4", name: "Logística y Cadena de Suministro", category: "Sector" as const, createdAt: "2026-09-02T10:00:00Z" },
-  { id: "sec-5", name: "Consultoría y Servicios TI", category: "Sector" as const, createdAt: "2026-09-03T10:00:00Z" },
-  { id: "sec-6", name: "Energía y Sostenibilidad", category: "Sector" as const, createdAt: "2026-09-04T10:00:00Z" }
+  { id: "sk-1", name: "Vue.js / Nuxt 3 [MOCK]", category: "Habilidad" as const, createdAt: "2026-09-01T10:00:00Z" },
+  { id: "sk-2", name: "TypeScript [MOCK]", category: "Habilidad" as const, createdAt: "2026-09-01T10:00:00Z" },
+  { id: "sk-3", name: "Tailwind CSS [MOCK]", category: "Habilidad" as const, createdAt: "2026-09-02T11:00:00Z" },
+  { id: "sk-4", name: "Node.js & Express [MOCK]", category: "Habilidad" as const, createdAt: "2026-09-02T12:00:00Z" },
+  { id: "sk-5", name: "AWS Cloud (Lambda, DynamoDB) [MOCK]", category: "Habilidad" as const, createdAt: "2026-09-03T10:00:00Z" },
+  { id: "sk-6", name: "Docker & Kubernetes [MOCK]", category: "Habilidad" as const, createdAt: "2026-09-04T09:00:00Z" },
+  { id: "sk-7", name: "Go (Golang) [MOCK]", category: "Habilidad" as const, createdAt: "2026-09-05T08:00:00Z" },
+  { id: "sk-8", name: "Figma & UI Design [MOCK]", category: "Habilidad" as const, createdAt: "2026-09-05T14:00:00Z" },
+  { id: "sk-9", name: "Playwright & QA Automation [MOCK]", category: "Habilidad" as const, createdAt: "2026-09-06T15:00:00Z" },
+  { id: "sec-1", name: "Tecnología y Software [MOCK]", category: "Sector" as const, createdAt: "2026-09-01T10:00:00Z" },
+  { id: "sec-2", name: "Cloud Computing y DevOps [MOCK]", category: "Sector" as const, createdAt: "2026-09-01T10:00:00Z" },
+  { id: "sec-3", name: "Diseño Digital y UX/UI [MOCK]", category: "Sector" as const, createdAt: "2026-09-02T10:00:00Z" },
+  { id: "sec-4", name: "Logística y Suministro [MOCK]", category: "Sector" as const, createdAt: "2026-09-02T10:00:00Z" },
+  { id: "sec-5", name: "Consultoría y Servicios TI [MOCK]", category: "Sector" as const, createdAt: "2026-09-03T10:00:00Z" }
 ];
-

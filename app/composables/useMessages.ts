@@ -1,5 +1,6 @@
 import { useRoute, useRuntimeConfig } from "#app";
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import { useMockSession } from "~/composables/useMockSession";
 import { useAuth } from "#imports"; // adjust if needed
 import { useS3Upload } from "~/composables/useS3Upload";
 
@@ -108,8 +109,17 @@ export const useMessages = () => {
 
   // Fetch active chats from API
   const fetchConversations = async () => {
-    if (status.value !== "authenticated") return;
+    const { isMockEnabled } = useMockSession();
+    if (status.value !== "authenticated" && !isMockEnabled.value) return;
     isLoadingChats.value = true;
+    if (isMockEnabled.value) {
+      chats.value = MOCK_CHATS;
+      if (chats.value.length > 0) {
+        await selectChat(chats.value[0]);
+      }
+      isLoadingChats.value = false;
+      return;
+    }
 
     try {
       let list: any[] = [];

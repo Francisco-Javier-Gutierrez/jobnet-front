@@ -1,6 +1,10 @@
 export default defineNuxtRouteMiddleware((to) => {
   const { status, data } = useAuth();
-  const { isMockEnabled, currentMockUser, mockRole } = useMockSession();
+  const { isMockEnabled, currentMockUser, mockRole, setMockRole } = useMockSession();
+  const queryRole = (to.query.role as string || to.query.mockRole as string || "").toUpperCase();
+  if (queryRole && (queryRole === "CANDIDATO" || queryRole === "EMPRESA" || queryRole === "MODERATOR" || queryRole === "ADMIN" || queryRole === "GUEST")) {
+    setMockRole(queryRole as any);
+  }
   const mockUser = currentMockUser.value;
 
   const effectiveStatus =

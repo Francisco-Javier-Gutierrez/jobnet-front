@@ -273,6 +273,7 @@
 <script setup lang="ts">
 import type { Incident } from "~/types";
 import { MOCK_INCIDENTS } from "~/utils/mockData";
+import { useMockSession } from "~/composables/useMockSession";
 import DisputeAuditModal from "~/components/mod/DisputeAuditModal.vue";
 import { useDisputeAudit } from "~/composables/useDisputeAudit";
 
@@ -333,6 +334,12 @@ const displayedIncidents = computed(() => {
 
 const fetchIncidents = async () => {
   loading.value = true;
+  const { isMockEnabled } = useMockSession();
+  if (isMockEnabled.value) {
+    incidents.value = MOCK_INCIDENTS;
+    loading.value = false;
+    return;
+  }
   try {
     const data = await $fetch<any>(
       `${config.public.apiUrl}/moderator/incidents`,

@@ -162,16 +162,16 @@
 <script setup lang="ts">
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useCatalogStore } from "~/stores/catalog";
+import { useMockSession } from "~/composables/useMockSession";
 
-definePageMeta({
-  middleware: "auth",
-});
+// definePageMeta removed for mock
 
 const { status, data: session } = useAuth();
 const isSaving = ref(false);
 
 const { showFeedback, showError } = useAppFeedback();
 const catalogStore = useCatalogStore();
+const { isMockEnabled } = useMockSession();
 
 const activeTab = ref("personales");
 const tabItems = [
@@ -220,6 +220,30 @@ const { hasDraft, discardDraft } = useDraftAutoSave(
 
 onMounted(async () => {
   catalogStore.fetchCatalog();
+  if (isMockEnabled.value) {
+    formData.value = {
+      name: "[DEMO] Juan Pérez (Candidato Mock)",
+      location: "Toluca, Estado de México",
+      bio: "Ingeniero de Software Senior especializado en arquitecturas Vue 3, Nuxt y Cloud AWS.",
+      fotoPerfil: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      experiencia: [
+        { id: "exp-1", cargo: "Senior Frontend Lead", empresa: "[MOCK] Acme Corp", periodo: "2022 - Presente" }
+      ],
+      educacion: [
+        { id: "edu-1", institucion: "UAEMex", grado: "Ingeniería en Computación", periodo: "2016 - 2021" }
+      ],
+      skills: ["Vue 3", "Nuxt 3", "TypeScript", "Tailwind CSS"],
+      sectores: ["Tecnología y Software", "Telecomunicaciones"],
+      cvUrl: "https://example.com/demo-cv.pdf",
+      cvName: "CV_Juan_Perez_Demo.pdf",
+      documentosAdicionales: [],
+      links: [{ title: "GitHub", url: "https://github.com/demo" }],
+      lat: 19.2826,
+      lng: -99.6557,
+      mfaEnabled: true
+    };
+    return;
+  }
   if (session.value?.user?.id) {
     try {
       const config = useRuntimeConfig();

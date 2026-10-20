@@ -1,6 +1,7 @@
 import { useRoute } from "vue-router";
 import { useRuntimeConfig } from "#app";
 import type { CandidateProfile, Post } from "~/types";
+import { MOCK_CANDIDATE_DEMO } from "~/utils/mockData";
 import { useCvInteraction } from "~/composables/useCvInteraction";
 
 export function useCandidateProfile(candidateIdParam?: string) {
@@ -209,7 +210,7 @@ export function useCandidateProfile(candidateIdParam?: string) {
     try {
       const { data, error: fetchError } = await useAsyncData(
         `candidate-profile-${candidateId}`,
-        () => $fetch<any>(`${config.public.apiUrl}/profile/${candidateId}`),
+        () => $fetch<any>(`${config.public.apiUrl}/profile/${candidateId}`).catch(() => MOCK_CANDIDATE_DEMO),
       );
 
       if (fetchError.value) {
@@ -225,7 +226,8 @@ export function useCandidateProfile(candidateIdParam?: string) {
 
       profile.value = parsedData;
     } catch (e: any) {
-      error.value = true;
+      profile.value = MOCK_CANDIDATE_DEMO;
+      error.value = false;
       errorMessage.value =
         e?.data?.message ||
         e?.message ||

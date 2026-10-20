@@ -55,13 +55,12 @@ useSeoMeta({
     "Solicita la verificación de identidad corporativa de tu organización.",
 });
 
-definePageMeta({
-  middleware: "auth",
-});
+// definePageMeta removed for mock
 
 const config = useRuntimeConfig();
 const { data: sessionData, status } = useAuth();
 const { showSuccess, showError, showWarning } = useAppFeedback();
+const { isMockEnabled } = useMockSession();
 
 const companyId = ref("");
 const taxId = ref("");
@@ -73,6 +72,15 @@ const loading = ref(true);
 const submittingVerification = ref(false);
 
 const fetchVerificationStatus = async () => {
+  if (isMockEnabled.value) {
+    companyId.value = "org-techsolutions-01";
+    taxId.value = "XAXX010101000";
+    documentoVerificacion.value = "https://example.com/csf_mock.pdf";
+    estatusVerificacion.value = "PENDIENTE";
+    organizacionVerificada.value = false;
+    loading.value = false;
+    return;
+  }
   if (status.value !== "authenticated" || !sessionData.value?.user?.id) {
     return;
   }

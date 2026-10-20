@@ -99,11 +99,11 @@ export const useApplicants = () => {
   );
 
   const fetchMyJobs = async () => {
-    if (status.value !== "authenticated") {
+    const { isMockEnabled, currentMockUser } = useMockSession();
+    if (status.value !== "authenticated" && !isMockEnabled.value) {
       router.push("/login");
       return;
     }
-    const { isMockEnabled, currentMockUser } = useMockSession();
     const companyId =
       (isMockEnabled.value && currentMockUser.value?.companyId) ||
       session.value?.user?.id ||
@@ -196,8 +196,9 @@ export const useApplicants = () => {
         }),
       );
 
-      // Fallback to MOCK_APPLICANTS if no remote applicants exist
-      if (resolvedCandidates.length === 0) {
+      // Fallback to MOCK_APPLICANTS if mock enabled or no remote applicants exist
+      const { isMockEnabled } = useMockSession();
+      if (isMockEnabled.value || resolvedCandidates.length === 0) {
         let mockFiltered = [...MOCK_APPLICANTS];
         if (selectedJobId.value) {
           mockFiltered = mockFiltered.filter(

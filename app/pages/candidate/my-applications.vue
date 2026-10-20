@@ -331,9 +331,7 @@
 <script setup lang="ts">
 import { useAuth, useRuntimeConfig, useRouter } from "#imports";
 
-definePageMeta({
-  middleware: ["auth"],
-});
+// definePageMeta removed for mock
 
 useSeoMeta({
   title: "Historial de Solicitudes - JobNet",
@@ -412,6 +410,11 @@ const MOCK_MY_APPLICATIONS = [
 ];
 
 const fetchApplications = async () => {
+  if (isMockEnabled.value) {
+    applications.value = JSON.parse(JSON.stringify(MOCK_MY_APPLICATIONS));
+    loading.value = false;
+    return;
+  }
   if (!isMockEnabled.value && status.value !== "authenticated") {
     router.push("/login");
     return;

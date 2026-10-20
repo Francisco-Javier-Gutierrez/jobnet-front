@@ -1,17 +1,22 @@
-import { defineEventHandler, getQuery } from "h3";
+import { defineEventHandler, getHeader, getQuery } from "h3";
 import { MOCK_VACANCIES } from "../utils/mockData";
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
+  const cookie = getHeader(event, "cookie") || "";
   const query = getQuery(event);
-  try {
-    const data = await $fetch<any>(`${config.public.apiUrl}/jobs`, {
-      query,
-    });
-    if (Array.isArray(data) && data.length > 0) return data;
-    if (data?.data && Array.isArray(data.data) && data.data.length > 0) return data;
-  } catch (error: any) {
-    // Fall through to mock data
+  const isMock = cookie.includes("jobnet-mock-enabled=true") || query.mock === "true";
+
+  if (!isMock) {
+    const config = useRuntimeConfig();
+    try {
+      const data = await $fetch<any>(`${config.public.apiUrl}/jobs`, {
+        query,
+      });
+      if (Array.isArray(data) && data.length > 0) return data;
+      if (data?.data && Array.isArray(data.data) && data.data.length > 0) return data;
+    } catch (error: any) {
+      // Fall through to mock data
+    }
   }
 
   // Fallback to rich MOCK_VACANCIES
