@@ -1,15 +1,164 @@
 <template>
-  <section class="px-margin-mobile mb-10 space-y-6">
+  <div class="space-y-6">
+    <!-- Ficha de Identificación Legal y Corporativa -->
+    <div
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 p-6 rounded-2xl shadow-sm border border-outline-variant/50 space-y-5"
+    >
+      <div class="border-b border-outline-variant/30 pb-3">
+        <h2
+          class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-primary">domain</span>
+          Ficha Institucional y Legal
+        </h2>
+        <p class="text-xs text-on-surface-variant dark:text-slate-400 mt-1">
+          Identificación formal, registro fiscal y datos de contacto de la organización.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Razón Social -->
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
+        >
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-primary">apartment</span>
+            Razón Social
+          </span>
+          <p class="text-xs font-bold text-on-surface truncate" :title="corporateRazonSocial">
+            {{ corporateRazonSocial }}
+          </p>
+        </div>
+
+        <!-- Nombre Comercial -->
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
+        >
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-secondary">store</span>
+            Nombre Comercial
+          </span>
+          <p class="text-xs font-bold text-on-surface truncate" :title="corporateNombreComercial">
+            {{ corporateNombreComercial }}
+          </p>
+        </div>
+
+        <!-- RFC Fiscal -->
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
+        >
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-emerald-600">badge</span>
+            RFC (Identificador Fiscal)
+          </span>
+          <p class="text-xs font-mono font-bold text-on-surface">
+            {{ company.rfc || "No registrado" }}
+          </p>
+        </div>
+
+        <!-- Sector Corporativo -->
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
+        >
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-indigo-600">category</span>
+            Sector / Industria
+          </span>
+          <p class="text-xs font-medium text-on-surface truncate">
+            {{ company.sector || "Sector no especificado" }}
+          </p>
+        </div>
+
+        <!-- Tamaño de la Empresa -->
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
+        >
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-amber-600">groups</span>
+            Tamaño de Organización
+          </span>
+          <p class="text-xs font-medium text-on-surface">
+            {{ company.tamanoEmpresa || "50 - 200 colaboradores" }}
+          </p>
+        </div>
+
+        <!-- Sede Principal / Ubicación -->
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
+        >
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-rose-600">location_on</span>
+            Sede Principal
+          </span>
+          <p class="text-xs font-medium text-on-surface truncate" :title="company.location">
+            {{ company.location || "Ubicación no especificada" }}
+          </p>
+        </div>
+
+        <!-- Correo de Contacto -->
+        <div
+          v-if="company.email"
+          class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
+        >
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-primary">mail</span>
+            Correo Institucional
+          </span>
+          <p class="text-xs font-medium text-on-surface truncate">
+            <a :href="`mailto:${company.email}`" class="text-primary hover:underline">
+              {{ company.email }}
+            </a>
+          </p>
+        </div>
+
+        <!-- Teléfono de Contacto -->
+        <div
+          v-if="company.telefono"
+          class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
+        >
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-emerald-600">call</span>
+            Teléfono de Contacto
+          </span>
+          <p class="text-xs font-medium text-on-surface">
+            {{ company.telefono }}
+          </p>
+        </div>
+
+        <!-- Sitio Web Oficial -->
+        <div
+          v-if="company.website"
+          class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
+        >
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-secondary">language</span>
+            Portal Web Oficial
+          </span>
+          <p class="text-xs font-medium text-on-surface truncate">
+            <a
+              :href="company.website"
+              target="_blank"
+              rel="noopener"
+              class="text-primary hover:underline"
+            >
+              {{ company.websiteDisplay || company.website }}
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acerca de nosotros / Biografía -->
     <div
       class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 p-6 rounded-2xl shadow-sm border border-outline-variant/50 space-y-6"
     >
       <div>
-        <h2
+        <h3
           class="font-headline-sm text-headline-sm text-on-surface mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2"
         >
-          <span class="material-symbols-outlined text-primary">domain</span>
-          Acerca de nosotros
-        </h2>
+          <span class="material-symbols-outlined text-primary">info</span>
+          Acerca de Nosotros
+        </h3>
         <p
           class="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 leading-relaxed"
         >
@@ -26,14 +175,14 @@
           v-if="company.mision"
           class="bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 p-4 rounded-xl space-y-2"
         >
-          <h3
+          <h4
             class="font-bold text-xs text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5 uppercase tracking-wider"
           >
             <span class="material-symbols-outlined text-base text-indigo-600"
               >flag</span
             >
             Misión Corporativa
-          </h3>
+          </h4>
           <p
             class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
           >
@@ -45,14 +194,14 @@
           v-if="company.vision"
           class="bg-primary/10/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 p-4 rounded-xl space-y-2"
         >
-          <h3
+          <h4
             class="font-bold text-xs text-primary dark:text-inverse-primary flex items-center gap-1.5 uppercase tracking-wider"
           >
             <span class="material-symbols-outlined text-base text-primary"
               >visibility</span
             >
             Visión Corporativa
-          </h3>
+          </h4>
           <p
             class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
           >
@@ -66,14 +215,14 @@
         v-if="company.beneficios"
         class="bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 p-4 rounded-xl space-y-2"
       >
-        <h3
+        <h4
           class="font-bold text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 uppercase tracking-wider"
         >
           <span class="material-symbols-outlined text-base text-emerald-600"
             >card_giftcard</span
           >
           Beneficios y Cultura Laboral
-        </h3>
+        </h4>
         <p
           class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed whitespace-pre-line"
         >
@@ -86,14 +235,14 @@
         v-if="webLinks && webLinks.length > 0"
         class="pt-4 border-t border-outline-variant/30"
       >
-        <h3
+        <h4
           class="font-bold text-sm text-on-surface mb-3 flex items-center gap-1.5"
         >
           <span class="material-symbols-outlined text-primary text-base"
             >public</span
           >
           Presencia de Marca y Redes Oficiales
-        </h3>
+        </h4>
         <div class="flex flex-wrap gap-3">
           <a
             v-for="link in webLinks"
@@ -117,19 +266,19 @@
       v-if="company.documents && company.documents.length > 0"
       class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 p-6 rounded-2xl shadow-sm border border-outline-variant/50 space-y-4"
     >
-      <h2
+      <h3
         class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-2"
       >
         <span class="material-symbols-outlined text-rose-600 dark:text-rose-400"
           >verified</span
         >
         Documentos Corporativos Relevantes
-      </h2>
+      </h3>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div
           v-for="doc in company.documents"
-          :key="doc.id || doc.url"
+          :key="doc.id || doc.url || doc.nombre"
           class="bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/50 dark:border-slate-800 p-4 rounded-xl flex items-center justify-between gap-3 shadow-sm"
         >
           <div class="flex items-center gap-3 min-w-0">
@@ -152,7 +301,7 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-shrink-0">
             <button
               type="button"
               @click="$emit('previewDoc', doc)"
@@ -162,6 +311,7 @@
               Ver
             </button>
             <a
+              v-if="doc.url"
               :href="doc.url"
               download
               target="_blank"
@@ -173,13 +323,14 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import type { CompanyProfile, WebLinkItem } from "~/types";
 
-defineProps<{
+const props = defineProps<{
   company: CompanyProfile;
   webLinks?: WebLinkItem[];
 }>();
@@ -187,4 +338,22 @@ defineProps<{
 defineEmits<{
   (e: "previewDoc", doc: any): void;
 }>();
+
+const corporateRazonSocial = computed(() => {
+  return (
+    props.company.razonSocial ||
+    props.company.nombre ||
+    props.company.name ||
+    "Organización Registrada"
+  );
+});
+
+const corporateNombreComercial = computed(() => {
+  return (
+    props.company.nombreComercial ||
+    props.company.name ||
+    props.company.nombre ||
+    "Organización Registrada"
+  );
+});
 </script>

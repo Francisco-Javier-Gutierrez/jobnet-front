@@ -65,6 +65,15 @@
       </div>
     </div>
 
+    <!-- Notification Feedback for Audit and Dispute Actions -->
+    <div
+      v-if="auditSuccess"
+      class="m-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2 transition"
+    >
+      <span class="material-symbols-outlined text-sm">check_circle</span>
+      <span>{{ auditSuccess }}</span>
+    </div>
+
     <!-- Loading skeleton -->
     <div v-if="loading" class="p-8 space-y-6">
       <div
@@ -175,7 +184,31 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-2 flex-shrink-0 self-center">
+        <div class="flex flex-wrap items-center gap-2 flex-shrink-0 self-center">
+          <!-- Dispute Messaging Audit Actions (Fase 1 y Fase 2) -->
+          <template v-if="inc.targetType === 'VACANTE' || inc.jobId || isSeriousInfraction(inc.infraccion)">
+            <button
+              v-if="inc.auditState === 'AUDIT_ACTIVE' || inc.estatus === 'AUDITORIA'"
+              type="button"
+              @click="inspectAuditChat(inc)"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
+              title="Inspeccionar historial íntegro de mensajes en solo lectura y dictaminar (Fase 2)"
+            >
+              <span class="material-symbols-outlined text-sm">visibility</span>
+              <span>Inspeccionar Auditoría</span>
+            </button>
+            <button
+              v-else-if="inc.auditState !== 'AUDIT_CONCLUDED'"
+              type="button"
+              @click="openAudit(inc)"
+              class="bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+              title="Admitir controversia y notificar apertura de auditoría a ambas partes (Fase 1)"
+            >
+              <span class="material-symbols-outlined text-sm">policy</span>
+              <span>Auditar Mensajes</span>
+            </button>
+          </template>
+
           <!-- For reports in EVALUACION (under appeal) -->
           <template v-if="inc.estatus === 'EVALUACION'">
             <span
@@ -192,7 +225,7 @@
           </template>
 
           <!-- For raw reports PENDIENTE -->
-          <template v-else>
+          <template v-else-if="inc.estatus !== 'AUDITORIA'">
             <button
               @click="resolve(inc.id, 'approve')"
               class="bg-surface border border-outline-variant/60 hover:bg-surface-container text-on-surface font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-sm"
@@ -221,11 +254,27 @@
         </div>
       </div>
     </div>
+
+    <!-- Dispute Audit Modal: Fase 2 -->
+    <DisputeAuditModal
+      v-model="isAuditModalOpen"
+      :incident="selectedIncident"
+      :messages="chatMessages"
+      :loading="isLoadingChat"
+      :submitting="isSubmittingDictum"
+      :error="auditError"
+      v-model:dictum-action="dictumAction"
+      v-model:dictum-notes="dictumNotes"
+      @submit="submitDictum"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Incident } from "~/types";
+import { MOCK_INCIDENTS } from "~/utils/mockData";
+import DisputeAuditModal from "~/components/mod/DisputeAuditModal.vue";
+import { useDisputeAudit } from "~/composables/useDisputeAudit";
 
 const config = useRuntimeConfig();
 const { data: session } = useAuth();
@@ -238,6 +287,35 @@ const userRole = computed(() => {
 const incidents = ref<Incident[]>([]);
 const loading = ref(true);
 const activeTab = ref("ALL");
+
+const {
+  isAuditModalOpen,
+  selectedIncident,
+  chatMessages,
+  isLoadingChat,
+  isSubmittingDictum,
+  dictumAction,
+  dictumNotes,
+  errorMsg: auditError,
+  successMsg: auditSuccess,
+  openAudit,
+  inspectAuditChat,
+  submitDictum,
+} = useDisputeAudit(async () => {
+  await fetchIncidents();
+});
+
+const isSeriousInfraction = (infraccion?: string) => {
+  if (!infraccion) return false;
+  const inf = infraccion.toUpperCase();
+  return (
+    inf.includes("FRAUDE") ||
+    inf.includes("SALARIO") ||
+    inf.includes("DISCREPANCIA") ||
+    inf.includes("ACOSO") ||
+    inf.includes("DISCRIMINACION")
+  );
+};
 
 const displayedIncidents = computed(() => {
   let list = incidents.value;
@@ -259,10 +337,12 @@ const fetchIncidents = async () => {
     const data = await $fetch<any>(
       `${config.public.apiUrl}/moderator/incidents`,
     );
-    incidents.value =
+    const fetched =
       data?.value || data?.Items || (Array.isArray(data) ? data : []);
+    incidents.value = fetched.length > 0 ? fetched : MOCK_INCIDENTS;
   } catch (e) {
     console.error("Error loading incidents:", e);
+    incidents.value = MOCK_INCIDENTS;
   } finally {
     loading.value = false;
   }

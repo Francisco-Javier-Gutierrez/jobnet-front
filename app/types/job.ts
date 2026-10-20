@@ -38,10 +38,15 @@ export interface Job {
   salary?: string;
   salarioMinimo?: number;
   salarioMaximo?: number;
+  salarioConfidencial?: boolean;
+  isSalaryConfidential?: boolean;
   experienciaAnos?: number;
   sector?: string;
   sectores?: string[];
   location?: string;
+  municipio?: string;
+  preguntasFiltro?: string[];
+  screeningQuestions?: string[];
   vacantesDisponibles?: number;
   pdfUrl?: string;
   pdfName?: string;

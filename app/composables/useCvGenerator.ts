@@ -185,8 +185,53 @@ export function useCvGenerator() {
           ? profile.skills
           : [],
       languages: Array.isArray(profile.idiomas) ? profile.idiomas : [],
-      education: Array.isArray(profile.educacion) ? profile.educacion : [],
-      experience: Array.isArray(profile.experiencia) ? profile.experiencia : [],
+      education: Array.isArray(profile.educacion)
+        ? profile.educacion.map((edu: any) => ({
+            titulo:
+              edu.titulo ||
+              edu.degree ||
+              edu.carrera ||
+              edu.nombre ||
+              "Título / Grado",
+            institucion:
+              edu.institucion ||
+              edu.institution ||
+              edu.universidad ||
+              edu.escuela ||
+              "Institución",
+            periodo:
+              edu.periodo ||
+              edu.dates ||
+              (edu.anoInicio
+                ? `${edu.anoInicio} - ${edu.actualmente ? "Presente" : edu.anoFin || "Graduado"}`
+                : ""),
+            descripcion: edu.descripcion || edu.description || edu.campoEstudio || "",
+          }))
+        : [],
+      experience: Array.isArray(profile.experiencia)
+        ? profile.experiencia.map((exp: any) => ({
+            puesto:
+              exp.puesto ||
+              exp.cargo ||
+              exp.role ||
+              exp.title ||
+              exp.posicion ||
+              "Puesto / Cargo",
+            empresa: exp.empresa || exp.company || "Empresa",
+            periodo:
+              exp.periodo ||
+              exp.dates ||
+              (exp.anoInicio
+                ? `${exp.anoInicio} - ${exp.actualmente ? "Presente" : exp.anoFin || "Presente"}`
+                : ""),
+            descripcion:
+              exp.descripcion ||
+              exp.description ||
+              (Array.isArray(exp.logros) && exp.logros.length > 0
+                ? exp.logros.map((l: string) => `• ${l}`).join("\n")
+                : ""),
+          }))
+        : [],
       links: linksList,
     };
   }
@@ -231,21 +276,19 @@ export function useCvGenerator() {
         pagebreak: { mode: ["avoid-all", "css", "legacy"] },
       };
 
-      const worker = html2pdf().set(opt).from(element);
+      let worker = html2pdf().set(opt).from(element).toPdf();
+
       if (pdfMeta) {
-        worker
-          .toPdf()
-          .get("pdf")
-          .then((pdf: any) => {
-            if (pdf && typeof pdf.setProperties === "function") {
-              pdf.setProperties({
-                title: pdfMeta.title || "Curriculum Vitae",
-                author: pdfMeta.author || "JobNet Platform",
-                subject: pdfMeta.subject || "CV Profesional",
-                creator: "JobNet Dynamic CV Builder",
-              });
-            }
-          });
+        worker = worker.get("pdf").then((pdf: any) => {
+          if (pdf && typeof pdf.setProperties === "function") {
+            pdf.setProperties({
+              title: pdfMeta.title || "Curriculum Vitae",
+              author: pdfMeta.author || "JobNet Platform",
+              subject: pdfMeta.subject || "CV Profesional",
+              creator: "JobNet Dynamic CV Builder",
+            });
+          }
+        });
       }
 
       const pdfBlob: Blob = await worker.output("blob");
@@ -281,8 +324,14 @@ export function useCvGenerator() {
     link.download = filename;
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(blobUrl);
+    setTimeout(() => {
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      } else {
+        link.remove();
+      }
+      URL.revokeObjectURL(blobUrl);
+    }, 150);
 
     showSuccess(
       isAnonymous ? "CV Anónimo Descargado" : "CV Descargado",

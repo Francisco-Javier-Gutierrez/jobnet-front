@@ -4,10 +4,15 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const id = event.context.params?.id;
   const body = await readBody(event);
+  const userUuid = body?.userUuid || body?.userId || body?.user_id;
   try {
     const data = await $fetch<any>(`${config.public.apiUrl}/posts/${id}/like`, {
       method: "POST",
-      body,
+      body: {
+        ...body,
+        userUuid,
+        userId: userUuid,
+      },
     });
     return data;
   } catch (error: any) {

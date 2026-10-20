@@ -10,10 +10,16 @@
     >
       <div
         v-if="modelValue"
-        class="fixed inset-0 z-[9999] bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto select-none"
+        :class="[
+          zIndexClass || 'z-[1000]',
+          'fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto select-none',
+        ]"
         @click="handleOverlayClick"
         @keydown.esc="handleEsc"
         tabindex="-1"
+        role="dialog"
+        aria-modal="true"
+        data-modal-active="true"
       >
         <div
           :class="[
@@ -93,6 +99,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed, watch, onUnmounted } from "vue";
+
 const props = withDefaults(
   defineProps<{
     modelValue: boolean;
@@ -106,12 +114,14 @@ const props = withDefaults(
     closeOnEsc?: boolean;
     showCloseButton?: boolean;
     customClass?: string;
+    zIndexClass?: string;
   }>(),
   {
     maxWidth: "md",
     closeOnOverlay: true,
     closeOnEsc: true,
     showCloseButton: true,
+    zIndexClass: "z-[1000]",
   },
 );
 
@@ -164,24 +174,4 @@ const handleEsc = () => {
   }
 };
 
-// Body scroll lock management
-watch(
-  () => props.modelValue,
-  (val) => {
-    if (typeof window !== "undefined") {
-      if (val) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "";
-      }
-    }
-  },
-  { immediate: true },
-);
-
-onUnmounted(() => {
-  if (typeof window !== "undefined") {
-    document.body.style.overflow = "";
-  }
-});
 </script>

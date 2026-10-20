@@ -161,6 +161,28 @@
           </div>
         </div>
 
+        <!-- Fecha de Cierre o Vigencia -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <label
+              class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1.5"
+              for="fecha-cierre"
+            >
+              <span class="material-symbols-outlined text-sm text-primary">calendar_clock</span>
+              Fecha de Cierre / Vigencia Estipulada
+            </label>
+            <span class="text-[10px] text-on-surface-variant dark:text-slate-400">
+              Recordatorio automático 3 días antes de expirar
+            </span>
+          </div>
+          <input
+            v-model="state.form.fechaCierre"
+            id="fecha-cierre"
+            type="date"
+            class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
+          />
+        </div>
+
         <!-- Description -->
         <div class="flex flex-col gap-1.5">
           <label
@@ -212,15 +234,31 @@
           </div>
         </div>
 
-        <!-- Rango Salarial (Opcional) -->
+        <!-- Rango Salarial & Configuración de Confidencialidad -->
         <div
           class="bg-surface-container-low/30 border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-4"
         >
-          <h3
-            class="text-xs font-bold text-on-background uppercase tracking-wider"
-          >
-            Rango Salarial Mensual (Opcional)
-          </h3>
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h3
+              class="text-xs font-bold text-on-background uppercase tracking-wider"
+            >
+              Rango Salarial Mensual
+            </h3>
+            <span
+              class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+              :class="
+                state.form.salarioConfidencial
+                  ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20'
+                  : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20'
+              "
+            >
+              {{
+                state.form.salarioConfidencial
+                  ? 'Salario Confidencial'
+                  : 'Salario Visible'
+              }}
+            </span>
+          </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5">
               <label
@@ -252,6 +290,33 @@
                 class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2 text-xs text-on-background outline-none transition"
               />
             </div>
+          </div>
+
+          <!-- Configuración de Salario Visible o Confidencial -->
+          <div
+            class="pt-2 border-t border-outline-variant/30 flex items-start gap-3"
+          >
+            <input
+              id="salary-confidential"
+              v-model="state.form.salarioConfidencial"
+              type="checkbox"
+              class="w-4 h-4 text-primary bg-surface border-outline-variant/60 rounded focus:ring-primary mt-0.5 cursor-pointer"
+            />
+            <label
+              for="salary-confidential"
+              class="text-xs cursor-pointer select-none"
+            >
+              <span class="font-bold text-on-background block"
+                >Configurar salario como confidencial</span
+              >
+              <span
+                class="text-[11px] text-on-surface-variant dark:text-slate-400 leading-relaxed block mt-0.5"
+              >
+                Al activar esta casilla, los postulantes verán "Salario
+                confidencial" en lugar de las cifras. Los montos se guardan para
+                filtros internos y analítica.
+              </span>
+            </label>
           </div>
         </div>
       </section>
@@ -483,17 +548,152 @@
             </div>
           </div>
         </div>
+
+        <!-- Preguntas Filtro de Precalificación (Hasta 3 Preguntas Obligatorias) -->
+        <div class="flex flex-col gap-3 pt-2 border-t border-outline-variant/30">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <label class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-primary">quiz</span>
+                Preguntas Filtro de Precalificación
+              </label>
+              <p class="text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5">
+                Configura hasta 3 preguntas de respuesta obligatoria que los candidatos responderán al postularse.
+              </p>
+            </div>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              {{ state.form.preguntasFiltro.length }} / 3 preguntas
+            </span>
+          </div>
+
+          <!-- Question inputs list -->
+          <div v-if="state.form.preguntasFiltro.length > 0" class="flex flex-col gap-3">
+            <div
+              v-for="(pregunta, index) in state.form.preguntasFiltro"
+              :key="index"
+              class="flex items-center gap-2 bg-surface-container-low/30 border border-outline-variant/60 rounded-xl p-3"
+            >
+              <span class="w-6 h-6 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center flex-shrink-0">
+                {{ index + 1 }}
+              </span>
+              <input
+                v-model="state.form.preguntasFiltro[index]"
+                type="text"
+                maxlength="250"
+                required
+                :placeholder="
+                  index === 0
+                    ? 'Ej: ¿Cuántos años de experiencia comprobable tienes en la posición?'
+                    : index === 1
+                      ? 'Ej: ¿Cuentas con disponibilidad de horario y cambio de residencia?'
+                      : 'Ej: ¿Manejas nivel de inglés conversacional avanzado B2/C1?'
+                "
+                class="flex-grow bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-lg px-3 py-2 text-xs text-on-background outline-none transition"
+              />
+              <button
+                type="button"
+                @click="state.removePreguntaFiltro(index)"
+                title="Eliminar pregunta"
+                class="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-500/10 rounded-lg transition flex items-center justify-center"
+              >
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          </div>
+
+          <div
+            v-else
+            class="text-xs text-on-surface-variant dark:text-slate-400 italic bg-surface-container-low/20 border border-dashed border-outline-variant/60 rounded-xl p-4 text-center"
+          >
+            No has agregado preguntas filtro. Puedes agregar hasta 3 preguntas para precalificar a los candidatos.
+          </div>
+
+          <!-- Add question button -->
+          <div v-if="state.form.preguntasFiltro.length < 3">
+            <button
+              type="button"
+              @click="state.addPreguntaFiltro"
+              class="inline-flex items-center gap-1.5 px-4 py-2 bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary text-xs font-bold rounded-xl transition"
+            >
+              <span class="material-symbols-outlined text-sm">add</span>
+              Agregar Pregunta Filtro ({{ 3 - state.form.preguntasFiltro.length }} disponibles)
+            </button>
+          </div>
+        </div>
       </section>
 
       <!-- SECTION: Ubicación -->
       <section v-show="activeTab === 'ubicacion'" class="flex flex-col gap-6">
+        <!-- Municipio del Estado de México y Coordenadas -->
+        <div class="bg-surface-container-low/30 border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-primary">location_city</span>
+                Municipio del Estado de México
+              </h3>
+              <p class="text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5">
+                Selecciona el municipio correspondiente para centrar automáticamente las coordenadas geográficas.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- Municipio Dropdown -->
+            <div class="flex flex-col sm:col-span-1">
+              <AppSelect
+                :model-value="state.form.municipio"
+                @update:model-value="state.setMunicipio($event)"
+                :options="state.EDO_MEX_MUNICIPALITIES"
+                label="Municipio (EdoMéx)"
+                placeholder="Seleccionar municipio..."
+              />
+            </div>
+
+            <!-- Latitud -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[10px] font-bold text-on-surface-variant dark:text-slate-300" for="lat-input">
+                Latitud Geográfica
+              </label>
+              <input
+                id="lat-input"
+                v-model.number="state.form.lat"
+                type="number"
+                step="0.0001"
+                class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
+              />
+            </div>
+
+            <!-- Longitud -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[10px] font-bold text-on-surface-variant dark:text-slate-300" for="lng-input">
+                Longitud Geográfica
+              </label>
+              <input
+                id="lng-input"
+                v-model.number="state.form.lng"
+                type="number"
+                step="0.0001"
+                class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
+              />
+            </div>
+          </div>
+        </div>
+
         <!-- Ubicación Geográfica (AppLocationMap Centrado) -->
-        <AppLocationMap
-          v-model:lat="state.form.lat"
-          v-model:lng="state.form.lng"
-          label="Ubicación Geográfica de la Vacante"
-          height="280px"
-        />
+        <ClientOnly>
+          <AppLocationMap
+            v-model:lat="state.form.lat"
+            v-model:lng="state.form.lng"
+            label="Ajuste Fino de Ubicación Geográfica en el Mapa"
+            height="300px"
+          />
+          <template #fallback>
+            <div class="h-[300px] w-full rounded-2xl bg-surface-container-low/40 dark:bg-slate-900/60 border border-outline-variant/40 animate-pulse flex items-center justify-center">
+              <span class="text-xs text-on-surface-variant dark:text-slate-400">Cargando mapa de ubicación...</span>
+            </div>
+          </template>
+        </ClientOnly>
       </section>
 
       <!-- Submit button -->
@@ -563,24 +763,12 @@ const state = reactive(useVacancyForm({ isEdit: props.isEdit }));
 const activeTab = ref("generales");
 
 const tabItems = computed(() => {
-  const tabs = [
+  return [
     { id: "generales", label: "Datos Generales", icon: "assignment" },
-    { id: "requisitos", label: "Requisitos & Catálogo", icon: "psychology" },
+    { id: "requisitos", label: "Requisitos & Filtros", icon: "psychology" },
+    { id: "ubicacion", label: "Ubicación EdoMéx", icon: "map" },
   ];
-  if (state.form.modality !== "Remoto") {
-    tabs.push({ id: "ubicacion", label: "Ubicación", icon: "map" });
-  }
-  return tabs;
 });
-
-watch(
-  () => state.form.modality,
-  (newModality) => {
-    if (newModality === "Remoto" && activeTab.value === "ubicacion") {
-      activeTab.value = "generales";
-    }
-  },
-);
 
 const { data: session } = useAuth();
 const router = useRouter();
@@ -603,20 +791,29 @@ const mockJobPreview = computed(() => {
     empresaLogoUrl: authorAvatar,
     companyLogo: authorAvatar,
     location:
-      state.form.modality === "Remoto" ? "Remoto" : "Ubicación Presencial",
+      state.form.modality === "Remoto"
+        ? "Remoto (EdoMéx)"
+        : `${state.form.municipio || "Toluca"}, Estado de México`,
+    municipio: state.form.municipio || "Toluca",
     modalidad: state.form.modality,
     salarioMinimo: state.form.salaryMin,
-
     salarioMaximo: state.form.salaryMax,
+    salarioConfidencial: state.form.salarioConfidencial,
+    isSalaryConfidential: state.form.salarioConfidencial,
+    lat: state.form.lat,
+    lng: state.form.lng,
     createdAt: new Date().toISOString(),
     descripcion:
       state.form.description.trim() || "Descripción de las actividades...",
     habilidadesRequeridas: state.form.skills,
     sectores: state.form.sectors,
+    sector: state.form.sector || (state.form.sectors && state.form.sectors[0]) || "Tecnología",
     aptitudes: state.form.aptitudes,
     experienciaAnos: state.form.experienceYears || 0,
     vacantesDisponibles: state.form.vacantesDisponibles || 1,
     maxPostulantes: state.form.maxPostulantes || null,
+    preguntasFiltro: state.form.preguntasFiltro.filter((q) => q.trim().length > 0),
+    screeningQuestions: state.form.preguntasFiltro.filter((q) => q.trim().length > 0),
     pdfUrl: state.vacancyPdfPreviewUrl || undefined,
     pdfName: state.selectedVacancyFile?.name || undefined,
   };

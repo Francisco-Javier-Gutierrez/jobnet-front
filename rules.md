@@ -17,6 +17,10 @@ Por favor, lee con detenimiento este documento antes de comenzar a programar.
   - **Los PRs se deben hacer siempre con destino a `develop` y nunca a `main`**.
   - Si el dispositivo/entorno cuenta con la CLI de GitHub (`gh`), el desarrollador o agente debe crear el PR automáticamente usando `gh pr create` apuntando a `develop`.
   - En caso de no contar con la CLI de GitHub (`gh`), el desarrollador o agente debe indicar siempre al usuario después de una implementación que debe realizar el PR de forma manual con destino a `develop` y **nunca a `main`**.
+- **Aislamiento Estricto de Ramas Mock y Datos de Prueba**:
+  - Las ramas de datos mock y herramientas de simulación (por ejemplo `feature/mock-*`) son **únicamente para sus ramas dedicadas**, no para el proyecto general.
+  - **JAMÁS deben ser mergeadas ni a `main` ni a `develop`**.
+  - Las ramas `develop` y `main` deben permanecer estrictamente limpias de devtools de mock, inyecciones ficticias de sesión o datos simulados no autorizados.
 
 ---
 

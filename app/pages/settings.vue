@@ -123,7 +123,17 @@
       </section>
 
       <section v-show="activeTab === 'seguridad'" class="flex flex-col gap-6">
-        <SettingsPasswordCard />
+        <SettingsLinkedAccountsCard
+          :is-federated="isFederatedUser"
+          :user-email="(session?.user as any)?.email || formData.email"
+        />
+        <MfaSettingsCard
+          :user-id="(session?.user as any)?.id || ''"
+          :initial-mfa-state="formData.mfaEnabled"
+          :is-federated="isFederatedUser"
+          @mfa-updated="(state) => (formData.mfaEnabled = state)"
+        />
+        <SettingsPasswordCard :is-federated="isFederatedUser" />
       </section>
     </div>
 
@@ -170,7 +180,7 @@ const tabItems = [
   { id: "habilidades", label: "Educación", icon: "school" },
   { id: "documentos", label: "Documentos", icon: "description" },
   { id: "enlaces", label: "Enlaces", icon: "language" },
-  { id: "seguridad", label: "Seguridad", icon: "shield_lock" },
+  { id: "seguridad", label: "Seguridad y MFA", icon: "shield_lock" },
 ];
 
 const formData = ref({
@@ -188,6 +198,19 @@ const formData = ref({
   links: [] as any[],
   lat: 19.4326,
   lng: -99.1332,
+  mfaEnabled: false,
+});
+
+const isFederatedProfile = ref(false);
+const isFederatedUser = computed(() => {
+  const user = session.value?.user as any;
+  return Boolean(
+    user?.isFederated ||
+      user?.provider === "cognito" ||
+      (typeof user?.id === "string" &&
+        user.id.toLowerCase().startsWith("google_")) ||
+      isFederatedProfile.value,
+  );
 });
 
 const { hasDraft, discardDraft } = useDraftAutoSave(
@@ -224,6 +247,15 @@ onMounted(async () => {
           profile.documentosAdicionales ||
           profile.documentosProfesionales ||
           [];
+        formData.value.mfaEnabled = Boolean(
+          profile.mfaEnabled || profile.mfaConfigured,
+        );
+        if (
+          profile.isFederated ||
+          profile.origenRegistro === "GOOGLE_OAUTH"
+        ) {
+          isFederatedProfile.value = true;
+        }
         if (Array.isArray(profile.links)) {
           formData.value.links = profile.links;
         } else if (

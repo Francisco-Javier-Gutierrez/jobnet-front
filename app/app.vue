@@ -6,6 +6,7 @@
     <ClientOnly>
       <AppProtectedModal />
       <AppFeedbackModal />
+      <AppCommandPalette />
     </ClientOnly>
   </div>
 </template>

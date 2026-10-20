@@ -2,49 +2,42 @@
   <div
     class="min-h-screen bg-background dark:bg-slate-950 text-on-background dark:text-slate-100 font-sans transition-colors duration-200"
   >
-    <!-- Modular Desktop & Mobile Drawer Sidebar -->
-    <AppSidebar v-model:isMobileMenuOpen="isMobileMenuOpen" />
+    <!-- Desktop Sidebar (Hidden on mobile) -->
+    <AppSidebar />
 
-    <!-- Modular Mobile Top Header Navbar -->
+    <!-- Unified Mobile Top Navbar with Collapsible Dropdown Menu (Hidden on desktop) -->
     <AppNavbar :is-visible="isHeaderVisible" />
 
     <!-- Main Content Area -->
     <main
-      class="flex-grow min-h-screen pt-16 pb-16 md:pt-0 md:pb-0 md:ml-64 transition-all duration-200"
+      class="flex-grow min-h-screen pt-16 md:pt-0 md:ml-64 transition-all duration-200"
       role="main"
     >
       <slot />
     </main>
-
-    <!-- Modular Mobile Bottom Navigation Footer -->
-    <AppFooter :is-visible="isFooterVisible" />
   </div>
 </template>
 
 <script setup lang="ts">
-const isMobileMenuOpen = ref(false);
+import { ref, onMounted, onUnmounted } from "vue";
 
-// Scroll tracking for hide/show nav bars on mobile
+// Scroll tracking for hide/show top navbar on mobile
 const isHeaderVisible = ref(true);
-const isFooterVisible = ref(true);
 let lastScrollY = 0;
 
 const handleScroll = () => {
-  if (process.client) {
+  if (import.meta.client) {
     const currentScrollY = window.scrollY;
 
     if (currentScrollY <= 20) {
       isHeaderVisible.value = true;
-      isFooterVisible.value = true;
     } else {
       if (currentScrollY > lastScrollY) {
-        // Scrolling down -> Hide top header, keep bottom footer visible
+        // Scrolling down -> Hide top header
         isHeaderVisible.value = false;
-        isFooterVisible.value = true;
       } else {
-        // Scrolling up -> Show top header, hide bottom footer
+        // Scrolling up -> Show top header
         isHeaderVisible.value = true;
-        isFooterVisible.value = false;
       }
     }
     lastScrollY = currentScrollY;
@@ -52,15 +45,14 @@ const handleScroll = () => {
 };
 
 onMounted(() => {
-  if (process.client) {
+  if (import.meta.client) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     isHeaderVisible.value = true;
-    isFooterVisible.value = true;
   }
 });
 
 onUnmounted(() => {
-  if (process.client) {
+  if (import.meta.client) {
     window.removeEventListener("scroll", handleScroll);
   }
 });

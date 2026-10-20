@@ -10,8 +10,9 @@
     >
       <div
         v-if="isModalOpen"
-        class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm"
+        class="fixed inset-0 z-[99950] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm"
         @click.self="closeProtectedModal"
+        data-modal-active="true"
       >
         <div
           class="w-full max-w-sm sm:max-w-md bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl shadow-2xl p-6 text-center space-y-5 relative"

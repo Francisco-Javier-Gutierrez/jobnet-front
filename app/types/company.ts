@@ -28,6 +28,7 @@ export interface CompanyProfile {
   organizacionVerificada?: boolean;
   estatusVerificacion?:
     "PENDIENTE" | "VERIFICADA" | "RECHAZADA" | "EN_REVISION" | string;
+  metodoVerificacion?: "DOMINIO_CORPORATIVO" | "VALIDACION_SAT" | string;
   documentosVerificacion?: CompanyVerificationDoc[];
   suspensionStatus?: string;
   estatus?: string;

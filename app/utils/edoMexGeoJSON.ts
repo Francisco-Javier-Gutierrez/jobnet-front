@@ -1,10 +1,40 @@
-import * as turf from "@turf/turf";
+export namespace turf {
+  export type Polygon = { type: "Polygon"; coordinates: number[][][] };
+  export type MultiPolygon = { type: "MultiPolygon"; coordinates: number[][][][] };
+  export type Feature<G = any> = {
+    type: "Feature";
+    properties: Record<string, any>;
+    geometry: G;
+  };
+}
+
+export interface GeoJSONGeometry {
+  type: "Polygon" | "MultiPolygon";
+  coordinates: any;
+}
+
+export interface GeoJSONFeature {
+  type: "Feature";
+  properties: Record<string, any>;
+  geometry: GeoJSONGeometry;
+}
 
 export interface EdoMexMuniFeature {
   name: string;
-  polygon: turf.Feature<turf.Polygon | turf.MultiPolygon>;
+  polygon: GeoJSONFeature;
   center: [number, number];
 }
+
+// Internal zero-dependency GeoJSON feature builder (eliminates heavy & broken @turf dependencies)
+const turf = {
+  feature<G extends GeoJSONGeometry>(geometry: G): GeoJSONFeature {
+    return {
+      type: "Feature",
+      properties: {},
+      geometry,
+    };
+  },
+};
 
 export const EDO_MEX_FEATURES: EdoMexMuniFeature[] = [
   {
@@ -7250,11 +7280,78 @@ export const EDO_MEX_FEATURES: EdoMexMuniFeature[] = [
   },
 ];
 
+/**
+ * Fast ray-casting algorithm to test if a point [lng, lat] is inside a GeoJSON Polygon or MultiPolygon.
+ */
+export function booleanPointInPolygon(
+  pointCoords: [number, number],
+  feature: { geometry: { type: string; coordinates: any } }
+): boolean {
+  const [x, y] = pointCoords;
+  const geom = feature.geometry;
+
+  const checkRings = (rings: number[][][]): boolean => {
+    let inside = false;
+    for (let r = 0; r < rings.length; r++) {
+      const ring = rings[r];
+      let ringInside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0];
+        const yi = ring[i][1];
+        const xj = ring[j][0];
+        const yj = ring[j][1];
+
+        const intersect =
+          yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+        if (intersect) ringInside = !ringInside;
+      }
+      if (r === 0) {
+        inside = ringInside;
+      } else if (ringInside) {
+        inside = false; // Point falls in interior ring (hole)
+      }
+    }
+    return inside;
+  };
+
+  if (geom.type === "Polygon") {
+    return checkRings(geom.coordinates);
+  } else if (geom.type === "MultiPolygon") {
+    for (const poly of geom.coordinates) {
+      if (checkRings(poly)) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Haversine formula to compute great-circle distance (in kilometers) between two [lng, lat] coordinates.
+ */
+export function haversineDistance(
+  from: [number, number],
+  to: [number, number]
+): number {
+  const [lng1, lat1] = from;
+  const [lng2, lat2] = to;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const R = 6371; // Earth mean radius in kilometers
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export function getNativeLocationName(lat: number, lng: number): string {
-  const point = turf.point([lng, lat]);
+  const pointCoords: [number, number] = [lng, lat];
 
   for (const muni of EDO_MEX_FEATURES) {
-    if (turf.booleanPointInPolygon(point, muni.polygon)) {
+    if (booleanPointInPolygon(pointCoords, muni.polygon)) {
       return muni.name;
     }
   }
@@ -7262,8 +7359,7 @@ export function getNativeLocationName(lat: number, lng: number): string {
   let closestName = "Desconocido";
   let minDistance = Infinity;
   for (const muni of EDO_MEX_FEATURES) {
-    const centerPt = turf.point(muni.center);
-    const dist = turf.distance(point, centerPt, { units: "kilometers" });
+    const dist = haversineDistance(pointCoords, muni.center);
     if (dist < minDistance) {
       minDistance = dist;
       closestName = muni.name;
@@ -7273,9 +7369,9 @@ export function getNativeLocationName(lat: number, lng: number): string {
 }
 
 export function isInsideEdoMex(lat: number, lng: number): boolean {
-  const point = turf.point([lng, lat]);
+  const pointCoords: [number, number] = [lng, lat];
   for (const muni of EDO_MEX_FEATURES) {
-    if (turf.booleanPointInPolygon(point, muni.polygon)) {
+    if (booleanPointInPolygon(pointCoords, muni.polygon)) {
       return true;
     }
   }
@@ -7284,14 +7380,13 @@ export function isInsideEdoMex(lat: number, lng: number): boolean {
 
 export function getNearestValidPoint(
   latVal: number,
-  lngVal: number,
+  lngVal: number
 ): { lat: number; lng: number } {
-  const point = turf.point([lngVal, latVal]);
-  let closestCenter = [-99.6557, 19.2826];
+  const pointCoords: [number, number] = [lngVal, latVal];
+  let closestCenter: [number, number] = [-99.6557, 19.2826];
   let minDistance = Infinity;
   for (const muni of EDO_MEX_FEATURES) {
-    const centerPt = turf.point(muni.center);
-    const dist = turf.distance(point, centerPt, { units: "kilometers" });
+    const dist = haversineDistance(pointCoords, muni.center);
     if (dist < minDistance) {
       minDistance = dist;
       closestCenter = muni.center;
@@ -7299,3 +7394,11 @@ export function getNearestValidPoint(
   }
   return { lat: closestCenter[1], lng: closestCenter[0] };
 }
+
+export const EDO_MEX_MUNICIPALITIES: string[] = Array.from(
+  new Set(
+    EDO_MEX_FEATURES.map((m) =>
+      m.name.replace(", Estado de México", "").trim(),
+    ),
+  ),
+).sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));

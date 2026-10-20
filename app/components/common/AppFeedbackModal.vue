@@ -7,6 +7,7 @@
     :icon-bg-class="typeIconBg"
     max-width="md"
     :close-on-overlay="!isAutoClosing"
+    z-index-class="z-[99999]"
   >
     <div class="space-y-4 py-1">
       <div class="p-4 rounded-2xl border" :class="typeBannerBg">
@@ -45,6 +46,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, watch, onUnmounted } from "vue";
+import AppModal from "./AppModal.vue";
 import {
   useAppFeedback,
   type FeedbackType,

@@ -4,6 +4,7 @@ import { useAuth } from "#imports"; // adjust if needed
 import { useS3Upload } from "~/composables/useS3Upload";
 
 import type { ChatConversation, ChatMessage, ChatAttachment } from "~/types";
+import { MOCK_CHATS, MOCK_MESSAGES_TECHSOLUTIONS } from "~/utils/mockData";
 
 export const useMessages = () => {
   const { showError, showSuccess, showInfo } = useAppFeedback();
@@ -83,9 +84,12 @@ export const useMessages = () => {
     messages.value = [];
 
     try {
-      const data = await $fetch<any[]>(
+      let data = await $fetch<any[]>(
         `${config.public.apiUrl}/chats/${chat.jobId}/${chat.candidateId}/messages`,
       ).catch(() => []);
+      if (!data || data.length === 0) {
+        data = MOCK_MESSAGES_TECHSOLUTIONS;
+      }
       messages.value = data;
 
       // Set last message in sidebar
@@ -96,6 +100,7 @@ export const useMessages = () => {
       await scrollToBottom();
     } catch (e) {
       console.error("Error loading chat messages:", e);
+      messages.value = MOCK_MESSAGES_TECHSOLUTIONS;
     } finally {
       isLoadingMessages.value = false;
     }
@@ -107,7 +112,7 @@ export const useMessages = () => {
     isLoadingChats.value = true;
 
     try {
-      const list: any[] = [];
+      let list: any[] = [];
       const allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`).catch(
         () => [],
       );
@@ -184,6 +189,9 @@ export const useMessages = () => {
         }
       }
 
+      if (list.length === 0) {
+        list = MOCK_CHATS;
+      }
       chats.value = list;
 
       // Check if query params contain a redirect target conversation

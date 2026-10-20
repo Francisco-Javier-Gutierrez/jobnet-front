@@ -1,13 +1,14 @@
 import { useRoute } from "vue-router";
 import { useRuntimeConfig } from "#app";
 import type { CandidateProfile, Post } from "~/types";
+import { useCvInteraction } from "~/composables/useCvInteraction";
 
 export function useCandidateProfile(candidateIdParam?: string) {
   const route = useRoute();
   const candidateId = candidateIdParam || (route.params.id as string);
   const { data: authData } = useAuth();
   const config = useRuntimeConfig();
-  const { sharePost } = useShare();
+  const { sharePost, shareJob } = useShare();
 
   const defaultAvatar =
     "https://ui-avatars.com/api/?name=User&background=6366f1&color=fff&size=128";
@@ -27,13 +28,35 @@ export function useCandidateProfile(candidateIdParam?: string) {
     selectedDocUrl.value = url;
     selectedDocTitle.value = title;
     showDocViewer.value = true;
+
+    if (
+      !isOwner.value &&
+      (title.toLowerCase().includes("cv") ||
+        title.toLowerCase().includes("curriculum"))
+    ) {
+      const { notifyCvInteraction } = useCvInteraction();
+      notifyCvInteraction(candidateId, { action: "VIEW" });
+    }
   };
 
   // --- Ownership Check ---
   const isOwner = computed(() => {
-    const user = authData.value?.user;
+    const user = authData.value?.user as any;
     if (!user) return false;
-    return user.id === candidateId || user.email === candidateId;
+    const uid = user.id ? String(user.id).toLowerCase() : "";
+    const uemail = user.email ? String(user.email).toLowerCase() : "";
+    const candIdLower = String(candidateId || "").toLowerCase();
+    const profId = profile.value.id ? String(profile.value.id).toLowerCase() : "";
+    const profEmail = profile.value.email ? String(profile.value.email).toLowerCase() : "";
+    const profUuid = profile.value.usuarioUuid ? String(profile.value.usuarioUuid).toLowerCase() : "";
+
+    return (
+      (uid && uid === candIdLower) ||
+      (uemail && uemail === candIdLower) ||
+      (profId && uid === profId) ||
+      (profUuid && uid === profUuid) ||
+      (profEmail && uemail === profEmail)
+    );
   });
 
   // --- Computed from profile data ---
@@ -110,14 +133,38 @@ export function useCandidateProfile(candidateIdParam?: string) {
               ? "Documento Adicional"
               : d.name || d.nombre || "Documento Adicional";
           if (url) {
+            const isExternalLink =
+              d.esEnlaceExterno === true ||
+              d.type === "link" ||
+              (!url.includes(".pdf") && url.startsWith("http"));
             const isPdf =
-              (typeof d !== "string" && d.type === "pdf") ||
-              (url && url.includes(".pdf"));
+              !isExternalLink &&
+              ((typeof d !== "string" && d.type === "pdf") ||
+                (url && url.toLowerCase().includes(".pdf")));
+
+            let meta = "Documento";
+            if (isExternalLink) {
+              meta = d.institucion
+                ? `Credencial Verificable · ${d.institucion}`
+                : "Enlace Externo Verificable";
+            } else if (d.tipoDocumento) {
+              const typeLabels: Record<string, string> = {
+                CERTIFICACION: "Certificación PDF",
+                DIPLOMA: "Diploma PDF",
+                CONSTANCIA: "Constancia PDF",
+                OTRO: "Documento PDF",
+              };
+              meta = typeLabels[d.tipoDocumento] || "Documento PDF";
+            } else {
+              meta = isPdf ? "Documento PDF" : "Archivo Adjunto";
+            }
+
             docs.push({
               name,
-              meta: isPdf ? "Documento PDF" : "Imagen / Certificado",
-              type: isPdf ? "pdf" : "image",
+              meta,
+              type: isExternalLink ? "link" : isPdf ? "pdf" : "image",
               url,
+              esEnlaceExterno: isExternalLink,
             });
           }
         }
@@ -134,7 +181,7 @@ export function useCandidateProfile(candidateIdParam?: string) {
           const isPdf = url.includes(".pdf");
           docs.push({
             name,
-            meta: isPdf ? "Documento PDF" : "Imagen / Certificado",
+            meta: isPdf ? "Documento PDF" : "Archivo Adjunto",
             type: isPdf ? "pdf" : "image",
             url,
           });
@@ -195,7 +242,6 @@ export function useCandidateProfile(candidateIdParam?: string) {
   // --- Posts & Bookmarks Tab State ---
   const activeTab = ref<"posts" | "bookmarks">("posts");
   const allUserPosts = ref<any[]>([]);
-  const allBookmarkedPosts = ref<any[]>([]);
 
   const { data: postsData, pending: postsPending } = useLazyAsyncData(
     `candidate-posts-${candidateId}`,
@@ -205,13 +251,49 @@ export function useCandidateProfile(candidateIdParam?: string) {
         .catch(() => ({ data: [] })),
   );
 
-  const { data: bookmarksData, pending: bookmarksPending } = useLazyAsyncData(
+  const allBookmarkedPosts = ref<any[]>([]);
+  const allBookmarkedJobs = ref<any[]>([]);
+
+  const currentUserId = computed(() => {
+    const user = authData.value?.user as any;
+    return user?.id || user?.email || "";
+  });
+
+  const effectiveBookmarkUserId = computed(() => {
+    if (isOwner.value && currentUserId.value) return currentUserId.value;
+    return candidateId;
+  });
+
+  const {
+    data: bookmarksData,
+    pending: bookmarksPending,
+    refresh: refreshBookmarks,
+  } = useLazyAsyncData(
     `candidate-bookmarks-${candidateId}`,
-    () =>
-      $fetch(`${config.public.apiUrl}/profile/${candidateId}/bookmarks`)
+    () => {
+      // Directiva de privacidad: los elementos guardados solo son accesibles por el propio usuario
+      if (!isOwner.value || !currentUserId.value) {
+        return Promise.resolve({ data: [], posts: [], jobs: [] });
+      }
+      const targetId = effectiveBookmarkUserId.value;
+      const uid = currentUserId.value;
+      return $fetch(
+        `/api/profile/${encodeURIComponent(targetId)}/bookmarks?userId=${encodeURIComponent(uid)}`,
+        {
+          headers: uid ? { "x-user-id": uid } : {},
+        },
+      )
         .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-        .catch(() => ({ data: [] })),
+        .catch(() => ({ data: [], posts: [], jobs: [] }));
+    },
+    { watch: [isOwner, effectiveBookmarkUserId] },
   );
+
+  watch([isOwner, currentUserId], ([owner, uid]) => {
+    if (owner && uid) {
+      refreshBookmarks();
+    }
+  });
 
   watch(
     postsData,
@@ -224,7 +306,35 @@ export function useCandidateProfile(candidateIdParam?: string) {
   watch(
     bookmarksData,
     (val: any) => {
-      if (val?.data) allBookmarkedPosts.value = val.data;
+      if (val) {
+        const posts =
+          Array.isArray(val.posts) && val.posts.length > 0
+            ? val.posts
+            : Array.isArray(val.data)
+              ? val.data.filter(
+                  (i: any) =>
+                    (i.PK && i.PK.startsWith("POST#")) ||
+                    i.uniqueId ||
+                    (i.content && !i.modalidad),
+                )
+              : [];
+        allBookmarkedPosts.value = posts;
+
+        const jobs =
+          Array.isArray(val.jobs) && val.jobs.length > 0
+            ? val.jobs
+            : Array.isArray(val.data)
+              ? val.data.filter(
+                  (i: any) =>
+                    (i.PK && i.PK.startsWith("VACANCY#")) ||
+                    i.empresaUuid !== undefined ||
+                    i.modalidad !== undefined ||
+                    i.salario !== undefined ||
+                    i.title !== undefined,
+                )
+              : [];
+        allBookmarkedJobs.value = jobs;
+      }
     },
     { immediate: true },
   );
@@ -234,6 +344,7 @@ export function useCandidateProfile(candidateIdParam?: string) {
   );
   const userPosts = computed(() => allUserPosts.value);
   const bookmarkedPosts = computed(() => allBookmarkedPosts.value);
+  const bookmarkedJobs = computed(() => allBookmarkedJobs.value);
 
   const isBookmarked = (post: any) => {
     if (!post) return false;
@@ -373,6 +484,63 @@ export function useCandidateProfile(candidateIdParam?: string) {
     }
   };
 
+  const toggleJobBookmark = async (job: any) => {
+    const authUser = authData.value?.user as any;
+    const currentUserId = authUser?.id || candidateId;
+    if (!currentUserId) return;
+    if (!job.bookmarksList) job.bookmarksList = [];
+
+    const jId = job.id || job.uniqueId;
+    const idx = job.bookmarksList.indexOf(currentUserId);
+    if (idx !== -1) {
+      job.bookmarksList.splice(idx, 1);
+      const bIdx = allBookmarkedJobs.value.findIndex(
+        (j) => (j.id || j.uniqueId) === jId,
+      );
+      if (bIdx !== -1) allBookmarkedJobs.value.splice(bIdx, 1);
+    } else {
+      job.bookmarksList.push(currentUserId);
+      if (
+        !allBookmarkedJobs.value.some((j) => (j.id || j.uniqueId) === jId)
+      ) {
+        allBookmarkedJobs.value.unshift(job);
+      }
+    }
+
+    try {
+      await $fetch(`/api/jobs/${jId}/bookmark`, {
+        method: "POST",
+        body: { userUuid: currentUserId },
+      });
+    } catch (e) {
+      console.error("Error toggling job bookmark:", e);
+    }
+  };
+
+  const toggleJobLike = async (job: any) => {
+    const authUser = authData.value?.user as any;
+    const currentUserId = authUser?.id || candidateId;
+    if (!currentUserId) return;
+    if (!job.likesList) job.likesList = [];
+
+    const jId = job.id || job.uniqueId;
+    const idx = job.likesList.indexOf(currentUserId);
+    if (idx !== -1) {
+      job.likesList.splice(idx, 1);
+    } else {
+      job.likesList.push(currentUserId);
+    }
+
+    try {
+      await $fetch(`/api/jobs/${jId}/like`, {
+        method: "POST",
+        body: { userUuid: currentUserId },
+      });
+    } catch (e) {
+      console.error("Error toggling job like:", e);
+    }
+  };
+
   return {
     candidateId,
     loading,
@@ -396,10 +564,14 @@ export function useCandidateProfile(candidateIdParam?: string) {
     loadingPosts,
     userPosts,
     bookmarkedPosts,
+    bookmarkedJobs,
     toggleLike,
     toggleBookmark,
+    toggleJobLike,
+    toggleJobBookmark,
     isBookmarked,
     sharePost,
+    shareJob,
     authData,
   };
 }

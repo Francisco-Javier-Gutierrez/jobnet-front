@@ -35,30 +35,72 @@
       </div>
 
       <div class="space-y-6">
-        <p
-          class="text-sm text-on-surface-variant dark:text-slate-300 leading-relaxed"
-        >
-          Protege tu cuenta vinculando un autenticador TOTP en AWS Cognito (como
-          Google Authenticator, Microsoft Authenticator o Authy).
-        </p>
-
-        <!-- Loading initialization -->
+        <!-- Guard for Federated Google Users -->
         <div
-          v-if="loadingInit"
-          class="flex flex-col items-center justify-center p-8 space-y-3"
+          v-if="isFederatedUser"
+          class="space-y-4 p-5 bg-surface-container-low dark:bg-slate-800/60 rounded-xl border border-outline-variant/40 text-center"
         >
-          <span
-            class="material-symbols-outlined text-3xl text-primary animate-spin"
-            >sync</span
+          <div
+            class="w-12 h-12 mx-auto rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center"
           >
+            <span class="material-symbols-outlined text-2xl">verified_user</span>
+          </div>
+          <h2 class="text-sm font-bold text-on-background dark:text-slate-100">
+            Seguridad administrada por Google
+          </h2>
           <p
-            class="text-xs text-on-surface-variant dark:text-slate-300 font-semibold"
+            class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
           >
-            Generando token TOTP en AWS Cognito...
+            Tu cuenta ha iniciado sesión con Google Sign-In. La verificación en
+            dos pasos (2FA / MFA) y la seguridad de acceso son administradas
+            directamente por Google, por lo que no es necesario ni posible
+            registrar un token TOTP en AWS Cognito.
           </p>
+          <div class="pt-2 flex flex-col sm:flex-row gap-2 justify-center">
+            <a
+              href="https://myaccount.google.com/signinoptions/two-step-verification"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-4 py-2.5 bg-primary hover:bg-primary/90 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5"
+            >
+              <span>Ver 2FA en Google</span>
+              <span class="material-symbols-outlined text-xs">open_in_new</span>
+            </a>
+            <button
+              type="button"
+              @click="goBack"
+              class="px-4 py-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-xs rounded-xl transition cursor-pointer"
+            >
+              Volver a Configuración
+            </button>
+          </div>
         </div>
 
         <template v-else>
+          <p
+            class="text-sm text-on-surface-variant dark:text-slate-300 leading-relaxed"
+          >
+            Protege tu cuenta vinculando un autenticador TOTP en AWS Cognito (como
+            Google Authenticator, Microsoft Authenticator o Authy).
+          </p>
+
+          <!-- Loading initialization -->
+          <div
+            v-if="loadingInit"
+            class="flex flex-col items-center justify-center p-8 space-y-3"
+          >
+            <span
+              class="material-symbols-outlined text-3xl text-primary animate-spin"
+              >sync</span
+            >
+            <p
+              class="text-xs text-on-surface-variant dark:text-slate-300 font-semibold"
+            >
+              Generando token TOTP en AWS Cognito...
+            </p>
+          </div>
+
+          <template v-else>
           <!-- Step 1: Scan QR Code -->
           <div class="space-y-2">
             <h3
@@ -183,6 +225,7 @@
             </button>
           </form>
         </template>
+        </template>
       </div>
     </div>
   </div>
@@ -224,6 +267,17 @@ const userRole = computed<string>(() => {
   return "candidate";
 });
 
+const isFederatedUser = computed(() => {
+  const user = sessionData.value?.user as any;
+  if (!user) return false;
+  return Boolean(
+    user.isFederated ||
+      user.provider === "cognito" ||
+      (typeof user.id === "string" &&
+        user.id.toLowerCase().startsWith("google_")),
+  );
+});
+
 const getReturnRoute = () => {
   if (userRole.value === "organization") {
     return "/company/edit";
@@ -242,6 +296,10 @@ const generateQrUrl = (secret: string) => {
 };
 
 const fetchAssociateToken = async () => {
+  if (isFederatedUser.value) {
+    loadingInit.value = false;
+    return;
+  }
   loadingInit.value = true;
   const accessToken =
     (sessionData.value as any)?.accessToken ||
@@ -291,7 +349,11 @@ const fetchAssociateToken = async () => {
 };
 
 onMounted(() => {
-  fetchAssociateToken();
+  if (!isFederatedUser.value) {
+    fetchAssociateToken();
+  } else {
+    loadingInit.value = false;
+  }
 });
 
 // Copy manual secret key to clipboard

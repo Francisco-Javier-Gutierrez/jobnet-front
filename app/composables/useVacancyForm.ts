@@ -3,6 +3,10 @@ import { useAuth } from "#imports"; // or wherever it comes from
 import { useCatalogStore } from "~/stores/catalog";
 import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import {
+  EDO_MEX_FEATURES,
+  EDO_MEX_MUNICIPALITIES,
+} from "~/utils/edoMexGeoJSON";
 
 export interface VacancyFormState {
   title: string;
@@ -10,14 +14,19 @@ export interface VacancyFormState {
   description: string;
   skills: string[];
   sectors: string[];
+  sector: string;
   aptitudes: string;
   experienceYears: number | null;
   vacantesDisponibles: number;
   maxPostulantes: number | null;
   salaryMin: number | null;
   salaryMax: number | null;
+  salarioConfidencial: boolean;
+  municipio: string;
   lat: number;
   lng: number;
+  preguntasFiltro: string[];
+  fechaCierre?: string;
 }
 
 export function useVacancyForm(options: { isEdit?: boolean } = {}) {
@@ -35,14 +44,21 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
     description: "",
     skills: [],
     sectors: [],
+    sector: "Tecnología",
     aptitudes: "",
     experienceYears: null,
     vacantesDisponibles: 1,
     maxPostulantes: null,
     salaryMin: null,
     salaryMax: null,
+    salarioConfidencial: false,
+    municipio: "Toluca",
     lat: 19.2826,
     lng: -99.6557,
+    preguntasFiltro: [],
+    fechaCierre: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0],
   });
 
   const showVacancyPdfModal = ref(false);
@@ -164,14 +180,18 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
         description: "",
         skills: [],
         sectors: [],
+        sector: "Tecnología",
         aptitudes: "",
         experienceYears: null,
         vacantesDisponibles: 1,
         maxPostulantes: null,
         salaryMin: null,
         salaryMax: null,
+        salarioConfidencial: false,
+        municipio: "Toluca",
         lat: 19.2826,
         lng: -99.6557,
+        preguntasFiltro: [],
       };
       isRestoring = false;
     }
@@ -242,14 +262,34 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
           form.value.description = job.descripcion || "";
           form.value.skills = job.habilidadesRequeridas || [];
           form.value.sectors = job.sectores || [];
+          form.value.sector =
+            job.sector ||
+            (job.sectores && job.sectores[0]) ||
+            "Tecnología";
           form.value.aptitudes = job.aptitudes || "";
           form.value.experienceYears = job.experienciaAnos || null;
           form.value.vacantesDisponibles = job.vacantesDisponibles || 1;
           form.value.maxPostulantes = job.maxPostulantes || null;
           form.value.salaryMin = job.salarioMinimo || null;
           form.value.salaryMax = job.salarioMaximo || null;
+          form.value.salarioConfidencial = Boolean(
+            job.salarioConfidencial || job.isSalaryConfidential,
+          );
+          form.value.municipio =
+            job.municipio ||
+            (job.location
+              ? job.location.replace(", Estado de México", "").trim()
+              : "Toluca");
           form.value.lat = job.lat || 19.2826;
           form.value.lng = job.lng || -99.6557;
+          form.value.preguntasFiltro = Array.isArray(job.preguntasFiltro)
+            ? job.preguntasFiltro.slice(0, 3)
+            : Array.isArray(job.screeningQuestions)
+              ? job.screeningQuestions.slice(0, 3)
+              : [];
+          if (job.fechaCierre || job.fechaVigencia) {
+            form.value.fechaCierre = (job.fechaCierre || job.fechaVigencia).split("T")[0];
+          }
         }
       } catch (e) {
         console.error("Error loading job:", e);
@@ -290,6 +330,28 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
     form.value.sectors = form.value.sectors.filter((s) => s !== sectorName);
   };
 
+  const addPreguntaFiltro = () => {
+    if (form.value.preguntasFiltro.length < 3) {
+      form.value.preguntasFiltro.push("");
+    }
+  };
+
+  const removePreguntaFiltro = (index: number) => {
+    form.value.preguntasFiltro.splice(index, 1);
+  };
+
+  const setMunicipio = (muniName: string) => {
+    form.value.municipio = muniName;
+    const clean = muniName.toLowerCase().trim();
+    const found = EDO_MEX_FEATURES.find((m) =>
+      m.name.toLowerCase().includes(clean),
+    );
+    if (found) {
+      form.value.lat = found.center[1];
+      form.value.lng = found.center[0];
+    }
+  };
+
   const handleQuickAddSector = async () => {
     const queryName = sectorSearchQuery.value.trim();
     if (!queryName) return;
@@ -308,13 +370,21 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
 
   const handleSubmit = async () => {
     if (!session.value?.user?.id) return;
-    if (form.value.skills.length === 0) {
-      errorMessage.value =
-        "Debes seleccionar al menos una habilidad requerida.";
+    if (!form.value.title.trim()) {
+      errorMessage.value = "El título de la vacante es obligatorio.";
       return;
     }
-    if (form.value.sectors.length === 0) {
-      errorMessage.value = "Debes seleccionar al menos un sector de industria.";
+    if (!form.value.description.trim()) {
+      errorMessage.value = "La descripción de la vacante es obligatoria.";
+      return;
+    }
+    if (form.value.skills.length === 0) {
+      errorMessage.value =
+        "La selección de al menos una habilidad técnica vinculada al catálogo es obligatoria.";
+      return;
+    }
+    if (form.value.sectors.length === 0 && !form.value.sector.trim()) {
+      errorMessage.value = "Debes indicar o seleccionar el sector de la vacante.";
       return;
     }
 
@@ -323,6 +393,20 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
     errorMessage.value = "";
 
     try {
+      // Auto-dispatch skills not currently in the master catalog to moderator inbox
+      for (const skill of form.value.skills) {
+        const isApproved = catalogStore.skills.some(
+          (cs) => cs.name.toLowerCase() === skill.toLowerCase().trim(),
+        );
+        if (!isApproved) {
+          try {
+            await catalogStore.suggestSkill(skill.trim());
+          } catch (e) {
+            console.warn("Auto-suggestion to skill mailbox:", e);
+          }
+        }
+      }
+
       let specPdfUrl = "";
       if (selectedVacancyFile.value) {
         const uploadStore = useUploadStore();
@@ -341,29 +425,51 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
         specPdfUrl = uploadResult.url;
       }
 
+      const validFilterQuestions = form.value.preguntasFiltro
+        .map((q) => q.trim())
+        .filter((q) => q.length > 0)
+        .slice(0, 3);
+
+      const resolvedSectors =
+        form.value.sectors.length > 0
+          ? form.value.sectors
+          : [form.value.sector.trim() || "Tecnología"];
+
       const payload: any = {
-        title: form.value.title,
+        title: form.value.title.trim(),
         company: companyName.value,
         empresaUuid: session.value.user.id,
         modalidad: form.value.modality,
         salarioMinimo: form.value.salaryMin || 0,
         salarioMaximo: form.value.salaryMax || 0,
-        salario: form.value.salaryMin || 0, // Fallback standard field
-        descripcion: form.value.description,
+        salario: form.value.salaryMin || 0,
+        salarioConfidencial: Boolean(form.value.salarioConfidencial),
+        isSalaryConfidential: Boolean(form.value.salarioConfidencial),
+        descripcion: form.value.description.trim(),
         habilidadesRequeridas: form.value.skills,
-        sectores: form.value.sectors,
+        sectores: resolvedSectors,
+        sector: form.value.sector || resolvedSectors[0],
         aptitudes: form.value.aptitudes,
         experienciaAnos: form.value.experienceYears || 0,
         vacantesDisponibles: form.value.vacantesDisponibles || 1,
         maxPostulantes: form.value.maxPostulantes || null,
+        municipio: form.value.municipio || "Toluca",
+        location: form.value.municipio
+          ? `${form.value.municipio}, Estado de México`
+          : "Estado de México",
+        lat: form.value.lat,
+        lng: form.value.lng,
+        preguntasFiltro: validFilterQuestions,
+        screeningQuestions: validFilterQuestions,
         pdfUrl: specPdfUrl,
         pdfName: selectedVacancyFile.value?.name || undefined,
+        fechaCierre: form.value.fechaCierre
+          ? new Date(`${form.value.fechaCierre}T23:59:59.999Z`).toISOString()
+          : undefined,
+        fechaVigencia: form.value.fechaCierre
+          ? new Date(`${form.value.fechaCierre}T23:59:59.999Z`).toISOString()
+          : undefined,
       };
-
-      if (["Híbrido", "Presencial"].includes(form.value.modality)) {
-        payload.lat = form.value.lat;
-        payload.lng = form.value.lng;
-      }
 
       let response;
       if (options.isEdit && route.params.id) {
@@ -398,14 +504,18 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
           description: "",
           skills: [],
           sectors: [],
+          sector: "Tecnología",
           aptitudes: "",
           experienceYears: null,
           vacantesDisponibles: 1,
           maxPostulantes: null,
           salaryMin: null,
           salaryMax: null,
+          salarioConfidencial: false,
+          municipio: "Toluca",
           lat: 19.2826,
           lng: -99.6557,
+          preguntasFiltro: [],
         };
         selectedVacancyFile.value = null;
 
@@ -415,9 +525,12 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
       }
     } catch (error: any) {
       console.error("Error creating/updating vacancy:", error);
-      errorMessage.value = options.isEdit
-        ? "Ocurrió un error al intentar actualizar la vacante."
-        : "Ocurrió un error al intentar publicar la vacante.";
+      errorMessage.value =
+        error?.data?.error ||
+        error?.response?._data?.error ||
+        (options.isEdit
+          ? "Ocurrió un error al intentar actualizar la vacante."
+          : "Ocurrió un error al intentar publicar la vacante.");
     } finally {
       submitting.value = false;
     }
@@ -437,6 +550,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
     sectorSearchQuery,
     filteredCatalogSkills,
     filteredCatalogSectors,
+    EDO_MEX_MUNICIPALITIES,
     openVacancyPdfPreview,
     triggerVacancyFileSelect,
     handleVacancyFileSelect,
@@ -446,8 +560,12 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
     removeSkill,
     addSector,
     removeSector,
+    addPreguntaFiltro,
+    removePreguntaFiltro,
+    setMunicipio,
     handleQuickAddSector,
     handleQuickAddSkill,
     handleSubmit,
   };
 }
+

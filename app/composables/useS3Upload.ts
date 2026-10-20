@@ -16,19 +16,19 @@ export function useS3Upload() {
     uploadError.value = null;
 
     try {
-      // PDF limit: 10MB, Images/Others limit: 5MB
+      // Strict 5MB limit
       const isPdf =
         file.type === "application/pdf" ||
         file.type === "application/x-pdf" ||
         file.name.toLowerCase().endsWith(".pdf");
 
-      const maxAllowedSize = isPdf ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
-      const limitMb = isPdf ? 10 : 5;
+      const maxAllowedSize = 5 * 1024 * 1024;
+      const limitMb = 5;
 
       if (file.size > maxAllowedSize) {
         const { showError } = useAppFeedback();
         const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-        const fileTypeLabel = isPdf ? "documento PDF" : "archivo de imagen";
+        const fileTypeLabel = isPdf ? "documento PDF" : "archivo";
         const msg = `El ${fileTypeLabel} "${file.name}" (${sizeMb} MB) supera el límite máximo permitido de ${limitMb}MB.`;
         showError("Límite de Tamaño Excedido", msg, null);
         throw new Error(msg);
@@ -83,9 +83,32 @@ export function useS3Upload() {
     }
   }
 
+  async function getSecureViewUrl(keyOrUrl: string): Promise<string> {
+    if (!keyOrUrl) return "";
+    if (keyOrUrl.startsWith("data:") || keyOrUrl.startsWith("blob:")) {
+      return keyOrUrl;
+    }
+    try {
+      const config = useRuntimeConfig();
+      const apiBase =
+        config.public.apiUrl ||
+        config.public.apiBase ||
+        "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
+      const res = await fetch(`${apiBase}/view-url?url=${encodeURIComponent(keyOrUrl)}`);
+      if (res.ok) {
+        const data = await res.json();
+        return data.url || keyOrUrl;
+      }
+    } catch (e) {
+      console.warn("Error fetching signed view URL:", e);
+    }
+    return keyOrUrl;
+  }
+
   return {
     isUploading,
     uploadError,
     uploadFile,
+    getSecureViewUrl,
   };
 }

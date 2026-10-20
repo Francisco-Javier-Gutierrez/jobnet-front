@@ -36,7 +36,32 @@
 
       <form @submit.prevent="handleSubmit" class="space-y-5">
         <div
-          v-if="errorMessage"
+          v-if="isFederatedAccount"
+          class="bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 p-4 rounded-xl text-xs space-y-3"
+        >
+          <div class="flex items-start gap-2">
+            <span
+              class="material-symbols-outlined text-base mt-0.5 text-amber-500"
+              >account_circle</span
+            >
+            <div>
+              <p class="font-bold text-sm">Cuenta vinculada a Google</p>
+              <p class="mt-0.5">
+                Esta cuenta utiliza inicio de sesión único con Google y no dispone
+                de contraseña local.
+              </p>
+            </div>
+          </div>
+          <NuxtLink
+            to="/login"
+            class="w-full py-2 bg-white dark:bg-slate-800 border border-amber-500/40 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 hover:bg-amber-50 dark:hover:bg-slate-700 transition"
+          >
+            <span>Ir al inicio de sesión con Google</span>
+          </NuxtLink>
+        </div>
+
+        <div
+          v-else-if="errorMessage"
           id="forgot-error"
           role="alert"
           aria-live="assertive"
@@ -122,6 +147,7 @@ const email = ref("");
 const loading = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
+const isFederatedAccount = ref(false);
 
 const router = useRouter();
 
@@ -129,6 +155,7 @@ const handleSubmit = async () => {
   loading.value = true;
   errorMessage.value = "";
   successMessage.value = "";
+  isFederatedAccount.value = false;
 
   try {
     const res = await $fetch("/api/auth/forgot-password", {
@@ -147,8 +174,18 @@ const handleSubmit = async () => {
       }, 1500);
     }
   } catch (error: any) {
+    if (
+      error.data?.data?.isFederated ||
+      error.data?.statusMessage?.includes("Google Sign-In") ||
+      error.data?.message?.includes("Google Sign-In")
+    ) {
+      isFederatedAccount.value = true;
+    }
     errorMessage.value =
-      error.data?.message || error.message || "Error al enviar código";
+      error.data?.statusMessage ||
+      error.data?.message ||
+      error.message ||
+      "Error al enviar código";
   } finally {
     loading.value = false;
   }

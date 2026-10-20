@@ -114,6 +114,7 @@ const reasonOptions = [
   "Spam o Publicidad No Deseada",
   "Suplantación de Identidad",
   "Discriminación o Acoso",
+  "Discrepancia Salarial / Oferta Engañosa",
   "Otro",
 ];
 const isSubmitting = ref(false);

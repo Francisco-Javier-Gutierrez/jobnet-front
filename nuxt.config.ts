@@ -1,3 +1,5 @@
+import path from "node:path";
+
 export default defineNuxtConfig({
   components: [
     {
@@ -10,9 +12,13 @@ export default defineNuxtConfig({
     appManifest: false,
   },
   devtools: { enabled: false },
-  css: ["~/assets/css/main.css"],
+  css: ["material-symbols/outlined.css", "~/assets/css/main.css"],
   alias: {
     "vue-demi": "vue",
+    "@panva/hkdf": path.resolve("./server/shims/hkdf.cjs"),
+    "@babel/runtime/helpers/interopRequireDefault": path.resolve(
+      "./server/shims/interopRequireDefault.cjs",
+    ),
   },
   build: {
     transpile: [
@@ -40,6 +46,11 @@ export default defineNuxtConfig({
       vapidPublicKey:
         process.env.NUXT_PUBLIC_VAPID_KEY ||
         "BOIrktuQCHHiOWcKICA7YEwdKJf8WNYCmBS_PI338wnaB9VqXPQfCRwTN5NLYokujXBp5pdD83av6DACG2rAYok",
+      cognitoClientId:
+        process.env.COGNITO_CLIENT_ID || "4ef8k4tofjj4ounvo8nf7d9pep",
+      cognitoDomain:
+        process.env.COGNITO_DOMAIN ||
+        "jobnet-auth-prod.auth.us-east-1.amazoncognito.com",
     },
   },
   app: {
@@ -54,10 +65,6 @@ export default defineNuxtConfig({
         {
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap",
-        },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
         },
       ],
     },
@@ -79,6 +86,12 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: "aws-lambda",
+    alias: {
+      "@panva/hkdf": path.resolve("./server/shims/hkdf.cjs"),
+      "@babel/runtime/helpers/interopRequireDefault": path.resolve(
+        "./server/shims/interopRequireDefault.cjs",
+      ),
+    },
     externals: {
       inline: [
         "@babel/runtime",

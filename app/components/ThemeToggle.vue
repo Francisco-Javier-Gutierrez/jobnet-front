@@ -8,18 +8,25 @@
     :title="`Modo ${isDark ? 'Oscuro' : 'Claro'} activo. Haz clic para cambiar`"
     aria-label="Cambiar tema de color"
   >
-    <span
-      v-if="isDark"
-      class="material-symbols-outlined text-[20px] text-amber-400 transform transition-transform duration-300 rotate-0 dark:rotate-[360deg]"
-    >
-      dark_mode
-    </span>
-    <span
-      v-else
-      class="material-symbols-outlined text-[20px] text-amber-500 transform transition-transform duration-300 rotate-0"
-    >
-      light_mode
-    </span>
+    <ClientOnly>
+      <span
+        v-if="isDark"
+        class="material-symbols-outlined text-[20px] text-amber-400 transform transition-transform duration-300 rotate-0 dark:rotate-[360deg]"
+      >
+        dark_mode
+      </span>
+      <span
+        v-else
+        class="material-symbols-outlined text-[20px] text-amber-500 transform transition-transform duration-300 rotate-0"
+      >
+        light_mode
+      </span>
+      <template #fallback>
+        <span class="material-symbols-outlined text-[20px] text-amber-500">
+          light_mode
+        </span>
+      </template>
+    </ClientOnly>
   </button>
 
   <!-- 2. PILLS MODE: Segmented control (ideal for desktop sidebars & settings pages) -->
@@ -27,56 +34,61 @@
     v-else-if="mode === 'pills'"
     class="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/80 w-full"
   >
-    <button
-      @click="setTheme('light')"
-      type="button"
-      class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all duration-200"
-      :class="[
-        theme === 'light'
-          ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-amber-400 shadow-sm'
-          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-      ]"
-      title="Tema Claro"
-    >
-      <span class="material-symbols-outlined text-[16px] text-amber-500"
-        >light_mode</span
+    <ClientOnly>
+      <button
+        @click="setTheme('light')"
+        type="button"
+        class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all duration-200"
+        :class="[
+          theme === 'light'
+            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-amber-400 shadow-sm'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+        ]"
+        title="Tema Claro"
       >
-      <span class="truncate">Claro</span>
-    </button>
+        <span class="material-symbols-outlined text-[16px] text-amber-500"
+          >light_mode</span
+        >
+        <span class="truncate">Claro</span>
+      </button>
 
-    <button
-      @click="setTheme('dark')"
-      type="button"
-      class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all duration-200"
-      :class="[
-        theme === 'dark'
-          ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-amber-400 shadow-sm'
-          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-      ]"
-      title="Tema Oscuro"
-    >
-      <span class="material-symbols-outlined text-[16px] text-indigo-400"
-        >dark_mode</span
+      <button
+        @click="setTheme('dark')"
+        type="button"
+        class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all duration-200"
+        :class="[
+          theme === 'dark'
+            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-amber-400 shadow-sm'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+        ]"
+        title="Tema Oscuro"
       >
-      <span class="truncate">Oscuro</span>
-    </button>
+        <span class="material-symbols-outlined text-[16px] text-indigo-400"
+          >dark_mode</span
+        >
+        <span class="truncate">Oscuro</span>
+      </button>
 
-    <button
-      @click="setTheme('system')"
-      type="button"
-      class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all duration-200"
-      :class="[
-        theme === 'system'
-          ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-amber-400 shadow-sm'
-          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-      ]"
-      title="Seguir Sistema"
-    >
-      <span class="material-symbols-outlined text-[16px] text-slate-400"
-        >desktop_windows</span
+      <button
+        @click="setTheme('system')"
+        type="button"
+        class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all duration-200"
+        :class="[
+          theme === 'system'
+            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-amber-400 shadow-sm'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+        ]"
+        title="Seguir Sistema"
       >
-      <span class="truncate">Auto</span>
-    </button>
+        <span class="material-symbols-outlined text-[16px] text-slate-400"
+          >desktop_windows</span
+        >
+        <span class="truncate">Auto</span>
+      </button>
+      <template #fallback>
+        <div class="h-6 w-full animate-pulse bg-slate-200/50 dark:bg-slate-700/50 rounded-lg"></div>
+      </template>
+    </ClientOnly>
   </div>
 
   <!-- 3. DROPDOWN MODE: Popover selector -->
@@ -88,14 +100,21 @@
       :title="`Tema: ${theme}`"
       aria-label="Cambiar tema"
     >
-      <span
-        v-if="isDark"
-        class="material-symbols-outlined text-[20px] text-amber-400"
-        >dark_mode</span
-      >
-      <span v-else class="material-symbols-outlined text-[20px] text-amber-500"
-        >light_mode</span
-      >
+      <ClientOnly>
+        <span
+          v-if="isDark"
+          class="material-symbols-outlined text-[20px] text-amber-400"
+          >dark_mode</span
+        >
+        <span v-else class="material-symbols-outlined text-[20px] text-amber-500"
+          >light_mode</span
+        >
+        <template #fallback>
+          <span class="material-symbols-outlined text-[20px] text-amber-500"
+            >light_mode</span
+          >
+        </template>
+      </ClientOnly>
     </button>
 
     <Transition

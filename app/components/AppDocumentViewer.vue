@@ -4,6 +4,8 @@
     @update:model-value="$emit('update:modelValue', $event)"
     :url="url"
     :title="title"
+    :candidate-id="candidateId"
+    :vacancy-title="vacancyTitle"
   />
 </template>
 
@@ -12,6 +14,8 @@ defineProps<{
   modelValue: boolean;
   url: string;
   title?: string;
+  candidateId?: string;
+  vacancyTitle?: string;
 }>();
 
 defineEmits<{
