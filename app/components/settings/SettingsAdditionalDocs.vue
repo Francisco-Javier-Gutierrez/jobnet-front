@@ -14,7 +14,9 @@
           Documentos y Certificaciones
         </h2>
         <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-0.5">
-          Adjunta certificaciones, diplomas y constancias profesionales en PDF (máximo 5 documentos, hasta 5 MB por archivo) o registra enlaces web externos verificables.
+          Adjunta certificaciones, diplomas y constancias profesionales en PDF
+          (máximo 5 documentos, hasta 5 MB por archivo) o registra enlaces web
+          externos verificables.
         </p>
       </div>
 
@@ -78,7 +80,9 @@
       >
         <span class="material-symbols-outlined text-lg shrink-0">info</span>
         <span>
-          Has alcanzado el límite máximo permitido de 5 documentos PDF. Si deseas adjuntar otro documento, elimina uno de los existentes en la lista inferior.
+          Has alcanzado el límite máximo permitido de 5 documentos PDF. Si
+          deseas adjuntar otro documento, elimina uno de los existentes en la
+          lista inferior.
         </span>
       </div>
 
@@ -157,7 +161,8 @@
             v-if="selectedFile"
             class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-full"
           >
-            Archivo listo: {{ (selectedFile.size / (1024 * 1024)).toFixed(2) }} MB
+            Archivo listo:
+            {{ (selectedFile.size / (1024 * 1024)).toFixed(2) }} MB
           </span>
         </div>
 
@@ -250,7 +255,8 @@
           >
         </div>
         <p class="text-[10px] text-on-surface-variant dark:text-slate-400 mt-1">
-          Debe ser una URL pública donde reclutadores puedan corroborar la autenticidad de tu certificación.
+          Debe ser una URL pública donde reclutadores puedan corroborar la
+          autenticidad de tu certificación.
         </p>
       </div>
 
@@ -286,11 +292,15 @@
 
     <!-- Listado de Documentos y Certificaciones Registradas -->
     <div v-if="docList.length > 0" class="space-y-3 pt-2">
-      <div class="flex items-center justify-between border-b border-outline-variant/40 pb-2">
+      <div
+        class="flex items-center justify-between border-b border-outline-variant/40 pb-2"
+      >
         <h3
           class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5"
         >
-          <span class="material-symbols-outlined text-sm text-primary">folder</span>
+          <span class="material-symbols-outlined text-sm text-primary"
+            >folder</span
+          >
           Documentos y Certificaciones Registradas ({{ docList.length }})
         </h3>
         <span class="text-[11px] text-on-surface-variant">
@@ -338,7 +348,9 @@
                   v-else
                   class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-0.5"
                 >
-                  <span class="material-symbols-outlined text-[10px]">lock_clock</span>
+                  <span class="material-symbols-outlined text-[10px]"
+                    >lock_clock</span
+                  >
                   Acceso seguro (1h)
                 </span>
               </div>
@@ -378,7 +390,9 @@
                 rel="noopener noreferrer"
                 class="text-blue-600 dark:text-blue-400 hover:underline font-bold text-[11px] flex items-center gap-1 cursor-pointer"
               >
-                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                <span class="material-symbols-outlined text-sm"
+                  >open_in_new</span
+                >
                 <span>Verificar en Sitio Web</span>
               </a>
             </template>
@@ -390,7 +404,9 @@
                 :disabled="loadingSecureUrl"
                 class="text-primary hover:underline font-bold text-[11px] flex items-center gap-1 cursor-pointer disabled:opacity-50"
               >
-                <span class="material-symbols-outlined text-sm">visibility</span>
+                <span class="material-symbols-outlined text-sm"
+                  >visibility</span
+                >
                 <span>Ver documento seguro</span>
               </button>
             </template>
@@ -595,8 +611,7 @@ async function uploadAndAddFile() {
 
   docError.value = "";
   const file = selectedFile.value;
-  const title =
-    newDocName.value.trim() || file.name.replace(/\.[^/.]+$/, "");
+  const title = newDocName.value.trim() || file.name.replace(/\.[^/.]+$/, "");
 
   uploadProgress.value = "Subiendo archivo a S3 de forma segura...";
 

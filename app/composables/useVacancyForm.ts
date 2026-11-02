@@ -263,9 +263,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
           form.value.skills = job.habilidadesRequeridas || [];
           form.value.sectors = job.sectores || [];
           form.value.sector =
-            job.sector ||
-            (job.sectores && job.sectores[0]) ||
-            "Tecnología";
+            job.sector || (job.sectores && job.sectores[0]) || "Tecnología";
           form.value.aptitudes = job.aptitudes || "";
           form.value.experienceYears = job.experienciaAnos || null;
           form.value.vacantesDisponibles = job.vacantesDisponibles || 1;
@@ -288,7 +286,9 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
               ? job.screeningQuestions.slice(0, 3)
               : [];
           if (job.fechaCierre || job.fechaVigencia) {
-            form.value.fechaCierre = (job.fechaCierre || job.fechaVigencia).split("T")[0];
+            form.value.fechaCierre = (
+              job.fechaCierre || job.fechaVigencia
+            ).split("T")[0];
           }
         }
       } catch (e) {
@@ -384,7 +384,8 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
       return;
     }
     if (form.value.sectors.length === 0 && !form.value.sector.trim()) {
-      errorMessage.value = "Debes indicar o seleccionar el sector de la vacante.";
+      errorMessage.value =
+        "Debes indicar o seleccionar el sector de la vacante.";
       return;
     }
 
@@ -568,4 +569,3 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
     handleSubmit,
   };
 }
-

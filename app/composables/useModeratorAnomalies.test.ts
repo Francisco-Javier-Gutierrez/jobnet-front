@@ -33,11 +33,17 @@ describe("useModeratorAnomalies Composable (Detección de Concurrencia Anómala 
         createdAt: new Date(now - i * 2.5 * 60 * 1000).toISOString(),
       }));
 
-      const orgVacanciesMap: Record<string, { companyName: string; dates: number[] }> = {};
+      const orgVacanciesMap: Record<
+        string,
+        { companyName: string; dates: number[] }
+      > = {};
       vacancies.forEach((vac) => {
         const time = new Date(vac.createdAt).getTime();
         if (!orgVacanciesMap[vac.empresaUuid]) {
-          orgVacanciesMap[vac.empresaUuid] = { companyName: vac.company, dates: [] };
+          orgVacanciesMap[vac.empresaUuid] = {
+            companyName: vac.company,
+            dates: [],
+          };
         }
         orgVacanciesMap[vac.empresaUuid].dates.push(time);
       });
@@ -48,7 +54,9 @@ describe("useModeratorAnomalies Composable (Detección de Concurrencia Anómala 
         for (let i = 0; i < data.dates.length; i++) {
           const windowStart = data.dates[i];
           const windowEnd = windowStart + oneHourMs;
-          const countInWindow = data.dates.filter((d) => d >= windowStart && d <= windowEnd).length;
+          const countInWindow = data.dates.filter(
+            (d) => d >= windowStart && d <= windowEnd,
+          ).length;
           if (countInWindow > 10) {
             detectedAnomalies.push({
               organizationId: orgId,
@@ -80,11 +88,17 @@ describe("useModeratorAnomalies Composable (Detección de Concurrencia Anómala 
         createdAt: new Date(now - i * 3 * 60 * 1000).toISOString(),
       }));
 
-      const orgReportsMap: Record<string, { companyName: string; dates: number[] }> = {};
+      const orgReportsMap: Record<
+        string,
+        { companyName: string; dates: number[] }
+      > = {};
       reports.forEach((rep) => {
         const time = new Date(rep.createdAt).getTime();
         if (!orgReportsMap[rep.companyId]) {
-          orgReportsMap[rep.companyId] = { companyName: rep.companyName, dates: [] };
+          orgReportsMap[rep.companyId] = {
+            companyName: rep.companyName,
+            dates: [],
+          };
         }
         orgReportsMap[rep.companyId].dates.push(time);
       });
@@ -95,7 +109,9 @@ describe("useModeratorAnomalies Composable (Detección de Concurrencia Anómala 
         for (let i = 0; i < data.dates.length; i++) {
           const windowStart = data.dates[i];
           const windowEnd = windowStart + oneHourMs;
-          const countInWindow = data.dates.filter((d) => d >= windowStart && d <= windowEnd).length;
+          const countInWindow = data.dates.filter(
+            (d) => d >= windowStart && d <= windowEnd,
+          ).length;
           if (countInWindow > 5) {
             detectedAnomalies.push({
               organizationId: orgId,
@@ -127,8 +143,12 @@ describe("useModeratorAnomalies Composable (Detección de Concurrencia Anómala 
         createdAt: new Date(now - i * 10 * 60 * 1000).getTime(),
       }));
 
-      const vacInWindow = vacancies.filter((v) => v.createdAt >= now - oneHourMs && v.createdAt <= now).length;
-      const repInWindow = reports.filter((r) => r.createdAt >= now - oneHourMs && r.createdAt <= now).length;
+      const vacInWindow = vacancies.filter(
+        (v) => v.createdAt >= now - oneHourMs && v.createdAt <= now,
+      ).length;
+      const repInWindow = reports.filter(
+        (r) => r.createdAt >= now - oneHourMs && r.createdAt <= now,
+      ).length;
 
       expect(vacInWindow > 10).toBe(false);
       expect(repInWindow > 5).toBe(false);
@@ -155,7 +175,9 @@ describe("useModeratorAnomalies Composable (Detección de Concurrencia Anómala 
       };
 
       expect(pausePayload.id).toBe("org-bot-recruitment-99");
-      expect(pausePayload.reason).toContain("Pausado preventivamente por concurrencia anómala");
+      expect(pausePayload.reason).toContain(
+        "Pausado preventivamente por concurrencia anómala",
+      );
       expect(pausePayload.graceDays).toBe(4);
       expect(pausePayload.nextPhase).toBe("IN_REVIEW");
     });

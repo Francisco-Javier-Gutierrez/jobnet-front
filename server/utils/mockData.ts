@@ -11,5 +11,5 @@ export {
   MOCK_INCIDENTS,
   MOCK_VERIFICATIONS,
   MOCK_APPEALS,
-  MOCK_CATALOG
+  MOCK_CATALOG,
 } from "../../app/utils/mockData";

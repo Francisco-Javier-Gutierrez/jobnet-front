@@ -13,9 +13,13 @@ import {
 describe("Domain Verifier - Verificación Automatizada de Organizaciones", () => {
   describe("extractEmailDomain", () => {
     it("should extract domain from normal email address", () => {
-      expect(extractEmailDomain("reclutador@techsolutions.mx")).toBe("techsolutions.mx");
+      expect(extractEmailDomain("reclutador@techsolutions.mx")).toBe(
+        "techsolutions.mx",
+      );
       expect(extractEmailDomain("admin@innovatech.com")).toBe("innovatech.com");
-      expect(extractEmailDomain("TALENTO@EMPRESA.COM.MX")).toBe("empresa.com.mx");
+      expect(extractEmailDomain("TALENTO@EMPRESA.COM.MX")).toBe(
+        "empresa.com.mx",
+      );
     });
 
     it("should return empty string if email is missing or invalid", () => {
@@ -176,4 +180,3 @@ describe("Domain Verifier - Verificación Automatizada de Organizaciones", () =>
     });
   });
 });
-

@@ -88,7 +88,9 @@
         role="alert"
         class="mb-5 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-3 rounded-xl text-sm flex items-start gap-2"
       >
-        <span class="material-symbols-outlined text-sm mt-0.5" aria-hidden="true"
+        <span
+          class="material-symbols-outlined text-sm mt-0.5"
+          aria-hidden="true"
           >error</span
         >
         <span>{{ errorMessage }}</span>
@@ -100,7 +102,9 @@
         role="status"
         class="mb-5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 p-3 rounded-xl text-sm flex items-start gap-2"
       >
-        <span class="material-symbols-outlined text-sm mt-0.5" aria-hidden="true"
+        <span
+          class="material-symbols-outlined text-sm mt-0.5"
+          aria-hidden="true"
           >check_circle</span
         >
         <span>{{ successMessage }}</span>

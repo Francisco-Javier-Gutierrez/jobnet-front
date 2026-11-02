@@ -79,7 +79,9 @@
           class="w-full bg-surface-container/70 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-2xs cursor-pointer"
           title="Comparte la estructura de tu perfil de forma anónima para ayudar a otros candidatos de la comunidad"
         >
-          <span class="material-symbols-outlined text-base">volunteer_activism</span>
+          <span class="material-symbols-outlined text-base"
+            >volunteer_activism</span
+          >
           <span>🤝 Compartir mi Perfil como Plantilla</span>
         </button>
 
@@ -89,7 +91,9 @@
           to="/candidate/cv-templates"
           class="w-full bg-surface-container/70 hover:bg-surface-container text-on-surface dark:text-slate-200 border border-outline-variant/50 h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
         >
-          <span class="material-symbols-outlined text-sm text-primary">auto_stories</span>
+          <span class="material-symbols-outlined text-sm text-primary"
+            >auto_stories</span
+          >
           <span>Explorar Comunidad de Plantillas</span>
         </NuxtLink>
 

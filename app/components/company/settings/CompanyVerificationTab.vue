@@ -45,7 +45,8 @@
         </div>
         <p class="text-xs mt-1 text-slate-600 dark:text-slate-300">
           Tu organización se encuentra verificada. Los candidatos verán la
-          insignia de verificación oficial en tu perfil y en todas tus vacantes activas.
+          insignia de verificación oficial en tu perfil y en todas tus vacantes
+          activas.
         </p>
       </div>
     </div>

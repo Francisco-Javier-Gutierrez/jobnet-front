@@ -102,7 +102,8 @@ export function isCorporateEmailDomain(domainOrEmail: string): boolean {
   }
 
   // Estructura de dominio válida: etiquetas alfanuméricas separadas por punto con TLD de 2+ letras
-  const domainRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i;
+  const domainRegex =
+    /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i;
   return domainRegex.test(domain);
 }
 

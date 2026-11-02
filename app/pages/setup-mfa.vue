@@ -43,7 +43,9 @@
           <div
             class="w-12 h-12 mx-auto rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center"
           >
-            <span class="material-symbols-outlined text-2xl">verified_user</span>
+            <span class="material-symbols-outlined text-2xl"
+              >verified_user</span
+            >
           </div>
           <h2 class="text-sm font-bold text-on-background dark:text-slate-100">
             Seguridad administrada por Google
@@ -80,8 +82,8 @@
           <p
             class="text-sm text-on-surface-variant dark:text-slate-300 leading-relaxed"
           >
-            Protege tu cuenta vinculando un autenticador TOTP en AWS Cognito (como
-            Google Authenticator, Microsoft Authenticator o Authy).
+            Protege tu cuenta vinculando un autenticador TOTP en AWS Cognito
+            (como Google Authenticator, Microsoft Authenticator o Authy).
           </p>
 
           <!-- Loading initialization -->
@@ -101,130 +103,130 @@
           </div>
 
           <template v-else>
-          <!-- Step 1: Scan QR Code -->
-          <div class="space-y-2">
-            <h3
-              class="text-xs font-bold uppercase tracking-wider text-primary dark:text-indigo-400"
-            >
-              1. Escanea el código QR con tu aplicación TOTP
-            </h3>
-            <div
-              class="flex flex-col items-center gap-3 p-4 bg-surface-container-low dark:bg-slate-800/60 rounded-xl border border-outline-variant/30 dark:border-slate-700/60"
-            >
-              <!-- Real Scannable QR Code Image -->
-              <div
-                class="w-48 h-48 bg-white p-2 rounded-xl shadow-md border border-outline-variant/40 flex items-center justify-center relative overflow-hidden"
+            <!-- Step 1: Scan QR Code -->
+            <div class="space-y-2">
+              <h3
+                class="text-xs font-bold uppercase tracking-wider text-primary dark:text-indigo-400"
               >
-                <img
-                  v-if="qrCodeUrl"
-                  :src="qrCodeUrl"
-                  alt="Código QR de Verificación MFA TOTP"
-                  class="w-full h-full object-contain"
-                />
-                <span v-else class="text-xs text-slate-400"
-                  >Cargando QR...</span
-                >
-              </div>
-
-              <div class="text-center w-full">
-                <p
-                  class="text-[10px] text-on-surface-variant dark:text-slate-300 mb-1 font-semibold"
-                >
-                  O ingresa esta clave de AWS Cognito manualmente:
-                </p>
+                1. Escanea el código QR con tu aplicación TOTP
+              </h3>
+              <div
+                class="flex flex-col items-center gap-3 p-4 bg-surface-container-low dark:bg-slate-800/60 rounded-xl border border-outline-variant/30 dark:border-slate-700/60"
+              >
+                <!-- Real Scannable QR Code Image -->
                 <div
-                  class="flex items-center justify-between gap-1.5 bg-surface-container dark:bg-slate-800 px-3 py-2 rounded-lg border border-outline-variant/40 dark:border-slate-700"
+                  class="w-48 h-48 bg-white p-2 rounded-xl shadow-md border border-outline-variant/40 flex items-center justify-center relative overflow-hidden"
                 >
-                  <code
-                    class="text-xs font-mono font-bold text-on-background dark:text-slate-100 truncate tracking-wider"
-                    >{{ secretCode }}</code
+                  <img
+                    v-if="qrCodeUrl"
+                    :src="qrCodeUrl"
+                    alt="Código QR de Verificación MFA TOTP"
+                    class="w-full h-full object-contain"
+                  />
+                  <span v-else class="text-xs text-slate-400"
+                    >Cargando QR...</span
                   >
-                  <button
-                    @click="copySecretKey"
-                    class="text-primary hover:text-primary-container transition p-1 flex-shrink-0"
-                    aria-label="Copiar clave secreta"
+                </div>
+
+                <div class="text-center w-full">
+                  <p
+                    class="text-[10px] text-on-surface-variant dark:text-slate-300 mb-1 font-semibold"
                   >
-                    <span class="material-symbols-outlined text-sm">{{
-                      keyCopied ? "done" : "content_copy"
-                    }}</span>
-                  </button>
+                    O ingresa esta clave de AWS Cognito manualmente:
+                  </p>
+                  <div
+                    class="flex items-center justify-between gap-1.5 bg-surface-container dark:bg-slate-800 px-3 py-2 rounded-lg border border-outline-variant/40 dark:border-slate-700"
+                  >
+                    <code
+                      class="text-xs font-mono font-bold text-on-background dark:text-slate-100 truncate tracking-wider"
+                      >{{ secretCode }}</code
+                    >
+                    <button
+                      @click="copySecretKey"
+                      class="text-primary hover:text-primary-container transition p-1 flex-shrink-0"
+                      aria-label="Copiar clave secreta"
+                    >
+                      <span class="material-symbols-outlined text-sm">{{
+                        keyCopied ? "done" : "content_copy"
+                      }}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Step 2: Verification Code -->
-          <form @submit.prevent="handleSetupVerify" class="space-y-4">
-            <h3
-              class="text-xs font-bold uppercase tracking-wider text-primary dark:text-indigo-400 mb-2"
-            >
-              2. Introduce el código de 6 dígitos del autenticador
-            </h3>
-
-            <div
-              v-if="errorMessage"
-              role="alert"
-              class="bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-3 rounded-lg text-sm flex items-start gap-2"
-            >
-              <span
-                class="material-symbols-outlined text-sm mt-0.5"
-                aria-hidden="true"
-                >error</span
+            <!-- Step 2: Verification Code -->
+            <form @submit.prevent="handleSetupVerify" class="space-y-4">
+              <h3
+                class="text-xs font-bold uppercase tracking-wider text-primary dark:text-indigo-400 mb-2"
               >
-              <span>{{ errorMessage }}</span>
-            </div>
+                2. Introduce el código de 6 dígitos del autenticador
+              </h3>
 
-            <div
-              v-if="successMessage"
-              role="status"
-              class="bg-secondary/10 border border-secondary/20 text-secondary dark:text-emerald-400 p-3 rounded-lg text-sm flex items-start gap-2"
-            >
-              <span
-                class="material-symbols-outlined text-sm mt-0.5"
-                aria-hidden="true"
-                >check_circle</span
-              >
-              <span>{{ successMessage }}</span>
-            </div>
-
-            <div>
               <div
-                class="flex justify-between gap-1.5 sm:gap-2"
-                id="otp-container"
-                role="group"
-                aria-label="Código MFA de 6 dígitos"
+                v-if="errorMessage"
+                role="alert"
+                class="bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-3 rounded-lg text-sm flex items-start gap-2"
               >
-                <input
-                  v-for="(digit, idx) in otp"
-                  :key="idx"
-                  ref="otpInputs"
-                  v-model="otp[idx]"
-                  type="text"
-                  maxlength="1"
-                  :aria-label="`Dígito ${idx + 1} de 6`"
-                  aria-required="true"
-                  class="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl outline-none transition-all text-on-background dark:text-slate-100"
-                  @input="handleInput($event, idx)"
-                  @keydown.delete="handleDelete($event, idx)"
-                  @paste="handlePaste"
-                />
+                <span
+                  class="material-symbols-outlined text-sm mt-0.5"
+                  aria-hidden="true"
+                  >error</span
+                >
+                <span>{{ errorMessage }}</span>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              :disabled="loading"
-              class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm"
-            >
-              <span
-                v-if="loading"
-                class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin"
-                aria-hidden="true"
-              ></span>
-              <span v-else>Activar MFA en Cognito</span>
-            </button>
-          </form>
-        </template>
+              <div
+                v-if="successMessage"
+                role="status"
+                class="bg-secondary/10 border border-secondary/20 text-secondary dark:text-emerald-400 p-3 rounded-lg text-sm flex items-start gap-2"
+              >
+                <span
+                  class="material-symbols-outlined text-sm mt-0.5"
+                  aria-hidden="true"
+                  >check_circle</span
+                >
+                <span>{{ successMessage }}</span>
+              </div>
+
+              <div>
+                <div
+                  class="flex justify-between gap-1.5 sm:gap-2"
+                  id="otp-container"
+                  role="group"
+                  aria-label="Código MFA de 6 dígitos"
+                >
+                  <input
+                    v-for="(digit, idx) in otp"
+                    :key="idx"
+                    ref="otpInputs"
+                    v-model="otp[idx]"
+                    type="text"
+                    maxlength="1"
+                    :aria-label="`Dígito ${idx + 1} de 6`"
+                    aria-required="true"
+                    class="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold bg-[#F1F5F9] dark:bg-slate-800/80 border border-[#F1F5F9] dark:border-slate-700 hover:border-outline focus:border-primary rounded-xl outline-none transition-all text-on-background dark:text-slate-100"
+                    @input="handleInput($event, idx)"
+                    @keydown.delete="handleDelete($event, idx)"
+                    @paste="handlePaste"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                :disabled="loading"
+                class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition shadow-sm"
+              >
+                <span
+                  v-if="loading"
+                  class="w-5 h-5 border-2 border-current/20 border-t-current rounded-full animate-spin"
+                  aria-hidden="true"
+                ></span>
+                <span v-else>Activar MFA en Cognito</span>
+              </button>
+            </form>
+          </template>
         </template>
       </div>
     </div>
@@ -272,9 +274,9 @@ const isFederatedUser = computed(() => {
   if (!user) return false;
   return Boolean(
     user.isFederated ||
-      user.provider === "cognito" ||
-      (typeof user.id === "string" &&
-        user.id.toLowerCase().startsWith("google_")),
+    user.provider === "cognito" ||
+    (typeof user.id === "string" &&
+      user.id.toLowerCase().startsWith("google_")),
   );
 });
 

@@ -46,9 +46,15 @@ export function useCandidateProfile(candidateIdParam?: string) {
     const uid = user.id ? String(user.id).toLowerCase() : "";
     const uemail = user.email ? String(user.email).toLowerCase() : "";
     const candIdLower = String(candidateId || "").toLowerCase();
-    const profId = profile.value.id ? String(profile.value.id).toLowerCase() : "";
-    const profEmail = profile.value.email ? String(profile.value.email).toLowerCase() : "";
-    const profUuid = profile.value.usuarioUuid ? String(profile.value.usuarioUuid).toLowerCase() : "";
+    const profId = profile.value.id
+      ? String(profile.value.id).toLowerCase()
+      : "";
+    const profEmail = profile.value.email
+      ? String(profile.value.email).toLowerCase()
+      : "";
+    const profUuid = profile.value.usuarioUuid
+      ? String(profile.value.usuarioUuid).toLowerCase()
+      : "";
 
     return (
       (uid && uid === candIdLower) ||
@@ -500,9 +506,7 @@ export function useCandidateProfile(candidateIdParam?: string) {
       if (bIdx !== -1) allBookmarkedJobs.value.splice(bIdx, 1);
     } else {
       job.bookmarksList.push(currentUserId);
-      if (
-        !allBookmarkedJobs.value.some((j) => (j.id || j.uniqueId) === jId)
-      ) {
+      if (!allBookmarkedJobs.value.some((j) => (j.id || j.uniqueId) === jId)) {
         allBookmarkedJobs.value.unshift(job);
       }
     }

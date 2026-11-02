@@ -6,7 +6,10 @@ export interface CvInteractionOptions {
 }
 
 export function useCvInteraction() {
-  const config = typeof useRuntimeConfig === "function" ? useRuntimeConfig() : { public: { apiUrl: "" } };
+  const config =
+    typeof useRuntimeConfig === "function"
+      ? useRuntimeConfig()
+      : { public: { apiUrl: "" } };
   const auth = typeof useAuth === "function" ? useAuth() : { data: ref(null) };
   const session = auth.data;
 
@@ -45,15 +48,21 @@ export function useCvInteraction() {
 
       // 2. Invocar backend en AWS Lambda / DynamoDB
       if (config.public?.apiUrl) {
-        await $fetch(`${config.public.apiUrl}/profile/${candidateId}/cv-interaction`, {
-          method: "POST",
-          body: payload,
-        }).catch(() => null);
+        await $fetch(
+          `${config.public.apiUrl}/profile/${candidateId}/cv-interaction`,
+          {
+            method: "POST",
+            body: payload,
+          },
+        ).catch(() => null);
       }
 
       return { success: true, sentPush: true };
     } catch (e) {
-      console.warn("[useCvInteraction] Error dispatching interaction notification:", e);
+      console.warn(
+        "[useCvInteraction] Error dispatching interaction notification:",
+        e,
+      );
       return { success: false };
     }
   };

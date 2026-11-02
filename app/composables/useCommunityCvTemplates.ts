@@ -47,15 +47,23 @@ export function useCommunityCvTemplates() {
 
       if (response?.templates && Array.isArray(response.templates)) {
         // Merge API templates with Seed (avoiding duplicates)
-        const apiIds = new Set(response.templates.map((t) => t.id || t.templateId));
+        const apiIds = new Set(
+          response.templates.map((t) => t.id || t.templateId),
+        );
         const combined = [
-          ...response.templates.map((t) => ({ ...t, id: t.templateId || t.id })),
+          ...response.templates.map((t) => ({
+            ...t,
+            id: t.templateId || t.id,
+          })),
           ...CV_COMMUNITY_SEED.filter((s) => !apiIds.has(s.id)),
         ];
         communityTemplates.value = combined;
       }
     } catch (err: any) {
-      console.warn("Could not fetch remote CV templates, using seed catalog:", err);
+      console.warn(
+        "Could not fetch remote CV templates, using seed catalog:",
+        err,
+      );
       // Fallback to seed is already initialized
     } finally {
       isLoading.value = false;
@@ -67,19 +75,33 @@ export function useCommunityCvTemplates() {
     return communityTemplates.value.filter((tpl) => {
       // 1. Language filter
       if (selectedLanguage.value !== "all") {
-        if (selectedLanguage.value === "es" && tpl.idioma !== "es" && tpl.idioma !== "bilingual") {
+        if (
+          selectedLanguage.value === "es" &&
+          tpl.idioma !== "es" &&
+          tpl.idioma !== "bilingual"
+        ) {
           return false;
         }
-        if (selectedLanguage.value === "en" && tpl.idioma !== "en" && tpl.idioma !== "bilingual") {
+        if (
+          selectedLanguage.value === "en" &&
+          tpl.idioma !== "en" &&
+          tpl.idioma !== "bilingual"
+        ) {
           return false;
         }
-        if (selectedLanguage.value === "bilingual" && tpl.idioma !== "bilingual") {
+        if (
+          selectedLanguage.value === "bilingual" &&
+          tpl.idioma !== "bilingual"
+        ) {
           return false;
         }
       }
 
       // 2. Category filter
-      if (selectedCategory.value !== "all" && tpl.categoria !== selectedCategory.value) {
+      if (
+        selectedCategory.value !== "all" &&
+        tpl.categoria !== selectedCategory.value
+      ) {
         return false;
       }
 
@@ -89,7 +111,10 @@ export function useCommunityCvTemplates() {
       }
 
       // 4. Scope filter
-      if (selectedScope.value !== "all" && tpl.alcance !== selectedScope.value) {
+      if (
+        selectedScope.value !== "all" &&
+        tpl.alcance !== selectedScope.value
+      ) {
         return false;
       }
 
@@ -98,8 +123,12 @@ export function useCommunityCvTemplates() {
         const query = searchQuery.value.toLowerCase().trim();
         const inTitle = (tpl.titulo || "").toLowerCase().includes(query);
         const inRole = (tpl.rol || "").toLowerCase().includes(query);
-        const inSkills = (tpl.habilidades || []).some((s) => s.toLowerCase().includes(query));
-        const inBio = (tpl.biografiaSugerida || "").toLowerCase().includes(query);
+        const inSkills = (tpl.habilidades || []).some((s) =>
+          s.toLowerCase().includes(query),
+        );
+        const inBio = (tpl.biografiaSugerida || "")
+          .toLowerCase()
+          .includes(query);
         if (!inTitle && !inRole && !inSkills && !inBio) {
           return false;
         }
@@ -112,13 +141,20 @@ export function useCommunityCvTemplates() {
   // User's own contributed templates
   const userContributedTemplates = computed(() => {
     if (!currentUserId.value) return [];
-    return communityTemplates.value.filter((t) => t.autorId === currentUserId.value);
+    return communityTemplates.value.filter(
+      (t) => t.autorId === currentUserId.value,
+    );
   });
 
   // Create & Publish a new community template
-  const createCommunityTemplate = async (templateInput: Partial<CommunityCvTemplate>) => {
+  const createCommunityTemplate = async (
+    templateInput: Partial<CommunityCvTemplate>,
+  ) => {
     if (!currentUserId.value) {
-      showError("Inicia Sesión", "Debes estar autenticado para contribuir una plantilla.");
+      showError(
+        "Inicia Sesión",
+        "Debes estar autenticado para contribuir una plantilla.",
+      );
       return null;
     }
 
@@ -163,7 +199,9 @@ export function useCommunityCvTemplates() {
       console.error("Error creating community template:", err);
       showError(
         "Error al Publicar",
-        err?.data?.error || err?.message || "No se pudo publicar la plantilla en la comunidad.",
+        err?.data?.error ||
+          err?.message ||
+          "No se pudo publicar la plantilla en la comunidad.",
       );
       return null;
     }
@@ -185,11 +223,17 @@ export function useCommunityCvTemplates() {
       communityTemplates.value = communityTemplates.value.filter(
         (t) => t.id !== templateId && t.templateId !== templateId,
       );
-      showSuccess("Plantilla Retirada", "La plantilla ha sido eliminada de la comunidad.");
+      showSuccess(
+        "Plantilla Retirada",
+        "La plantilla ha sido eliminada de la comunidad.",
+      );
       return true;
     } catch (err: any) {
       console.error("Error deleting template:", err);
-      showError("Error al Eliminar", "No se pudo eliminar la plantilla seleccionada.");
+      showError(
+        "Error al Eliminar",
+        "No se pudo eliminar la plantilla seleccionada.",
+      );
       return false;
     }
   };
@@ -261,12 +305,12 @@ export function useCommunityCvTemplates() {
       console.error("Error applying template to profile:", err);
       showError(
         "Error al Aplicar",
-        err?.message || "No se pudo actualizar tu perfil con los datos de la plantilla.",
+        err?.message ||
+          "No se pudo actualizar tu perfil con los datos de la plantilla.",
       );
       return false;
     }
   };
-
 
   return {
     communityTemplates,

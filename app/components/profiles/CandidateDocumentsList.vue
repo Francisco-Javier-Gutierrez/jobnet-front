@@ -3,7 +3,9 @@
     <h2
       class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm px-1"
     >
-      <span class="material-symbols-outlined text-secondary">workspace_premium</span>
+      <span class="material-symbols-outlined text-secondary"
+        >workspace_premium</span
+      >
       Documentos y Certificaciones
     </h2>
     <div
@@ -67,7 +69,9 @@
                 rel="noopener noreferrer"
                 class="text-blue-600 dark:text-blue-400 hover:underline font-label-sm text-xs font-bold flex items-center gap-1 cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[15px]">open_in_new</span>
+                <span class="material-symbols-outlined text-[15px]"
+                  >open_in_new</span
+                >
                 <span>Verificar</span>
               </a>
             </template>
@@ -77,7 +81,9 @@
                 @click="$emit('open', doc.url, doc.name)"
                 class="text-primary hover:underline font-label-sm text-xs font-bold flex items-center gap-0.5 cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[15px]">visibility</span>
+                <span class="material-symbols-outlined text-[15px]"
+                  >visibility</span
+                >
                 <span>Ver</span>
               </button>
               <a
@@ -87,7 +93,9 @@
                 rel="noopener noreferrer"
                 class="text-secondary hover:underline font-label-sm text-xs font-bold flex items-center gap-0.5"
               >
-                <span class="material-symbols-outlined text-[15px]">download</span>
+                <span class="material-symbols-outlined text-[15px]"
+                  >download</span
+                >
                 <span>Descargar</span>
               </a>
             </template>

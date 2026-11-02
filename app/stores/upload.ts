@@ -192,10 +192,12 @@ export const useUploadStore = defineStore("upload", {
         );
         return res?.url || keyOrUrl;
       } catch (e) {
-        console.warn("Could not retrieve presigned view URL, using fallback:", e);
+        console.warn(
+          "Could not retrieve presigned view URL, using fallback:",
+          e,
+        );
         return keyOrUrl;
       }
     },
   },
 });
-

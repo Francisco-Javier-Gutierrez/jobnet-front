@@ -206,10 +206,10 @@ const isFederatedUser = computed(() => {
   const user = session.value?.user as any;
   return Boolean(
     user?.isFederated ||
-      user?.provider === "cognito" ||
-      (typeof user?.id === "string" &&
-        user.id.toLowerCase().startsWith("google_")) ||
-      isFederatedProfile.value,
+    user?.provider === "cognito" ||
+    (typeof user?.id === "string" &&
+      user.id.toLowerCase().startsWith("google_")) ||
+    isFederatedProfile.value,
   );
 });
 
@@ -250,10 +250,7 @@ onMounted(async () => {
         formData.value.mfaEnabled = Boolean(
           profile.mfaEnabled || profile.mfaConfigured,
         );
-        if (
-          profile.isFederated ||
-          profile.origenRegistro === "GOOGLE_OAUTH"
-        ) {
+        if (profile.isFederated || profile.origenRegistro === "GOOGLE_OAUTH") {
           isFederatedProfile.value = true;
         }
         if (Array.isArray(profile.links)) {

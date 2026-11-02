@@ -12,7 +12,9 @@ describe("cvStarterPacks & Rellenador Inteligente de CV", () => {
     it("debe contener al menos 5 starter kits preconfigurados para distintas industrias", () => {
       expect(CV_STARTER_PACKS.length).toBeGreaterThanOrEqual(5);
 
-      const juniorPack = CV_STARTER_PACKS.find((p) => p.id === "junior-starter");
+      const juniorPack = CV_STARTER_PACKS.find(
+        (p) => p.id === "junior-starter",
+      );
       expect(juniorPack).toBeDefined();
       expect(juniorPack?.data.title).toContain("Egresado");
       expect(juniorPack?.data.skills.length).toBeGreaterThanOrEqual(5);
@@ -44,8 +46,12 @@ describe("cvStarterPacks & Rellenador Inteligente de CV", () => {
       expect(result.filledFields).toContain("Título profesional");
       expect(result.filledFields).toContain("Resumen profesional enriquecido");
       expect(result.filledFields).toContain("Habilidades clave");
-      expect(result.filledFields).toContain("Experiencias / Proyectos formativos");
-      expect(result.filledFields).toContain("Estructura de educación académica");
+      expect(result.filledFields).toContain(
+        "Experiencias / Proyectos formativos",
+      );
+      expect(result.filledFields).toContain(
+        "Estructura de educación académica",
+      );
 
       expect(result.enrichedData.title).toBe(
         "Profesional en Inicio de Carrera / Recién Egresado(a)",
@@ -70,7 +76,8 @@ describe("cvStarterPacks & Rellenador Inteligente de CV", () => {
             puesto: "Lead Architect",
             empresa: "Global Cloud",
             periodo: "2020 - 2024",
-            descripcion: "Diseño de plataformas bancarias de alta disponibilidad.",
+            descripcion:
+              "Diseño de plataformas bancarias de alta disponibilidad.",
           },
         ],
         education: [],
@@ -88,7 +95,9 @@ describe("cvStarterPacks & Rellenador Inteligente de CV", () => {
       expect(result.enrichedData.skills).toContain("Java");
       expect(result.enrichedData.skills).toContain("Spring Boot");
       // Debe rellenar la educación faltante
-      expect(result.filledFields).toContain("Estructura de educación académica");
+      expect(result.filledFields).toContain(
+        "Estructura de educación académica",
+      );
       expect(result.enrichedData.education.length).toBeGreaterThanOrEqual(1);
     });
   });
@@ -146,7 +155,9 @@ describe("cvStarterPacks & Rellenador Inteligente de CV", () => {
       const ats = calculateCvAtsScore(sparseCv, { anonymousMode: false });
       expect(ats.score).toBeLessThan(50);
       expect(ats.status).toBe("Por Mejorar");
-      expect(ats.checklist.filter((c) => !c.passed).length).toBeGreaterThanOrEqual(4);
+      expect(
+        ats.checklist.filter((c) => !c.passed).length,
+      ).toBeGreaterThanOrEqual(4);
     });
 
     it("no debe penalizar el modo anónimo en la evaluación ATS", () => {
@@ -164,7 +175,8 @@ describe("cvStarterPacks & Rellenador Inteligente de CV", () => {
             puesto: "Ejecutivo",
             empresa: "Retail Corp",
             periodo: "2023",
-            descripcion: "Gestión de cartera de clientes y cumplimiento de cuotas comerciales.",
+            descripcion:
+              "Gestión de cartera de clientes y cumplimiento de cuotas comerciales.",
           },
         ],
         education: [
@@ -177,7 +189,9 @@ describe("cvStarterPacks & Rellenador Inteligente de CV", () => {
       };
 
       const ats = calculateCvAtsScore(anonCv, { anonymousMode: true });
-      const contactCheck = ats.checklist.find((c) => c.label.includes("Modo Anónimo"));
+      const contactCheck = ats.checklist.find((c) =>
+        c.label.includes("Modo Anónimo"),
+      );
       expect(contactCheck?.passed).toBe(true);
     });
   });
@@ -185,7 +199,9 @@ describe("cvStarterPacks & Rellenador Inteligente de CV", () => {
   describe("4. ACTION_VERBS Catálogo", () => {
     it("debe incluir verbos clasificados para redacción de impacto", () => {
       expect(ACTION_VERBS.length).toBeGreaterThanOrEqual(4);
-      const liderazgo = ACTION_VERBS.find((a) => a.category.includes("Liderazgo"));
+      const liderazgo = ACTION_VERBS.find((a) =>
+        a.category.includes("Liderazgo"),
+      );
       expect(liderazgo?.verbs).toContain("Lideré");
       expect(liderazgo?.verbs).toContain("Coordiné");
     });

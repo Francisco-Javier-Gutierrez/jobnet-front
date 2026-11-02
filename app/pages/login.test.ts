@@ -13,16 +13,26 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
         return null;
       };
 
-      expect(validateCredentialsForm("", "")).toBe("El correo electrónico es requerido");
-      expect(validateCredentialsForm("candidato@gmail.com", "")).toBe("La contraseña es requerida");
-      expect(validateCredentialsForm("candidato@gmail.com", "Password#2026")).toBeNull();
+      expect(validateCredentialsForm("", "")).toBe(
+        "El correo electrónico es requerido",
+      );
+      expect(validateCredentialsForm("candidato@gmail.com", "")).toBe(
+        "La contraseña es requerida",
+      );
+      expect(
+        validateCredentialsForm("candidato@gmail.com", "Password#2026"),
+      ).toBeNull();
     });
 
     it("debe procesar credenciales válidas, generar token de sesión y redirigir al flujo principal", async () => {
       const signInMock = vi.fn().mockResolvedValue({ error: null });
       const routerPushMock = vi.fn();
 
-      const performLogin = async (email: string, pass: string, userRole = "CANDIDATO") => {
+      const performLogin = async (
+        email: string,
+        pass: string,
+        userRole = "CANDIDATO",
+      ) => {
         const res = await signInMock("credentials", {
           email,
           password: pass,
@@ -42,7 +52,11 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
         return { success: false, error: res.error };
       };
 
-      const result = await performLogin("candidato.valido@gmail.com", "SecretPass#123", "CANDIDATO");
+      const result = await performLogin(
+        "candidato.valido@gmail.com",
+        "SecretPass#123",
+        "CANDIDATO",
+      );
       expect(result.success).toBe(true);
       expect(signInMock).toHaveBeenCalledWith("credentials", {
         email: "candidato.valido@gmail.com",
@@ -51,7 +65,11 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
       });
       expect(routerPushMock).toHaveBeenCalledWith("/");
 
-      const adminResult = await performLogin("admin@jobnet.mx", "AdminSecret#123", "ADMIN");
+      const adminResult = await performLogin(
+        "admin@jobnet.mx",
+        "AdminSecret#123",
+        "ADMIN",
+      );
       expect(adminResult.success).toBe(true);
       expect(routerPushMock).toHaveBeenCalledWith("/admin");
     });
@@ -67,9 +85,15 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
         return errorMap[cognitoErrorCode] || "Credenciales inválidas";
       };
 
-      expect(handleLoginFailure("NotAuthorizedException")).toBe("Credenciales inválidas");
-      expect(handleLoginFailure("UserNotFoundException")).toBe("Credenciales inválidas");
-      expect(handleLoginFailure("InvalidPasswordException")).toBe("Credenciales inválidas");
+      expect(handleLoginFailure("NotAuthorizedException")).toBe(
+        "Credenciales inválidas",
+      );
+      expect(handleLoginFailure("UserNotFoundException")).toBe(
+        "Credenciales inválidas",
+      );
+      expect(handleLoginFailure("InvalidPasswordException")).toBe(
+        "Credenciales inválidas",
+      );
       expect(handleLoginFailure("UnknownError")).toBe("Credenciales inválidas");
     });
   });
@@ -96,7 +120,9 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
       expect(url).toContain("client_id=4ef8k4tofjj4ounvo8nf7d9pep");
       expect(url).toContain("scope=email+openid+profile");
       expect(url).toContain("response_type=code");
-      expect(url).toContain(encodeURIComponent("http://localhost:3000/api/auth/callback/cognito"));
+      expect(url).toContain(
+        encodeURIComponent("http://localhost:3000/api/auth/callback/cognito"),
+      );
     });
 
     it("debe autenticar en un solo clic y sincronizar automáticamente nombre y correo del candidato", async () => {
@@ -203,7 +229,9 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
 
       expect(result.isFederatedPrompt).toBe(true);
       expect(result.suggestGoogleLogin).toBe(true);
-      expect(result.alert).toContain("Tu cuenta está registrada a través de Google Sign-In");
+      expect(result.alert).toContain(
+        "Tu cuenta está registrada a través de Google Sign-In",
+      );
     });
 
     it("debe procesar los banners informativos de vinculación rechazada y exitosa", () => {
@@ -224,11 +252,12 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
       };
 
       const unlinkedResult = processQueryParams({ unlinked: "true" });
-      expect(unlinkedResult.info).toContain("No se realizó la vinculación de cuentas");
+      expect(unlinkedResult.info).toContain(
+        "No se realizó la vinculación de cuentas",
+      );
 
       const linkedResult = processQueryParams({ linked: "success" });
       expect(linkedResult.success).toContain("Cuentas vinculadas exitosamente");
     });
   });
 });
-

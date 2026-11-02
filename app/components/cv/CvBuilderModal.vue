@@ -133,9 +133,13 @@
                     >
                       {{ step.number }}
                     </span>
-                    <span class="font-bold text-xs truncate">{{ step.title }}</span>
+                    <span class="font-bold text-xs truncate">{{
+                      step.title
+                    }}</span>
                   </div>
-                  <span class="text-[10px] text-on-surface-variant/80 hidden sm:inline truncate">
+                  <span
+                    class="text-[10px] text-on-surface-variant/80 hidden sm:inline truncate"
+                  >
                     {{ step.subtitle }}
                   </span>
                 </button>
@@ -144,7 +148,10 @@
               <!-- ======================================================== -->
               <!-- PASO 1: PLANTILLA & ESTILO                               -->
               <!-- ======================================================== -->
-              <div v-show="activeBuilderTab === 'design'" class="space-y-6 animate-in fade-in duration-150">
+              <div
+                v-show="activeBuilderTab === 'design'"
+                class="space-y-6 animate-in fade-in duration-150"
+              >
                 <!-- 0. Modo Anónimo Switch Card (RF-123) - Versión Compacta -->
                 <div
                   class="p-3 rounded-xl border transition-all duration-200"
@@ -165,12 +172,18 @@
                         "
                       >
                         <span class="material-symbols-outlined text-base">
-                          {{ options.anonymousMode ? 'visibility_off' : 'visibility' }}
+                          {{
+                            options.anonymousMode
+                              ? "visibility_off"
+                              : "visibility"
+                          }}
                         </span>
                       </div>
                       <div class="min-w-0">
                         <div class="flex items-center gap-1.5">
-                          <span class="text-xs font-bold text-on-background">Modo Anónimo</span>
+                          <span class="text-xs font-bold text-on-background"
+                            >Modo Anónimo</span
+                          >
                           <span
                             v-if="options.anonymousMode"
                             class="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-primary/20 text-primary"
@@ -203,10 +216,15 @@
                 <!-- 1. Templates Selection (6 Estilos Estándar Carta) -->
                 <div class="space-y-2.5">
                   <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant block">
+                    <label
+                      class="text-xs font-bold uppercase tracking-wider text-on-surface-variant block"
+                    >
                       1. Elige tu Plantilla Carta
                     </label>
-                    <span class="text-[11px] text-on-surface-variant font-medium">6 diseños optimizados</span>
+                    <span
+                      class="text-[11px] text-on-surface-variant font-medium"
+                      >6 diseños optimizados</span
+                    >
                   </div>
 
                   <div class="grid grid-cols-2 gap-2.5">
@@ -241,10 +259,14 @@
                         </span>
                       </div>
                       <div>
-                        <span class="font-bold text-xs text-on-background block">
+                        <span
+                          class="font-bold text-xs text-on-background block"
+                        >
                           {{ tmpl.name }}
                         </span>
-                        <span class="text-[10px] text-on-surface-variant line-clamp-1 leading-tight mt-0.5">
+                        <span
+                          class="text-[10px] text-on-surface-variant line-clamp-1 leading-tight mt-0.5"
+                        >
                           {{ tmpl.desc }}
                         </span>
                       </div>
@@ -254,7 +276,9 @@
 
                 <!-- 2. Color Palettes Selection (6 Curated Palettes) -->
                 <div class="space-y-2.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant block">
+                  <label
+                    class="text-xs font-bold uppercase tracking-wider text-on-surface-variant block"
+                  >
                     2. Paleta Cromática
                   </label>
                   <div class="grid grid-cols-3 gap-2">
@@ -277,9 +301,12 @@
                         <span
                           v-if="options.colorTheme === theme.id"
                           class="material-symbols-outlined text-[10px]"
-                        >check</span>
+                          >check</span
+                        >
                       </span>
-                      <span class="text-[11px] font-semibold text-on-background truncate">
+                      <span
+                        class="text-[11px] font-semibold text-on-background truncate"
+                      >
                         {{ theme.name }}
                       </span>
                     </button>
@@ -288,7 +315,9 @@
 
                 <!-- 3. Typography Scale -->
                 <div class="space-y-2">
-                  <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant block">
+                  <label
+                    class="text-xs font-bold uppercase tracking-wider text-on-surface-variant block"
+                  >
                     3. Densidad de Texto
                   </label>
                   <div class="grid grid-cols-3 gap-2">
@@ -310,14 +339,18 @@
                 </div>
 
                 <!-- Step 1 Footer Action: Avanzar al Paso 2 -->
-                <div class="pt-3 border-t border-outline-variant/40 flex justify-end">
+                <div
+                  class="pt-3 border-t border-outline-variant/40 flex justify-end"
+                >
                   <button
                     type="button"
                     @click="activeBuilderTab = 'content'"
                     class="py-2.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95"
                   >
                     <span>Continuar al Contenido</span>
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    <span class="material-symbols-outlined text-sm"
+                      >arrow_forward</span
+                    >
                   </button>
                 </div>
               </div>
@@ -325,20 +358,36 @@
               <!-- ======================================================== -->
               <!-- PASO 2: CONTENIDO & DATOS                                -->
               <!-- ======================================================== -->
-              <div v-show="activeBuilderTab === 'content'" class="space-y-5 animate-in fade-in duration-150">
+              <div
+                v-show="activeBuilderTab === 'content'"
+                class="space-y-5 animate-in fade-in duration-150"
+              >
                 <!-- Reassuring Info Banner -->
-                <div class="p-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-[11px] text-on-surface-variant flex items-start gap-2">
-                  <span class="material-symbols-outlined text-primary text-base shrink-0 mt-0.5">info</span>
+                <div
+                  class="p-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-[11px] text-on-surface-variant flex items-start gap-2"
+                >
+                  <span
+                    class="material-symbols-outlined text-primary text-base shrink-0 mt-0.5"
+                    >info</span
+                  >
                   <p class="leading-relaxed">
-                    Edición en tiempo real para este CV. Tus cambios no alteran tu perfil general hasta que decidas guardarlo.
+                    Edición en tiempo real para este CV. Tus cambios no alteran
+                    tu perfil general hasta que decidas guardarlo.
                   </p>
                 </div>
 
                 <!-- Smart Auto-Fill & Starter Packs (Clean Accordion Card) -->
-                <div class="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/50 space-y-3">
+                <div
+                  class="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/50 space-y-3"
+                >
                   <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-on-background flex items-center gap-1.5">
-                      <span class="material-symbols-outlined text-primary text-base">auto_awesome</span>
+                    <span
+                      class="text-xs font-bold text-on-background flex items-center gap-1.5"
+                    >
+                      <span
+                        class="material-symbols-outlined text-primary text-base"
+                        >auto_awesome</span
+                      >
                       Asistente de Contenido
                     </span>
                     <button
@@ -357,7 +406,9 @@
                       @click="handleAutoFillMissing"
                       class="flex-1 py-1.5 px-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-bold rounded-lg flex items-center justify-center gap-1 transition cursor-pointer"
                     >
-                      <span class="material-symbols-outlined text-sm">bolt</span>
+                      <span class="material-symbols-outlined text-sm"
+                        >bolt</span
+                      >
                       <span>Rellenar Secciones Vacías</span>
                     </button>
 
@@ -367,15 +418,25 @@
                       class="py-1.5 px-2.5 rounded-lg border border-outline-variant/60 hover:bg-surface-container text-on-surface text-xs font-medium flex items-center gap-1 transition cursor-pointer"
                       title="Ver paquetes modelo por rol profesional"
                     >
-                      <span class="material-symbols-outlined text-sm">badge</span>
+                      <span class="material-symbols-outlined text-sm"
+                        >badge</span
+                      >
                       <span>Kits</span>
-                      <span class="material-symbols-outlined text-sm">{{ showStarterPacks ? 'expand_less' : 'expand_more' }}</span>
+                      <span class="material-symbols-outlined text-sm">{{
+                        showStarterPacks ? "expand_less" : "expand_more"
+                      }}</span>
                     </button>
                   </div>
 
                   <!-- Collapsible Starter Packs List -->
-                  <div v-if="showStarterPacks" class="pt-2 border-t border-outline-variant/30 space-y-1.5 animate-in fade-in duration-150">
-                    <p class="text-[10px] text-on-surface-variant">Selecciona una especialidad para precargar estructura completa:</p>
+                  <div
+                    v-if="showStarterPacks"
+                    class="pt-2 border-t border-outline-variant/30 space-y-1.5 animate-in fade-in duration-150"
+                  >
+                    <p class="text-[10px] text-on-surface-variant">
+                      Selecciona una especialidad para precargar estructura
+                      completa:
+                    </p>
                     <div class="space-y-1">
                       <button
                         v-for="pack in CV_STARTER_PACKS"
@@ -385,11 +446,22 @@
                         class="w-full p-2 rounded-lg border border-outline-variant/40 hover:border-primary/50 hover:bg-primary/5 text-left transition flex items-center justify-between gap-2 cursor-pointer text-xs group"
                       >
                         <div class="flex items-center gap-2 min-w-0">
-                          <span class="material-symbols-outlined text-base text-primary">{{ pack.icon }}</span>
-                          <span class="font-bold text-on-background truncate">{{ pack.name }}</span>
-                          <span class="text-[9px] px-1 py-0.2 rounded bg-surface-container text-primary font-bold">{{ pack.badge }}</span>
+                          <span
+                            class="material-symbols-outlined text-base text-primary"
+                            >{{ pack.icon }}</span
+                          >
+                          <span class="font-bold text-on-background truncate">{{
+                            pack.name
+                          }}</span>
+                          <span
+                            class="text-[9px] px-1 py-0.2 rounded bg-surface-container text-primary font-bold"
+                            >{{ pack.badge }}</span
+                          >
                         </div>
-                        <span class="material-symbols-outlined text-sm text-on-surface-variant group-hover:text-primary">add_circle</span>
+                        <span
+                          class="material-symbols-outlined text-sm text-on-surface-variant group-hover:text-primary"
+                          >add_circle</span
+                        >
                       </button>
                     </div>
                   </div>
@@ -399,7 +471,9 @@
                 <div class="space-y-4">
                   <!-- Título Profesional -->
                   <div>
-                    <label class="block text-[11px] font-semibold text-on-surface-variant mb-1">
+                    <label
+                      class="block text-[11px] font-semibold text-on-surface-variant mb-1"
+                    >
                       Título Profesional / Titular
                     </label>
                     <input
@@ -413,7 +487,9 @@
                   <!-- Resumen Profesional -->
                   <div>
                     <div class="flex items-center justify-between mb-1">
-                      <label class="text-[11px] font-semibold text-on-surface-variant">
+                      <label
+                        class="text-[11px] font-semibold text-on-surface-variant"
+                      >
                         Resumen Profesional / Biografía
                       </label>
                       <span class="text-[10px] text-on-surface-variant">
@@ -429,7 +505,10 @@
 
                     <!-- Plantillas de biografía en 1 clic -->
                     <div class="flex flex-wrap gap-1 mt-1.5">
-                      <span class="text-[10px] text-on-surface-variant self-center mr-1">Sugerir:</span>
+                      <span
+                        class="text-[10px] text-on-surface-variant self-center mr-1"
+                        >Sugerir:</span
+                      >
                       <button
                         type="button"
                         @click="applyBioSnippet('junior')"
@@ -457,7 +536,9 @@
                   <!-- Habilidades con Chips interactivos -->
                   <div>
                     <div class="flex items-center justify-between mb-1">
-                      <label class="text-[11px] font-semibold text-on-surface-variant">
+                      <label
+                        class="text-[11px] font-semibold text-on-surface-variant"
+                      >
                         Habilidades ({{ editableCv.skills.length }})
                       </label>
                       <button
@@ -466,7 +547,9 @@
                         class="text-[10px] text-primary hover:underline font-semibold flex items-center gap-0.5 cursor-pointer"
                       >
                         <span>💡 Sugerencias populares</span>
-                        <span class="material-symbols-outlined text-xs">{{ showSkillSuggestions ? 'expand_less' : 'expand_more' }}</span>
+                        <span class="material-symbols-outlined text-xs">{{
+                          showSkillSuggestions ? "expand_less" : "expand_more"
+                        }}</span>
                       </button>
                     </div>
 
@@ -488,7 +571,9 @@
                     </div>
 
                     <!-- Selected skills chips -->
-                    <div class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1.5 bg-surface-container-low/50 border border-outline-variant/40 rounded-lg">
+                    <div
+                      class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1.5 bg-surface-container-low/50 border border-outline-variant/40 rounded-lg"
+                    >
                       <span
                         v-for="(skill, idx) in editableCv.skills"
                         :key="idx"
@@ -504,14 +589,22 @@
                           ×
                         </button>
                       </span>
-                      <span v-if="editableCv.skills.length === 0" class="text-[11px] text-on-surface-variant/70 italic">
+                      <span
+                        v-if="editableCv.skills.length === 0"
+                        class="text-[11px] text-on-surface-variant/70 italic"
+                      >
                         No hay habilidades agregadas.
                       </span>
                     </div>
 
                     <!-- Collapsible Suggested Popular Skills -->
-                    <div v-if="showSkillSuggestions" class="mt-2 p-2 rounded-lg bg-surface-container-low border border-outline-variant/40 animate-in fade-in duration-150">
-                      <span class="text-[10px] text-on-surface-variant block mb-1">
+                    <div
+                      v-if="showSkillSuggestions"
+                      class="mt-2 p-2 rounded-lg bg-surface-container-low border border-outline-variant/40 animate-in fade-in duration-150"
+                    >
+                      <span
+                        class="text-[10px] text-on-surface-variant block mb-1"
+                      >
                         Haz clic para agregar al CV:
                       </span>
                       <div class="flex flex-wrap gap-1">
@@ -532,8 +625,12 @@
                   <!-- Experiencias Resumen -->
                   <div>
                     <div class="flex items-center justify-between mb-1">
-                      <label class="text-[11px] font-semibold text-on-surface-variant">
-                        Experiencias / Proyectos ({{ editableCv.experience.length }})
+                      <label
+                        class="text-[11px] font-semibold text-on-surface-variant"
+                      >
+                        Experiencias / Proyectos ({{
+                          editableCv.experience.length
+                        }})
                       </label>
                       <button
                         type="button"
@@ -556,7 +653,9 @@
                           class="absolute top-1.5 right-1.5 text-on-surface-variant hover:text-rose-500 p-0.5"
                           title="Eliminar experiencia"
                         >
-                          <span class="material-symbols-outlined text-sm">delete</span>
+                          <span class="material-symbols-outlined text-sm"
+                            >delete</span
+                          >
                         </button>
                         <p class="font-bold text-on-background pr-5">
                           {{ exp.puesto || exp.role || "Puesto Profesional" }}
@@ -565,8 +664,13 @@
                           {{ exp.empresa || exp.company || "Empresa" }} ·
                           {{ exp.periodo || exp.period || "2023 - 2024" }}
                         </p>
-                        <p class="text-[11px] text-on-surface-variant mt-1 line-clamp-2">
-                          {{ exp.descripcion || "Responsabilidades y logros clave..." }}
+                        <p
+                          class="text-[11px] text-on-surface-variant mt-1 line-clamp-2"
+                        >
+                          {{
+                            exp.descripcion ||
+                            "Responsabilidades y logros clave..."
+                          }}
                         </p>
                       </div>
 
@@ -587,41 +691,70 @@
                   </div>
 
                   <!-- Secciones Visibles (Collapsible Progressive Accordion) -->
-                  <div class="rounded-xl border border-outline-variant/50 overflow-hidden bg-surface-container-low/50">
+                  <div
+                    class="rounded-xl border border-outline-variant/50 overflow-hidden bg-surface-container-low/50"
+                  >
                     <button
                       type="button"
                       @click="showSectionVisibility = !showSectionVisibility"
                       class="w-full p-3 flex items-center justify-between text-left hover:bg-surface-container transition cursor-pointer"
                     >
                       <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary text-base">tune</span>
+                        <span
+                          class="material-symbols-outlined text-primary text-base"
+                          >tune</span
+                        >
                         <div>
-                          <span class="text-xs font-bold text-on-background block">Visibilidad de Secciones</span>
-                          <span class="text-[10px] text-on-surface-variant">{{ activeSectionsCount }} de 10 secciones activas</span>
+                          <span
+                            class="text-xs font-bold text-on-background block"
+                            >Visibilidad de Secciones</span
+                          >
+                          <span class="text-[10px] text-on-surface-variant"
+                            >{{ activeSectionsCount }} de 10 secciones
+                            activas</span
+                          >
                         </div>
                       </div>
-                      <span class="material-symbols-outlined text-on-surface-variant text-sm">
-                        {{ showSectionVisibility ? 'expand_less' : 'expand_more' }}
+                      <span
+                        class="material-symbols-outlined text-on-surface-variant text-sm"
+                      >
+                        {{
+                          showSectionVisibility ? "expand_less" : "expand_more"
+                        }}
                       </span>
                     </button>
 
-                    <div v-if="showSectionVisibility" class="p-3 border-t border-outline-variant/40 space-y-2 text-xs animate-in fade-in duration-150">
+                    <div
+                      v-if="showSectionVisibility"
+                      class="p-3 border-t border-outline-variant/40 space-y-2 text-xs animate-in fade-in duration-150"
+                    >
                       <div class="flex justify-end pb-1">
                         <button
                           type="button"
                           @click="toggleAllSections"
                           class="text-[11px] text-primary hover:underline font-semibold cursor-pointer"
                         >
-                          {{ allSectionsActive ? "Desactivar Todo" : "Activar Todo" }}
+                          {{
+                            allSectionsActive
+                              ? "Desactivar Todo"
+                              : "Activar Todo"
+                          }}
                         </button>
                       </div>
 
                       <label
                         class="flex items-center justify-between cursor-pointer"
-                        :class="{ 'opacity-50 cursor-not-allowed': options.anonymousMode }"
+                        :class="{
+                          'opacity-50 cursor-not-allowed':
+                            options.anonymousMode,
+                        }"
                       >
-                        <span class="text-on-background font-medium flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-sm">badge</span>
+                        <span
+                          class="text-on-background font-medium flex items-center gap-1.5"
+                        >
+                          <span class="material-symbols-outlined text-sm"
+                            >badge</span
+                          >
                           Foto de Perfil
                         </span>
                         <input
@@ -632,9 +765,15 @@
                         />
                       </label>
 
-                      <label class="flex items-center justify-between cursor-pointer">
-                        <span class="text-on-background font-medium flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-sm">subject</span>
+                      <label
+                        class="flex items-center justify-between cursor-pointer"
+                      >
+                        <span
+                          class="text-on-background font-medium flex items-center gap-1.5"
+                        >
+                          <span class="material-symbols-outlined text-sm"
+                            >subject</span
+                          >
                           Biografía / Resumen
                         </span>
                         <input
@@ -648,10 +787,17 @@
                       <div class="pt-1 border-t border-outline-variant/30">
                         <label
                           class="flex items-center justify-between cursor-pointer"
-                          :class="{ 'opacity-50 cursor-not-allowed': options.anonymousMode }"
+                          :class="{
+                            'opacity-50 cursor-not-allowed':
+                              options.anonymousMode,
+                          }"
                         >
-                          <span class="text-on-background font-medium flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-sm">call</span>
+                          <span
+                            class="text-on-background font-medium flex items-center gap-1.5"
+                          >
+                            <span class="material-symbols-outlined text-sm"
+                              >call</span
+                            >
                             Información de Contacto
                           </span>
                           <input
@@ -665,16 +811,24 @@
                           v-if="contactToggle && !options.anonymousMode"
                           class="pl-4 pt-1.5 space-y-1.5 border-l-2 border-primary/20 ml-1.5 mt-1"
                         >
-                          <label class="flex items-center justify-between cursor-pointer">
-                            <span class="text-on-surface-variant text-[11px]">Teléfono</span>
+                          <label
+                            class="flex items-center justify-between cursor-pointer"
+                          >
+                            <span class="text-on-surface-variant text-[11px]"
+                              >Teléfono</span
+                            >
                             <input
                               v-model="options.showPhone"
                               type="checkbox"
                               class="accent-primary rounded w-3.5 h-3.5 cursor-pointer"
                             />
                           </label>
-                          <label class="flex items-center justify-between cursor-pointer">
-                            <span class="text-on-surface-variant text-[11px]">Correo Electrónico</span>
+                          <label
+                            class="flex items-center justify-between cursor-pointer"
+                          >
+                            <span class="text-on-surface-variant text-[11px]"
+                              >Correo Electrónico</span
+                            >
                             <input
                               v-model="options.showEmail"
                               type="checkbox"
@@ -684,9 +838,15 @@
                         </div>
                       </div>
 
-                      <label class="flex items-center justify-between cursor-pointer">
-                        <span class="text-on-background font-medium flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-sm">pin_drop</span>
+                      <label
+                        class="flex items-center justify-between cursor-pointer"
+                      >
+                        <span
+                          class="text-on-background font-medium flex items-center gap-1.5"
+                        >
+                          <span class="material-symbols-outlined text-sm"
+                            >pin_drop</span
+                          >
                           Ubicación
                         </span>
                         <input
@@ -698,10 +858,17 @@
 
                       <label
                         class="flex items-center justify-between cursor-pointer"
-                        :class="{ 'opacity-50 cursor-not-allowed': options.anonymousMode }"
+                        :class="{
+                          'opacity-50 cursor-not-allowed':
+                            options.anonymousMode,
+                        }"
                       >
-                        <span class="text-on-background font-medium flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-sm">link</span>
+                        <span
+                          class="text-on-background font-medium flex items-center gap-1.5"
+                        >
+                          <span class="material-symbols-outlined text-sm"
+                            >link</span
+                          >
                           Enlaces y Portafolio
                         </span>
                         <input
@@ -712,9 +879,15 @@
                         />
                       </label>
 
-                      <label class="flex items-center justify-between cursor-pointer">
-                        <span class="text-on-background font-medium flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-sm">psychology</span>
+                      <label
+                        class="flex items-center justify-between cursor-pointer"
+                      >
+                        <span
+                          class="text-on-background font-medium flex items-center gap-1.5"
+                        >
+                          <span class="material-symbols-outlined text-sm"
+                            >psychology</span
+                          >
                           Habilidades y Aptitudes
                         </span>
                         <input
@@ -724,9 +897,15 @@
                         />
                       </label>
 
-                      <label class="flex items-center justify-between cursor-pointer">
-                        <span class="text-on-background font-medium flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-sm">translate</span>
+                      <label
+                        class="flex items-center justify-between cursor-pointer"
+                      >
+                        <span
+                          class="text-on-background font-medium flex items-center gap-1.5"
+                        >
+                          <span class="material-symbols-outlined text-sm"
+                            >translate</span
+                          >
                           Idiomas
                         </span>
                         <input
@@ -736,9 +915,15 @@
                         />
                       </label>
 
-                      <label class="flex items-center justify-between cursor-pointer">
-                        <span class="text-on-background font-medium flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-sm">work</span>
+                      <label
+                        class="flex items-center justify-between cursor-pointer"
+                      >
+                        <span
+                          class="text-on-background font-medium flex items-center gap-1.5"
+                        >
+                          <span class="material-symbols-outlined text-sm"
+                            >work</span
+                          >
                           Experiencia Laboral
                         </span>
                         <input
@@ -748,9 +933,15 @@
                         />
                       </label>
 
-                      <label class="flex items-center justify-between cursor-pointer">
-                        <span class="text-on-background font-medium flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-sm">school</span>
+                      <label
+                        class="flex items-center justify-between cursor-pointer"
+                      >
+                        <span
+                          class="text-on-background font-medium flex items-center gap-1.5"
+                        >
+                          <span class="material-symbols-outlined text-sm"
+                            >school</span
+                          >
                           Educación y Formación
                         </span>
                         <input
@@ -764,13 +955,17 @@
                 </div>
 
                 <!-- Step 2 Footer Navigation: Volver o Avanzar al Paso 3 -->
-                <div class="pt-3 border-t border-outline-variant/40 flex items-center justify-between gap-2">
+                <div
+                  class="pt-3 border-t border-outline-variant/40 flex items-center justify-between gap-2"
+                >
                   <button
                     type="button"
                     @click="activeBuilderTab = 'design'"
                     class="py-2 px-3 rounded-xl border border-outline-variant/60 hover:bg-surface-container text-on-surface text-xs font-bold transition flex items-center gap-1 cursor-pointer"
                   >
-                    <span class="material-symbols-outlined text-sm">arrow_back</span>
+                    <span class="material-symbols-outlined text-sm"
+                      >arrow_back</span
+                    >
                     <span>Volver a Estilo</span>
                   </button>
 
@@ -780,7 +975,9 @@
                     class="py-2.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95"
                   >
                     <span>Revisar Fuerza ATS</span>
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    <span class="material-symbols-outlined text-sm"
+                      >arrow_forward</span
+                    >
                   </button>
                 </div>
               </div>
@@ -788,9 +985,14 @@
               <!-- ======================================================== -->
               <!-- PASO 3: CALIDAD Y FUERZA ATS                             -->
               <!-- ======================================================== -->
-              <div v-show="activeBuilderTab === 'ats'" class="space-y-5 animate-in fade-in duration-150">
+              <div
+                v-show="activeBuilderTab === 'ats'"
+                class="space-y-5 animate-in fade-in duration-150"
+              >
                 <!-- Live Score Card -->
-                <div class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/60 space-y-3">
+                <div
+                  class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/60 space-y-3"
+                >
                   <div class="flex items-center justify-between">
                     <div>
                       <span class="text-xs font-bold text-on-background block">
@@ -805,13 +1007,20 @@
                       class="px-2.5 py-1 rounded-full border text-xs font-extrabold flex items-center gap-1"
                       :class="atsEvaluation.badgeColor"
                     >
-                      <span class="material-symbols-outlined text-sm">verified</span>
-                      <span>{{ atsEvaluation.score }}% · {{ atsEvaluation.status }}</span>
+                      <span class="material-symbols-outlined text-sm"
+                        >verified</span
+                      >
+                      <span
+                        >{{ atsEvaluation.score }}% ·
+                        {{ atsEvaluation.status }}</span
+                      >
                     </div>
                   </div>
 
                   <!-- Progress Bar -->
-                  <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                  <div
+                    class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden"
+                  >
                     <div
                       class="h-full transition-all duration-500 rounded-full"
                       :class="[
@@ -828,7 +1037,9 @@
 
                 <!-- Checklist de Calidad ATS -->
                 <div class="space-y-2">
-                  <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant block">
+                  <label
+                    class="text-xs font-bold uppercase tracking-wider text-on-surface-variant block"
+                  >
                     Checklist de Verificación ATS
                   </label>
                   <div class="space-y-1.5">
@@ -844,15 +1055,23 @@
                     >
                       <span
                         class="material-symbols-outlined text-base mt-0.5 shrink-0"
-                        :class="item.passed ? 'text-emerald-500' : 'text-slate-400'"
+                        :class="
+                          item.passed ? 'text-emerald-500' : 'text-slate-400'
+                        "
                       >
-                        {{ item.passed ? "check_circle" : "radio_button_unchecked" }}
+                        {{
+                          item.passed
+                            ? "check_circle"
+                            : "radio_button_unchecked"
+                        }}
                       </span>
                       <div class="min-w-0">
                         <p class="font-bold text-[11px]">
                           {{ item.label }}
                         </p>
-                        <p class="text-[10px] text-on-surface-variant mt-0.5 leading-tight">
+                        <p
+                          class="text-[10px] text-on-surface-variant mt-0.5 leading-tight"
+                        >
                           {{ item.tip }}
                         </p>
                       </div>
@@ -861,31 +1080,47 @@
                 </div>
 
                 <!-- Banco de Verbos de Acción (Collapsible Accordion) -->
-                <div class="rounded-xl border border-outline-variant/50 overflow-hidden bg-surface-container-low/50">
+                <div
+                  class="rounded-xl border border-outline-variant/50 overflow-hidden bg-surface-container-low/50"
+                >
                   <button
                     type="button"
                     @click="showStarVerbs = !showStarVerbs"
                     class="w-full p-3 flex items-center justify-between text-left hover:bg-surface-container transition cursor-pointer"
                   >
                     <div class="flex items-center gap-2">
-                      <span class="material-symbols-outlined text-primary text-base">format_quote</span>
+                      <span
+                        class="material-symbols-outlined text-primary text-base"
+                        >format_quote</span
+                      >
                       <div>
-                        <span class="text-xs font-bold text-on-background block">Banco de Verbos STAR</span>
-                        <span class="text-[10px] text-on-surface-variant">Sugerencias orientadas a logros</span>
+                        <span class="text-xs font-bold text-on-background block"
+                          >Banco de Verbos STAR</span
+                        >
+                        <span class="text-[10px] text-on-surface-variant"
+                          >Sugerencias orientadas a logros</span
+                        >
                       </div>
                     </div>
-                    <span class="material-symbols-outlined text-on-surface-variant text-sm">
-                      {{ showStarVerbs ? 'expand_less' : 'expand_more' }}
+                    <span
+                      class="material-symbols-outlined text-on-surface-variant text-sm"
+                    >
+                      {{ showStarVerbs ? "expand_less" : "expand_more" }}
                     </span>
                   </button>
 
-                  <div v-if="showStarVerbs" class="p-3 border-t border-outline-variant/40 space-y-2 animate-in fade-in duration-150">
+                  <div
+                    v-if="showStarVerbs"
+                    class="p-3 border-t border-outline-variant/40 space-y-2 animate-in fade-in duration-150"
+                  >
                     <div
                       v-for="(grp, gIdx) in ACTION_VERBS"
                       :key="gIdx"
                       class="p-2 rounded-lg bg-surface border border-outline-variant/30"
                     >
-                      <span class="text-[10px] font-bold text-primary uppercase tracking-wide block mb-1">
+                      <span
+                        class="text-[10px] font-bold text-primary uppercase tracking-wide block mb-1"
+                      >
                         {{ grp.category }}
                       </span>
                       <div class="flex flex-wrap gap-1">
@@ -902,13 +1137,17 @@
                 </div>
 
                 <!-- Step 3 Footer Navigation: Volver o Exportar -->
-                <div class="pt-3 border-t border-outline-variant/40 flex items-center justify-between gap-2">
+                <div
+                  class="pt-3 border-t border-outline-variant/40 flex items-center justify-between gap-2"
+                >
                   <button
                     type="button"
                     @click="activeBuilderTab = 'content'"
                     class="py-2 px-3 rounded-xl border border-outline-variant/60 hover:bg-surface-container text-on-surface text-xs font-bold transition flex items-center gap-1 cursor-pointer"
                   >
-                    <span class="material-symbols-outlined text-sm">arrow_back</span>
+                    <span class="material-symbols-outlined text-sm"
+                      >arrow_back</span
+                    >
                     <span>Volver a Contenido</span>
                   </button>
 
@@ -918,7 +1157,9 @@
                     :disabled="isGenerating || isSavingToProfile"
                     class="py-2.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer disabled:opacity-50 active:scale-95"
                   >
-                    <span class="material-symbols-outlined text-sm">download</span>
+                    <span class="material-symbols-outlined text-sm"
+                      >download</span
+                    >
                     <span>Descargar PDF</span>
                   </button>
                 </div>
@@ -952,12 +1193,22 @@
                     type="button"
                     @click="isSidebarCollapsed = !isSidebarCollapsed"
                     class="hidden lg:flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-lg border border-outline-variant/60 hover:bg-surface-container text-on-surface transition cursor-pointer mr-1"
-                    :title="isSidebarCollapsed ? 'Mostrar panel de opciones' : 'Modo Enfoque (Pantalla completa)'"
+                    :title="
+                      isSidebarCollapsed
+                        ? 'Mostrar panel de opciones'
+                        : 'Modo Enfoque (Pantalla completa)'
+                    "
                   >
                     <span class="material-symbols-outlined text-sm">
-                      {{ isSidebarCollapsed ? 'left_panel_open' : 'left_panel_close' }}
+                      {{
+                        isSidebarCollapsed
+                          ? "left_panel_open"
+                          : "left_panel_close"
+                      }}
                     </span>
-                    <span>{{ isSidebarCollapsed ? 'Opciones' : 'Enfoque' }}</span>
+                    <span>{{
+                      isSidebarCollapsed ? "Opciones" : "Enfoque"
+                    }}</span>
                   </button>
 
                   <button
@@ -1062,7 +1313,9 @@
                 class="px-3.5 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
                 title="Sincronizar este CV y sus datos con tu perfil público en JobNet"
               >
-                <span class="material-symbols-outlined text-sm">cloud_upload</span>
+                <span class="material-symbols-outlined text-sm"
+                  >cloud_upload</span
+                >
                 <span>Guardar en Perfil</span>
               </button>
 
@@ -1138,9 +1391,27 @@ const showStarterPacks = ref(false);
 const showStarVerbs = ref(false);
 
 const BUILDER_STEPS = [
-  { id: "design" as const, number: 1, title: "Estilo", subtitle: "Plantilla y color", icon: "palette" },
-  { id: "content" as const, number: 2, title: "Contenido", subtitle: "Datos y secciones", icon: "edit_note" },
-  { id: "ats" as const, number: 3, title: "Revisión", subtitle: "Fuerza ATS y exportar", icon: "verified" },
+  {
+    id: "design" as const,
+    number: 1,
+    title: "Estilo",
+    subtitle: "Plantilla y color",
+    icon: "palette",
+  },
+  {
+    id: "content" as const,
+    number: 2,
+    title: "Contenido",
+    subtitle: "Datos y secciones",
+    icon: "edit_note",
+  },
+  {
+    id: "ats" as const,
+    number: 3,
+    title: "Revisión",
+    subtitle: "Fuerza ATS y exportar",
+    icon: "verified",
+  },
 ];
 
 const TEMPLATE_OPTIONS: Array<{
@@ -1423,7 +1694,11 @@ const applyBioSnippet = (type: "junior" | "results" | "tech") => {
 const handleAddSkill = (skill: string) => {
   const clean = skill.trim();
   if (!clean) return;
-  if (!editableCv.value.skills.some((s) => s.toLowerCase() === clean.toLowerCase())) {
+  if (
+    !editableCv.value.skills.some(
+      (s) => s.toLowerCase() === clean.toLowerCase(),
+    )
+  ) {
     editableCv.value.skills.push(clean);
   }
   newSkillInput.value = "";
@@ -1482,7 +1757,8 @@ const handleDownload = async () => {
   } catch (err: any) {
     showError(
       "Error al Descargar",
-      err?.message || "Ocurrió un error inesperado al generar el PDF del currículum.",
+      err?.message ||
+        "Ocurrió un error inesperado al generar el PDF del currículum.",
     );
   }
 };
@@ -1531,13 +1807,15 @@ const handleSaveToProfile = async () => {
     } else {
       showError(
         "Error al Guardar CV",
-        result.error || "No se pudo generar o subir el CV a tu perfil. Por favor intenta de nuevo.",
+        result.error ||
+          "No se pudo generar o subir el CV a tu perfil. Por favor intenta de nuevo.",
       );
     }
   } catch (err: any) {
     showError(
       "Error al Guardar CV",
-      err?.message || "Ocurrió un error inesperado al procesar y subir tu currículum.",
+      err?.message ||
+        "Ocurrió un error inesperado al procesar y subir tu currículum.",
     );
   }
 };

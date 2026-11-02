@@ -184,11 +184,21 @@
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 flex-shrink-0 self-center">
+        <div
+          class="flex flex-wrap items-center gap-2 flex-shrink-0 self-center"
+        >
           <!-- Dispute Messaging Audit Actions (Fase 1 y Fase 2) -->
-          <template v-if="inc.targetType === 'VACANTE' || inc.jobId || isSeriousInfraction(inc.infraccion)">
+          <template
+            v-if="
+              inc.targetType === 'VACANTE' ||
+              inc.jobId ||
+              isSeriousInfraction(inc.infraccion)
+            "
+          >
             <button
-              v-if="inc.auditState === 'AUDIT_ACTIVE' || inc.estatus === 'AUDITORIA'"
+              v-if="
+                inc.auditState === 'AUDIT_ACTIVE' || inc.estatus === 'AUDITORIA'
+              "
               type="button"
               @click="inspectAuditChat(inc)"
               class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"

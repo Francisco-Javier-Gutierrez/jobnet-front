@@ -3,19 +3,27 @@
     class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between"
   >
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-outline-variant/30 dark:border-slate-800">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-outline-variant/30 dark:border-slate-800"
+    >
       <div>
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-[22px]">code_blocks</span>
+          <span class="material-symbols-outlined text-primary text-[22px]"
+            >code_blocks</span
+          >
           <h2 class="text-base font-bold text-on-surface dark:text-slate-100">
             Top 10 Habilidades Técnicas Más Demandadas
           </h2>
         </div>
         <p class="text-xs text-on-surface-variant dark:text-slate-400 mt-0.5">
-          Frecuencia de requisitos técnicos en vacantes de la región ({{ region }})
+          Frecuencia de requisitos técnicos en vacantes de la región ({{
+            region
+          }})
         </p>
       </div>
-      <span class="self-start sm:self-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400">
+      <span
+        class="self-start sm:self-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400"
+      >
         <span class="material-symbols-outlined text-[14px]">location_on</span>
         {{ region }}
       </span>
@@ -37,7 +45,9 @@
             >
               {{ index + 1 }}
             </span>
-            <span class="font-semibold text-on-surface dark:text-slate-200 truncate group-hover:text-primary transition">
+            <span
+              class="font-semibold text-on-surface dark:text-slate-200 truncate group-hover:text-primary transition"
+            >
               {{ skill.name }}
             </span>
             <span
@@ -53,14 +63,18 @@
             <span class="text-slate-500 dark:text-slate-400 font-medium">
               {{ skill.count }} vacantes
             </span>
-            <span class="font-bold text-on-surface dark:text-slate-100 w-10 text-right">
+            <span
+              class="font-bold text-on-surface dark:text-slate-100 w-10 text-right"
+            >
               {{ skill.percentage }}%
             </span>
           </div>
         </div>
 
         <!-- Horizontal Bar with Gradient -->
-        <div class="w-full bg-slate-100 dark:bg-slate-800/80 h-2.5 rounded-full overflow-hidden">
+        <div
+          class="w-full bg-slate-100 dark:bg-slate-800/80 h-2.5 rounded-full overflow-hidden"
+        >
           <div
             class="h-full rounded-full transition-all duration-500 ease-out"
             :class="getBarGradient(index)"
@@ -71,9 +85,13 @@
     </div>
 
     <!-- Footer Summary -->
-    <div class="mt-6 pt-3 border-t border-outline-variant/30 dark:border-slate-800 flex items-center justify-between text-xs text-on-surface-variant dark:text-slate-400">
+    <div
+      class="mt-6 pt-3 border-t border-outline-variant/30 dark:border-slate-800 flex items-center justify-between text-xs text-on-surface-variant dark:text-slate-400"
+    >
       <span>Actualizado en tiempo real según publicaciones activas</span>
-      <span class="font-semibold text-primary">Total: 10 tecnologías líderes</span>
+      <span class="font-semibold text-primary"
+        >Total: 10 tecnologías líderes</span
+      >
     </div>
   </div>
 </template>

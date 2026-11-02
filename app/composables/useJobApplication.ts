@@ -114,7 +114,8 @@ export function useJobApplication(jobId: string, jobRef: any) {
       jobRef.value?.preguntasFiltro || jobRef.value?.screeningQuestions || [];
     if (Array.isArray(screeningQuestions) && screeningQuestions.length > 0) {
       const missing = screeningQuestions.some(
-        (q: string) => !filterAnswers.value[q] || !filterAnswers.value[q].trim(),
+        (q: string) =>
+          !filterAnswers.value[q] || !filterAnswers.value[q].trim(),
       );
       if (missing) {
         showWarning(
@@ -139,7 +140,8 @@ export function useJobApplication(jobId: string, jobRef: any) {
       jobRef.value?.preguntasFiltro || jobRef.value?.screeningQuestions || [];
     if (Array.isArray(screeningQuestions) && screeningQuestions.length > 0) {
       const missing = screeningQuestions.some(
-        (q: string) => !filterAnswers.value[q] || !filterAnswers.value[q].trim(),
+        (q: string) =>
+          !filterAnswers.value[q] || !filterAnswers.value[q].trim(),
       );
       if (missing) {
         showWarning(
@@ -177,7 +179,10 @@ export function useJobApplication(jobId: string, jobRef: any) {
         finalMessage +=
           `\n\n📋 Respuestas a Preguntas de Precalificación:\n` +
           respuestasFiltro
-            .map((item, idx) => `P${idx + 1}: ${item.pregunta}\nR: ${item.respuesta}`)
+            .map(
+              (item, idx) =>
+                `P${idx + 1}: ${item.pregunta}\nR: ${item.respuesta}`,
+            )
             .join("\n\n");
       }
 

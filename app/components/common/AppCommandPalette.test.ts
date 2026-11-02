@@ -11,7 +11,9 @@ const mockSignOut = vi.fn();
 const mockToggleTheme = vi.fn();
 const mockIsDark = ref(false);
 
-const mockAuthStatus = ref<"authenticated" | "unauthenticated" | "loading">("unauthenticated");
+const mockAuthStatus = ref<"authenticated" | "unauthenticated" | "loading">(
+  "unauthenticated",
+);
 const mockAuthData = ref<any>(null);
 
 vi.stubGlobal("useAuth", () => ({

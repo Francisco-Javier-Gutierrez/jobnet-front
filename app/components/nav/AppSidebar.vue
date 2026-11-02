@@ -28,10 +28,18 @@
           title="Abrir buscador global y comandos (Ctrl+K)"
         >
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-primary group-hover:scale-110 transition-transform">search</span>
-            <span class="font-medium text-on-surface-variant dark:text-slate-300">Buscar...</span>
+            <span
+              class="material-symbols-outlined text-[18px] text-primary group-hover:scale-110 transition-transform"
+              >search</span
+            >
+            <span
+              class="font-medium text-on-surface-variant dark:text-slate-300"
+              >Buscar...</span
+            >
           </div>
-          <kbd class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-surface dark:bg-slate-900 rounded border border-outline-variant/60 dark:border-slate-700 text-on-surface-variant dark:text-slate-400">
+          <kbd
+            class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-surface dark:bg-slate-900 rounded border border-outline-variant/60 dark:border-slate-700 text-on-surface-variant dark:text-slate-400"
+          >
             Ctrl K
           </kbd>
         </button>
@@ -44,7 +52,9 @@
           @click="handleNavClick(primaryAction)"
           class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/95 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all duration-200 cursor-pointer active:scale-[0.98]"
         >
-          <span class="material-symbols-outlined text-[18px] font-bold">add</span>
+          <span class="material-symbols-outlined text-[18px] font-bold"
+            >add</span
+          >
           <span>{{ primaryAction.label }}</span>
         </button>
       </div>
@@ -56,7 +66,9 @@
           :key="section.title"
           class="space-y-1"
         >
-          <p class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant/60 dark:text-slate-500 select-none">
+          <p
+            class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant/60 dark:text-slate-500 select-none"
+          >
             {{ section.title }}
           </p>
           <div class="space-y-0.5">
@@ -74,7 +86,11 @@
             >
               <span
                 class="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110"
-                :class="isActive(item.to) ? 'text-primary dark:text-indigo-400' : 'text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-indigo-400'"
+                :class="
+                  isActive(item.to)
+                    ? 'text-primary dark:text-indigo-400'
+                    : 'text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-indigo-400'
+                "
               >
                 {{ item.icon }}
               </span>
@@ -93,7 +109,10 @@
       <div
         class="flex items-center justify-between px-3 py-2 bg-surface-container/50 dark:bg-slate-800/60 rounded-xl"
       >
-        <span class="text-xs font-semibold text-on-surface-variant dark:text-slate-400">Apariencia</span>
+        <span
+          class="text-xs font-semibold text-on-surface-variant dark:text-slate-400"
+          >Apariencia</span
+        >
         <ThemeToggle />
       </div>
 
@@ -159,10 +178,16 @@
 
         <template #fallback>
           <div class="px-3 py-2 h-12 flex items-center gap-3 animate-pulse">
-            <div class="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-slate-700/50"></div>
+            <div
+              class="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-slate-700/50"
+            ></div>
             <div class="space-y-1 flex-1">
-              <div class="h-3 bg-slate-200/50 dark:bg-slate-700/50 rounded w-20"></div>
-              <div class="h-2 bg-slate-200/50 dark:bg-slate-700/50 rounded w-12"></div>
+              <div
+                class="h-3 bg-slate-200/50 dark:bg-slate-700/50 rounded w-20"
+              ></div>
+              <div
+                class="h-2 bg-slate-200/50 dark:bg-slate-700/50 rounded w-12"
+              ></div>
             </div>
           </div>
         </template>

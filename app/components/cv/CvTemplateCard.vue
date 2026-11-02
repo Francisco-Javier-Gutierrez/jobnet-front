@@ -6,12 +6,18 @@
     <div>
       <div class="flex items-center justify-between gap-2 mb-3">
         <!-- Interactive Language Switcher Toggle -->
-        <div class="inline-flex items-center p-0.5 rounded-xl bg-surface-container dark:bg-slate-800 border border-outline-variant/40">
+        <div
+          class="inline-flex items-center p-0.5 rounded-xl bg-surface-container dark:bg-slate-800 border border-outline-variant/40"
+        >
           <button
             type="button"
             @click.stop="activeLang = 'es'"
             class="px-2 py-0.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer"
-            :class="activeLang === 'es' ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-on-surface'"
+            :class="
+              activeLang === 'es'
+                ? 'bg-primary text-on-primary shadow-xs'
+                : 'text-on-surface-variant hover:text-on-surface'
+            "
             title="Ver contenido en Español"
           >
             <span>🇲🇽</span>
@@ -21,7 +27,11 @@
             type="button"
             @click.stop="activeLang = 'en'"
             class="px-2 py-0.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer"
-            :class="activeLang === 'en' ? 'bg-indigo-600 text-white shadow-xs' : 'text-on-surface-variant hover:text-on-surface'"
+            :class="
+              activeLang === 'en'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-on-surface-variant hover:text-on-surface'
+            "
             title="Switch content to English"
           >
             <span>🇺🇸</span>
@@ -60,7 +70,9 @@
       >
         {{ resolvedContent.titulo }}
       </h3>
-      <p class="text-xs text-on-surface-variant dark:text-slate-400 mb-3 flex items-center gap-1">
+      <p
+        class="text-xs text-on-surface-variant dark:text-slate-400 mb-3 flex items-center gap-1"
+      >
         <span class="material-symbols-outlined text-sm">badge</span>
         <span>{{ resolvedContent.rol }}</span>
       </p>
@@ -91,9 +103,13 @@
     </div>
 
     <!-- Bottom Actions & Author -->
-    <div class="pt-3 border-t border-outline-variant/40 dark:border-slate-800 space-y-3">
+    <div
+      class="pt-3 border-t border-outline-variant/40 dark:border-slate-800 space-y-3"
+    >
       <!-- Author info & stats -->
-      <div class="flex items-center justify-between text-xs text-on-surface-variant dark:text-slate-400">
+      <div
+        class="flex items-center justify-between text-xs text-on-surface-variant dark:text-slate-400"
+      >
         <div class="flex items-center gap-1.5 truncate">
           <span
             v-if="template.isOfficial"
@@ -110,7 +126,9 @@
         </div>
 
         <div class="flex items-center gap-1 text-[11px] font-bold shrink-0">
-          <span class="material-symbols-outlined text-sm text-primary">download</span>
+          <span class="material-symbols-outlined text-sm text-primary"
+            >download</span
+          >
           <span>{{ template.stats.usesCount }} usos</span>
         </div>
       </div>
@@ -144,7 +162,9 @@
             title="Más opciones de plantilla"
             aria-label="Más opciones"
           >
-            <span class="material-symbols-outlined text-base leading-none">more_vert</span>
+            <span class="material-symbols-outlined text-base leading-none"
+              >more_vert</span
+            >
           </button>
 
           <!-- Dropdown Popover -->
@@ -155,26 +175,42 @@
           >
             <button
               type="button"
-              @click="showMoreMenu = false; $emit('preview-profile', template, activeLang)"
+              @click="
+                showMoreMenu = false;
+                $emit('preview-profile', template, activeLang);
+              "
               class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-surface-container flex items-center gap-2 text-on-surface dark:text-slate-200 font-medium transition cursor-pointer"
             >
-              <span class="material-symbols-outlined text-sm text-primary">preview</span>
+              <span class="material-symbols-outlined text-sm text-primary"
+                >preview</span
+              >
               <span>Previsualizar en Perfil</span>
             </button>
 
             <button
               type="button"
-              @click="showMoreMenu = false; $emit('apply-profile', template, activeLang)"
+              @click="
+                showMoreMenu = false;
+                $emit('apply-profile', template, activeLang);
+              "
               class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-primary/10 flex items-center gap-2 text-primary font-medium transition cursor-pointer"
             >
-              <span class="material-symbols-outlined text-sm">sync_saved_locally</span>
+              <span class="material-symbols-outlined text-sm"
+                >sync_saved_locally</span
+              >
               <span>Aplicar datos a mi Perfil</span>
             </button>
 
-            <div v-if="isOwner" class="border-t border-outline-variant/40 pt-1 mt-1">
+            <div
+              v-if="isOwner"
+              class="border-t border-outline-variant/40 pt-1 mt-1"
+            >
               <button
                 type="button"
-                @click="showMoreMenu = false; $emit('delete', template.id)"
+                @click="
+                  showMoreMenu = false;
+                  $emit('delete', template.id);
+                "
                 class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-rose-500/10 flex items-center gap-2 text-error font-medium transition cursor-pointer"
               >
                 <span class="material-symbols-outlined text-sm">delete</span>
@@ -201,12 +237,18 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "preview", template: CommunityCvTemplate, lang: "es" | "en"): void;
   (e: "use-cv", template: CommunityCvTemplate, lang: "es" | "en"): void;
-  (e: "preview-profile", template: CommunityCvTemplate, lang: "es" | "en"): void;
+  (
+    e: "preview-profile",
+    template: CommunityCvTemplate,
+    lang: "es" | "en",
+  ): void;
   (e: "apply-profile", template: CommunityCvTemplate, lang: "es" | "en"): void;
   (e: "delete", templateId: string): void;
 }>();
 
-const activeLang = ref<"es" | "en">(props.template.idioma === "en" ? "en" : "es");
+const activeLang = ref<"es" | "en">(
+  props.template.idioma === "en" ? "en" : "es",
+);
 const showMoreMenu = ref(false);
 const menuRef = ref<HTMLElement | null>(null);
 

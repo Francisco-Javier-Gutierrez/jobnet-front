@@ -9,32 +9,71 @@ on:
     branches:
       - develop
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  ci:
+  quality-gate:
+    name: "Quality Gate & PR Validation (Strict)"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "npm"
 
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Run Prettier
-        run: npm run format:check
+      - name: 1. Verify Code Formatting (Prettier)
+        run: |
+          echo "🎨 Verificando formato de código con Prettier..."
+          npm run format:check
 
-      - name: Run Linter
-        run: npm run lint
+      - name: 2. Static Code Analysis (ESLint)
+        run: |
+          echo "🔍 Ejecutando análisis estático con ESLint..."
+          npm run lint
 
-      - name: Type Check
-        run: npm run typecheck
+      - name: 3. TypeScript Strict Typecheck (vue-tsc)
+        run: |
+          echo "📐 Verificando tipos TypeScript..."
+          npm run typecheck
 
-      - name: Run Tests (100% Coverage)
-        run: npm run test:coverage
+      - name: 4. Unit Tests & Strict Code Coverage (Vitest)
+        run: |
+          echo "🧪 Ejecutando suite de pruebas unitarias y cobertura..."
+          npm run test:coverage
 
-      - name: Build
-        run: npm run build
+      - name: 5. Nuxt 4 SSR Production Build
+        run: |
+          echo "⚙️  Verificando compilación de producción para AWS Lambda..."
+          npm run build
+
+      - name: 6. Build Artifacts Integrity Validation
+        run: |
+          echo "📦 Verificando integridad de artefactos generados..."
+          if [ ! -d ".output/server" ] || [ ! -d ".output/public" ]; then
+            echo "❌ Error crítico: .output/server o .output/public no se generaron."
+            exit 1
+          fi
+          echo "✅ Artefactos de servidor y estáticos validados."
+
+      - name: Generate PR Summary Report
+        if: always()
+        run: |
+          echo "### 🛡️ JobNet Frontend Quality Gate Report" >> $GITHUB_STEP_SUMMARY
+          echo "| Validación | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎨 **Formato de Código (Prettier)** | ${{ job.status == 'success' && '✅ Aprobado' || '⚠️ Revisar' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔍 **Linter Estático (ESLint)** | ${{ job.status == 'success' && '✅ Aprobado' || '⚠️ Revisar' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📐 **Tipado Estricto (vue-tsc)** | ${{ job.status == 'success' && '✅ Aprobado' || '⚠️ Revisar' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧪 **Pruebas y Cobertura (Vitest)** | ${{ job.status == 'success' && '✅ Aprobado' || '⚠️ Revisar' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚙️ **Compilación SSR Nitro (Build)** | ${{ job.status == 'success' && '✅ Aprobado' || '⚠️ Revisar' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Veredicto:** ${{ job.status == 'success' && '🟢 PR Apto para Merge' || '🔴 Bloqueado por Quality Gate' }}" >> $GITHUB_STEP_SUMMARY

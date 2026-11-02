@@ -4,7 +4,9 @@ export default defineEventHandler(async (event) => {
   const incidentId = getRouterParam(event, "id");
   const config = useRuntimeConfig();
   const authHeader = getHeader(event, "authorization");
-  const userRoleHeader = (getHeader(event, "x-user-role") || "MODERATOR").toUpperCase();
+  const userRoleHeader = (
+    getHeader(event, "x-user-role") || "MODERATOR"
+  ).toUpperCase();
 
   // Role verification: ONLY MODERATOR or ADMIN allowed
   if (
@@ -56,7 +58,8 @@ export default defineEventHandler(async (event) => {
 
   return {
     success: true,
-    message: "Dictamen de auditoría emitido exitosamente. Expediente concluido y partes notificadas.",
+    message:
+      "Dictamen de auditoría emitido exitosamente. Expediente concluido y partes notificadas.",
     incidentId,
     dictum,
   };

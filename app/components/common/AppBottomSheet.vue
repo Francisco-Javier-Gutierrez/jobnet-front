@@ -64,9 +64,10 @@
                     :class="iconBgClass || 'bg-primary/10 text-primary'"
                     class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                   >
-                    <span class="material-symbols-outlined text-xl sm:text-2xl">{{
-                      icon
-                    }}</span>
+                    <span
+                      class="material-symbols-outlined text-xl sm:text-2xl"
+                      >{{ icon }}</span
+                    >
                   </div>
 
                   <!-- Title & Description -->

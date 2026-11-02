@@ -138,7 +138,9 @@
       class="mb-6 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 flex items-center justify-between gap-3 shadow-sm animate-fade-in"
     >
       <div class="flex items-center gap-2 text-sm font-semibold">
-        <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+        <span class="material-symbols-outlined text-emerald-600"
+          >check_circle</span
+        >
         <span>{{ successMsg }}</span>
       </div>
       <button
@@ -155,11 +157,16 @@
       class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm"
     >
       <div class="flex items-start sm:items-center gap-3">
-        <span class="material-symbols-outlined text-amber-600 text-2xl">warning</span>
+        <span class="material-symbols-outlined text-amber-600 text-2xl"
+          >warning</span
+        >
         <div>
-          <h4 class="font-bold text-sm">Organización en Estado de Revisión (Fase de Apelación)</h4>
+          <h4 class="font-bold text-sm">
+            Organización en Estado de Revisión (Fase de Apelación)
+          </h4>
           <p class="text-xs text-amber-800/80 dark:text-amber-300/80">
-            Esta cuenta tiene una notificación de infracción en curso y se encuentra en periodo de gracia para apelar.
+            Esta cuenta tiene una notificación de infracción en curso y se
+            encuentra en periodo de gracia para apelar.
           </p>
         </div>
       </div>
@@ -169,7 +176,9 @@
           to="/support"
           class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5"
         >
-          <span class="material-symbols-outlined text-[16px]">support_agent</span>
+          <span class="material-symbols-outlined text-[16px]"
+            >support_agent</span
+          >
           Enviar Apelación
         </NuxtLink>
         <NuxtLink
@@ -197,11 +206,14 @@
       class="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm"
     >
       <div class="flex items-start sm:items-center gap-3">
-        <span class="material-symbols-outlined text-rose-600 text-2xl">block</span>
+        <span class="material-symbols-outlined text-rose-600 text-2xl"
+          >block</span
+        >
         <div>
           <h4 class="font-bold text-sm">Cuenta Suspendida por Infracción</h4>
           <p class="text-xs text-rose-800/80 dark:text-rose-300/80">
-            El acceso de inicio de sesión se encuentra bloqueado y sus ofertas han sido ocultadas del portal.
+            El acceso de inicio de sesión se encuentra bloqueado y sus ofertas
+            han sido ocultadas del portal.
           </p>
         </div>
       </div>
@@ -312,9 +324,7 @@ const isStaff = computed(() => {
     (session.value?.user as any)?.role;
   const userRole = (rawRole || "").toUpperCase();
   return (
-    userRole === "ADMIN" ||
-    userRole === "MODERATOR" ||
-    userRole === "MODERADOR"
+    userRole === "ADMIN" || userRole === "MODERATOR" || userRole === "MODERADOR"
   );
 });
 

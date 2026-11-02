@@ -563,7 +563,9 @@ describe("useCvGenerator & RF-123 Anonymous Mode", () => {
       expect(anonData.email).toBe("");
       expect(anonData.phone).toBe("");
       // Debe conservar biografía técnica y habilidades
-      expect(anonData.bio).toBe("Desarrollador Full Stack con 5 años de experiencia.");
+      expect(anonData.bio).toBe(
+        "Desarrollador Full Stack con 5 años de experiencia.",
+      );
       expect(anonData.skills).toEqual(["Node.js", "Vue.js", "PostgreSQL"]);
     });
   });

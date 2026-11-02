@@ -1,4 +1,8 @@
-import { MOCK_VACANCIES, MOCK_COMPANIES, MOCK_APPLICANTS } from "../../../app/utils/mockData";
+import {
+  MOCK_VACANCIES,
+  MOCK_COMPANIES,
+  MOCK_APPLICANTS,
+} from "../../../app/utils/mockData";
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -10,14 +14,17 @@ export default defineEventHandler(async (event) => {
 
   // Try fetching from backend API if available
   try {
-    const backendData = await $fetch<any>(`${config.public.apiUrl}/admin/analytics`, {
-      method: "GET",
-      params: { region },
-      headers: {
-        ...(authHeader ? { Authorization: authHeader } : {}),
-        "x-user-role": userRoleHeader,
+    const backendData = await $fetch<any>(
+      `${config.public.apiUrl}/admin/analytics`,
+      {
+        method: "GET",
+        params: { region },
+        headers: {
+          ...(authHeader ? { Authorization: authHeader } : {}),
+          "x-user-role": userRoleHeader,
+        },
       },
-    });
+    );
 
     if (backendData?.success && backendData?.data) {
       return backendData;
@@ -43,9 +50,21 @@ export default defineEventHandler(async (event) => {
     if (rawLoc.toLowerCase().includes("toluca")) reg = "Toluca";
     else if (rawLoc.toLowerCase().includes("metepec")) reg = "Metepec";
     else if (rawLoc.toLowerCase().includes("naucalpan")) reg = "Naucalpan";
-    else if (rawLoc.toLowerCase().includes("cdmx") || rawLoc.toLowerCase().includes("ciudad de méxico")) reg = "Ciudad de México";
-    else if (rawLoc.toLowerCase().includes("querétaro") || rawLoc.toLowerCase().includes("qro")) reg = "Querétaro";
-    else if (rawLoc.toLowerCase().includes("remoto") || vac.modalidad === "Remoto") reg = "Remoto Nacional";
+    else if (
+      rawLoc.toLowerCase().includes("cdmx") ||
+      rawLoc.toLowerCase().includes("ciudad de méxico")
+    )
+      reg = "Ciudad de México";
+    else if (
+      rawLoc.toLowerCase().includes("querétaro") ||
+      rawLoc.toLowerCase().includes("qro")
+    )
+      reg = "Querétaro";
+    else if (
+      rawLoc.toLowerCase().includes("remoto") ||
+      vac.modalidad === "Remoto"
+    )
+      reg = "Remoto Nacional";
 
     regionSet.add(reg);
 
@@ -85,7 +104,9 @@ export default defineEventHandler(async (event) => {
       count: count * 4 + 2, // scale to regional market sample
       percentage: Math.min(
         95,
-        Math.round(((count * 4 + 2) / Math.max(filteredVacanciesCount * 4, 38)) * 100),
+        Math.round(
+          ((count * 4 + 2) / Math.max(filteredVacanciesCount * 4, 38)) * 100,
+        ),
       ),
       category: getCategory(name),
     }))
@@ -113,7 +134,11 @@ export default defineEventHandler(async (event) => {
     { month: "Jul 2026", count: 25, label: "Jul 2026" },
     { month: "Ago 2026", count: 29, label: "Ago 2026" },
     { month: "Sep 2026", count: 33, label: "Sep 2026" },
-    { month: "Oct 2026", count: Math.max(MOCK_COMPANIES.length * 3, 38), label: "Oct 2026" },
+    {
+      month: "Oct 2026",
+      count: Math.max(MOCK_COMPANIES.length * 3, 38),
+      label: "Oct 2026",
+    },
   ];
 
   // 3. Calculate Application Rate per Job Offer
@@ -138,7 +163,9 @@ export default defineEventHandler(async (event) => {
     ],
   };
 
-  const verifiedOrgs = MOCK_COMPANIES.filter((c) => c.organizacionVerificada).length;
+  const verifiedOrgs = MOCK_COMPANIES.filter(
+    (c) => c.organizacionVerificada,
+  ).length;
 
   const baselineAnomalies = [
     {
@@ -202,22 +229,44 @@ export default defineEventHandler(async (event) => {
 
 function getCategory(skill: string): string {
   const s = skill.toLowerCase();
-  if (s.includes("vue") || s.includes("react") || s.includes("nuxt") || s.includes("frontend") || s.includes("tailwind") || s.includes("css")) {
+  if (
+    s.includes("vue") ||
+    s.includes("react") ||
+    s.includes("nuxt") ||
+    s.includes("frontend") ||
+    s.includes("tailwind") ||
+    s.includes("css")
+  ) {
     return "Frontend";
   }
   if (s.includes("aws") || s.includes("cloud") || s.includes("lambda")) {
     return "Cloud";
   }
-  if (s.includes("node") || s.includes("backend") || s.includes("express") || s.includes("java")) {
+  if (
+    s.includes("node") ||
+    s.includes("backend") ||
+    s.includes("express") ||
+    s.includes("java")
+  ) {
     return "Backend";
   }
-  if (s.includes("docker") || s.includes("ci/cd") || s.includes("git") || s.includes("devops")) {
+  if (
+    s.includes("docker") ||
+    s.includes("ci/cd") ||
+    s.includes("git") ||
+    s.includes("devops")
+  ) {
     return "DevOps";
   }
   if (s.includes("python") || s.includes("data") || s.includes("ai")) {
     return "Data / AI";
   }
-  if (s.includes("figma") || s.includes("design") || s.includes("ui") || s.includes("ux")) {
+  if (
+    s.includes("figma") ||
+    s.includes("design") ||
+    s.includes("ui") ||
+    s.includes("ux")
+  ) {
     return "Diseño";
   }
   if (s.includes("sql") || s.includes("database") || s.includes("dynamo")) {

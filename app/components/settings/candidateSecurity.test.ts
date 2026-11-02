@@ -10,10 +10,10 @@ describe("Seguridad del Perfil de Candidato y Restricciones para Usuarios Federa
       const isFederated = (user: any) => {
         return Boolean(
           user?.isFederated ||
-            user?.provider === "cognito" ||
-            (typeof user?.id === "string" &&
-              user.id.toLowerCase().startsWith("google_")) ||
-            user?.origenRegistro === "GOOGLE_OAUTH"
+          user?.provider === "cognito" ||
+          (typeof user?.id === "string" &&
+            user.id.toLowerCase().startsWith("google_")) ||
+          user?.origenRegistro === "GOOGLE_OAUTH",
         );
       };
 

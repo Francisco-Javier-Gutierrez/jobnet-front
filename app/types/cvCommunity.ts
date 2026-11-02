@@ -1,9 +1,4 @@
-export type ExperienceLevel =
-  | "trainee"
-  | "junior"
-  | "mid"
-  | "senior"
-  | "lead";
+export type ExperienceLevel = "trainee" | "junior" | "mid" | "senior" | "lead";
 
 export type RoleCategory =
   | "frontend"
@@ -79,7 +74,7 @@ export interface CommunityCvTemplate {
  */
 export function resolveTemplateContent(
   template: CommunityCvTemplate,
-  lang: "es" | "en"
+  lang: "es" | "en",
 ): CommunityTemplateContent {
   if (template.translations && template.translations[lang]) {
     const t = template.translations[lang]!;
@@ -87,7 +82,10 @@ export function resolveTemplateContent(
       titulo: t.titulo || template.titulo,
       rol: t.rol || template.rol,
       biografiaSugerida: t.biografiaSugerida || template.biografiaSugerida,
-      habilidades: t.habilidades && t.habilidades.length > 0 ? t.habilidades : template.habilidades,
+      habilidades:
+        t.habilidades && t.habilidades.length > 0
+          ? t.habilidades
+          : template.habilidades,
       experienciaSugerida:
         t.experienciaSugerida && t.experienciaSugerida.length > 0
           ? t.experienciaSugerida
@@ -108,4 +106,3 @@ export function resolveTemplateContent(
     educacionSugerida: template.educacionSugerida,
   };
 }
-

@@ -149,7 +149,8 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
     experienciaSugerida: [
       {
         cargo: "Supervisor de Almacén y Distribución",
-        empresa: "Centro de Distribución Logístico / Parque Industrial Toluca 2000",
+        empresa:
+          "Centro de Distribución Logístico / Parque Industrial Toluca 2000",
         periodo: "2021 - Presente",
         logros: [
           "Supervisé operaciones diarias de inventario con más de [10,000] SKUs manteniendo un índice de exactitud del 99.2%.",
@@ -184,7 +185,8 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
         experienciaSugerida: [
           {
             cargo: "Supervisor de Almacén y Distribución",
-            empresa: "Centro de Distribución Logístico / Parque Industrial Toluca 2000",
+            empresa:
+              "Centro de Distribución Logístico / Parque Industrial Toluca 2000",
             periodo: "2021 - Presente",
             logros: [
               "Supervisé operaciones diarias de inventario con más de [10,000] SKUs manteniendo un índice de exactitud del 99.2%.",
@@ -267,7 +269,8 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
     experienciaSugerida: [
       {
         cargo: "Desarrollador Web / Proyectos Académicos y Prácticas",
-        empresa: "Facultad de Ingeniería / Proyectos de Vinculación Comunitaria",
+        empresa:
+          "Facultad de Ingeniería / Proyectos de Vinculación Comunitaria",
         periodo: "2023 - 2024",
         logros: [
           "Desarrollé una plataforma web responsiva para gestión local consumiendo APIs REST con React y Tailwind.",
@@ -302,7 +305,8 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
         experienciaSugerida: [
           {
             cargo: "Desarrollador Web / Proyectos Académicos y Prácticas",
-            empresa: "Facultad de Ingeniería / Proyectos de Vinculación Comunitaria",
+            empresa:
+              "Facultad de Ingeniería / Proyectos de Vinculación Comunitaria",
             periodo: "2023 - 2024",
             logros: [
               "Desarrollé una plataforma web responsiva para gestión local consumiendo APIs REST con React y Tailwind.",
@@ -314,7 +318,8 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
         educacionSugerida: [
           {
             titulo: "Ingeniería en Computación o Informática",
-            institucion: "Universidad o Instituto Tecnológico del Estado de México",
+            institucion:
+              "Universidad o Instituto Tecnológico del Estado de México",
             periodo: "2020 - 2024",
           },
         ],
@@ -670,7 +675,8 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
         ],
         educacionSugerida: [
           {
-            titulo: "Ingeniería en Sistemas Computacionales o Tecnologías de Información",
+            titulo:
+              "Ingeniería en Sistemas Computacionales o Tecnologías de Información",
             institucion: "Instituto Tecnológico / Universidad Estatal",
             periodo: "2015 - 2019",
           },
@@ -817,7 +823,7 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
             logros: [
               "Built over [15] interactive Power BI dashboards consumed daily by VP of Operations and Finance directors.",
               "Developed Python scripts automating ETL extraction workflows, saving [12] weekly hours of manual reporting.",
-              "Identified customer retention patterns that accelerated account reactivation rates by [18]%."
+              "Identified customer retention patterns that accelerated account reactivation rates by [18]%.",
             ],
           },
         ],
@@ -871,7 +877,8 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
     ],
     educacionSugerida: [
       {
-        titulo: "Licenciatura en Lenguas, Comunicación o Relaciones Internacionales",
+        titulo:
+          "Licenciatura en Lenguas, Comunicación o Relaciones Internacionales",
         institucion: "Facultad de Lenguas (UAEMéx) / Universidad Estatal",
         periodo: "2018 - 2022",
       },
@@ -906,7 +913,8 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
         ],
         educacionSugerida: [
           {
-            titulo: "Licenciatura en Lenguas, Comunicación o Relaciones Internacionales",
+            titulo:
+              "Licenciatura en Lenguas, Comunicación o Relaciones Internacionales",
             institucion: "Facultad de Lenguas (UAEMéx) / Universidad Estatal",
             periodo: "2018 - 2022",
           },
@@ -941,7 +949,8 @@ export const CV_COMMUNITY_SEED: CommunityCvTemplate[] = [
         ],
         educacionSugerida: [
           {
-            titulo: "B.A. in Modern Languages, Communications, or International Business",
+            titulo:
+              "B.A. in Modern Languages, Communications, or International Business",
             institucion: "State University / College of Languages",
             periodo: "2018 - 2022",
           },

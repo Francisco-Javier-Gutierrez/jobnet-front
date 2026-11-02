@@ -9,7 +9,8 @@ export default defineEventHandler(async (event) => {
       query,
     });
     if (Array.isArray(data) && data.length > 0) return data;
-    if (data?.data && Array.isArray(data.data) && data.data.length > 0) return data;
+    if (data?.data && Array.isArray(data.data) && data.data.length > 0)
+      return data;
   } catch (error: any) {
     // Fall through to mock data
   }
@@ -22,12 +23,13 @@ export default defineEventHandler(async (event) => {
       (j) =>
         j.title?.toLowerCase().includes(qStr) ||
         j.company?.toLowerCase().includes(qStr) ||
-        j.habilidadesRequeridas?.some((s) => s.toLowerCase().includes(qStr))
+        j.habilidadesRequeridas?.some((s) => s.toLowerCase().includes(qStr)),
     );
   }
   if (query.modalidad) {
     results = results.filter(
-      (j) => j.modalidad?.toLowerCase() === String(query.modalidad).toLowerCase()
+      (j) =>
+        j.modalidad?.toLowerCase() === String(query.modalidad).toLowerCase(),
     );
   }
   return results;

@@ -341,7 +341,9 @@ const effectiveIsBookmarked = computed(() => {
   const authUser = session.value?.user as any;
   const loggedEmail = authUser?.email?.toLowerCase();
   const loggedId = authUser?.id ? String(authUser.id).toLowerCase() : "";
-  const passedUserId = props.currentUserId ? String(props.currentUserId).toLowerCase() : "";
+  const passedUserId = props.currentUserId
+    ? String(props.currentUserId).toLowerCase()
+    : "";
 
   const bookmarks =
     props.job?.bookmarksList ||
@@ -361,7 +363,9 @@ const effectiveIsBookmarked = computed(() => {
     if (found) return true;
   }
 
-  return Boolean((props.job as any)?.isBookmarked || (props.job as any)?.bookmarked);
+  return Boolean(
+    (props.job as any)?.isBookmarked || (props.job as any)?.bookmarked,
+  );
 });
 
 // Comments count

@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
         (c) =>
           c.nombre?.toLowerCase().includes(q) ||
           c.nombreComercial?.toLowerCase().includes(q) ||
-          c.sector?.toLowerCase().includes(q)
+          c.sector?.toLowerCase().includes(q),
       );
     }
     return list;

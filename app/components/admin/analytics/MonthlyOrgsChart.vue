@@ -3,10 +3,15 @@
     class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between"
   >
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-outline-variant/30 dark:border-slate-800">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-outline-variant/30 dark:border-slate-800"
+    >
       <div>
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-[22px]">domain_add</span>
+          <span
+            class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-[22px]"
+            >domain_add</span
+          >
           <h2 class="text-base font-bold text-on-surface dark:text-slate-100">
             Volumen Mensual de Nuevas Organizaciones
           </h2>
@@ -15,7 +20,9 @@
           Evolución del registro institucional acumulado en los últimos 12 meses
         </p>
       </div>
-      <span class="self-start sm:self-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300">
+      <span
+        class="self-start sm:self-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300"
+      >
         <span class="material-symbols-outlined text-[14px]">trending_up</span>
         +15.2% este mes
       </span>
@@ -24,16 +31,22 @@
     <!-- Chart Body (SVG Columns) -->
     <div class="mt-6 flex-1 flex flex-col justify-end">
       <!-- Top Max Value Indicator -->
-      <div class="flex justify-between items-center text-[11px] text-slate-400 dark:text-slate-500 mb-2 px-1">
+      <div
+        class="flex justify-between items-center text-[11px] text-slate-400 dark:text-slate-500 mb-2 px-1"
+      >
         <span>Máx: {{ maxCount }} orgs</span>
-        <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
+        <span
+          class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5"
+        >
           <span class="material-symbols-outlined text-[12px]">verified</span>
           Tendencia al alza
         </span>
       </div>
 
       <!-- Bars Container -->
-      <div class="h-44 sm:h-52 w-full flex items-end justify-between gap-1 sm:gap-2 px-1 pb-2 border-b border-outline-variant/40 dark:border-slate-800">
+      <div
+        class="h-44 sm:h-52 w-full flex items-end justify-between gap-1 sm:gap-2 px-1 pb-2 border-b border-outline-variant/40 dark:border-slate-800"
+      >
         <div
           v-for="item in monthlyData"
           :key="item.month"
@@ -49,12 +62,20 @@
           <!-- The Bar -->
           <div
             class="w-full max-w-[28px] rounded-t-lg transition-all duration-300 group-hover:brightness-110"
-            :class="isLatest(item) ? 'bg-gradient-to-t from-purple-700 to-indigo-500 shadow-md' : 'bg-gradient-to-t from-purple-400/80 to-purple-500/90 dark:from-purple-900/60 dark:to-purple-500/60'"
-            :style="{ height: `${Math.max((item.count / maxCount) * 100, 8)}%` }"
+            :class="
+              isLatest(item)
+                ? 'bg-gradient-to-t from-purple-700 to-indigo-500 shadow-md'
+                : 'bg-gradient-to-t from-purple-400/80 to-purple-500/90 dark:from-purple-900/60 dark:to-purple-500/60'
+            "
+            :style="{
+              height: `${Math.max((item.count / maxCount) * 100, 8)}%`,
+            }"
           ></div>
 
           <!-- Month Label -->
-          <span class="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 mt-2 truncate w-full text-center group-hover:text-primary transition font-medium">
+          <span
+            class="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 mt-2 truncate w-full text-center group-hover:text-primary transition font-medium"
+          >
             {{ formatShortMonth(item.month) }}
           </span>
         </div>
@@ -62,18 +83,32 @@
     </div>
 
     <!-- Bottom Metrics -->
-    <div class="mt-4 pt-3 border-t border-outline-variant/30 dark:border-slate-800 grid grid-cols-3 gap-2 text-center">
+    <div
+      class="mt-4 pt-3 border-t border-outline-variant/30 dark:border-slate-800 grid grid-cols-3 gap-2 text-center"
+    >
       <div>
-        <p class="text-[10px] text-slate-400 dark:text-slate-500">Total Actual</p>
-        <p class="text-sm font-bold text-on-surface dark:text-slate-100">{{ currentTotal }} orgs</p>
+        <p class="text-[10px] text-slate-400 dark:text-slate-500">
+          Total Actual
+        </p>
+        <p class="text-sm font-bold text-on-surface dark:text-slate-100">
+          {{ currentTotal }} orgs
+        </p>
       </div>
       <div>
-        <p class="text-[10px] text-slate-400 dark:text-slate-500">Promedio / Mes</p>
-        <p class="text-sm font-bold text-on-surface dark:text-slate-100">{{ averageMonthly }} orgs</p>
+        <p class="text-[10px] text-slate-400 dark:text-slate-500">
+          Promedio / Mes
+        </p>
+        <p class="text-sm font-bold text-on-surface dark:text-slate-100">
+          {{ averageMonthly }} orgs
+        </p>
       </div>
       <div>
-        <p class="text-[10px] text-slate-400 dark:text-slate-500">Pico Más Alto</p>
-        <p class="text-sm font-bold text-purple-600 dark:text-purple-400">{{ maxCount }} en Oct</p>
+        <p class="text-[10px] text-slate-400 dark:text-slate-500">
+          Pico Más Alto
+        </p>
+        <p class="text-sm font-bold text-purple-600 dark:text-purple-400">
+          {{ maxCount }} en Oct
+        </p>
       </div>
     </div>
   </div>

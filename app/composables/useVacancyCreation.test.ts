@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { EDO_MEX_FEATURES, EDO_MEX_MUNICIPALITIES } from "~/utils/edoMexGeoJSON";
+import {
+  EDO_MEX_FEATURES,
+  EDO_MEX_MUNICIPALITIES,
+} from "~/utils/edoMexGeoJSON";
 import { formatSalaryDisplay } from "~/utils/formatters";
 
 describe("Creación de Ofertas de Empleo (Especificación Organizaciones)", () => {
@@ -14,7 +17,8 @@ describe("Creación de Ofertas de Empleo (Especificación Organizaciones)", () =
         description: string;
         skills: string[];
       }) => {
-        if (!form.title.trim()) return "El título de la vacante es obligatorio.";
+        if (!form.title.trim())
+          return "El título de la vacante es obligatorio.";
         if (!form.description.trim())
           return "La descripción de la vacante es obligatoria.";
         if (!form.skills || form.skills.length === 0)
@@ -227,7 +231,11 @@ describe("Creación de Ofertas de Empleo (Especificación Organizaciones)", () =
       expect(updatedJob.modalidad).toBe("Híbrido");
       expect(updatedJob.salarioMinimo).toBe(40000);
       expect(updatedJob.salarioConfidencial).toBe(true);
-      expect(updatedJob.skills).toEqual(["TypeScript", "Vue 3", "Tailwind CSS"]);
+      expect(updatedJob.skills).toEqual([
+        "TypeScript",
+        "Vue 3",
+        "Tailwind CSS",
+      ]);
       expect(updatedJob.preguntasFiltro).toHaveLength(2);
 
       // Verify applications remain strictly intact and unchanged
@@ -271,7 +279,11 @@ describe("Creación de Ofertas de Empleo (Especificación Organizaciones)", () =
 
     it("should disable application button and reject apply when vacancy is PAUSADA", () => {
       const isApplyDisabled = (job: { estado: string }) => {
-        return job.estado === "PAUSADA" || job.estado === "EVALUACION" || job.estado === "CERRADA";
+        return (
+          job.estado === "PAUSADA" ||
+          job.estado === "EVALUACION" ||
+          job.estado === "CERRADA"
+        );
       };
 
       expect(isApplyDisabled({ estado: "PAUSADA" })).toBe(true);
@@ -370,7 +382,11 @@ describe("Creación de Ofertas de Empleo (Especificación Organizaciones)", () =
         const diffMs = new Date(vacancy.fechaCierre).getTime() - Date.now();
         const diasRestantes = Math.ceil(diffMs / ONE_DAY_MS);
 
-        if (diasRestantes <= 3 && diasRestantes >= 0 && !vacancy.alertaCaducidadEnviada) {
+        if (
+          diasRestantes <= 3 &&
+          diasRestantes >= 0 &&
+          !vacancy.alertaCaducidadEnviada
+        ) {
           await reminderMock({
             userId: vacancy.companyId,
             title: "Recordatorio de vigencia de vacante",
@@ -389,7 +405,9 @@ describe("Creación de Ofertas de Empleo (Especificación Organizaciones)", () =
         id: "vac-soon",
         companyId: "org-200",
         title: "Desarrollador Fullstack",
-        fechaCierre: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        fechaCierre: new Date(
+          Date.now() + 2 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         alertaCaducidadEnviada: false,
       };
 
@@ -415,7 +433,9 @@ describe("Creación de Ofertas de Empleo (Especificación Organizaciones)", () =
         id: "vac-safe",
         companyId: "org-200",
         title: "Analista QA",
-        fechaCierre: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+        fechaCierre: new Date(
+          Date.now() + 10 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         alertaCaducidadEnviada: false,
       };
 
