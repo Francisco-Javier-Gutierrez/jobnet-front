@@ -50,11 +50,18 @@ jobs:
           cd terraform/environments/prod
           terraform apply -auto-approve
 
+      - name: Update Lambda SSR Code
+        run: |
+          cd terraform/environments/prod
+          LAMBDA_FUNCTION_NAME=$(terraform output -raw lambda_function_name)
+          aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --zip-file "fileb://dummy_payload.zip" --publish
+          aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME
+
       - name: Sync Static Assets to S3
         run: |
           cd terraform/environments/prod
           BUCKET_NAME=$(terraform output -raw s3_bucket_name)
-          aws s3 sync ../../../.output/public s3://$BUCKET_NAME --delete
+          aws s3 sync ../../../.output/public s3://$BUCKET_NAME --delete --exclude 'google*.html'
 
       - name: Invalidate CloudFront
         run: |
