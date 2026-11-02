@@ -16,7 +16,6 @@ pipeline {
 
     environment {
         CI = 'true'
-        NODE_ENV = 'production'
         NITRO_PRESET = 'aws-lambda'
     }
 
@@ -40,9 +39,9 @@ pipeline {
                 echo '=================================================='
                 script {
                     if (isUnix()) {
-                        sh 'npm install --legacy-peer-deps'
+                        sh 'npm install --include=dev'
                     } else {
-                        bat 'npm install --legacy-peer-deps'
+                        bat 'npm install --include=dev'
                     }
                 }
             }
@@ -96,6 +95,9 @@ pipeline {
         }
 
         stage('SSR Lambda Build Verification') {
+            environment {
+                NODE_ENV = 'production'
+            }
             steps {
                 echo '=================================================='
                 echo '⚙️ [Etapa 6/6] Compilación Nuxt 4 Nitro (aws-lambda)'

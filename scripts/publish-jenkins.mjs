@@ -99,6 +99,20 @@ const CREDENTIALS = Buffer.from(`${USER}:${TOKEN}`).toString("base64");
 const queryParams = new URLSearchParams({ GIT_BRANCH: "develop" }).toString();
 const TRIGGER_URL = `${JENKINS_HOST}/job/${JOB_NAME}/buildWithParameters?${queryParams}`;
 
+function normalizeUrl(targetUrl) {
+  if (!targetUrl) return targetUrl;
+  try {
+    const parsed = new URL(targetUrl);
+    const hostParsed = new URL(JENKINS_HOST);
+    parsed.protocol = hostParsed.protocol;
+    parsed.host = hostParsed.host;
+    parsed.port = hostParsed.port;
+    return parsed.toString();
+  } catch (_) {
+    return targetUrl;
+  }
+}
+
 async function triggerAndGate() {
   let response;
 
@@ -137,11 +151,12 @@ async function triggerAndGate() {
     process.exit(1);
   }
 
-  const queueUrl = response.headers.get("location");
-  if (!queueUrl) {
+  const rawQueueUrl = response.headers.get("location");
+  if (!rawQueueUrl) {
     console.error("❌ Jenkins no devolvió la ubicación de la tarea en cola.");
     process.exit(1);
   }
+  const queueUrl = normalizeUrl(rawQueueUrl);
 
   console.log(
     "   📬 Tarea en cola de Jenkins. Esperando ejecutor disponible...",
@@ -160,7 +175,7 @@ async function triggerAndGate() {
       if (qRes.ok) {
         const qData = await qRes.json();
         if (qData.executable && qData.executable.url) {
-          buildUrl = qData.executable.url;
+          buildUrl = normalizeUrl(qData.executable.url);
           buildNumber = qData.executable.number;
           break;
         }
