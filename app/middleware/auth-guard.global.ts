@@ -3,8 +3,7 @@ export default defineNuxtRouteMiddleware((to) => {
 
   const effectiveStatus = status.value;
   const rawRole =
-    (data.value?.user as any)?.tipoUsuario ||
-    (data.value?.user as any)?.role;
+    (data.value?.user as any)?.tipoUsuario || (data.value?.user as any)?.role;
   const userRole = (rawRole || "").toUpperCase();
 
   const path = to.path.toLowerCase();

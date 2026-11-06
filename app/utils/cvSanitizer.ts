@@ -51,9 +51,15 @@ export function sanitizeText(text?: string): string {
 
   let cleaned = text
     // Replace emails
-    .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, "[correo@ejemplo.com]")
+    .replace(
+      /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+      "[correo@ejemplo.com]",
+    )
     // Replace phone numbers (Mexican and international formats)
-    .replace(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}/g, "[+52 722 XXX XXXX]")
+    .replace(
+      /(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}/g,
+      "[+52 722 XXX XXXX]",
+    )
     // Replace RFC / CURP patterns
     .replace(/[A-Z]{4}\d{6}[A-Z0-9]{3}/gi, "[RFC-GENERICO]")
     .replace(/[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]{2}/gi, "[CURP-GENERICA]")
@@ -66,7 +72,10 @@ export function sanitizeText(text?: string): string {
 /**
  * Infers a generic company placeholder based on job title or role context
  */
-export function sanitizeCompanyName(rawCompany?: string, jobTitle?: string): string {
+export function sanitizeCompanyName(
+  rawCompany?: string,
+  jobTitle?: string,
+): string {
   const title = (jobTitle || "")
     .toLowerCase()
     .normalize("NFD")
@@ -103,10 +112,7 @@ export function sanitizeCompanyName(rawCompany?: string, jobTitle?: string): str
   ) {
     return "Compañía de Analítica & Consultoría Digital";
   }
-  if (
-    title.includes("diseno") ||
-    /\b(ux|ui)\b/.test(title)
-  ) {
+  if (title.includes("diseno") || /\b(ux|ui)\b/.test(title)) {
     return "Agencia Creativa / Producto Digital";
   }
 
@@ -120,14 +126,18 @@ export function sanitizeProfileToCommunityTemplate(
   profile: SanitizeInputProfile,
   options: SanitizeOptions = {},
 ): CommunityCvTemplate {
-  const roleName = options.rol || profile.tituloProfesional || "Profesional Especialista";
+  const roleName =
+    options.rol || profile.tituloProfesional || "Profesional Especialista";
   const category = options.categoria || "frontend";
   const level = options.nivel || "mid";
   const language = options.idioma || "es";
-  const scope = options.alcance || (language === "en" ? "GLOBAL_REMOTO" : "SUR_EDOMEX");
+  const scope =
+    options.alcance || (language === "en" ? "GLOBAL_REMOTO" : "SUR_EDOMEX");
 
   // Clean and prepare experiences
-  const sanitizedExperience: CommunityTemplateExperience[] = (profile.experiencia || []).map((exp) => {
+  const sanitizedExperience: CommunityTemplateExperience[] = (
+    profile.experiencia || []
+  ).map((exp) => {
     const cargo = exp.puesto || exp.cargo || "Especialista";
     const empresa = sanitizeCompanyName(exp.empresa, cargo);
     const periodo = exp.periodo || "2023 - Presente";
@@ -155,14 +165,17 @@ export function sanitizeProfileToCommunityTemplate(
   });
 
   // Clean and prepare education
-  const sanitizedEducation: CommunityTemplateEducation[] = (profile.educacion || []).map((edu) => ({
+  const sanitizedEducation: CommunityTemplateEducation[] = (
+    profile.educacion || []
+  ).map((edu) => ({
     titulo: edu.titulo || edu.carrera || "Licenciatura / Ingeniería",
     institucion: "Universidad / Instituto Tecnológico",
     periodo: edu.periodo || "2018 - 2022",
   }));
 
   // Clean bio
-  const cleanBio = sanitizeText(profile.biografia) ||
+  const cleanBio =
+    sanitizeText(profile.biografia) ||
     `Profesional con experiencia en ${profile.habilidades?.slice(0, 4).join(", ") || "soluciones estratégicas"}. Enfocado en metodologías modernas, trabajo colaborativo y entrega de resultados de alto impacto.`;
 
   return {
@@ -176,28 +189,39 @@ export function sanitizeProfileToCommunityTemplate(
     autorId: options.autorId || profile.id || "candidato-comunidad",
     autorNombre: options.autorNombre || "Candidato de JobNet",
     isOfficial: false,
-    habilidades: profile.habilidades && profile.habilidades.length > 0
-      ? [...profile.habilidades]
-      : ["Resolución de Problemas", "Trabajo en Equipo", "Comunicación Asertiva"],
+    habilidades:
+      profile.habilidades && profile.habilidades.length > 0
+        ? [...profile.habilidades]
+        : [
+            "Resolución de Problemas",
+            "Trabajo en Equipo",
+            "Comunicación Asertiva",
+          ],
     biografiaSugerida: cleanBio,
-    experienciaSugerida: sanitizedExperience.length > 0 ? sanitizedExperience : [
-      {
-        cargo: roleName,
-        empresa: sanitizeCompanyName(undefined, roleName),
-        periodo: "2023 - Presente",
-        logros: [
-          "Optimicé los flujos operativos incrementando la eficiencia del equipo en un [X]%.",
-          "Gestioné proyectos clave cumpliendo los estándares de calidad y tiempos acordados.",
-        ],
-      },
-    ],
-    educacionSugerida: sanitizedEducation.length > 0 ? sanitizedEducation : [
-      {
-        titulo: "Grado Académico Profesional",
-        institucion: "Institución de Educación Superior",
-        periodo: "2019 - 2023",
-      },
-    ],
+    experienciaSugerida:
+      sanitizedExperience.length > 0
+        ? sanitizedExperience
+        : [
+            {
+              cargo: roleName,
+              empresa: sanitizeCompanyName(undefined, roleName),
+              periodo: "2023 - Presente",
+              logros: [
+                "Optimicé los flujos operativos incrementando la eficiencia del equipo en un [X]%.",
+                "Gestioné proyectos clave cumpliendo los estándares de calidad y tiempos acordados.",
+              ],
+            },
+          ],
+    educacionSugerida:
+      sanitizedEducation.length > 0
+        ? sanitizedEducation
+        : [
+            {
+              titulo: "Grado Académico Profesional",
+              institucion: "Institución de Educación Superior",
+              periodo: "2019 - 2023",
+            },
+          ],
     stats: {
       usesCount: 0,
       likesCount: 0,

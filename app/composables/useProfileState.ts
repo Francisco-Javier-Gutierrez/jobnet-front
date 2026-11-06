@@ -14,10 +14,22 @@ export const useProfileState = () => {
         config.public.apiUrl ||
         config.public.apiBase ||
         "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
-      const res = await $fetch(`${apiBase}/profile/${userId}`).catch(() => null);
+      const res = await $fetch(`${apiBase}/profile/${userId}`).catch(
+        () => null,
+      );
       const profile: any = typeof res === "string" ? JSON.parse(res) : res;
-      if (profile && (profile.fotoPerfil || profile.avatarUrl || profile.logo || profile.image)) {
-        profilePic.value = profile.fotoPerfil || profile.avatarUrl || profile.logo || profile.image;
+      if (
+        profile &&
+        (profile.fotoPerfil ||
+          profile.avatarUrl ||
+          profile.logo ||
+          profile.image)
+      ) {
+        profilePic.value =
+          profile.fotoPerfil ||
+          profile.avatarUrl ||
+          profile.logo ||
+          profile.image;
       } else {
         profilePic.value = "";
       }

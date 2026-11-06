@@ -6,19 +6,26 @@
     <header
       class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm space-y-4"
     >
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div
+        class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+      >
         <div class="flex items-center gap-3.5">
           <div
             class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0"
           >
-            <span class="material-symbols-outlined text-2xl font-fill-1">bookmark</span>
+            <span class="material-symbols-outlined text-2xl font-fill-1"
+              >bookmark</span
+            >
           </div>
           <div>
-            <h1 class="text-2xl font-extrabold text-on-surface tracking-tight flex items-center gap-2">
+            <h1
+              class="text-2xl font-extrabold text-on-surface tracking-tight flex items-center gap-2"
+            >
               Guardados
             </h1>
             <p class="text-xs text-on-surface-variant dark:text-slate-400">
-              Tu colección privada de vacantes y publicaciones guardadas en JobNet.
+              Tu colección privada de vacantes y publicaciones guardadas en
+              JobNet.
             </p>
           </div>
         </div>
@@ -46,16 +53,24 @@
       <div
         class="flex items-center gap-3 p-4 bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 rounded-2xl text-xs text-indigo-950 dark:text-indigo-200 shadow-sm"
       >
-        <span class="material-symbols-outlined text-indigo-600 text-xl flex-shrink-0">verified_user</span>
+        <span
+          class="material-symbols-outlined text-indigo-600 text-xl flex-shrink-0"
+          >verified_user</span
+        >
         <div class="leading-relaxed">
-          <strong class="font-bold">Directiva de Privacidad y Confidencialidad:</strong>
-          Tus elementos guardados se conservan bajo estricta reserva y protección de datos.
-          Ningún otro usuario, empresa o visitante del portal puede acceder a tu historial de favoritos.
+          <strong class="font-bold"
+            >Directiva de Privacidad y Confidencialidad:</strong
+          >
+          Tus elementos guardados se conservan bajo estricta reserva y
+          protección de datos. Ningún otro usuario, empresa o visitante del
+          portal puede acceder a tu historial de favoritos.
         </div>
       </div>
 
       <!-- Filtros por tipo de contenido -->
-      <div class="flex items-center gap-2 pt-2 border-t border-outline-variant/30">
+      <div
+        class="flex items-center gap-2 pt-2 border-t border-outline-variant/30"
+      >
         <button
           type="button"
           @click="activeFilter = 'ALL'"
@@ -104,7 +119,9 @@
       v-if="pending"
       class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-3xl p-12 text-center text-xs text-on-surface-variant animate-pulse space-y-3"
     >
-      <div class="w-10 h-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin mx-auto"></div>
+      <div
+        class="w-10 h-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin mx-auto"
+      ></div>
       <p class="font-semibold">Cargando tus elementos favoritos privados...</p>
     </div>
 
@@ -119,9 +136,13 @@
         <span class="material-symbols-outlined text-3xl">bookmark_border</span>
       </div>
       <div class="max-w-md mx-auto space-y-1">
-        <h3 class="text-base font-bold text-on-surface">No tienes elementos guardados en esta categoría</h3>
+        <h3 class="text-base font-bold text-on-surface">
+          No tienes elementos guardados en esta categoría
+        </h3>
         <p class="text-xs text-on-surface-variant dark:text-slate-400">
-          Cuando encuentres una vacante atractiva o una publicación relevante en JobNet, presiona el icono de marcador para conservarla en tu panel privado.
+          Cuando encuentres una vacante atractiva o una publicación relevante en
+          JobNet, presiona el icono de marcador para conservarla en tu panel
+          privado.
         </p>
       </div>
       <div class="flex justify-center gap-3 pt-2">
@@ -144,15 +165,26 @@
     <div v-else class="space-y-8">
       <!-- Sección Ofertas Laborales -->
       <section
-        v-if="(activeFilter === 'ALL' || activeFilter === 'JOBS') && bookmarkedJobs.length > 0"
+        v-if="
+          (activeFilter === 'ALL' || activeFilter === 'JOBS') &&
+          bookmarkedJobs.length > 0
+        "
         class="space-y-4"
       >
         <div class="flex items-center justify-between px-1">
-          <h2 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant dark:text-slate-400 flex items-center gap-2">
-            <span class="material-symbols-outlined text-base text-primary">work</span>
-            <span>Ofertas de Empleo Guardadas ({{ bookmarkedJobs.length }})</span>
+          <h2
+            class="text-sm font-bold uppercase tracking-wider text-on-surface-variant dark:text-slate-400 flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-base text-primary"
+              >work</span
+            >
+            <span
+              >Ofertas de Empleo Guardadas ({{ bookmarkedJobs.length }})</span
+            >
           </h2>
-          <span class="text-xs text-on-surface-variant/70">Solo visibles por ti</span>
+          <span class="text-xs text-on-surface-variant/70"
+            >Solo visibles por ti</span
+          >
         </div>
 
         <div class="grid grid-cols-1 gap-4">
@@ -172,15 +204,24 @@
 
       <!-- Sección Publicaciones -->
       <section
-        v-if="(activeFilter === 'ALL' || activeFilter === 'POSTS') && bookmarkedPosts.length > 0"
+        v-if="
+          (activeFilter === 'ALL' || activeFilter === 'POSTS') &&
+          bookmarkedPosts.length > 0
+        "
         class="space-y-4"
       >
         <div class="flex items-center justify-between px-1">
-          <h2 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant dark:text-slate-400 flex items-center gap-2">
-            <span class="material-symbols-outlined text-base text-primary">article</span>
+          <h2
+            class="text-sm font-bold uppercase tracking-wider text-on-surface-variant dark:text-slate-400 flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-base text-primary"
+              >article</span
+            >
             <span>Publicaciones Guardadas ({{ bookmarkedPosts.length }})</span>
           </h2>
-          <span class="text-xs text-on-surface-variant/70">Solo visibles por ti</span>
+          <span class="text-xs text-on-surface-variant/70"
+            >Solo visibles por ti</span
+          >
         </div>
 
         <div class="grid grid-cols-1 gap-4">
@@ -202,12 +243,19 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth, useRuntimeConfig, useLazyAsyncData, useSeoMeta, useRouter } from "#imports";
+import {
+  useAuth,
+  useRuntimeConfig,
+  useLazyAsyncData,
+  useSeoMeta,
+  useRouter,
+} from "#imports";
 import { useShare } from "~/composables/useShare";
 
 useSeoMeta({
   title: "Panel Personal de Favoritos - JobNet",
-  description: "Accede a tus publicaciones y ofertas laborales guardadas de forma estrictamente privada y confidencial.",
+  description:
+    "Accede a tus publicaciones y ofertas laborales guardadas de forma estrictamente privada y confidencial.",
 });
 
 const { data: session, status } = useAuth();
@@ -230,7 +278,11 @@ const activeFilter = ref<"ALL" | "JOBS" | "POSTS">("ALL");
 const bookmarkedPosts = ref<any[]>([]);
 const bookmarkedJobs = ref<any[]>([]);
 
-const { data: bookmarksData, pending, refresh } = useLazyAsyncData(
+const {
+  data: bookmarksData,
+  pending,
+  refresh,
+} = useLazyAsyncData(
   "user-personal-favorites",
   async () => {
     if (!currentUserId.value) return { data: [], posts: [], jobs: [] };
@@ -293,7 +345,9 @@ const displayedCount = computed(() => {
 // Toggle Job Bookmark (Optimistic removal from favorites)
 const toggleJobBookmark = async (job: any) => {
   const jId = job.id || job.uniqueId;
-  const idx = bookmarkedJobs.value.findIndex((j) => (j.id || j.uniqueId) === jId);
+  const idx = bookmarkedJobs.value.findIndex(
+    (j) => (j.id || j.uniqueId) === jId,
+  );
   if (idx !== -1) {
     bookmarkedJobs.value.splice(idx, 1);
   }
@@ -334,7 +388,9 @@ const toggleJobLike = async (job: any) => {
 // Toggle Post Bookmark (Optimistic removal from favorites)
 const togglePostBookmark = async (post: any) => {
   const pId = post.uniqueId || post.id;
-  const idx = bookmarkedPosts.value.findIndex((p) => (p.uniqueId || p.id) === pId);
+  const idx = bookmarkedPosts.value.findIndex(
+    (p) => (p.uniqueId || p.id) === pId,
+  );
   if (idx !== -1) {
     bookmarkedPosts.value.splice(idx, 1);
   }

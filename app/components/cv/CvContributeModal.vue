@@ -9,12 +9,18 @@
   >
     <form @submit.prevent="handleSubmit" class="space-y-5 py-1">
       <!-- Mode Selection Header: Desde Perfil vs Desde Cero -->
-      <div class="flex items-center gap-2 p-1 rounded-2xl bg-surface-container dark:bg-slate-800 border border-outline-variant/40">
+      <div
+        class="flex items-center gap-2 p-1 rounded-2xl bg-surface-container dark:bg-slate-800 border border-outline-variant/40"
+      >
         <button
           type="button"
           @click="setMode('profile')"
           class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
-          :class="creationMode === 'profile' ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-on-surface'"
+          :class="
+            creationMode === 'profile'
+              ? 'bg-primary text-on-primary shadow-xs'
+              : 'text-on-surface-variant hover:text-on-surface'
+          "
         >
           <span class="material-symbols-outlined text-base">badge</span>
           <span>📋 Autocompletar desde mi Perfil (Sanitizado)</span>
@@ -24,7 +30,11 @@
           type="button"
           @click="setMode('scratch')"
           class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
-          :class="creationMode === 'scratch' ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-on-surface'"
+          :class="
+            creationMode === 'scratch'
+              ? 'bg-primary text-on-primary shadow-xs'
+              : 'text-on-surface-variant hover:text-on-surface'
+          "
         >
           <span class="material-symbols-outlined text-base">edit_note</span>
           <span>✨ Diseñar Plantilla desde Cero</span>
@@ -32,12 +42,19 @@
       </div>
 
       <!-- Privacy & Sanitization Banner -->
-      <div class="p-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-xs text-on-surface-variant dark:text-slate-200 flex items-start gap-2.5">
-        <span class="material-symbols-outlined text-primary text-base shrink-0 mt-0.5">security</span>
+      <div
+        class="p-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-xs text-on-surface-variant dark:text-slate-200 flex items-start gap-2.5"
+      >
+        <span
+          class="material-symbols-outlined text-primary text-base shrink-0 mt-0.5"
+          >security</span
+        >
         <div class="space-y-1">
           <p class="font-bold text-primary">Privacidad y Protección de Datos</p>
           <p class="leading-relaxed">
-            Tu información personal (teléfonos, correos, salarios y nombres de clientes) no se comparte. La comunidad recibe una estructura profesional con fórmulas de logros STAR rellenables.
+            Tu información personal (teléfonos, correos, salarios y nombres de
+            clientes) no se comparte. La comunidad recibe una estructura
+            profesional con fórmulas de logros STAR rellenables.
           </p>
         </div>
       </div>
@@ -45,7 +62,9 @@
       <!-- Step 1: Titulo & Rol -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="space-y-1">
-          <label class="text-xs font-bold text-on-surface">Título de la Plantilla *</label>
+          <label class="text-xs font-bold text-on-surface"
+            >Título de la Plantilla *</label
+          >
           <input
             v-model="form.titulo"
             type="text"
@@ -56,7 +75,9 @@
         </div>
 
         <div class="space-y-1">
-          <label class="text-xs font-bold text-on-surface">Rol Específico *</label>
+          <label class="text-xs font-bold text-on-surface"
+            >Rol Específico *</label
+          >
           <input
             v-model="form.rol"
             type="text"
@@ -101,7 +122,9 @@
       <!-- Step 3: Biografía Modelo -->
       <div class="space-y-1">
         <div class="flex items-center justify-between">
-          <label class="text-xs font-bold text-on-surface">Resumen Profesional / Biografía Sugerida *</label>
+          <label class="text-xs font-bold text-on-surface"
+            >Resumen Profesional / Biografía Sugerida *</label
+          >
           <button
             v-if="creationMode === 'profile'"
             type="button"
@@ -123,7 +146,9 @@
 
       <!-- Step 4: Habilidades Clave -->
       <div class="space-y-1">
-        <label class="text-xs font-bold text-on-surface">Habilidades y Tecnologías Clave (Separadas por comas) *</label>
+        <label class="text-xs font-bold text-on-surface"
+          >Habilidades y Tecnologías Clave (Separadas por comas) *</label
+        >
         <input
           v-model="skillsInput"
           type="text"
@@ -131,7 +156,10 @@
           placeholder="Ej. Java 17, Spring Boot, PostgreSQL, Docker, Microservicios, REST APIs"
           class="w-full px-3.5 py-2 text-xs rounded-xl bg-surface-container dark:bg-slate-800 border border-outline-variant/60 focus:border-primary outline-none text-on-surface transition"
         />
-        <div v-if="parsedSkills.length > 0" class="flex flex-wrap gap-1.5 pt-1.5">
+        <div
+          v-if="parsedSkills.length > 0"
+          class="flex flex-wrap gap-1.5 pt-1.5"
+        >
           <span
             v-for="s in parsedSkills"
             :key="s"
@@ -145,7 +173,9 @@
       <!-- Step 5: Experiencia Modelo Sugerida -->
       <div class="space-y-2">
         <div class="flex items-center justify-between">
-          <label class="text-xs font-bold text-on-surface">Fórmulas de Experiencia Modelo (Método STAR)</label>
+          <label class="text-xs font-bold text-on-surface"
+            >Fórmulas de Experiencia Modelo (Método STAR)</label
+          >
           <button
             type="button"
             @click="addExperienceItem"
@@ -194,8 +224,16 @@
 
             <!-- Bullet points STAR -->
             <div class="space-y-1">
-              <p class="text-[10px] font-bold text-on-surface-variant uppercase">Logros Cuantificables (STAR):</p>
-              <div v-for="(logro, lIdx) in exp.logros" :key="lIdx" class="flex items-center gap-1.5">
+              <p
+                class="text-[10px] font-bold text-on-surface-variant uppercase"
+              >
+                Logros Cuantificables (STAR):
+              </p>
+              <div
+                v-for="(logro, lIdx) in exp.logros"
+                :key="lIdx"
+                class="flex items-center gap-1.5"
+              >
                 <span class="text-primary font-bold text-xs">•</span>
                 <input
                   v-model="exp.logros[lIdx]"
@@ -210,7 +248,9 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-outline-variant/40">
+      <div
+        class="flex items-center justify-end gap-2.5 pt-3 border-t border-outline-variant/40"
+      >
         <button
           type="button"
           @click="$emit('update:modelValue', false)"
@@ -224,7 +264,10 @@
           :disabled="isSubmitting"
           class="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-on-primary font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
         >
-          <span v-if="isSubmitting" class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+          <span
+            v-if="isSubmitting"
+            class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"
+          ></span>
           <span v-else class="material-symbols-outlined text-base">send</span>
           <span>Publicar Plantilla a la Comunidad</span>
         </button>
@@ -254,9 +297,17 @@ const CATEGORY_OPTIONS = [
   { value: "data-ai", label: "Datos & IA", icon: "query_stats" },
   { value: "devops-cloud", label: "DevOps & Cloud", icon: "cloud" },
   { value: "design-ux", label: "Diseño UI/UX", icon: "draw" },
-  { value: "logistica-operaciones", label: "Logística & Almacén", icon: "warehouse" },
+  {
+    value: "logistica-operaciones",
+    label: "Logística & Almacén",
+    icon: "warehouse",
+  },
   { value: "ventas-bizdev", label: "Ventas & Comercial", icon: "storefront" },
-  { value: "administracion-finanzas", label: "Administración & Finanzas", icon: "account_balance" },
+  {
+    value: "administracion-finanzas",
+    label: "Administración & Finanzas",
+    icon: "account_balance",
+  },
 ];
 
 const LEVEL_OPTIONS = [
@@ -274,7 +325,11 @@ const LANGUAGE_OPTIONS = [
 ];
 
 const SCOPE_OPTIONS = [
-  { value: "SUR_EDOMEX", label: "📍 Sur EdoMéx / Regional", icon: "location_on" },
+  {
+    value: "SUR_EDOMEX",
+    label: "📍 Sur EdoMéx / Regional",
+    icon: "location_on",
+  },
   { value: "NACIONAL", label: "🇲🇽 Nacional", icon: "flag" },
   { value: "GLOBAL_REMOTO", label: "🌍 Global / Remoto", icon: "language" },
 ];
@@ -379,9 +434,7 @@ const addExperienceItem = () => {
     cargo: "Nuevo Cargo Profesional",
     empresa: "Sector Empresarial Relevante",
     periodo: "Año Inicio - Año Fin",
-    logros: [
-      "Implementé [X] procesos clave alcanzando una mejora del [20]%.",
-    ],
+    logros: ["Implementé [X] procesos clave alcanzando una mejora del [20]%."],
   });
 };
 

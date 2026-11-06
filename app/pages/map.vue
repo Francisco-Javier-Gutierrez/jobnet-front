@@ -32,8 +32,13 @@
               height="550px"
             />
             <template #fallback>
-              <div class="h-[550px] w-full rounded-2xl bg-surface-container-low/40 dark:bg-slate-900/60 border border-outline-variant/40 animate-pulse flex items-center justify-center">
-                <span class="text-xs text-on-surface-variant dark:text-slate-400">Cargando mapa interactivo...</span>
+              <div
+                class="h-[550px] w-full rounded-2xl bg-surface-container-low/40 dark:bg-slate-900/60 border border-outline-variant/40 animate-pulse flex items-center justify-center"
+              >
+                <span
+                  class="text-xs text-on-surface-variant dark:text-slate-400"
+                  >Cargando mapa interactivo...</span
+                >
               </div>
             </template>
           </ClientOnly>
@@ -41,8 +46,12 @@
 
         <!-- Vacantes en el área -->
         <div class="space-y-3">
-          <h2 class="text-sm font-bold text-on-surface dark:text-slate-200 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-base">pin_drop</span>
+          <h2
+            class="text-sm font-bold text-on-surface dark:text-slate-200 flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-primary text-base"
+              >pin_drop</span
+            >
             Vacantes Geolocalizadas ({{ vacancies.length }})
           </h2>
           <div class="space-y-3 max-h-[550px] overflow-y-auto pr-1">
@@ -53,22 +62,34 @@
               class="block p-4 rounded-xl border border-outline-variant/60 bg-surface-container-lowest dark:bg-slate-900 hover:border-primary/50 transition shadow-sm group"
             >
               <div class="flex items-start justify-between gap-2 mb-1">
-                <h3 class="text-xs font-bold text-on-surface dark:text-slate-100 group-hover:text-primary transition line-clamp-1">
+                <h3
+                  class="text-xs font-bold text-on-surface dark:text-slate-100 group-hover:text-primary transition line-clamp-1"
+                >
                   {{ vac.titulo || vac.title }}
                 </h3>
-                <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0">
+                <span
+                  class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0"
+                >
                   {{ vac.modalidad }}
                 </span>
               </div>
-              <p class="text-[11px] text-on-surface-variant dark:text-slate-400 mb-2">
+              <p
+                class="text-[11px] text-on-surface-variant dark:text-slate-400 mb-2"
+              >
                 {{ vac.empresaNombre || vac.company }}
               </p>
-              <div class="flex items-center justify-between text-[10px] text-on-surface-variant dark:text-slate-400">
+              <div
+                class="flex items-center justify-between text-[10px] text-on-surface-variant dark:text-slate-400"
+              >
                 <span class="flex items-center gap-1 truncate max-w-[150px]">
-                  <span class="material-symbols-outlined text-xs text-primary">location_on</span>
+                  <span class="material-symbols-outlined text-xs text-primary"
+                    >location_on</span
+                  >
                   {{ vac.location }}
                 </span>
-                <span class="font-bold text-secondary dark:text-emerald-400 shrink-0">
+                <span
+                  class="font-bold text-secondary dark:text-emerald-400 shrink-0"
+                >
                   {{ vac.salarioFormatted || vac.salary }}
                 </span>
               </div>

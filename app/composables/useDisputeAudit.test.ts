@@ -117,7 +117,11 @@ describe("useDisputeAudit Composable (Auditoría de Mensajería para Disputas)",
 
       expect(validateDictum("")).toBe(false);
       expect(validateDictum("   ")).toBe(false);
-      expect(validateDictum("Se confirma discrepancia salarial tras auditar el PDF adjunto.")).toBe(true);
+      expect(
+        validateDictum(
+          "Se confirma discrepancia salarial tras auditar el PDF adjunto.",
+        ),
+      ).toBe(true);
     });
 
     it("should conclude audit and apply resolution when dictum is submitted", () => {

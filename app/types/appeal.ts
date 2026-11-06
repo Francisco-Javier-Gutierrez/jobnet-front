@@ -56,7 +56,14 @@ export interface Incident {
   severity?: string;
   severidad?: string;
   infraccion?: string;
-  status: "PENDIENTE" | "INVESTIGANDO" | "EVALUACION" | "AUDITORIA" | "RESUELTO" | "DESCARTADO" | string;
+  status:
+    | "PENDIENTE"
+    | "INVESTIGANDO"
+    | "EVALUACION"
+    | "AUDITORIA"
+    | "RESUELTO"
+    | "DESCARTADO"
+    | string;
   estatus?: string;
   createdAt: string;
   fechaCreacion?: string;

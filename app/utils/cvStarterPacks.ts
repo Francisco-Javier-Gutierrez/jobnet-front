@@ -293,7 +293,9 @@ export function smartAutoFillGaps(
   // 3. Habilidades
   if (!copy.skills || copy.skills.length < 3) {
     const existing = new Set(copy.skills.map((s) => s.toLowerCase()));
-    const toAdd = pack.data.skills.filter((s) => !existing.has(s.toLowerCase()));
+    const toAdd = pack.data.skills.filter(
+      (s) => !existing.has(s.toLowerCase()),
+    );
     copy.skills = [...copy.skills, ...toAdd.slice(0, 6)];
     filledFields.push("Habilidades clave");
   }
@@ -326,16 +328,45 @@ export function smartAutoFillGaps(
  * Action Verbs and High-Impact Phrasing suggestions for CV bullets
  */
 export const ACTION_VERBS = [
-  { category: "Liderazgo & Gestión", verbs: ["Coordiné", "Lideré", "Gestioné", "Supervisé", "Capacité", "Planifiqué"] },
-  { category: "Logros & Crecimiento", verbs: ["Incrementé", "Optimicé", "Reduje", "Alcancé", "Superé", "Generé"] },
-  { category: "Creación & Desarrollo", verbs: ["Diseñé", "Desarrollé", "Implementé", "Automatice", "Construí", "Estructuré"] },
-  { category: "Operación & Soporte", verbs: ["Administré", "Resolví", "Atendí", "Concilié", "Elaboré", "Auditó"] },
+  {
+    category: "Liderazgo & Gestión",
+    verbs: [
+      "Coordiné",
+      "Lideré",
+      "Gestioné",
+      "Supervisé",
+      "Capacité",
+      "Planifiqué",
+    ],
+  },
+  {
+    category: "Logros & Crecimiento",
+    verbs: ["Incrementé", "Optimicé", "Reduje", "Alcancé", "Superé", "Generé"],
+  },
+  {
+    category: "Creación & Desarrollo",
+    verbs: [
+      "Diseñé",
+      "Desarrollé",
+      "Implementé",
+      "Automatice",
+      "Construí",
+      "Estructuré",
+    ],
+  },
+  {
+    category: "Operación & Soporte",
+    verbs: ["Administré", "Resolví", "Atendí", "Concilié", "Elaboré", "Auditó"],
+  },
 ];
 
 /**
  * ATS Quality Evaluation Checker
  */
-export function calculateCvAtsScore(cv: CvData, options: { anonymousMode?: boolean }): {
+export function calculateCvAtsScore(
+  cv: CvData,
+  options: { anonymousMode?: boolean },
+): {
   score: number;
   status: "Excelente" | "Bueno" | "Por Mejorar";
   badgeColor: string;
@@ -345,7 +376,9 @@ export function calculateCvAtsScore(cv: CvData, options: { anonymousMode?: boole
   const checklist = [
     {
       label: "Título profesional específico",
-      passed: Boolean(cv.title && cv.title !== "Profesional" && cv.title.trim().length > 3),
+      passed: Boolean(
+        cv.title && cv.title !== "Profesional" && cv.title.trim().length > 3,
+      ),
       tip: "Indica tu rol exacto (ej. Desarrollador Frontend o Ejecutivo de Ventas).",
     },
     {
@@ -360,18 +393,30 @@ export function calculateCvAtsScore(cv: CvData, options: { anonymousMode?: boole
     },
     {
       label: "Experiencia laboral o proyectos formativos descritos",
-      passed: Boolean(cv.experience && cv.experience.length > 0 && cv.experience.some((e) => e.descripcion && e.descripcion.length > 20)),
+      passed: Boolean(
+        cv.experience &&
+        cv.experience.length > 0 &&
+        cv.experience.some((e) => e.descripcion && e.descripcion.length > 20),
+      ),
       tip: "Incluye logros cuantificables y responsabilidades principales.",
     },
     {
       label: "Formación académica o grado educativo",
-      passed: Boolean(cv.education && cv.education.length > 0 && cv.education.some((ed) => ed.institucion && ed.titulo)),
+      passed: Boolean(
+        cv.education &&
+        cv.education.length > 0 &&
+        cv.education.some((ed) => ed.institucion && ed.titulo),
+      ),
       tip: "Registra tu último nivel de estudios o certificaciones relevantes.",
     },
     {
-      label: isAnon ? "Modo Anónimo Imparcial activo" : "Datos de contacto completos",
+      label: isAnon
+        ? "Modo Anónimo Imparcial activo"
+        : "Datos de contacto completos",
       passed: isAnon ? true : Boolean(cv.email && (cv.phone || cv.location)),
-      tip: isAnon ? "Cumple con el estándar de postulación a ciegas sin sesgos." : "Verifica tu correo electrónico y teléfono de contacto.",
+      tip: isAnon
+        ? "Cumple con el estándar de postulación a ciegas sin sesgos."
+        : "Verifica tu correo electrónico y teléfono de contacto.",
     },
   ];
 

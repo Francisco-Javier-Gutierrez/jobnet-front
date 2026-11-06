@@ -132,18 +132,25 @@
         v-if="isSuspended && !isOwner"
         class="py-8 text-center text-xs text-rose-600 dark:text-rose-400 font-medium bg-rose-50/50 dark:bg-rose-950/20 rounded-xl border border-rose-200/60 dark:border-rose-900/40 space-y-1"
       >
-        <span class="material-symbols-outlined text-2xl mb-1 block">visibility_off</span>
+        <span class="material-symbols-outlined text-2xl mb-1 block"
+          >visibility_off</span
+        >
         <p class="font-bold">Vacantes temporalmente ocultas</p>
         <p class="text-[11px] text-slate-500 dark:text-slate-400">
-          Las vacantes de esta organización han sido ocultadas automáticamente del portal debido a la suspensión de la cuenta.
+          Las vacantes de esta organización han sido ocultadas automáticamente
+          del portal debido a la suspensión de la cuenta.
         </p>
       </div>
       <div
         v-else-if="visibleVacancies.length === 0"
         class="py-12 text-center text-xs text-on-surface-variant dark:text-slate-300 italic bg-surface-container-low/30 rounded-xl border border-outline-variant/30 space-y-2"
       >
-        <span class="material-symbols-outlined text-3xl text-slate-400 block">work_off</span>
-        <p>No hay vacantes abiertas registradas actualmente en esta organización.</p>
+        <span class="material-symbols-outlined text-3xl text-slate-400 block"
+          >work_off</span
+        >
+        <p>
+          No hay vacantes abiertas registradas actualmente en esta organización.
+        </p>
       </div>
       <div v-else class="grid grid-cols-1 gap-4">
         <JobCard
@@ -177,7 +184,9 @@
         v-else-if="companyPosts.length === 0"
         class="py-12 text-center text-xs text-on-surface-variant dark:text-slate-300 italic bg-surface-container-low/30 rounded-xl border border-outline-variant/30 space-y-2"
       >
-        <span class="material-symbols-outlined text-3xl text-slate-400 block">article</span>
+        <span class="material-symbols-outlined text-3xl text-slate-400 block"
+          >article</span
+        >
         <p>No hay publicaciones de la organización para mostrar.</p>
       </div>
       <div v-else class="grid grid-cols-1 gap-4">
@@ -219,9 +228,13 @@
       <div
         class="flex items-center gap-3 p-3.5 bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 rounded-xl text-xs text-indigo-900 dark:text-indigo-200"
       >
-        <span class="material-symbols-outlined text-indigo-600 text-lg flex-shrink-0">lock</span>
+        <span
+          class="material-symbols-outlined text-indigo-600 text-lg flex-shrink-0"
+          >lock</span
+        >
         <span>
-          <strong>Directiva de Privacidad:</strong> Las publicaciones guardadas se conservan de forma estrictamente privada y confidencial.
+          <strong>Directiva de Privacidad:</strong> Las publicaciones guardadas
+          se conservan de forma estrictamente privada y confidencial.
         </span>
       </div>
 

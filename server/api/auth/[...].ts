@@ -247,7 +247,9 @@ export default NuxtAuthHandler({
                   );
                   const isOnlyGoogle =
                     matching.length > 0 &&
-                    matching.every((p) => p.origenRegistro === "GOOGLE_OAUTH") &&
+                    matching.every(
+                      (p) => p.origenRegistro === "GOOGLE_OAUTH",
+                    ) &&
                     !matching.some(
                       (p) =>
                         p.origenRegistro === "LINKED_GOOGLE" ||
@@ -264,7 +266,9 @@ export default NuxtAuthHandler({
                     );
                   }
                 } catch (lookupErr: any) {
-                  if (lookupErr.message?.includes("FederatedUserLoginException")) {
+                  if (
+                    lookupErr.message?.includes("FederatedUserLoginException")
+                  ) {
                     throw lookupErr;
                   }
                 }
@@ -366,7 +370,8 @@ export default NuxtAuthHandler({
           if (
             groups.some(
               (g: string) =>
-                g.toUpperCase() === "ADMIN" || g.toUpperCase().includes("ADMIN"),
+                g.toUpperCase() === "ADMIN" ||
+                g.toUpperCase().includes("ADMIN"),
             ) ||
             scopes.some((s: string) => s.includes("admin")) ||
             customRole === "ADMIN"
@@ -429,15 +434,15 @@ export default NuxtAuthHandler({
 
             const matching = allProfiles.filter(
               (p) =>
-                p.email &&
-                p.email.toLowerCase() === userEmail.toLowerCase(),
+                p.email && p.email.toLowerCase() === userEmail.toLowerCase(),
             );
 
             const alreadyLinked = matching.find(
               (p) =>
                 p.linkedGoogleSub === userId ||
                 (p.origenRegistro === "LINKED_GOOGLE" &&
-                  (p.id !== userId && p.PK !== `USER#${userId}`)),
+                  p.id !== userId &&
+                  p.PK !== `USER#${userId}`),
             );
 
             const nativeAccount = matching.find(
@@ -475,23 +480,26 @@ export default NuxtAuthHandler({
               (user as any)?.name ||
               (payload.email || (user as any)?.email)?.split("@")[0] ||
               "Candidato";
-            userProfile = await $fetch(`${config.public.apiUrl}/profile/${effectiveUserId}`, {
-              method: "POST",
-              headers: {
-                "x-user-id": effectiveUserId,
-                "x-user-role": "CANDIDATO",
+            userProfile = await $fetch(
+              `${config.public.apiUrl}/profile/${effectiveUserId}`,
+              {
+                method: "POST",
+                headers: {
+                  "x-user-id": effectiveUserId,
+                  "x-user-role": "CANDIDATO",
+                },
+                body: {
+                  id: effectiveUserId,
+                  nombre: userName,
+                  email: userEmail,
+                  tipoUsuario: "CANDIDATO",
+                  estadoCuenta: "ACTIVO",
+                  fotoPerfil: payload.picture || (user as any)?.image || "",
+                  origenRegistro: "GOOGLE_OAUTH",
+                  isFederated: true,
+                },
               },
-              body: {
-                id: effectiveUserId,
-                nombre: userName,
-                email: userEmail,
-                tipoUsuario: "CANDIDATO",
-                estadoCuenta: "ACTIVO",
-                fotoPerfil: payload.picture || (user as any)?.image || "",
-                origenRegistro: "GOOGLE_OAUTH",
-                isFederated: true,
-              },
-            }).catch(() => null);
+            ).catch(() => null);
           }
 
           if (userProfile) {
@@ -562,14 +570,14 @@ export default NuxtAuthHandler({
               const isMod =
                 userProfile.solicitudRol === "MODERATOR" ||
                 customRole.includes("MOD") ||
-                (userProfile.biografia && userProfile.biografia.includes("Moderador"));
+                (userProfile.biografia &&
+                  userProfile.biografia.includes("Moderador"));
               const roleTitle = isMod ? "de moderación" : "administrativo";
 
               throw new Error(
                 JSON.stringify({
                   code: "AccountInactive",
-                  message:
-                    `Su cuenta se encuentra en estado inactivo neutral. El titular de AWS Cognito debe autorizar y asignar explícitamente el rol ${roleTitle} para habilitar el acceso.`,
+                  message: `Su cuenta se encuentra en estado inactivo neutral. El titular de AWS Cognito debe autorizar y asignar explícitamente el rol ${roleTitle} para habilitar el acceso.`,
                 }),
               );
             }
@@ -587,8 +595,7 @@ export default NuxtAuthHandler({
               throw new Error(
                 JSON.stringify({
                   code: "AccountInactive",
-                  message:
-                    `Su cuenta se encuentra en estado inactivo neutral. El titular de AWS Cognito debe autorizar y asignar explícitamente el rol ${isMod ? "de moderación" : "administrativo"} para habilitar el acceso.`,
+                  message: `Su cuenta se encuentra en estado inactivo neutral. El titular de AWS Cognito debe autorizar y asignar explícitamente el rol ${isMod ? "de moderación" : "administrativo"} para habilitar el acceso.`,
                 }),
               );
             }
@@ -664,11 +671,15 @@ export default NuxtAuthHandler({
             const isGoogleFederated =
               account?.provider === "cognito" ||
               token.provider === "cognito" ||
-              payload["cognito:username"]?.toLowerCase().startsWith("google_") ||
+              payload["cognito:username"]
+                ?.toLowerCase()
+                .startsWith("google_") ||
               (typeof payload.identities === "string" &&
                 payload.identities.includes("Google")) ||
               (Array.isArray(payload.identities) &&
-                payload.identities.some((i: any) => i.providerName === "Google"));
+                payload.identities.some(
+                  (i: any) => i.providerName === "Google",
+                ));
 
             token.isFederated = Boolean(isGoogleFederated);
 
@@ -689,9 +700,7 @@ export default NuxtAuthHandler({
                 );
                 if (linked) {
                   token.id =
-                    linked.id ||
-                    linked.PK?.replace("USER#", "") ||
-                    token.id;
+                    linked.id || linked.PK?.replace("USER#", "") || token.id;
                   if (linked.tipoUsuario)
                     token.tipoUsuario = linked.tipoUsuario;
                   if (linked.nombre) token.name = linked.nombre;
@@ -725,7 +734,8 @@ export default NuxtAuthHandler({
             if (
               groups.some(
                 (g: string) =>
-                  g.toUpperCase() === "ADMIN" || g.toUpperCase().includes("ADMIN"),
+                  g.toUpperCase() === "ADMIN" ||
+                  g.toUpperCase().includes("ADMIN"),
               ) ||
               scopes.some((s: string) => s.includes("admin")) ||
               customRole === "ADMIN"

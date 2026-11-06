@@ -4,34 +4,51 @@
     :class="viewMode === 'split' ? 'max-w-7xl' : 'max-w-4xl'"
   >
     <!-- Page Header & View Toggle -->
-    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div
+      class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+    >
       <div>
         <h1 class="text-2xl font-bold text-on-background mb-1">
           Explorar Vacantes
         </h1>
         <p class="text-on-surface-variant dark:text-slate-300 text-sm">
-          Busca y filtra oportunidades profesionales relevantes para tu perfil en el Estado de México y remotas.
+          Busca y filtra oportunidades profesionales relevantes para tu perfil
+          en el Estado de México y remotas.
         </p>
       </div>
 
       <!-- View Mode Segmented Controls -->
-      <div class="flex items-center p-1 bg-surface-container dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-xl self-start sm:self-auto shadow-2xs">
+      <div
+        class="flex items-center p-1 bg-surface-container dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-xl self-start sm:self-auto shadow-2xs"
+      >
         <button
           type="button"
           @click="viewMode = 'list'"
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
-          :class="viewMode === 'list' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant dark:text-slate-400 hover:text-on-surface'"
+          :class="
+            viewMode === 'list'
+              ? 'bg-primary text-white shadow-xs'
+              : 'text-on-surface-variant dark:text-slate-400 hover:text-on-surface'
+          "
         >
-          <span class="material-symbols-outlined text-base">format_list_bulleted</span>
+          <span class="material-symbols-outlined text-base"
+            >format_list_bulleted</span
+          >
           <span>Lista</span>
         </button>
         <button
           type="button"
           @click="viewMode = 'split'"
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
-          :class="viewMode === 'split' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant dark:text-slate-400 hover:text-on-surface'"
+          :class="
+            viewMode === 'split'
+              ? 'bg-primary text-white shadow-xs'
+              : 'text-on-surface-variant dark:text-slate-400 hover:text-on-surface'
+          "
         >
-          <span class="material-symbols-outlined text-base">splitscreen_left</span>
+          <span class="material-symbols-outlined text-base"
+            >splitscreen_left</span
+          >
           <span>Split Mapa</span>
         </button>
       </div>
@@ -84,20 +101,27 @@
           v-for="mod in modalitySelectOptions"
           :key="mod.value"
           type="button"
-          @click="filterModality = filterModality === mod.value ? '' : String(mod.value)"
+          @click="
+            filterModality =
+              filterModality === mod.value ? '' : String(mod.value)
+          "
           class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border"
           :class="
-            (filterModality === mod.value) || (!filterModality && mod.value === '')
+            filterModality === mod.value ||
+            (!filterModality && mod.value === '')
               ? 'bg-primary text-white border-primary shadow-xs'
               : 'bg-surface-container dark:bg-slate-800 border-outline-variant/40 text-on-surface dark:text-slate-200 hover:bg-surface-container-high'
           "
         >
-          <span v-if="mod.icon" class="material-symbols-outlined text-sm">{{ mod.icon }}</span>
+          <span v-if="mod.icon" class="material-symbols-outlined text-sm">{{
+            mod.icon
+          }}</span>
           <span>{{ mod.label }}</span>
           <span
             class="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
             :class="
-              (filterModality === mod.value) || (!filterModality && mod.value === '')
+              filterModality === mod.value ||
+              (!filterModality && mod.value === '')
                 ? 'bg-white/20 text-white'
                 : 'bg-surface-container-high dark:bg-slate-700 text-on-surface-variant dark:text-slate-300'
             "
@@ -363,7 +387,10 @@
     <!-- Results: Split View or Standard List View -->
     <div v-else>
       <!-- SPLIT VIEW MODE (List + Leaflet Multi-pin Map) -->
-      <div v-if="viewMode === 'split'" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div
+        v-if="viewMode === 'split'"
+        class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"
+      >
         <!-- Left Side: Interactive Job Cards (7 columns) -->
         <div class="lg:col-span-7 space-y-4">
           <div
@@ -373,7 +400,11 @@
             @mouseenter="hoveredJobId = job.id || (job as any).uniqueId"
             @mouseleave="hoveredJobId = null"
             class="transition-all duration-200 rounded-2xl"
-            :class="hoveredJobId === (job.id || (job as any).uniqueId) ? 'ring-2 ring-primary dark:ring-indigo-500 shadow-md -translate-y-0.5' : ''"
+            :class="
+              hoveredJobId === (job.id || (job as any).uniqueId)
+                ? 'ring-2 ring-primary dark:ring-indigo-500 shadow-md -translate-y-0.5'
+                : ''
+            "
           >
             <JobCard
               :job="job"
@@ -391,7 +422,7 @@
           <VacanciesSplitMap
             :jobs="filteredJobs"
             :highlighted-job-id="hoveredJobId"
-            @hover-job="(id) => hoveredJobId = id"
+            @hover-job="(id) => (hoveredJobId = id)"
             @select-job="handleMapJobSelect"
           />
         </div>
@@ -456,7 +487,9 @@ const allJobs = computed(() => jobsStore.jobs || []);
 const modalitySelectOptions = computed(() => {
   const total = allJobs.value.length;
   const counts = {
-    Remoto: allJobs.value.filter((j) => (j.modalidad || "").toLowerCase() === "remoto").length,
+    Remoto: allJobs.value.filter(
+      (j) => (j.modalidad || "").toLowerCase() === "remoto",
+    ).length,
     Híbrido: allJobs.value.filter(
       (j) =>
         (j.modalidad || "").toLowerCase() === "híbrido" ||

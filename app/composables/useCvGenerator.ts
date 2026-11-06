@@ -205,7 +205,8 @@ export function useCvGenerator() {
               (edu.anoInicio
                 ? `${edu.anoInicio} - ${edu.actualmente ? "Presente" : edu.anoFin || "Graduado"}`
                 : ""),
-            descripcion: edu.descripcion || edu.description || edu.campoEstudio || "",
+            descripcion:
+              edu.descripcion || edu.description || edu.campoEstudio || "",
           }))
         : [],
       experience: Array.isArray(profile.experiencia)

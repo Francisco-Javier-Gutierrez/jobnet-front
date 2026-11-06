@@ -14,16 +14,16 @@
           real.
         </p>
       </div>
-      <!-- Connection status badge -->
+      <!-- Connection status badge with truthful real-time state -->
       <div class="flex items-center gap-2">
         <span
           :class="[
             'w-2.5 h-2.5 rounded-full',
             wsStatus === 'connected'
-              ? 'bg-emerald-500 animate-pulse'
-              : wsStatus === 'connecting'
+              ? 'bg-emerald-500'
+              : wsStatus === 'connecting' || wsStatus === 'reconnecting'
                 ? 'bg-amber-500 animate-pulse'
-                : 'bg-emerald-500',
+                : 'bg-rose-500',
           ]"
         ></span>
         <span
@@ -34,7 +34,9 @@
               ? "En línea"
               : wsStatus === "connecting"
                 ? "Conectando..."
-                : "En línea"
+                : wsStatus === "reconnecting"
+                  ? "Reconectando..."
+                  : "Sin conexión"
           }}
         </span>
       </div>
@@ -59,12 +61,17 @@
         :isLoadingMessages="isLoadingMessages"
         :userId="userId"
         :isUploading="isUploading"
-        :pendingAttachment="pendingAttachment"
+        :stagedFile="stagedFile"
+        :previewModal="previewModal"
         :isImageUrl="isImageUrl"
         :openImagePreview="openImagePreview"
+        :openPdfViewer="openPdfViewer"
+        :closePreviewModal="closePreviewModal"
+        :downloadAttachment="downloadAttachment"
         :formatTime="formatTime"
         @handle-send="handleSend"
         @handle-file-upload="handleFileUpload"
+        @cancel-staged-file="cancelStagedFile"
         @set-message-container="messageContainer = $event"
         @set-file-input="fileInput = $event"
       />
@@ -93,13 +100,19 @@ const {
   filteredChats,
   fileInput,
   isUploading,
-  pendingAttachment,
+  stagedFile,
+  previewModal,
   messageContainer,
   selectChat,
   handleSend,
   handleFileUpload,
+  cancelStagedFile,
+  triggerFileInput,
   isImageUrl,
   openImagePreview,
+  openPdfViewer,
+  closePreviewModal,
+  downloadAttachment,
   formatTime,
 } = useMessages();
 </script>

@@ -26,9 +26,10 @@
     <p
       class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
     >
-      Carga tu CV oficial en formato PDF (máximo 5 MB) o créalo mediante nuestras
-      plantillas profesionales. Tu documento se almacenará de forma segura en la
-      nube y podrás previsualizarlo o reemplazarlo directamente en cualquier momento.
+      Carga tu CV oficial en formato PDF (máximo 5 MB) o créalo mediante
+      nuestras plantillas profesionales. Tu documento se almacenará de forma
+      segura en la nube y podrás previsualizarlo o reemplazarlo directamente en
+      cualquier momento.
     </p>
 
     <!-- Estado Actual del CV Almacenado -->

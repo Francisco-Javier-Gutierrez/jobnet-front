@@ -241,7 +241,8 @@ export const useApplicants = () => {
       const job = myJobs.value.find((j) => j.id === candidate.jobId);
       await notifyCvInteraction(candidateId, {
         action,
-        vacancyTitle: job?.title || candidate.jobTitle || "Vacante seleccionada",
+        vacancyTitle:
+          job?.title || candidate.jobTitle || "Vacante seleccionada",
       });
     }
   };

@@ -21,10 +21,14 @@ describe("Visualización Detallada de Perfil de Organización", () => {
     telefono: "+52 722 123 4567",
     website: "https://techsolutions.mx",
     websiteDisplay: "techsolutions.mx",
-    about: "Líderes en soluciones de ingeniería en la nube e inteligencia artificial para empresas de alta escala.",
-    mision: "Democratizar la infraestructura cloud con altos estándares de seguridad y eficiencia operativa.",
-    vision: "Consolidarnos como el referente tecnológico institucional más confiable del país.",
-    beneficios: "• Seguro de Gastos Médicos Mayores\n• Modalidad remota y flexible\n• Fondo de ahorro y vales",
+    about:
+      "Líderes en soluciones de ingeniería en la nube e inteligencia artificial para empresas de alta escala.",
+    mision:
+      "Democratizar la infraestructura cloud con altos estándares de seguridad y eficiencia operativa.",
+    vision:
+      "Consolidarnos como el referente tecnológico institucional más confiable del país.",
+    beneficios:
+      "• Seguro de Gastos Médicos Mayores\n• Modalidad remota y flexible\n• Fondo de ahorro y vales",
     verified: true,
     organizacionVerificada: true,
     estatusVerificacion: "VERIFICADA",
@@ -69,7 +73,8 @@ describe("Visualización Detallada de Perfil de Organización", () => {
       author: "TechSolutions Inc.",
       role: "Organización",
       authorUuid: "org-123",
-      content: "Orgullosos de abrir 5 nuevas vacantes para nuestro equipo de ciberseguridad.",
+      content:
+        "Orgullosos de abrir 5 nuevas vacantes para nuestro equipo de ciberseguridad.",
       createdAt: "2026-10-14T10:00:00Z",
       sharesCount: 3,
       likesList: ["user-1"],
@@ -94,7 +99,11 @@ describe("Visualización Detallada de Perfil de Organización", () => {
   ];
 
   const MOCK_WEB_LINKS = [
-    { name: "LinkedIn", url: "https://linkedin.com/company/techsolutions", icon: "work" },
+    {
+      name: "LinkedIn",
+      url: "https://linkedin.com/company/techsolutions",
+      icon: "work",
+    },
     { name: "Portal Web", url: "https://techsolutions.mx", icon: "link" },
   ];
 
@@ -194,7 +203,9 @@ describe("Visualización Detallada de Perfil de Organización", () => {
       expect(wrapper.emitted("update:companyTab")?.[0]).toEqual(["vacancies"]);
 
       await wrapper.find("#tab-verification").trigger("click");
-      expect(wrapper.emitted("update:companyTab")?.[1]).toEqual(["verification"]);
+      expect(wrapper.emitted("update:companyTab")?.[1]).toEqual([
+        "verification",
+      ]);
 
       await wrapper.find("#tab-posts").trigger("click");
       expect(wrapper.emitted("update:companyTab")?.[2]).toEqual(["posts"]);
@@ -256,7 +267,9 @@ describe("Visualización Detallada de Perfil de Organización", () => {
       await previewButton.trigger("click");
 
       expect(wrapper.emitted("previewDoc")).toBeTruthy();
-      expect(wrapper.emitted("previewDoc")?.[0][0]).toEqual(MOCK_COMPANY.documents[0]);
+      expect(wrapper.emitted("previewDoc")?.[0][0]).toEqual(
+        MOCK_COMPANY.documents[0],
+      );
     });
   });
 
@@ -345,7 +358,9 @@ describe("Visualización Detallada de Perfil de Organización", () => {
         },
       });
 
-      expect(wrapper.text()).toContain("No hay vacantes abiertas registradas actualmente");
+      expect(wrapper.text()).toContain(
+        "No hay vacantes abiertas registradas actualmente",
+      );
     });
   });
 
@@ -375,7 +390,9 @@ describe("Visualización Detallada de Perfil de Organización", () => {
 
       const posts = wrapper.findAll(".post-card-mock");
       expect(posts).toHaveLength(1);
-      expect(posts[0].text()).toContain("Orgullosos de abrir 5 nuevas vacantes");
+      expect(posts[0].text()).toContain(
+        "Orgullosos de abrir 5 nuevas vacantes",
+      );
     });
 
     it("debe mostrar estado de carga y estado vacío de publicaciones", () => {
@@ -403,7 +420,9 @@ describe("Visualización Detallada de Perfil de Organización", () => {
         },
         global: { stubs: { JobCard: true, PostCard: true } },
       });
-      expect(emptyWrapper.text()).toContain("No hay publicaciones de la organización para mostrar");
+      expect(emptyWrapper.text()).toContain(
+        "No hay publicaciones de la organización para mostrar",
+      );
     });
   });
 
@@ -417,10 +436,14 @@ describe("Visualización Detallada de Perfil de Organización", () => {
 
       const text = wrapper.text();
       expect(text).toContain("Organización Verificada");
-      expect(text).toContain("Distintivo Oficial de Verificación Institucional");
+      expect(text).toContain(
+        "Distintivo Oficial de Verificación Institucional",
+      );
       expect(text).toContain("Acreditación Oficial");
       expect(text).toContain("JobNet Plataforma");
-      expect(text).toContain("ha acreditado formalmente su existencia jurídica");
+      expect(text).toContain(
+        "ha acreditado formalmente su existencia jurídica",
+      );
     });
 
     it("debe desplegar los métodos de validación institucional (Dominio Corporativo y SAT)", () => {
@@ -458,14 +481,20 @@ describe("Visualización Detallada de Perfil de Organización", () => {
         },
       });
 
-      expect(wrapper.text()).toContain("Documentación Probatoria de Verificación");
-      expect(wrapper.text()).toContain("Constancia de Situación Fiscal SAT.pdf");
+      expect(wrapper.text()).toContain(
+        "Documentación Probatoria de Verificación",
+      );
+      expect(wrapper.text()).toContain(
+        "Constancia de Situación Fiscal SAT.pdf",
+      );
 
       const previewBtn = wrapper.find("button");
       await previewBtn.trigger("click");
 
       expect(wrapper.emitted("previewDoc")).toBeTruthy();
-      expect(wrapper.emitted("previewDoc")?.[0][0]).toEqual(MOCK_COMPANY.documentosVerificacion[0]);
+      expect(wrapper.emitted("previewDoc")?.[0][0]).toEqual(
+        MOCK_COMPANY.documentosVerificacion[0],
+      );
     });
 
     it("debe mostrar el estatus correspondiente cuando una empresa se encuentra en trámite o no verificada", () => {
@@ -486,7 +515,9 @@ describe("Visualización Detallada de Perfil de Organización", () => {
 
       expect(wrapper.text()).toContain("Sin Verificación Oficial");
       expect(wrapper.text()).toContain("Estatus de Registro No Verificado");
-      expect(wrapper.text()).toContain("aún no ha completado el procedimiento probatorio");
+      expect(wrapper.text()).toContain(
+        "aún no ha completado el procedimiento probatorio",
+      );
     });
   });
 });

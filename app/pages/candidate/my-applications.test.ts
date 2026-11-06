@@ -38,7 +38,8 @@ describe("Historial de Solicitudes de Candidatos", () => {
       jobTitle: "Desarrollador Backend Go / Python",
       companyName: "DataFintech Labs",
       status: "RECHAZADO",
-      motivoRechazo: "Experiencia requerida: Se requiere mayor trayectoria en arquitecturas de alta concurrencia.",
+      motivoRechazo:
+        "Experiencia requerida: Se requiere mayor trayectoria en arquitecturas de alta concurrencia.",
       appliedAt: "2026-10-05T12:00:00Z",
       coverLetter: "Conocimientos sólidos en microservicios.",
     },
@@ -47,7 +48,8 @@ describe("Historial de Solicitudes de Candidatos", () => {
       jobTitle: "Tech Lead Mobile",
       companyName: "MobileApp Studio",
       status: "RECHAZADO",
-      motivoRechazo: "Pretensión salarial: La expectativa económica supera el rango asignado.",
+      motivoRechazo:
+        "Pretensión salarial: La expectativa económica supera el rango asignado.",
       appliedAt: "2026-10-02T11:00:00Z",
       coverLetter: "Liderazgo de proyectos móviles.",
     },
@@ -94,13 +96,25 @@ describe("Historial de Solicitudes de Candidatos", () => {
     function getStandardReasonCategory(reason?: string | null): string {
       if (!reason) return "Perfil cubierto";
       const lower = reason.toLowerCase();
-      if (lower.includes("perfil cubierto") || lower.includes("vacante cubierta")) {
+      if (
+        lower.includes("perfil cubierto") ||
+        lower.includes("vacante cubierta")
+      ) {
         return "Perfil cubierto";
       }
-      if (lower.includes("experiencia") || lower.includes("técnica") || lower.includes("trayectoria")) {
+      if (
+        lower.includes("experiencia") ||
+        lower.includes("técnica") ||
+        lower.includes("trayectoria")
+      ) {
         return "Experiencia requerida";
       }
-      if (lower.includes("salarial") || lower.includes("pretensión") || lower.includes("sueldo") || lower.includes("remuneración")) {
+      if (
+        lower.includes("salarial") ||
+        lower.includes("pretensión") ||
+        lower.includes("sueldo") ||
+        lower.includes("remuneración")
+      ) {
         return "Pretensión salarial";
       }
       return "Retroalimentación técnica";

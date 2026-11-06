@@ -1,17 +1,30 @@
 <template>
-  <div class="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 select-none">
+  <div
+    class="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 select-none"
+  >
     <!-- Top Header & Banner -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 p-6 sm:p-8 rounded-3xl shadow-xs">
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 p-6 sm:p-8 rounded-3xl shadow-xs"
+    >
       <div class="space-y-2 max-w-2xl">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20"
+        >
           <span class="material-symbols-outlined text-sm">auto_stories</span>
           <span>Comunidad de Talentos JobNet</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-on-surface dark:text-slate-100 tracking-tight">
+        <h1
+          class="text-2xl sm:text-3xl font-extrabold text-on-surface dark:text-slate-100 tracking-tight"
+        >
           Hub Comunitario de Plantillas de CV
         </h1>
-        <p class="text-xs sm:text-sm text-on-surface-variant dark:text-slate-300 leading-relaxed">
-          Estructuras profesionales optimizadas para filtros ATS. Encuentra el stack tecnológico y fórmulas de logros ideales para empresas en el <strong>Sur del Estado de México</strong> y posiciones remotas internacionales.
+        <p
+          class="text-xs sm:text-sm text-on-surface-variant dark:text-slate-300 leading-relaxed"
+        >
+          Estructuras profesionales optimizadas para filtros ATS. Encuentra el
+          stack tecnológico y fórmulas de logros ideales para empresas en el
+          <strong>Sur del Estado de México</strong> y posiciones remotas
+          internacionales.
         </p>
       </div>
 
@@ -22,23 +35,33 @@
           @click="showContributeModal = true"
           class="px-5 py-3 rounded-2xl bg-primary hover:bg-primary/90 text-on-primary font-bold text-xs sm:text-sm transition shadow-md flex items-center gap-2 cursor-pointer active:scale-95 duration-100"
         >
-          <span class="material-symbols-outlined text-lg">volunteer_activism</span>
+          <span class="material-symbols-outlined text-lg"
+            >volunteer_activism</span
+          >
           <span>Contribuir Plantilla</span>
         </button>
       </div>
     </div>
 
     <!-- Navigation Tabs: Explorar vs Mis Plantillas -->
-    <div class="flex items-center gap-3 border-b border-outline-variant/60 dark:border-slate-800 pb-2">
+    <div
+      class="flex items-center gap-3 border-b border-outline-variant/60 dark:border-slate-800 pb-2"
+    >
       <button
         type="button"
         @click="activeViewTab = 'explore'"
         class="pb-2.5 px-3 text-sm font-bold transition flex items-center gap-2 border-b-2 cursor-pointer"
-        :class="activeViewTab === 'explore' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'"
+        :class="
+          activeViewTab === 'explore'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-on-surface-variant hover:text-on-surface'
+        "
       >
         <span class="material-symbols-outlined text-lg">explore</span>
         <span>Explorar Plantillas</span>
-        <span class="px-2 py-0.5 rounded-full text-xs bg-surface-container text-on-surface font-semibold">
+        <span
+          class="px-2 py-0.5 rounded-full text-xs bg-surface-container text-on-surface font-semibold"
+        >
           {{ filteredTemplates.length }}
         </span>
       </button>
@@ -47,11 +70,17 @@
         type="button"
         @click="activeViewTab = 'my-templates'"
         class="pb-2.5 px-3 text-sm font-bold transition flex items-center gap-2 border-b-2 cursor-pointer"
-        :class="activeViewTab === 'my-templates' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'"
+        :class="
+          activeViewTab === 'my-templates'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-on-surface-variant hover:text-on-surface'
+        "
       >
         <span class="material-symbols-outlined text-lg">person_pin</span>
         <span>Mis Contribuciones</span>
-        <span class="px-2 py-0.5 rounded-full text-xs bg-surface-container text-on-surface font-semibold">
+        <span
+          class="px-2 py-0.5 rounded-full text-xs bg-surface-container text-on-surface font-semibold"
+        >
           {{ userContributedTemplates.length }}
         </span>
       </button>
@@ -60,10 +89,15 @@
     <!-- TAB 1: EXPLORAR PLANTILLAS -->
     <div v-if="activeViewTab === 'explore'" class="space-y-6">
       <!-- Search & Filters Container -->
-      <div class="p-5 bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl space-y-4">
+      <div
+        class="p-5 bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl space-y-4"
+      >
         <!-- Search Input -->
         <div class="relative">
-          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
+          <span
+            class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl"
+            >search</span
+          >
           <input
             v-model="searchQuery"
             type="text"
@@ -82,7 +116,10 @@
 
         <!-- Language Filter Pills with Live Faceted Counts -->
         <div class="space-y-1.5">
-          <label class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Idioma & Región:</label>
+          <label
+            class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant"
+            >Idioma & Región:</label
+          >
           <div class="flex items-center gap-2 flex-wrap">
             <button
               v-for="lang in computedLanguageOptions"
@@ -90,13 +127,21 @@
               type="button"
               @click="selectedLanguage = lang.id as any"
               class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border"
-              :class="selectedLanguage === lang.id ? 'bg-primary text-on-primary border-primary shadow-xs' : 'bg-surface-container dark:bg-slate-800 border-outline-variant/40 text-on-surface hover:bg-surface-container-high'"
+              :class="
+                selectedLanguage === lang.id
+                  ? 'bg-primary text-on-primary border-primary shadow-xs'
+                  : 'bg-surface-container dark:bg-slate-800 border-outline-variant/40 text-on-surface hover:bg-surface-container-high'
+              "
             >
               <span>{{ lang.icon }}</span>
               <span>{{ lang.label }}</span>
               <span
                 class="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                :class="selectedLanguage === lang.id ? 'bg-white/20 text-white' : 'bg-surface-container-high dark:bg-slate-700 text-on-surface-variant dark:text-slate-300'"
+                :class="
+                  selectedLanguage === lang.id
+                    ? 'bg-white/20 text-white'
+                    : 'bg-surface-container-high dark:bg-slate-700 text-on-surface-variant dark:text-slate-300'
+                "
               >
                 {{ lang.count }}
               </span>
@@ -105,7 +150,9 @@
         </div>
 
         <!-- Category & Scope Filters using custom JobNet AppSelect with Live Counts -->
-        <div class="flex flex-wrap items-end gap-4 pt-3 border-t border-outline-variant/30">
+        <div
+          class="flex flex-wrap items-end gap-4 pt-3 border-t border-outline-variant/30"
+        >
           <!-- Categoría -->
           <div class="w-full sm:w-64">
             <AppSelect
@@ -133,14 +180,19 @@
             @click="resetFilters"
             class="text-xs text-primary hover:underline font-bold sm:ml-auto flex items-center gap-1 cursor-pointer pb-2"
           >
-            <span class="material-symbols-outlined text-sm">filter_alt_off</span>
+            <span class="material-symbols-outlined text-sm"
+              >filter_alt_off</span
+            >
             <span>Limpiar Filtros</span>
           </button>
         </div>
       </div>
 
       <!-- Templates Grid -->
-      <div v-if="filteredTemplates.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div
+        v-if="filteredTemplates.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      >
         <CvTemplateCard
           v-for="tpl in filteredTemplates"
           :key="tpl.id"
@@ -159,10 +211,16 @@
         v-else
         class="p-12 text-center rounded-3xl bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 space-y-4"
       >
-        <span class="material-symbols-outlined text-5xl text-on-surface-variant">sentiment_dissatisfied</span>
-        <h3 class="text-base font-bold text-on-surface">No se encontraron plantillas con los filtros seleccionados</h3>
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant"
+          >sentiment_dissatisfied</span
+        >
+        <h3 class="text-base font-bold text-on-surface">
+          No se encontraron plantillas con los filtros seleccionados
+        </h3>
         <p class="text-xs text-on-surface-variant max-w-md mx-auto">
-          Prueba buscando con otros términos o cambia el idioma de búsqueda. También puedes ser el primero en contribuir una plantilla para este rol.
+          Prueba buscando con otros términos o cambia el idioma de búsqueda.
+          También puedes ser el primero en contribuir una plantilla para este
+          rol.
         </p>
         <button
           type="button"
@@ -176,7 +234,10 @@
 
     <!-- TAB 2: MIS CONTRIBUCIONES -->
     <div v-else-if="activeViewTab === 'my-templates'" class="space-y-6">
-      <div v-if="userContributedTemplates.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div
+        v-if="userContributedTemplates.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      >
         <CvTemplateCard
           v-for="tpl in userContributedTemplates"
           :key="tpl.id"
@@ -195,12 +256,22 @@
         v-else
         class="p-12 text-center rounded-3xl bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 space-y-4"
       >
-        <div class="w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center">
-          <span class="material-symbols-outlined text-3xl">volunteer_activism</span>
+        <div
+          class="w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center"
+        >
+          <span class="material-symbols-outlined text-3xl"
+            >volunteer_activism</span
+          >
         </div>
-        <h3 class="text-base font-bold text-on-surface">Aún no has compartido plantillas con la comunidad</h3>
-        <p class="text-xs text-on-surface-variant max-w-md mx-auto leading-relaxed">
-          Ayuda a otros profesionales y estudiantes del Sur del Estado de México o de la comunidad remota compartiendo la estructura de tu perfil. Tu información sensible será anonimizada automáticamente.
+        <h3 class="text-base font-bold text-on-surface">
+          Aún no has compartido plantillas con la comunidad
+        </h3>
+        <p
+          class="text-xs text-on-surface-variant max-w-md mx-auto leading-relaxed"
+        >
+          Ayuda a otros profesionales y estudiantes del Sur del Estado de México
+          o de la comunidad remota compartiendo la estructura de tu perfil. Tu
+          información sensible será anonimizada automáticamente.
         </p>
         <button
           type="button"
@@ -286,9 +357,17 @@ const CATEGORY_OPTIONS = [
   { value: "data-ai", label: "Datos & IA", icon: "query_stats" },
   { value: "devops-cloud", label: "DevOps & Cloud", icon: "cloud" },
   { value: "design-ux", label: "Diseño UI/UX", icon: "draw" },
-  { value: "logistica-operaciones", label: "Logística & Almacén", icon: "warehouse" },
+  {
+    value: "logistica-operaciones",
+    label: "Logística & Almacén",
+    icon: "warehouse",
+  },
   { value: "ventas-bizdev", label: "Ventas & Comercial", icon: "storefront" },
-  { value: "administracion-finanzas", label: "Administración & Soporte", icon: "account_balance" },
+  {
+    value: "administracion-finanzas",
+    label: "Administración & Soporte",
+    icon: "account_balance",
+  },
 ];
 
 const LEVEL_OPTIONS = [
@@ -302,7 +381,8 @@ const LEVEL_OPTIONS = [
 
 useSeoMeta({
   title: "Comunidad de Plantillas de CV | JobNet",
-  description: "Explora y comparte plantillas de currículum optimizadas para ATS y vacantes en el Sur del Edoméx y globales.",
+  description:
+    "Explora y comparte plantillas de currículum optimizadas para ATS y vacantes en el Sur del Edoméx y globales.",
 });
 
 const { data: session } = useAuth();
@@ -331,7 +411,8 @@ const computedCategoryOptions = computed(() => {
     const count =
       opt.value === "all"
         ? total
-        : communityTemplates.value.filter((t) => t.categoria === opt.value).length;
+        : communityTemplates.value.filter((t) => t.categoria === opt.value)
+            .length;
     return {
       ...opt,
       badge: count,
@@ -423,12 +504,15 @@ const resetFilters = () => {
 const loadCandidateProfile = async () => {
   if (!currentUserId.value) return;
   try {
-    const res = await $fetch<any>(`${config.public.apiUrl}/profile/${currentUserId.value}`, {
-      headers: {
-        "x-user-id": currentUserId.value,
-        "x-user-role": "CANDIDATO",
+    const res = await $fetch<any>(
+      `${config.public.apiUrl}/profile/${currentUserId.value}`,
+      {
+        headers: {
+          "x-user-id": currentUserId.value,
+          "x-user-role": "CANDIDATO",
+        },
       },
-    });
+    );
     if (res) {
       candidateProfile.value = res;
     }
@@ -443,20 +527,29 @@ onMounted(() => {
 });
 
 // Handlers
-const handlePreviewTemplate = (template: CommunityCvTemplate, lang?: "es" | "en") => {
+const handlePreviewTemplate = (
+  template: CommunityCvTemplate,
+  lang?: "es" | "en",
+) => {
   selectedTemplate.value = template;
   selectedTemplateLang.value = lang || (template.idioma === "en" ? "en" : "es");
   showDetailModal.value = true;
 };
 
-const handlePreviewProfile = (template: CommunityCvTemplate, lang?: "es" | "en") => {
+const handlePreviewProfile = (
+  template: CommunityCvTemplate,
+  lang?: "es" | "en",
+) => {
   previewProfileTemplate.value = template;
   previewProfileLang.value = lang || (template.idioma === "en" ? "en" : "es");
   showDetailModal.value = false;
   showProfilePreviewModal.value = true;
 };
 
-const handleUseTemplateInCv = (template: CommunityCvTemplate, lang: "es" | "en" = "es") => {
+const handleUseTemplateInCv = (
+  template: CommunityCvTemplate,
+  lang: "es" | "en" = "es",
+) => {
   showDetailModal.value = false;
   showProfilePreviewModal.value = false;
 
@@ -493,12 +586,18 @@ const handleUseTemplateInCv = (template: CommunityCvTemplate, lang: "es" | "en" 
 
 const confirmApplyMessage = computed(() => {
   if (!selectedTemplate.value) return "";
-  const localized = resolveTemplateContent(selectedTemplate.value, applyTargetLang.value);
+  const localized = resolveTemplateContent(
+    selectedTemplate.value,
+    applyTargetLang.value,
+  );
   const langTxt = applyTargetLang.value === "en" ? "en Inglés" : "en Español";
   return `Se actualizará tu título a "${localized.rol || localized.titulo}" (${langTxt}), tu biografía y tus habilidades recomendadas en tu perfil de JobNet. Tus experiencias previas y datos de contacto se mantendrán seguros.`;
 });
 
-const handlePromptApplyProfile = (template: CommunityCvTemplate, lang: "es" | "en" = "es") => {
+const handlePromptApplyProfile = (
+  template: CommunityCvTemplate,
+  lang: "es" | "en" = "es",
+) => {
   selectedTemplate.value = template;
   applyTargetLang.value = lang || "es";
   showDetailModal.value = false;
@@ -509,12 +608,17 @@ const executeApplyToProfile = async () => {
   showConfirmApplyProfile.value = false;
   if (!selectedTemplate.value || !currentUserId.value) return;
 
-  await applyTemplateToCandidateProfile(selectedTemplate.value, currentUserId.value, applyTargetLang.value);
+  await applyTemplateToCandidateProfile(
+    selectedTemplate.value,
+    currentUserId.value,
+    applyTargetLang.value,
+  );
   await loadCandidateProfile();
 };
 
-
-const handleCreateTemplateSubmit = async (templateData: Partial<CommunityCvTemplate>) => {
+const handleCreateTemplateSubmit = async (
+  templateData: Partial<CommunityCvTemplate>,
+) => {
   showContributeModal.value = false;
   await createCommunityTemplate(templateData);
 };

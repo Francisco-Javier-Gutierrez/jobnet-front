@@ -29,9 +29,9 @@
         <p
           class="text-xs text-on-surface-variant dark:text-slate-300/80 mt-1 max-w-sm"
         >
-          Ruta independiente para aspirantes a moderación. La cuenta se registrará
-          en <strong>estado inactivo neutral</strong> hasta que el titular de AWS
-          asigne explícitamente el rol en AWS Cognito.
+          Ruta independiente para aspirantes a moderación. La cuenta se
+          registrará en <strong>estado inactivo neutral</strong> hasta que el
+          titular de AWS asigne explícitamente el rol en AWS Cognito.
         </p>
       </div>
 
@@ -129,8 +129,12 @@
           aria-live="polite"
         >
           <div class="flex items-center justify-between">
-            <p class="text-xs font-bold text-on-surface dark:text-slate-100 flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-sm text-primary">verified_user</span>
+            <p
+              class="text-xs font-bold text-on-surface dark:text-slate-100 flex items-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-sm text-primary"
+                >verified_user</span
+              >
               <span>Requisitos de Seguridad RNF-5</span>
             </p>
             <span
@@ -149,7 +153,9 @@
           </div>
 
           <!-- Barra visual de progreso RNF-5 -->
-          <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+          <div
+            class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden"
+          >
             <div
               class="h-full transition-all duration-300 rounded-full"
               :class="progressColorClass"
@@ -171,7 +177,11 @@
             >
               <span
                 class="material-symbols-outlined text-sm shrink-0"
-                :class="rule.valid ? 'text-secondary dark:text-emerald-400' : 'text-slate-400 dark:text-slate-600'"
+                :class="
+                  rule.valid
+                    ? 'text-secondary dark:text-emerald-400'
+                    : 'text-slate-400 dark:text-slate-600'
+                "
               >
                 {{ rule.valid ? "check_circle" : "radio_button_unchecked" }}
               </span>
@@ -193,9 +203,10 @@
             for="terms"
             class="text-xs text-on-surface-variant dark:text-slate-300 leading-tight select-none cursor-pointer"
           >
-            Acepto crear la cuenta en <strong>estado inactivo neutral</strong>. Reconozco
-            que el acceso permanecerá bloqueado sin rol de Candidato hasta que el titular
-            de AWS autorice y asigne explícitamente el rol de moderación en AWS Cognito.
+            Acepto crear la cuenta en <strong>estado inactivo neutral</strong>.
+            Reconozco que el acceso permanecerá bloqueado sin rol de Candidato
+            hasta que el titular de AWS autorice y asigne explícitamente el rol
+            de moderación en AWS Cognito.
           </label>
         </div>
 
@@ -211,7 +222,9 @@
           ></span>
           <span class="material-symbols-outlined text-sm" v-else>shield</span>
           <span>{{
-            loading ? "Registrando moderador..." : "Registrar Aspirante a Moderador"
+            loading
+              ? "Registrando moderador..."
+              : "Registrar Aspirante a Moderador"
           }}</span>
         </button>
       </form>

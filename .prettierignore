@@ -10,3 +10,7 @@ terraform
 *.yml
 *.yaml
 package-lock.json
+*.geojson
+public/data/**
+*.zip
+.githooks/**

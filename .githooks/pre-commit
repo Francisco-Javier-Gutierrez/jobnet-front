@@ -1,0 +1,31 @@
+#!/bin/sh
+
+echo ""
+echo "🔍 ============================================================"
+echo "🛡️  [Git Hook: Pre-Commit] Ejecutando validaciones locales..."
+echo "============================================================"
+echo "⏳ Verificando formato, linting, tipos, tests y compilación..."
+echo ""
+
+npm run check
+
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "❌ ============================================================"
+    echo "⛔ ERROR: Las validaciones de calidad (npm run check) fallaron."
+    echo "============================================================"
+    echo "👉 Corrige los errores antes de hacer commit:"
+    echo "   - Formato:  npm run format"
+    echo "   - Lint:     npm run lint"
+    echo "   - Tipos:    npm run typecheck"
+    echo "   - Pruebas:  npm run test"
+    echo "   - Build:    npm run build"
+    echo "============================================================"
+    echo ""
+    exit $EXIT_CODE
+fi
+
+echo "✅ [Pre-Commit] Todas las validaciones locales pasaron con éxito."
+echo ""
+exit 0

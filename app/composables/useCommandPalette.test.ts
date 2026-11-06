@@ -13,8 +13,9 @@ describe("useCommandPalette", () => {
   });
 
   it("should open and close the command palette", () => {
-    const { isOpen, openCommandPalette, closeCommandPalette } = useCommandPalette();
-    
+    const { isOpen, openCommandPalette, closeCommandPalette } =
+      useCommandPalette();
+
     openCommandPalette();
     expect(isOpen.value).toBe(true);
 
@@ -24,7 +25,7 @@ describe("useCommandPalette", () => {
 
   it("should toggle the command palette state", () => {
     const { isOpen, toggleCommandPalette } = useCommandPalette();
-    
+
     expect(isOpen.value).toBe(false);
     toggleCommandPalette();
     expect(isOpen.value).toBe(true);

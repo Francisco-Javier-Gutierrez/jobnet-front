@@ -11,11 +11,13 @@ export default defineConfig({
     alias: {
       "~": path.resolve(__dirname, "./app"),
       "@": path.resolve(__dirname, "./app"),
+      "#imports": path.resolve(__dirname, "./test/mocks/imports.ts"),
     },
   },
   test: {
     globals: true,
     environment: "happy-dom",
+    setupFiles: ["./test/setup.ts"],
     coverage: {
       provider: "v8",
       lines: 100,

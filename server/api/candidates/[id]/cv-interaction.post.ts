@@ -5,8 +5,7 @@ import webpush from "web-push";
 
 const DEFAULT_VAPID_PUBLIC_KEY =
   "BOIrktuQCHHiOWcKICA7YEwdKJf8WNYCmBS_PI338wnaB9VqXPQfCRwTN5NLYokujXBp5pdD83av6DACG2rAYok";
-const DEFAULT_VAPID_PRIVATE_KEY =
-  "oJXO_P5wuj45JaC8taPC1E3pPR8Hu1zi_kAiv5yAaNg";
+const DEFAULT_VAPID_PRIVATE_KEY = "oJXO_P5wuj45JaC8taPC1E3pPR8Hu1zi_kAiv5yAaNg";
 const DEFAULT_VAPID_SUBJECT = "mailto:contacto@franciscojgh.com";
 
 webpush.setVapidDetails(
@@ -44,7 +43,11 @@ export default defineEventHandler(async (event) => {
 
   // Intentar notificar via web-push local si existe suscripción persistida
   try {
-    const subPath = path.resolve(process.cwd(), "..", ".push-subscription.json");
+    const subPath = path.resolve(
+      process.cwd(),
+      "..",
+      ".push-subscription.json",
+    );
     if (fs.existsSync(subPath)) {
       const subRaw = fs.readFileSync(subPath, "utf-8");
       const subscription = JSON.parse(subRaw);
@@ -70,7 +73,10 @@ export default defineEventHandler(async (event) => {
       }
     }
   } catch (err: any) {
-    console.warn("[CV Interaction Push] Could not send local webpush notification:", err?.message || err);
+    console.warn(
+      "[CV Interaction Push] Could not send local webpush notification:",
+      err?.message || err,
+    );
   }
 
   return {

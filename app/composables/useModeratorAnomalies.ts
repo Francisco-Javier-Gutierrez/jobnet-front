@@ -12,11 +12,7 @@ export function useModeratorAnomalies() {
 
   const isModerator = computed(() => {
     const role = userRole.value;
-    return (
-      role === "MODERATOR" ||
-      role === "MODERADOR" ||
-      role === "ADMIN"
-    );
+    return role === "MODERATOR" || role === "MODERADOR" || role === "ADMIN";
   });
 
   const {

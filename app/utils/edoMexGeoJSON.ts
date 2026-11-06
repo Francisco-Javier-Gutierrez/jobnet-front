@@ -1,6 +1,9 @@
 export namespace turf {
   export type Polygon = { type: "Polygon"; coordinates: number[][][] };
-  export type MultiPolygon = { type: "MultiPolygon"; coordinates: number[][][][] };
+  export type MultiPolygon = {
+    type: "MultiPolygon";
+    coordinates: number[][][][];
+  };
   export type Feature<G = any> = {
     type: "Feature";
     properties: Record<string, any>;
@@ -7285,7 +7288,7 @@ export const EDO_MEX_FEATURES: EdoMexMuniFeature[] = [
  */
 export function booleanPointInPolygon(
   pointCoords: [number, number],
-  feature: { geometry: { type: string; coordinates: any } }
+  feature: { geometry: { type: string; coordinates: any } },
 ): boolean {
   const [x, y] = pointCoords;
   const geom = feature.geometry;
@@ -7329,7 +7332,7 @@ export function booleanPointInPolygon(
  */
 export function haversineDistance(
   from: [number, number],
-  to: [number, number]
+  to: [number, number],
 ): number {
   const [lng1, lat1] = from;
   const [lng2, lat2] = to;
@@ -7380,7 +7383,7 @@ export function isInsideEdoMex(lat: number, lng: number): boolean {
 
 export function getNearestValidPoint(
   latVal: number,
-  lngVal: number
+  lngVal: number,
 ): { lat: number; lng: number } {
   const pointCoords: [number, number] = [lngVal, latVal];
   let closestCenter: [number, number] = [-99.6557, 19.2826];

@@ -5,11 +5,7 @@ import { useShare } from "~/composables/useShare";
 import type { Post, Job, CompanyProfile } from "~/types";
 
 export type CompanyProfileTab =
-  | "ficha"
-  | "vacancies"
-  | "posts"
-  | "verification"
-  | "bookmarks";
+  "ficha" | "vacancies" | "posts" | "verification" | "bookmarks";
 
 export const useCompanyProfile = () => {
   const route = useRoute();
@@ -89,8 +85,12 @@ export const useCompanyProfile = () => {
     const uid = user.id ? String(user.id).toLowerCase() : "";
     const uemail = user.email ? String(user.email).toLowerCase() : "";
     const cidLower = String(companyId || "").toLowerCase();
-    const compId = company.value.id ? String(company.value.id).toLowerCase() : "";
-    const compEmail = company.value.email ? String(company.value.email).toLowerCase() : "";
+    const compId = company.value.id
+      ? String(company.value.id).toLowerCase()
+      : "";
+    const compEmail = company.value.email
+      ? String(company.value.email).toLowerCase()
+      : "";
     const compUuid = (company.value as any)?.usuarioUuid
       ? String((company.value as any).usuarioUuid).toLowerCase()
       : "";
@@ -119,24 +119,20 @@ export const useCompanyProfile = () => {
     data: profileData,
     pending: profilePending,
     refresh: refreshProfile,
-  } = useLazyAsyncData(
-    `company-profile-${companyId}`,
-    () =>
-      $fetch(`${config.public.apiUrl}/profile/${companyId}`)
-        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-        .catch(() => null),
+  } = useLazyAsyncData(`company-profile-${companyId}`, () =>
+    $fetch(`${config.public.apiUrl}/profile/${companyId}`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => null),
   );
 
   const {
     data: vacanciesData,
     pending: vacanciesPending,
     refresh: refreshVacancies,
-  } = useLazyAsyncData(
-    `company-vacancies-${companyId}`,
-    () =>
-      $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
-        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-        .catch(() => ({ data: [] })),
+  } = useLazyAsyncData(`company-vacancies-${companyId}`, () =>
+    $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => ({ data: [] })),
   );
 
   const { data: postsData, pending: postsPending } = useLazyAsyncData(
@@ -155,7 +151,8 @@ export const useCompanyProfile = () => {
     `company-bookmarks-${companyId}`,
     () => {
       // Directiva de privacidad: los elementos guardados son estrictamente privados del propietario
-      if (!isOwner.value || !currentUserId.value) return Promise.resolve({ data: [] });
+      if (!isOwner.value || !currentUserId.value)
+        return Promise.resolve({ data: [] });
       const targetId = effectiveBookmarkUserId.value;
       const uid = currentUserId.value;
       return $fetch(
@@ -235,7 +232,10 @@ export const useCompanyProfile = () => {
           p.nombre || p.nombreComercial || p.name || "Sin Nombre";
         company.value.nombre = company.value.name;
         company.value.nombreComercial =
-          p.nombreComercial || p.nombre || p.name || company.value.nombreComercial;
+          p.nombreComercial ||
+          p.nombre ||
+          p.name ||
+          company.value.nombreComercial;
         company.value.razonSocial =
           p.razonSocial || company.value.razonSocial || company.value.name;
         company.value.rfc = p.rfc || company.value.rfc || "No registrado";
@@ -244,27 +244,32 @@ export const useCompanyProfile = () => {
         company.value.email =
           p.email || p.correoContacto || company.value.email || "";
         company.value.tamanoEmpresa =
-          p.tamanoEmpresa || company.value.tamanoEmpresa || "50 - 200 colaboradores";
+          p.tamanoEmpresa ||
+          company.value.tamanoEmpresa ||
+          "50 - 200 colaboradores";
         company.value.suspensionStatus = p.suspensionStatus || "";
         company.value.estatus = p.estatus || "";
         company.value.estadoCuenta = p.estadoCuenta || "";
-        company.value.logo =
-          p.fotoPerfil ||
-          p.logo ||
-          company.value.logo;
-        company.value.sector = p.sector || company.value.sector || "Sector no especificado";
+        company.value.logo = p.fotoPerfil || p.logo || company.value.logo;
+        company.value.sector =
+          p.sector || company.value.sector || "Sector no especificado";
         company.value.about =
-          p.biografia || p.descripcion || company.value.about || "Sin descripción corporativa.";
+          p.biografia ||
+          p.descripcion ||
+          company.value.about ||
+          "Sin descripción corporativa.";
         company.value.mision = p.mision || company.value.mision || "";
         company.value.vision = p.vision || company.value.vision || "";
         company.value.beneficios =
           p.beneficios || p.culturaLaboral || company.value.beneficios || "";
         company.value.documents =
-          Array.isArray(p.documentosCorporativos) && p.documentosCorporativos.length > 0
+          Array.isArray(p.documentosCorporativos) &&
+          p.documentosCorporativos.length > 0
             ? p.documentosCorporativos
             : company.value.documents;
         company.value.documentosVerificacion =
-          Array.isArray(p.documentosVerificacion) && p.documentosVerificacion.length > 0
+          Array.isArray(p.documentosVerificacion) &&
+          p.documentosVerificacion.length > 0
             ? p.documentosVerificacion
             : company.value.documentosVerificacion;
         company.value.location =
@@ -285,7 +290,8 @@ export const useCompanyProfile = () => {
         company.value.metodoVerificacion =
           p.metodoVerificacion ||
           (p.rfc ? "VALIDACION_SAT" : "DOMINIO_CORPORATIVO");
-        company.value.website = p.enlacesWeb?.website || p.website || company.value.website;
+        company.value.website =
+          p.enlacesWeb?.website || p.website || company.value.website;
         company.value.websiteDisplay =
           company.value.website
             .replace("https://", "")

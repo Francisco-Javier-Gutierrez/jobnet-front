@@ -9,7 +9,10 @@
       class="mb-4 p-3.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-500/40 rounded-xl text-xs font-semibold text-emerald-800 dark:text-emerald-200 flex items-center justify-between shadow-sm animate-fade-in"
     >
       <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-[18px] text-emerald-600 dark:text-emerald-400">check_circle</span>
+        <span
+          class="material-symbols-outlined text-[18px] text-emerald-600 dark:text-emerald-400"
+          >check_circle</span
+        >
         <span>{{ successMsg }}</span>
       </div>
       <button
@@ -22,7 +25,9 @@
     </div>
 
     <!-- Title & Navigation to Main Dashboard -->
-    <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div
+      class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+    >
       <div>
         <div class="flex items-center gap-2 mb-1.5">
           <NuxtLink
@@ -33,11 +38,14 @@
             Volver al Panel Principal
           </NuxtLink>
         </div>
-        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h1
+          class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+        >
           Analítica Avanzada
         </h1>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-          Demanda de habilidades técnicas, distribución regional y tasas de postulación en el Estado de México.
+          Demanda de habilidades técnicas, distribución regional y tasas de
+          postulación en el Estado de México.
         </p>
       </div>
 
@@ -76,16 +84,12 @@
       />
 
       <!-- 2. Volumen mensual de nuevas organizaciones registradas -->
-      <MonthlyOrgsChart
-        :monthly-data="analyticsData.monthlyOrganizations"
-      />
+      <MonthlyOrgsChart :monthly-data="analyticsData.monthlyOrganizations" />
     </div>
 
     <!-- 3. Tasa promedio de postulaciones por oferta laboral -->
     <div class="mb-8">
-      <ApplicationRateCard
-        :rate-data="analyticsData.applicationRate"
-      />
+      <ApplicationRateCard :rate-data="analyticsData.applicationRate" />
     </div>
   </div>
 </template>

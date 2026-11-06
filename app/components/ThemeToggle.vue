@@ -86,7 +86,9 @@
         <span class="truncate">Auto</span>
       </button>
       <template #fallback>
-        <div class="h-6 w-full animate-pulse bg-slate-200/50 dark:bg-slate-700/50 rounded-lg"></div>
+        <div
+          class="h-6 w-full animate-pulse bg-slate-200/50 dark:bg-slate-700/50 rounded-lg"
+        ></div>
       </template>
     </ClientOnly>
   </div>
@@ -106,7 +108,9 @@
           class="material-symbols-outlined text-[20px] text-amber-400"
           >dark_mode</span
         >
-        <span v-else class="material-symbols-outlined text-[20px] text-amber-500"
+        <span
+          v-else
+          class="material-symbols-outlined text-[20px] text-amber-500"
           >light_mode</span
         >
         <template #fallback>
