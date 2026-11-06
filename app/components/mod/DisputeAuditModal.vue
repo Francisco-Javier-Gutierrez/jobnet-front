@@ -188,17 +188,16 @@
                 </span>
               </div>
 
-              <a
-                :href="msg.attachmentUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-primary hover:text-primary-container bg-primary/10 hover:bg-primary/20 rounded-md transition flex-shrink-0"
+              <button
+                type="button"
+                @click="openAttachment(msg.attachmentUrl)"
+                class="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-primary hover:text-primary-container bg-primary/10 hover:bg-primary/20 rounded-md transition flex-shrink-0 cursor-pointer"
               >
                 <span class="material-symbols-outlined text-[13px]"
                   >download</span
                 >
                 <span>Ver Archivo</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -338,8 +337,11 @@
 </template>
 
 <script setup lang="ts">
+import { useS3Upload } from "~/composables/useS3Upload";
 import type { Incident } from "~/types";
 import type { AuditMessage } from "~/composables/useDisputeAudit";
+
+const { getSecureViewUrl } = useS3Upload();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -383,5 +385,13 @@ const formatTime = (isoString?: string) => {
 const isImage = (fileName?: string | null) => {
   if (!fileName) return false;
   return /\.(png|jpe?g|webp|gif)$/i.test(fileName);
+};
+
+const openAttachment = async (url: string) => {
+  if (!url) return;
+  const secureUrl = await getSecureViewUrl(url);
+  if (secureUrl) {
+    window.open(secureUrl, "_blank", "noopener,noreferrer");
+  }
 };
 </script>

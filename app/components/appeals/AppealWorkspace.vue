@@ -161,15 +161,14 @@
                   :src="msg.attachmentUrl"
                   alt="Adjunto"
                   class="w-full h-auto object-cover max-h-[180px] cursor-pointer hover:opacity-90 transition"
-                  @click="openImagePreview(msg.attachmentUrl)"
+                  @click="openAttachment(msg.attachmentUrl)"
                 />
               </div>
-              <a
+              <button
                 v-else
-                :href="msg.attachmentUrl"
-                target="_blank"
-                rel="noopener"
-                class="flex items-center gap-2 p-2.5 rounded-xl bg-black/10 hover:bg-black/20 text-current transition font-medium border border-white/10"
+                type="button"
+                @click="openAttachment(msg.attachmentUrl)"
+                class="flex items-center gap-2 p-2.5 rounded-xl bg-black/10 hover:bg-black/20 text-current transition font-medium border border-white/10 text-left cursor-pointer"
               >
                 <span class="material-symbols-outlined text-base"
                   >description</span
@@ -180,7 +179,7 @@
                 <span class="material-symbols-outlined text-xs ml-auto"
                   >download</span
                 >
-              </a>
+              </button>
             </div>
 
             <span
@@ -289,7 +288,11 @@ const emit = defineEmits<{
   (e: "chat-ref", ref: HTMLDivElement | null): void;
 }>();
 
-const { uploadFile, uploadError: s3UploadError } = useS3Upload();
+const {
+  uploadFile,
+  uploadError: s3UploadError,
+  getSecureViewUrl,
+} = useS3Upload();
 const { data: session } = useAuth();
 const { showInfo, showError } = useAppFeedback();
 
@@ -321,8 +324,8 @@ const handleFileUpload = async (event: Event) => {
   if (!file) return;
 
   const isImg =
-    file.type.startsWith("image/") ||
-    /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(file.name);
+    (file.type.startsWith("image/") && !file.type.includes("svg")) ||
+    /\.(jpg|jpeg|png|webp|gif)$/i.test(file.name);
   const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
 
   if (!isImg && !isPdf) {
@@ -370,10 +373,14 @@ const handleSendMessage = () => {
 const isImageUrl = (url?: string) => {
   if (!url) return false;
   const cleanUrl = url.split("?")[0];
-  return /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(cleanUrl);
+  return /\.(jpg|jpeg|png|webp|gif)$/i.test(cleanUrl);
 };
 
-const openImagePreview = (url: string) => {
-  window.open(url, "_blank");
+const openAttachment = async (url: string) => {
+  if (!url) return;
+  const secureUrl = await getSecureViewUrl(url);
+  if (secureUrl) {
+    window.open(secureUrl, "_blank", "noopener,noreferrer");
+  }
 };
 </script>
