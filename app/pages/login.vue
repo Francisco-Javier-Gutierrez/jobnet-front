@@ -255,6 +255,26 @@
             <span>Continuar con Google</span>
           </template>
         </button>
+
+        <!-- Nota de Seguridad sobre Segregación de Roles -->
+        <div class="mt-2 text-center px-1">
+          <p
+            class="text-[11px] text-on-surface-variant/85 dark:text-slate-400 leading-tight"
+          >
+            <span
+              class="inline-flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400"
+            >
+              <span
+                class="material-symbols-outlined text-[13px]"
+                aria-hidden="true"
+                >shield</span
+              >
+              Acceso exclusivo como Candidato:
+            </span>
+            Cuentas de Administrador, Moderador u Organización deben ingresar
+            con correo y contraseña.
+          </p>
+        </div>
       </form>
     </div>
   </div>
@@ -321,7 +341,7 @@ const handleGoogleSignIn = async () => {
 
   try {
     await signIn("cognito", {
-      callbackUrl: "/",
+      callbackUrl: "/?google_login=1",
     });
   } catch (err: any) {
     console.error("Error during Google OAuth sign-in:", err);

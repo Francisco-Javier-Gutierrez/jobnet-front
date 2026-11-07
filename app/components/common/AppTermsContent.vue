@@ -68,6 +68,65 @@
         de correo electrónico se encuentren asociados a organizaciones que hayan
         sido suspendidas o prohibidas de forma definitiva.
       </p>
+
+      <h3>
+        3.1 Estatutos de Autenticación Federada con Google (Google Sign-In),
+        Vinculación de Cuentas (Google Link) y Estricta Segregación de Roles
+      </h3>
+      <p>
+        <strong>Alcance exclusivo del rol de Candidato:</strong> El mecanismo de
+        registro e inicio de sesión mediante proveedor externo (Google OAuth /
+        Google Sign-In / "Continuar con Google"), así como el servicio de
+        vinculación de cuentas ("Google Link"), opera de manera
+        <strong>estricta y exclusiva bajo el rol de CANDIDATO</strong>. Toda
+        cuenta creada o autenticada a través de Google dispondrá únicamente del
+        perfil, herramientas y facultades asignadas a candidatos que buscan
+        empleo dentro de la Plataforma.
+      </p>
+      <p>
+        <strong
+          >Incompatibilidad con roles privilegiados y empresariales:</strong
+        >
+        Las cuentas con responsabilidades de gestión, facultades operativas o de
+        seguridad institucional —específicamente
+        <strong>Administradores</strong>, <strong>Moderadores</strong> y
+        <strong>Organizaciones (Empresas)</strong>— no podrán en ningún caso
+        heredar, delegar ni ejercer privilegios administrativos o corporativos a
+        través de identidades sociales de Google. El acceso a consolas
+        administrativas, paneles de moderación y herramientas de contratación
+        requiere obligatoriamente la autenticación directa mediante correo
+        electrónico y contraseña local gestionada en AWS Cognito.
+      </p>
+      <p>
+        <strong
+          >Estatuto de acceso para titulares de roles no candidatos:</strong
+        >
+        Si un usuario cuya cuenta original en JobNet corresponde al rol de
+        Administrador, Moderador u Organización decide iniciar sesión utilizando
+        Google Sign-In con la misma dirección de correo electrónico (o vincula
+        dicho identificador mediante Google Link), reconoce, asume y acepta de
+        forma expresa que:
+      </p>
+      <ul>
+        <li>
+          <strong>Sesión estrictamente como Candidato:</strong> Toda sesión
+          iniciada a través de Google operará de manera
+          <strong>estricta e invariable como CANDIDATO</strong>, sin otorgar
+          acceso a paneles de control, herramientas de moderación ni funciones
+          empresariales.
+        </li>
+        <li>
+          <strong>Segregación y aislamiento de seguridad:</strong> Bajo ninguna
+          circunstancia el inicio de sesión con Google constituirá una vía de
+          elevación de privilegios ni alterará la seguridad de la cuenta nativa.
+        </li>
+        <li>
+          <strong>Acceso a funciones principales:</strong> Para operar como
+          Administrador, Moderador u Organización, el usuario deberá finalizar
+          la sesión federada e ingresar obligatoriamente mediante sus
+          credenciales locales (correo electrónico y contraseña).
+        </li>
+      </ul>
     </section>
 
     <!-- 4 -->

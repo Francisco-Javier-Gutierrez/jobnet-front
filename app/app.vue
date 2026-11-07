@@ -7,6 +7,7 @@
       <AppProtectedModal />
       <AppFeedbackModal />
       <AppCommandPalette />
+      <AppGoogleRoleNoticeModal />
     </ClientOnly>
   </div>
 </template>

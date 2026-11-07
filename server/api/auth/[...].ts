@@ -458,7 +458,8 @@ export default NuxtAuthHandler({
                 (user as any)?.name ||
                 userEmail.split("@")[0] ||
                 "";
-              return `/link-account?email=${encodeURIComponent(userEmail)}&googleSub=${encodeURIComponent(userId)}&name=${encodeURIComponent(userName)}`;
+              const nativeRole = nativeAccount.tipoUsuario || "CANDIDATO";
+              return `/link-account?email=${encodeURIComponent(userEmail)}&googleSub=${encodeURIComponent(userId)}&name=${encodeURIComponent(userName)}&role=${encodeURIComponent(nativeRole)}`;
             }
 
             if (alreadyLinked) {
@@ -701,10 +702,34 @@ export default NuxtAuthHandler({
                 if (linked) {
                   token.id =
                     linked.id || linked.PK?.replace("USER#", "") || token.id;
-                  if (linked.tipoUsuario)
-                    token.tipoUsuario = linked.tipoUsuario;
                   if (linked.nombre) token.name = linked.nombre;
                 }
+
+                // Estatuto de Seguridad y Segregación de Roles:
+                // Si la cuenta nativa posee un rol privilegiado o distinto a candidato,
+                // detectamos dicha condición para notificar al usuario en el redirect URL.
+                let nativeRole: string | null = null;
+                if (linked?.tipoUsuario && linked.tipoUsuario !== "CANDIDATO") {
+                  nativeRole = linked.tipoUsuario;
+                } else {
+                  const native = allProfiles.find(
+                    (p) =>
+                      p.email &&
+                      token.email &&
+                      p.email.toLowerCase() ===
+                        (token.email as string).toLowerCase() &&
+                      p.tipoUsuario &&
+                      p.tipoUsuario !== "CANDIDATO",
+                  );
+                  if (native?.tipoUsuario) {
+                    nativeRole = native.tipoUsuario;
+                  }
+                }
+
+                token.hasPrivilegedNativeAccount = Boolean(
+                  nativeRole && nativeRole !== "CANDIDATO",
+                );
+                token.nativeRole = nativeRole || null;
               } catch {
                 // Fallback a token.id existente
               }
@@ -732,41 +757,44 @@ export default NuxtAuthHandler({
               .toUpperCase();
 
             if (
-              groups.some(
+              !isGoogleFederated &&
+              (groups.some(
                 (g: string) =>
                   g.toUpperCase() === "ADMIN" ||
                   g.toUpperCase().includes("ADMIN"),
               ) ||
-              scopes.some((s: string) => s.includes("admin")) ||
-              customRole === "ADMIN"
+                scopes.some((s: string) => s.includes("admin")) ||
+                customRole === "ADMIN")
             ) {
               token.tipoUsuario = "ADMIN";
             } else if (
-              groups.some(
+              !isGoogleFederated &&
+              (groups.some(
                 (g: string) =>
                   g.toUpperCase() === "MODERATOR" ||
                   g.toUpperCase().includes("MOD"),
               ) ||
-              scopes.some(
-                (s: string) => s.includes("moderator") || s.includes("mod"),
-              ) ||
-              customRole === "MODERATOR"
+                scopes.some(
+                  (s: string) => s.includes("moderator") || s.includes("mod"),
+                ) ||
+                customRole === "MODERATOR")
             ) {
               token.tipoUsuario = "MODERATOR";
             } else if (
-              groups.some(
+              !isGoogleFederated &&
+              (groups.some(
                 (g: string) =>
                   g.toUpperCase() === "ORGANIZACION" ||
                   g.toUpperCase() === "EMPRESA" ||
                   g.toUpperCase() === "COMPANY",
               ) ||
-              scopes.some(
-                (s: string) =>
-                  s.includes("organization") || s.includes("empresa"),
-              ) ||
-              customRole === "ORGANIZACION" ||
-              customRole === "EMPRESA" ||
-              customRole === "COMPANY"
+                scopes.some(
+                  (s: string) =>
+                    s.includes("organization") || s.includes("empresa"),
+                ) ||
+                customRole === "ORGANIZACION" ||
+                customRole === "EMPRESA" ||
+                customRole === "COMPANY")
             ) {
               token.tipoUsuario = "ORGANIZACION";
             } else if (
@@ -840,6 +868,10 @@ export default NuxtAuthHandler({
         (session.user as any).tipoUsuario = token.tipoUsuario;
         (session.user as any).role = token.tipoUsuario;
         (session.user as any).isFederated = Boolean(token.isFederated);
+        (session.user as any).hasPrivilegedNativeAccount = Boolean(
+          token.hasPrivilegedNativeAccount,
+        );
+        (session.user as any).nativeRole = token.nativeRole || null;
         (session.user as any).provider =
           token.provider || (token.isFederated ? "cognito" : "credentials");
         if (token.name) session.user.name = token.name as string;

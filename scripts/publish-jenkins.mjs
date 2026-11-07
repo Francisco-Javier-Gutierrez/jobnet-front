@@ -75,7 +75,9 @@ if (!remoteUrl) {
 }
 
 try {
-  execSync("git push origin HEAD:refs/heads/develop", { stdio: "inherit" });
+  execSync("git push origin HEAD:refs/heads/develop --force-with-lease", {
+    stdio: "inherit",
+  });
   console.log('   ✅ Rama "develop" sincronizada en GitHub.');
 } catch (pushErr) {
   console.error(
