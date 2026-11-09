@@ -20,6 +20,15 @@
         {{ profile.nombre || "Sin Nombre" }}
       </h1>
 
+      <!-- Professional Title / Headline -->
+      <p
+        v-if="profileTitle"
+        class="text-sm sm:text-base font-bold text-primary dark:text-primary-container mb-2 flex items-center justify-center gap-1.5"
+      >
+        <span class="material-symbols-outlined text-[18px]">badge</span>
+        <span>{{ profileTitle }}</span>
+      </p>
+
       <!-- Location -->
       <p
         v-if="locationText"
@@ -116,11 +125,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import type { CandidateProfile, WebLinkItem } from "~/types";
 import CvBuilderModal from "~/components/cv/CvBuilderModal.vue";
 
-defineProps<{
+const props = defineProps<{
   profile: CandidateProfile;
   defaultAvatar: string;
   locationText: string;
@@ -135,6 +144,16 @@ const emit = defineEmits<{
 
 const showDropdown = ref(false);
 const showCvModal = ref(false);
+
+const profileTitle = computed(() => {
+  return (
+    props.profile?.tituloProfesional ||
+    props.profile?.titularProfesional ||
+    props.profile?.titular ||
+    props.profile?.puestoDeseado ||
+    ""
+  );
+});
 
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value;

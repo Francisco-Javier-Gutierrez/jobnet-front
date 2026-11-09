@@ -51,7 +51,9 @@ export interface CandidateProfile {
   celular?: string;
   fotoPerfil?: string;
   avatarUrl?: string;
+  tituloProfesional?: string;
   titularProfesional?: string;
+  titular?: string;
   bio?: string;
   descripcion?: string;
   resumen?: string;

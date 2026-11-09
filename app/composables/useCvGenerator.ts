@@ -152,6 +152,7 @@ export function useCvGenerator() {
       name: displayName,
       title:
         profile.tituloProfesional ||
+        profile.titularProfesional ||
         profile.titular ||
         profile.sector ||
         profile.puestoDeseado ||

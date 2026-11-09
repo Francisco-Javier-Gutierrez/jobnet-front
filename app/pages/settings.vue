@@ -80,8 +80,10 @@
       <section v-show="activeTab === 'personales'" class="flex flex-col gap-6">
         <SettingsPersonalInfo
           v-model:name="formData.name"
+          v-model:titulo-profesional="formData.tituloProfesional"
+          v-model:location="formData.location"
           v-model:bio="formData.bio"
-          v-model:fotoPerfil="formData.fotoPerfil"
+          v-model:foto-perfil="formData.fotoPerfil"
         />
         <SettingsLocationMap
           v-model:lat="formData.lat"
@@ -185,6 +187,7 @@ const tabItems = [
 
 const formData = ref({
   name: "",
+  tituloProfesional: "",
   location: "",
   bio: "",
   fotoPerfil: "",
@@ -231,6 +234,12 @@ onMounted(async () => {
         const profile = await res.json();
         formData.value.name =
           profile.nombre || profile.name || session.value.user.name || "";
+        formData.value.tituloProfesional =
+          profile.tituloProfesional ||
+          profile.titularProfesional ||
+          profile.titular ||
+          profile.puestoDeseado ||
+          "";
         formData.value.location =
           profile.location || profile.ubicacionTexto || "";
         formData.value.bio = profile.bio || profile.biografia || "";
@@ -286,6 +295,9 @@ async function saveProfile() {
 
     const payload = {
       nombre: formData.value.name,
+      tituloProfesional: formData.value.tituloProfesional,
+      titularProfesional: formData.value.tituloProfesional,
+      titular: formData.value.tituloProfesional,
       location: formData.value.location,
       bio: formData.value.bio,
       biografia: formData.value.bio,

@@ -1389,6 +1389,8 @@ const handleSaveToProfile = async () => {
           },
           body: {
             tituloProfesional: editableCv.value.title,
+            titularProfesional: editableCv.value.title,
+            titular: editableCv.value.title,
             biografia: editableCv.value.bio,
             habilidades: editableCv.value.skills,
             idiomas: editableCv.value.languages,
