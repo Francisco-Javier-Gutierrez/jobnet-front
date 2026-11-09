@@ -1,7 +1,6 @@
 import { useRoute, useRouter, useRuntimeConfig } from "#imports";
 import { useAuth } from "#imports";
 import type { ApplicantCandidate, ApplicantStage } from "~/types";
-import { MOCK_VACANCIES, MOCK_APPLICANTS } from "~/utils/mockData";
 import { useCvInteraction } from "~/composables/useCvInteraction";
 
 // Global shared state for the applicants dashboard
@@ -110,7 +109,7 @@ export const useApplicants = () => {
         () => [],
       );
       if (!allJobs || allJobs.length === 0) {
-        allJobs = MOCK_VACANCIES;
+        allJobs = [];
       }
       allJobsList.value = allJobs.map((j) => ({
         id: j.id,
@@ -192,18 +191,6 @@ export const useApplicants = () => {
         }),
       );
 
-      // Fallback to MOCK_APPLICANTS if no remote applicants exist
-      if (resolvedCandidates.length === 0) {
-        let mockFiltered = [...MOCK_APPLICANTS];
-        if (selectedJobId.value) {
-          mockFiltered = mockFiltered.filter(
-            (c) => c.jobId === selectedJobId.value,
-          );
-        }
-        resolvedCandidates =
-          mockFiltered.length > 0 ? mockFiltered : MOCK_APPLICANTS;
-      }
-
       candidates.value = resolvedCandidates;
       if (resolvedCandidates.length > 0) {
         const stillExists = resolvedCandidates.find(
@@ -217,8 +204,8 @@ export const useApplicants = () => {
       }
     } catch (e) {
       console.error("Error fetching job applicants:", e);
-      candidates.value = MOCK_APPLICANTS;
-      selectedCandidate.value = MOCK_APPLICANTS[0];
+      candidates.value = [];
+      selectedCandidate.value = null;
     } finally {
       isLoading.value = false;
     }

@@ -282,7 +282,6 @@
 
 <script setup lang="ts">
 import type { Incident } from "~/types";
-import { MOCK_INCIDENTS } from "~/utils/mockData";
 import DisputeAuditModal from "~/components/mod/DisputeAuditModal.vue";
 import { useDisputeAudit } from "~/composables/useDisputeAudit";
 
@@ -349,10 +348,10 @@ const fetchIncidents = async () => {
     );
     const fetched =
       data?.value || data?.Items || (Array.isArray(data) ? data : []);
-    incidents.value = fetched.length > 0 ? fetched : MOCK_INCIDENTS;
+    incidents.value = fetched;
   } catch (e) {
     console.error("Error loading incidents:", e);
-    incidents.value = MOCK_INCIDENTS;
+    incidents.value = [];
   } finally {
     loading.value = false;
   }

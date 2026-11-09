@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { MOCK_CATALOG_ITEMS } from "~/utils/mockData";
 
 export interface CatalogItem {
   id: string;
@@ -32,15 +31,15 @@ export const useCatalogStore = defineStore("catalog", {
         const data = await $fetch<CatalogItem[]>(
           `${config.public.apiUrl}/catalog`,
         );
-        if (data && data.length > 0) {
+        if (Array.isArray(data)) {
           this.items = data;
         } else {
-          this.items = [...MOCK_CATALOG_ITEMS];
+          this.items = [];
         }
         this.loaded = true;
       } catch (error) {
-        console.warn("Fallback to mock catalog items:", error);
-        this.items = [...MOCK_CATALOG_ITEMS];
+        console.warn("Could not fetch catalog items:", error);
+        this.items = [];
         this.loaded = true;
       }
     },

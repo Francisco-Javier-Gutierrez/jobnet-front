@@ -50,13 +50,6 @@ vi.mock("~/stores/jobs", () => ({
   }),
 }));
 
-vi.mock("~/composables/useCommunityCvTemplates", () => ({
-  useCommunityCvTemplates: () => ({
-    filteredTemplates: ref([]),
-    fetchTemplates: vi.fn(),
-  }),
-}));
-
 describe("AppCommandPalette.vue Role-Based Filtering", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -106,7 +99,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Candidate quick actions and navigation
     expect(renderedText).toContain("Ver Mis Postulaciones");
-    expect(renderedText).toContain("Comunidad de Plantillas de CV");
+    expect(renderedText).toContain("Generar y Administrar CV");
     expect(renderedText).toContain("Vacantes Guardadas");
     expect(renderedText).toContain("Mi Perfil Profesional");
     expect(renderedText).toContain("Mensajes y Chat");
@@ -152,7 +145,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Blocked routes for company MUST NOT appear
     expect(renderedText).not.toContain("Explorar Vacantes");
-    expect(renderedText).not.toContain("Comunidad de Plantillas de CV");
+    expect(renderedText).not.toContain("Generar y Administrar CV");
     expect(renderedText).not.toContain("Ver Mis Postulaciones");
     expect(renderedText).not.toContain("Métricas y Analítica Global");
   });
@@ -180,7 +173,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Company publication or candidate CV templates MUST NOT appear for Admin
     expect(renderedText).not.toContain("Publicar Oferta de Empleo");
-    expect(renderedText).not.toContain("Comunidad de Plantillas de CV");
+    expect(renderedText).not.toContain("Generar y Administrar CV");
     expect(renderedText).not.toContain("Ver Mis Postulaciones");
   });
 });

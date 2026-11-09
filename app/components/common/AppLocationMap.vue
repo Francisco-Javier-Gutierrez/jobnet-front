@@ -117,6 +117,13 @@ const props = withDefaults(
     showHeader?: boolean;
     showUseCurrentLocation?: boolean;
     containerId?: string;
+    markers?: Array<{
+      lat: number;
+      lng: number;
+      title?: string;
+      subtitle?: string;
+      id?: string;
+    }>;
   }>(),
   {
     lat: 19.2826, // Toluca center
@@ -128,6 +135,7 @@ const props = withDefaults(
     showHeader: true,
     showUseCurrentLocation: true,
     containerId: "",
+    markers: () => [],
   },
 );
 
@@ -135,6 +143,16 @@ const emit = defineEmits<{
   (e: "update:lat", value: number): void;
   (e: "update:lng", value: number): void;
   (e: "locationName", value: string): void;
+  (
+    e: "selectMarker",
+    marker: {
+      lat: number;
+      lng: number;
+      title?: string;
+      subtitle?: string;
+      id?: string;
+    },
+  ): void;
   (
     e: "change",
     payload: { lat: number; lng: number; locationName: string },
@@ -154,7 +172,46 @@ const isLocating = ref(false);
 
 let map: any = null;
 let marker: any = null;
+let markersLayer: any = null;
+let leafletInstance: any = null;
 let resizeObserver: ResizeObserver | null = null;
+
+function renderExtraMarkers() {
+  if (!map || !leafletInstance) return;
+  if (markersLayer) {
+    map.removeLayer(markersLayer);
+    markersLayer = null;
+  }
+  if (!props.markers || props.markers.length === 0) return;
+
+  markersLayer = leafletInstance.layerGroup();
+  props.markers.forEach((m) => {
+    if (
+      typeof m.lat === "number" &&
+      typeof m.lng === "number" &&
+      !isNaN(m.lat) &&
+      !isNaN(m.lng)
+    ) {
+      const extraMarker = leafletInstance.marker([m.lat, m.lng], {
+        title: m.title || "",
+      });
+      if (m.title) {
+        extraMarker.bindPopup(`
+          <div style="font-family: inherit; font-size: 12px; line-height: 1.4; padding: 2px;">
+            <strong style="color: #2563eb; display: block; margin-bottom: 2px;">${m.title}</strong>
+            ${m.subtitle ? `<div style="color: #64748b; font-size: 11px; margin-bottom: 4px;">${m.subtitle}</div>` : ""}
+            ${m.id ? `<a href="/vacancies/${m.id}" style="color: #2563eb; font-weight: bold; font-size: 11px; text-decoration: underline;">Ver vacante &rarr;</a>` : ""}
+          </div>
+        `);
+      }
+      extraMarker.on("click", () => {
+        emit("selectMarker", m);
+      });
+      extraMarker.addTo(markersLayer);
+    }
+  });
+  markersLayer.addTo(map);
+}
 
 import {
   getNativeLocationName,
@@ -224,6 +281,7 @@ onMounted(async () => {
   if (!import.meta.client) return;
 
   const L = await import("leaflet");
+  leafletInstance = L;
 
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -278,6 +336,7 @@ onMounted(async () => {
   }
 
   resolveLocationName(currentLat.value, currentLng.value);
+  renderExtraMarkers();
 
   // Use ResizeObserver to fix tile cutoff issues when container resizes
   const mapEl = document.getElementById(mapContainerId.value);
@@ -298,11 +357,23 @@ onUnmounted(() => {
     resizeObserver.disconnect();
     resizeObserver = null;
   }
+  if (markersLayer && map) {
+    map.removeLayer(markersLayer);
+    markersLayer = null;
+  }
   if (map) {
     map.remove();
     map = null as any;
   }
 });
+
+watch(
+  () => props.markers,
+  () => {
+    renderExtraMarkers();
+  },
+  { deep: true },
+);
 
 watch(
   () => [props.lat, props.lng],

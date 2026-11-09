@@ -1,5 +1,3 @@
-import { MOCK_INCIDENTS } from "../../../../../app/utils/mockData";
-
 export default defineEventHandler(async (event) => {
   const incidentId = getRouterParam(event, "id");
   const config = useRuntimeConfig();
@@ -22,9 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event).catch(() => ({}));
-  const { dictum, notes } = body;
 
-  // Try calling backend API
   try {
     const backendData = await $fetch<any>(
       `${config.public.apiUrl}/moderator/incidents/${incidentId}/audit-dictum`,
@@ -38,29 +34,11 @@ export default defineEventHandler(async (event) => {
       },
     );
 
-    if (backendData?.success) {
-      return backendData;
-    }
-  } catch {
-    // Fallback to local / mock state update
+    return backendData;
+  } catch (error: any) {
+    throw createError({
+      statusCode: error?.statusCode || 500,
+      statusMessage: error?.message || "Error al emitir dictamen de auditoría.",
+    });
   }
-
-  // Update in local mock incidents
-  const incident = MOCK_INCIDENTS.find((i) => i.id === incidentId);
-  if (incident) {
-    incident.estatus = "RESUELTO";
-    incident.status = "RESUELTO";
-    incident.auditState = "AUDIT_CONCLUDED";
-    incident.auditDictum = dictum;
-    incident.auditDictumNotes = notes;
-    incident.supervisionStatus = "CONCLUDED";
-  }
-
-  return {
-    success: true,
-    message:
-      "Dictamen de auditoría emitido exitosamente. Expediente concluido y partes notificadas.",
-    incidentId,
-    dictum,
-  };
 });

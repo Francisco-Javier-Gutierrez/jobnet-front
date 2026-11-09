@@ -264,8 +264,6 @@
 </template>
 
 <script setup lang="ts">
-import { MOCK_VACANCIES } from "~/utils/mockData";
-
 useSeoMeta({
   title: "Mis Vacantes Publicadas - JobNet",
   description:
@@ -303,14 +301,7 @@ const fetchVacancies = async () => {
     let allJobs = await $fetch<any[]>(
       `${config.public.apiUrl}/jobs?companyId=${encodeURIComponent(targetCompanyId)}`,
     ).catch(() => []);
-    if (!allJobs || allJobs.length === 0) {
-      allJobs = MOCK_VACANCIES;
-    }
-    // Keep all jobs for the company regardless of active/evaluation/appeal status
-    let filtered = allJobs.filter((j) => j.empresaUuid === targetCompanyId);
-    if (filtered.length === 0) {
-      filtered = allJobs.slice(0, 3);
-    }
+    let filtered = Array.isArray(allJobs) ? allJobs : [];
 
     // Fetch counts
     const jobsWithCounts = await Promise.all(

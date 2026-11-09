@@ -186,14 +186,13 @@ import { useRouter } from "vue-router";
 import { useCommandPalette } from "~/composables/useCommandPalette";
 import { useTheme } from "~/composables/useTheme";
 import { useJobsStore } from "~/stores/jobs";
-import { useCommunityCvTemplates } from "~/composables/useCommunityCvTemplates";
 
 interface CommandItem {
   id: string;
   title: string;
   subtitle?: string;
   icon: string;
-  group: "Acciones Rápidas" | "Navegación" | "Vacantes" | "Plantillas de CV";
+  group: "Acciones Rápidas" | "Navegación" | "Vacantes";
   badge?: string;
   badgeVariant?: "primary" | "secondary" | "accent" | "neutral";
   keywords?: string[];
@@ -206,8 +205,6 @@ const router = useRouter();
 const { toggleTheme, isDark } = useTheme();
 const { status, data: session, signOut } = useAuth();
 const jobsStore = useJobsStore();
-const { filteredTemplates: communityTemplates, fetchTemplates } =
-  useCommunityCvTemplates();
 
 const searchQuery = ref("");
 const activeIndex = ref(0);
@@ -404,23 +401,23 @@ const staticItems = computed<CommandItem[]>(() => {
         action: () => router.push("/candidate/my-applications"),
       },
       {
-        id: "action-cv-templates",
-        title: "Comunidad de Plantillas de CV",
-        subtitle: "Formatos profesionales y optimizados para filtros ATS",
-        icon: "auto_stories",
+        id: "action-cv-builder",
+        title: "Generar y Administrar CV",
+        subtitle: "Crea y descarga tu currículum profesional en formato Carta",
+        icon: "picture_as_pdf",
         group: "Acciones Rápidas",
-        badge: "Comunidad",
-        badgeVariant: "secondary",
+        badge: "CV",
+        badgeVariant: "primary",
         keywords: [
           "cv",
           "curriculum",
-          "plantillas",
-          "templates",
-          "ats",
-          "habilidades",
-          "rol",
+          "hoja de vida",
+          "builder",
+          "pdf",
+          "descargar",
+          "carta",
         ],
-        action: () => router.push("/candidate/cv-templates"),
+        action: () => router.push("/candidate/profile"),
       },
       {
         id: "action-saved",
@@ -912,39 +909,7 @@ const filteredItems = computed<CommandItem[]>(() => {
         }))
     : [];
 
-  // 3. Dynamic CV Templates matches (ONLY for candidates and guests)
-  const matchingTemplates: CommandItem[] = isCandidateOrGuest
-    ? (communityTemplates.value || [])
-        .filter((tpl) => {
-          const inTitle = (tpl.titulo || "").toLowerCase().includes(query);
-          const inRole = (tpl.rol || "").toLowerCase().includes(query);
-          const inSkills = (tpl.habilidadesClave || []).some((s) =>
-            s.toLowerCase().includes(query),
-          );
-          const inTags = (tpl.tags || []).some((t) =>
-            t.toLowerCase().includes(query),
-          );
-          return inTitle || inRole || inSkills || inTags;
-        })
-        .slice(0, 5)
-        .map((tpl) => ({
-          id: `tpl-${tpl.id}`,
-          title: tpl.titulo,
-          subtitle: `${tpl.rol} · Nivel ${tpl.nivel.toUpperCase()}`,
-          icon: "description",
-          group: "Plantillas de CV",
-          badge:
-            tpl.idioma === "en"
-              ? "EN"
-              : tpl.idioma === "bilingual"
-                ? "Bilingüe"
-                : "ES",
-          badgeVariant: "secondary",
-          action: () => router.push("/candidate/cv-templates"),
-        }))
-    : [];
-
-  return [...matchingStatic, ...matchingJobs, ...matchingTemplates];
+  return [...matchingStatic, ...matchingJobs];
 });
 
 // Group items for display
@@ -954,7 +919,6 @@ const groupedItems = computed(() => {
     "Acciones Rápidas",
     "Navegación",
     "Vacantes",
-    "Plantillas de CV",
   ];
 
   let currentFlatIndex = 0;
@@ -1051,7 +1015,6 @@ watch(isOpen, async (opened) => {
       if (jobsStore.jobs.length === 0) {
         jobsStore.fetchJobs();
       }
-      fetchTemplates();
     }
     await nextTick();
     searchInputRef.value?.focus();

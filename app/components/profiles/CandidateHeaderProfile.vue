@@ -59,44 +59,6 @@
           <span>✨ Generar CV (Carta)</span>
         </button>
 
-        <!-- Previsualizar Plantillas en mi Perfil Button (Only for owner) -->
-        <button
-          v-if="isOwner"
-          type="button"
-          @click="showProfilePreviewModal = true"
-          class="w-full bg-surface-container/70 hover:bg-primary/10 text-primary border border-primary/30 h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-2xs cursor-pointer"
-          title="Prueba y compara en tiempo real cómo luciría tu perfil con plantillas profesionales en Español o Inglés"
-        >
-          <span class="material-symbols-outlined text-base">visibility</span>
-          <span>👁️ Previsualizar Plantillas en mi Perfil</span>
-        </button>
-
-        <!-- Compartir mi Perfil como Plantilla Button (Only for owner) -->
-        <button
-          v-if="isOwner"
-          type="button"
-          @click="showContributeModal = true"
-          class="w-full bg-surface-container/70 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-2xs cursor-pointer"
-          title="Comparte la estructura de tu perfil de forma anónima para ayudar a otros candidatos de la comunidad"
-        >
-          <span class="material-symbols-outlined text-base"
-            >volunteer_activism</span
-          >
-          <span>🤝 Compartir mi Perfil como Plantilla</span>
-        </button>
-
-        <!-- Community Templates Button (Only for owner) -->
-        <NuxtLink
-          v-if="isOwner"
-          to="/candidate/cv-templates"
-          class="w-full bg-surface-container/70 hover:bg-surface-container text-on-surface dark:text-slate-200 border border-outline-variant/50 h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
-        >
-          <span class="material-symbols-outlined text-sm text-primary"
-            >auto_stories</span
-          >
-          <span>Explorar Comunidad de Plantillas</span>
-        </NuxtLink>
-
         <a
           v-else
           :href="`mailto:${profile.email}`"
@@ -150,33 +112,13 @@
       :profile="profile"
       @cv-updated="emit('cv-updated', $event)"
     />
-
-    <!-- Profile Template Preview Modal -->
-    <CvProfilePreviewModal
-      v-if="isOwner"
-      v-model="showProfilePreviewModal"
-      :profile="profile"
-      @applied="onProfileApplied"
-      @use-cv="onUseCvFromPreview"
-    />
-
-    <!-- Community Contribute Modal -->
-    <CvContributeModal
-      v-if="isOwner"
-      v-model="showContributeModal"
-      :candidate-profile="profile"
-      @submit="handleCreateTemplateSubmit"
-    />
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import type { CandidateProfile, WebLinkItem } from "~/types";
-import CvProfilePreviewModal from "~/components/cv/CvProfilePreviewModal.vue";
 import CvBuilderModal from "~/components/cv/CvBuilderModal.vue";
-import CvContributeModal from "~/components/cv/CvContributeModal.vue";
-import { useCommunityCvTemplates } from "~/composables/useCommunityCvTemplates";
 
 defineProps<{
   profile: CandidateProfile;
@@ -191,25 +133,8 @@ const emit = defineEmits<{
   (e: "profile-updated"): void;
 }>();
 
-const { createCommunityTemplate } = useCommunityCvTemplates();
-
 const showDropdown = ref(false);
 const showCvModal = ref(false);
-const showProfilePreviewModal = ref(false);
-const showContributeModal = ref(false);
-
-const handleCreateTemplateSubmit = async (templateData: any) => {
-  showContributeModal.value = false;
-  await createCommunityTemplate(templateData);
-};
-
-const onProfileApplied = () => {
-  emit("profile-updated");
-};
-
-const onUseCvFromPreview = () => {
-  showCvModal.value = true;
-};
 
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value;

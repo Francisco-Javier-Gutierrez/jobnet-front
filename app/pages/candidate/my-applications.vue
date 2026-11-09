@@ -413,56 +413,6 @@ const statusFilters = [
   { label: "Descartadas", value: "RECHAZADO" },
 ];
 
-const MOCK_MY_APPLICATIONS = [
-  {
-    jobId: "vac-frontend-sr-01",
-    jobTitle: "Ingeniero Frontend Senior (Vue 3 / Nuxt / Tailwind)",
-    companyName: "TechSolutions México",
-    status: "EN_CONTACTO",
-    appliedAt: "2026-10-12T14:30:00Z",
-    motivoRechazo: null,
-    coverLetter:
-      "Cuento con más de 5 años diseñando aplicaciones empresariales con Vue 3 y Nuxt.",
-  },
-  {
-    jobId: "vac-devops-aws-02",
-    jobTitle: "Especialista Cloud AWS & DevOps Platform",
-    companyName: "Innovatech Global",
-    status: "SELECCIONADO",
-    appliedAt: "2026-10-10T10:00:00Z",
-    motivoRechazo: null,
-    coverLetter:
-      "Interesado en la gestión de infraestructura cloud con Terraform.",
-  },
-  {
-    jobId: "vac-fullstack-ts-03",
-    jobTitle: "Desarrollador Fullstack TypeScript / Node.js",
-    companyName: "SoftMX Technologies",
-    status: "RECHAZADO",
-    motivoRechazo: "Perfil cubierto",
-    appliedAt: "2026-10-08T09:15:00Z",
-    coverLetter: "Experiencia en APIs serverless y Vue 3.",
-  },
-  {
-    jobId: "vac-arquitecto-cloud-04",
-    jobTitle: "Arquitecto de Soluciones Cloud",
-    companyName: "DataCloud Networks",
-    status: "RECHAZADO",
-    motivoRechazo: "Experiencia requerida",
-    appliedAt: "2026-10-05T16:20:00Z",
-    coverLetter: "Certificado en AWS Solutions Architect Associate.",
-  },
-  {
-    jobId: "vac-lead-engineer-05",
-    jobTitle: "Tech Lead Engineer",
-    companyName: "Fintech Growth Latam",
-    status: "RECHAZADO",
-    motivoRechazo: "Pretensión salarial",
-    appliedAt: "2026-10-01T11:00:00Z",
-    coverLetter: "Liderazgo de equipos de desarrollo ágiles.",
-  },
-];
-
 const fetchApplications = async () => {
   if (status.value !== "authenticated") {
     router.push("/login");
@@ -501,11 +451,11 @@ const fetchApplications = async () => {
           new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
       );
     } else {
-      applications.value = MOCK_MY_APPLICATIONS;
+      applications.value = [];
     }
   } catch (e) {
     console.error("Error loading candidate applications:", e);
-    applications.value = MOCK_MY_APPLICATIONS;
+    applications.value = [];
   } finally {
     loading.value = false;
   }

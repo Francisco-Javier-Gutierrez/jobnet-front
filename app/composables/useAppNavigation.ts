@@ -347,12 +347,6 @@ export const useAppNavigation = () => {
             title: "Mi Actividad",
             items: [
               {
-                to: "/candidate/cv-templates",
-                icon: "auto_stories",
-                label: "Plantillas de CV",
-                protected: true,
-              },
-              {
                 to: "/saved",
                 icon: "bookmark",
                 label: "Guardados",
