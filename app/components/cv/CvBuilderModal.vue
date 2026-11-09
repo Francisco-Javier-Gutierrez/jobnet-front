@@ -43,8 +43,8 @@
                 <p
                   class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate"
                 >
-                  Diseño profesional estándar · 100% optimizado para filtros ATS
-                  · Tamaño 215.9 × 279.4 mm
+                  6 diseños profesionales optimizados para filtros ATS · Tamaño
+                  215.9 × 279.4 mm
                 </p>
               </div>
             </div>
@@ -148,6 +148,22 @@
               >
                 <button
                   type="button"
+                  @click="activeTab = 'template'"
+                  class="pb-2.5 px-3 text-xs font-bold transition flex items-center gap-1.5 border-b-2 cursor-pointer"
+                  :class="
+                    activeTab === 'template'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-on-surface-variant hover:text-on-surface'
+                  "
+                >
+                  <span class="material-symbols-outlined text-base"
+                    >dashboard_customize</span
+                  >
+                  <span>Plantilla</span>
+                </button>
+
+                <button
+                  type="button"
                   @click="activeTab = 'content'"
                   class="pb-2.5 px-3 text-xs font-bold transition flex items-center gap-1.5 border-b-2 cursor-pointer"
                   :class="
@@ -181,6 +197,74 @@
                     {{ atsEvaluation.score }}%
                   </span>
                 </button>
+              </div>
+
+              <!-- TAB 0: Plantillas de CV -->
+              <div
+                v-if="activeTab === 'template'"
+                class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs select-text"
+              >
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="font-bold text-on-surface text-sm">
+                      Elige tu Plantilla Carta
+                    </h3>
+                    <p class="text-[11px] text-on-surface-variant">
+                      6 diseños profesionales optimizados para filtros ATS
+                    </p>
+                  </div>
+                  <span
+                    class="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold"
+                  >
+                    Carta (215.9 × 279.4 mm)
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <button
+                    v-for="tmpl in TEMPLATE_OPTIONS"
+                    :key="tmpl.id"
+                    type="button"
+                    @click="options.templateId = tmpl.id"
+                    class="p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between gap-2.5 cursor-pointer relative"
+                    :class="
+                      options.templateId === tmpl.id
+                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm'
+                        : 'border-outline-variant/60 hover:border-outline hover:bg-surface-container-low'
+                    "
+                  >
+                    <div class="flex items-center justify-between">
+                      <div
+                        class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+                        :class="
+                          options.templateId === tmpl.id
+                            ? 'bg-primary text-white'
+                            : 'bg-surface-container text-on-surface-variant'
+                        "
+                      >
+                        <span class="material-symbols-outlined text-lg">{{
+                          tmpl.icon
+                        }}</span>
+                      </div>
+                      <span
+                        v-if="options.templateId === tmpl.id"
+                        class="material-symbols-outlined text-primary text-lg"
+                      >
+                        check_circle
+                      </span>
+                    </div>
+                    <div>
+                      <span class="font-bold text-xs text-on-surface block">
+                        {{ tmpl.name }}
+                      </span>
+                      <span
+                        class="text-[11px] text-on-surface-variant line-clamp-2 leading-snug mt-0.5"
+                      >
+                        {{ tmpl.desc }}
+                      </span>
+                    </div>
+                  </button>
+                </div>
               </div>
 
               <!-- TAB 1: Contenido del CV -->
@@ -936,7 +1020,8 @@
                 >
                   <!-- Print Reference Container for html2pdf.js -->
                   <div ref="cvPrintRef">
-                    <TemplateStandard
+                    <component
+                      :is="activeTemplateComponent"
                       :cv="editableCv"
                       :options="options"
                       :primary-color="selectedColorTheme.primary"
@@ -955,10 +1040,16 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from "vue";
 import type { CandidateProfile } from "~/types/candidate";
-import type { CvData, CvOptions, CvColorTheme } from "~/types/cv";
+import type { CvData, CvOptions, CvColorTheme, CvTemplateId } from "~/types/cv";
 import { useCvGenerator, CV_COLOR_THEMES } from "~/composables/useCvGenerator";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { calculateCvAtsScore } from "~/utils/cvStarterPacks";
+import TemplateMinimalTech from "./templates/TemplateMinimalTech.vue";
+import TemplateExecutive from "./templates/TemplateExecutive.vue";
+import TemplateCreative from "./templates/TemplateCreative.vue";
+import TemplateHarvardClassic from "./templates/TemplateHarvardClassic.vue";
+import TemplateCompactOnePage from "./templates/TemplateCompactOnePage.vue";
+import TemplateModernSplit from "./templates/TemplateModernSplit.vue";
 import TemplateStandard from "./templates/TemplateStandard.vue";
 
 const props = defineProps<{
@@ -986,7 +1077,51 @@ const config = useRuntimeConfig();
 const cvPrintRef = ref<HTMLElement | null>(null);
 const zoom = ref(0.75);
 const activeMobileTab = ref<"editor" | "preview">("editor");
-const activeTab = ref<"content" | "settings">("content");
+const activeTab = ref<"template" | "content" | "settings">("template");
+
+const TEMPLATE_OPTIONS: Array<{
+  id: CvTemplateId;
+  name: string;
+  desc: string;
+  icon: string;
+}> = [
+  {
+    id: "minimal-tech",
+    name: "Minimal Tech",
+    desc: "Sidebar oscuro con habilidades técnicas y timeline de proyectos.",
+    icon: "code",
+  },
+  {
+    id: "executive",
+    name: "Ejecutivo",
+    desc: "Diseño sobrio y formal para puestos de liderazgo y gestión.",
+    icon: "corporate_fare",
+  },
+  {
+    id: "creative",
+    name: "Creativo",
+    desc: "Encabezado moderno con degradado y badges dinámicos.",
+    icon: "palette",
+  },
+  {
+    id: "harvard-classic",
+    name: "Harvard Clásico",
+    desc: "Tipografía serif tradicional, 100% optimizado para ATS.",
+    icon: "school",
+  },
+  {
+    id: "compact-ats",
+    name: "Compacto ATS",
+    desc: "Alta densidad para sintetizar todo en una sola hoja Carta.",
+    icon: "density_medium",
+  },
+  {
+    id: "modern-split",
+    name: "Moderno Dividido",
+    desc: "Distribución en 2 columnas equilibradas con cards suaves.",
+    icon: "splitscreen",
+  },
+];
 
 const FONT_SIZES = [
   { id: "sm" as const, label: "Compacto" },
@@ -997,7 +1132,7 @@ const FONT_SIZES = [
 const selectedColorTheme = ref<CvColorTheme>(CV_COLOR_THEMES[0]);
 
 const options = reactive<CvOptions>({
-  templateId: "standard",
+  templateId: "minimal-tech",
   colorTheme: "indigo-jobnet",
   anonymousMode: false,
   showPhoto: true,
@@ -1011,6 +1146,27 @@ const options = reactive<CvOptions>({
   showEducation: true,
   showExperience: true,
   fontSize: "base",
+});
+
+const activeTemplateComponent = computed(() => {
+  switch (options.templateId) {
+    case "minimal-tech":
+      return TemplateMinimalTech;
+    case "executive":
+      return TemplateExecutive;
+    case "creative":
+      return TemplateCreative;
+    case "harvard-classic":
+      return TemplateHarvardClassic;
+    case "compact-ats":
+      return TemplateCompactOnePage;
+    case "modern-split":
+      return TemplateModernSplit;
+    case "standard":
+      return TemplateStandard;
+    default:
+      return TemplateMinimalTech;
+  }
 });
 
 const selectColorTheme = (theme: CvColorTheme) => {
