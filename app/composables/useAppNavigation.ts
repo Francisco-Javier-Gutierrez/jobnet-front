@@ -70,10 +70,36 @@ export const useAppNavigation = () => {
 
   const profileRoute = computed(() => "/profile");
 
+  const normalizePath = (p: string) => p.replace(/\/+$/, "") || "/";
+
   const isActive = (path: string | null): boolean => {
     if (!path) return false;
-    if (path === "/") return route.path === "/";
-    return route.path.startsWith(path);
+
+    const current = normalizePath(route.path);
+    const target = normalizePath(path);
+
+    // 1. Coincidencia exacta (ej: /admin === /admin, / === /, /admin/analytics === /admin/analytics)
+    if (current === target) return true;
+
+    // 2. Rutas raíz que NUNCA deben coincidir con subrutas hermanas
+    if (target === "/" || target === "/admin") {
+      return false;
+    }
+
+    // 3. Casos especiales de detalle asociados a listas principales
+    if (target === "/vacancies" && current.startsWith("/jobs/")) {
+      return true;
+    }
+    if (target === "/companies" && current.startsWith("/company/")) {
+      return true;
+    }
+    if (target === "/my-vacancies" && current.startsWith("/edit-vacancy/")) {
+      return true;
+    }
+
+    // 4. Subrutas jerárquicas reales (requiere frontera de segmento '/')
+    // Evita falsos positivos como /create coincidiendo con /create-vacancy
+    return current.startsWith(`${target}/`);
   };
 
   const handleNavClick = (item: NavItem, onBeforeNavigate?: () => void) => {
@@ -159,6 +185,12 @@ export const useAppNavigation = () => {
           {
             title: "Moderación & Auditoría",
             items: [
+              {
+                to: "/admin/fraud",
+                icon: "find_in_page",
+                label: "Reportes de Fraude",
+                protected: true,
+              },
               {
                 to: "/mod/incidents",
                 icon: "report_problem",

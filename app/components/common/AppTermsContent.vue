@@ -253,6 +253,17 @@
         permanece disponible como registro de auditoría en modo de solo lectura,
         sin posibilidad de enviar nuevos mensajes.
       </p>
+      <p>
+        <strong>Supervisión y auditoría ante controversias:</strong> Ante
+        denuncias formales o controversias graves ingresadas en la Bandeja de
+        Incidencias por presunto fraude, acoso, irregularidades laborales o
+        discrepancia salarial, la Plataforma se reserva la facultad de habilitar
+        un acceso de supervisión y auditoría en modo de solo lectura para el
+        equipo de moderación y administración. Esta medida se aplicará previa
+        notificación formal a las partes involucradas, con el único propósito de
+        evaluar la evidencia probatoria, salvaguardar la seguridad de la
+        comunidad y dictaminar la resolución correspondiente.
+      </p>
     </section>
 
     <!-- 9 -->
@@ -387,9 +398,13 @@
       <p>
         JobNet se reserva el derecho de modificar los presentes Términos y
         Condiciones en cualquier momento. Las modificaciones serán publicadas en
-        esta misma página con la fecha de última actualización. El uso
-        continuado de la Plataforma tras la publicación de cambios constituirá
-        la aceptación de los mismos.
+        esta misma página con el número de versión y la fecha de última
+        actualización. Asimismo, cuando se realicen reformas o actualizaciones a
+        las políticas de la Plataforma, se notificará oportunamente a los
+        usuarios mediante notificaciones push en el navegador y alertas dentro
+        de la plataforma. El uso continuado de la Plataforma tras la
+        notificación o publicación de cambios constituirá la aceptación de los
+        mismos.
       </p>
     </section>
 
