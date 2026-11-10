@@ -737,7 +737,7 @@
                           >visibility_off</span
                         >
                         <h3 class="font-bold text-on-surface">
-                          Modo Anónimo Imparcial (RF-123)
+                          Modo Anónimo Imparcial
                         </h3>
                       </div>
                       <p

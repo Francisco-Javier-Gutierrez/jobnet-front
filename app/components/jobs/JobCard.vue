@@ -322,9 +322,9 @@ const isLiked = computed(() => {
 });
 
 const likesCount = computed(() => {
-  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
   if (typeof props.job?.likesCount === "number") return props.job.likesCount;
   if (typeof props.job?.likes === "number") return props.job.likes;
+  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
   return likesList.value.length;
 });
 
@@ -381,10 +381,10 @@ const sharesCount = computed(() => {
 });
 
 const bookmarksCount = computed(() => {
-  if (Array.isArray(props.job?.bookmarksList))
-    return props.job.bookmarksList.length;
   if (typeof props.job?.bookmarksCount === "number")
     return props.job.bookmarksCount;
+  if (Array.isArray(props.job?.bookmarksList))
+    return props.job.bookmarksList.length;
   return bookmarksList.value.length;
 });
 

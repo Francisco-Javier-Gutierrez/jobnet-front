@@ -198,41 +198,7 @@ export function useAdminAnalytics() {
           { range: "20+ postulaciones", count: 2, percentage: 5.3 },
         ],
       },
-      anomalies: [
-        {
-          id: "anom-vac-demo-01",
-          type: "RAPID_VACANCIES",
-          severity: "CRITICAL",
-          organizationId: "org-bot-recruitment-99",
-          organizationName: "FastHiring Express Latam S.A.S.",
-          count: 14,
-          threshold: 10,
-          timeWindow: "38 min (< 1 hora)",
-          detectedAt: new Date(Date.now() - 38 * 60 * 1000).toISOString(),
-          title: "Concurrencia Anómala: Posible Bot / Spam de Vacantes",
-          description:
-            "Se detectaron 14 vacantes publicadas en 38 minutos por FastHiring Express Latam S.A.S. Supera el límite de seguridad de 10 vacantes/hora.",
-          category: "BOT_SPAM",
-          status: "ACTIVE",
-        },
-        {
-          id: "anom-rep-demo-02",
-          type: "REPORT_SURGE",
-          severity: "CRITICAL",
-          organizationId: "org-fake-corp-77",
-          organizationName: "Inversiones & Créditos Inmediatos México",
-          count: 7,
-          threshold: 5,
-          timeWindow: "24 min (< 1 hora)",
-          detectedAt: new Date(Date.now() - 24 * 60 * 1000).toISOString(),
-          title:
-            "Concurrencia Anómala: Avalancha de Reportes por Fraude Masivo",
-          description:
-            "Se acumularon 7 denuncias independientes por cobro previo indebido y estafa en 24 minutos contra Inversiones & Créditos Inmediatos México. Supera el límite de 5 reportes/hora.",
-          category: "MASS_FRAUD",
-          status: "ACTIVE",
-        },
-      ],
+      anomalies: [],
       kpis: {
         totalVacancies: 41,
         totalOrganizations: 38,
@@ -242,7 +208,7 @@ export function useAdminAnalytics() {
         topSkillName: "Vue.js / Nuxt 3",
         topSkillCount: 34,
         monthlyGrowthRate: "+15.2%",
-        activeAnomaliesCount: 2,
+        activeAnomaliesCount: 0,
       },
     };
   });

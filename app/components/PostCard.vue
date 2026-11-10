@@ -488,12 +488,14 @@ const effectiveIsBookmarked = computed(() => {
 });
 
 const likesCount = computed(() => {
-  return props.post?.likesList
-    ? props.post.likesList.length
-    : props.post?.likes || 0;
+  if (typeof props.post?.likesCount === "number") return props.post.likesCount;
+  if (typeof props.post?.likes === "number") return props.post.likes;
+  return props.post?.likesList ? props.post.likesList.length : 0;
 });
 
 const commentsCount = computed(() => {
+  if (typeof props.post?.commentsCount === "number")
+    return props.post.commentsCount;
   return props.post?.comments?.length || 0;
 });
 
