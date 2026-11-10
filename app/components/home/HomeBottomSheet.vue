@@ -59,6 +59,7 @@
           :post="selectedPost"
           :current-user-id="currentUserId"
           :is-bookmarked="isBookmarked(selectedPost)"
+          :is-liked="isLiked ? isLiked(selectedPost) : undefined"
           :is-detail="true"
           @like="$emit('toggle-like', selectedPost)"
           @bookmark="$emit('toggle-bookmark', selectedPost)"
@@ -272,6 +273,7 @@ const props = defineProps<{
   selectedPost: Post | null;
   currentUserId: string;
   isBookmarked: (item: Post) => boolean;
+  isLiked?: (item: Post) => boolean;
   commentsCount: (postItem: Post) => number;
   commentTree: CommentNode[];
   canDeleteComment: (node: CommentNode) => boolean;

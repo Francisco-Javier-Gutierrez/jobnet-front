@@ -194,6 +194,7 @@
             :job="job"
             :current-user-id="currentUserId"
             :is-bookmarked="true"
+            :is-liked="job.isLiked"
             @navigate="(id) => $router.push(`/jobs/${id}`)"
             @like="toggleJobLike"
             @bookmark="toggleJobBookmark"
@@ -231,6 +232,7 @@
             :post="post"
             :current-user-id="currentUserId"
             :is-bookmarked="true"
+            :is-liked="post.isLiked"
             @navigate="(id) => $router.push(`/posts/${id}`)"
             @like="togglePostLike"
             @bookmark="togglePostBookmark"
@@ -371,9 +373,20 @@ const toggleJobLike = async (job: any) => {
   const idx = job.likesList.indexOf(currentUserId.value);
   if (idx !== -1) {
     job.likesList.splice(idx, 1);
+    if (typeof job.likesCount === "number") {
+      job.likesCount = Math.max(0, job.likesCount - 1);
+    }
+    job.isLiked = false;
   } else {
     job.likesList.push(currentUserId.value);
+    if (typeof job.likesCount === "number") {
+      job.likesCount = job.likesCount + 1;
+    } else {
+      job.likesCount = job.likesList.length;
+    }
+    job.isLiked = true;
   }
+  job.likes = job.likesList.length;
 
   try {
     await $fetch(`/api/jobs/${jId}/like`, {
@@ -413,9 +426,20 @@ const togglePostLike = async (post: any) => {
   const idx = post.likesList.indexOf(currentUserId.value);
   if (idx !== -1) {
     post.likesList.splice(idx, 1);
+    if (typeof post.likesCount === "number") {
+      post.likesCount = Math.max(0, post.likesCount - 1);
+    }
+    post.isLiked = false;
   } else {
     post.likesList.push(currentUserId.value);
+    if (typeof post.likesCount === "number") {
+      post.likesCount = post.likesCount + 1;
+    } else {
+      post.likesCount = post.likesList.length;
+    }
+    post.isLiked = true;
   }
+  post.likes = post.likesList.length;
 
   try {
     await $fetch(`/api/posts/${post.uniqueId || post.id}/like`, {

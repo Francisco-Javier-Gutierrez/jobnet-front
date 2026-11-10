@@ -403,9 +403,22 @@ export function useCandidateProfile(candidateIdParam?: string) {
 
     if (existingIdx !== -1) {
       post.likesList.splice(existingIdx, 1);
+      if (typeof post.likesCount === "number") {
+        post.likesCount = Math.max(0, post.likesCount - 1);
+      } else {
+        post.likesCount = post.likesList.length;
+      }
+      post.isLiked = false;
     } else {
       post.likesList.push(currentUserId);
+      if (typeof post.likesCount === "number") {
+        post.likesCount = post.likesCount + 1;
+      } else {
+        post.likesCount = post.likesList.length;
+      }
+      post.isLiked = true;
     }
+    post.likes = post.likesList.length;
 
     try {
       const postId = post.uniqueId || post.id;
@@ -456,8 +469,20 @@ export function useCandidateProfile(candidateIdParam?: string) {
 
     if (existingIdx !== -1) {
       post.bookmarksList.splice(existingIdx, 1);
+      if (typeof post.bookmarksCount === "number") {
+        post.bookmarksCount = Math.max(0, post.bookmarksCount - 1);
+      } else {
+        post.bookmarksCount = post.bookmarksList.length;
+      }
+      post.isBookmarked = false;
     } else {
       post.bookmarksList.push(currentUserId);
+      if (typeof post.bookmarksCount === "number") {
+        post.bookmarksCount = post.bookmarksCount + 1;
+      } else {
+        post.bookmarksCount = post.bookmarksList.length;
+      }
+      post.isBookmarked = true;
     }
 
     try {
@@ -500,12 +525,24 @@ export function useCandidateProfile(candidateIdParam?: string) {
     const idx = job.bookmarksList.indexOf(currentUserId);
     if (idx !== -1) {
       job.bookmarksList.splice(idx, 1);
+      if (typeof job.bookmarksCount === "number") {
+        job.bookmarksCount = Math.max(0, job.bookmarksCount - 1);
+      } else {
+        job.bookmarksCount = job.bookmarksList.length;
+      }
+      job.isBookmarked = false;
       const bIdx = allBookmarkedJobs.value.findIndex(
         (j) => (j.id || j.uniqueId) === jId,
       );
       if (bIdx !== -1) allBookmarkedJobs.value.splice(bIdx, 1);
     } else {
       job.bookmarksList.push(currentUserId);
+      if (typeof job.bookmarksCount === "number") {
+        job.bookmarksCount = job.bookmarksCount + 1;
+      } else {
+        job.bookmarksCount = job.bookmarksList.length;
+      }
+      job.isBookmarked = true;
       if (!allBookmarkedJobs.value.some((j) => (j.id || j.uniqueId) === jId)) {
         allBookmarkedJobs.value.unshift(job);
       }
@@ -531,9 +568,22 @@ export function useCandidateProfile(candidateIdParam?: string) {
     const idx = job.likesList.indexOf(currentUserId);
     if (idx !== -1) {
       job.likesList.splice(idx, 1);
+      if (typeof job.likesCount === "number") {
+        job.likesCount = Math.max(0, job.likesCount - 1);
+      } else {
+        job.likesCount = job.likesList.length;
+      }
+      job.isLiked = false;
     } else {
       job.likesList.push(currentUserId);
+      if (typeof job.likesCount === "number") {
+        job.likesCount = job.likesCount + 1;
+      } else {
+        job.likesCount = job.likesList.length;
+      }
+      job.isLiked = true;
     }
+    job.likes = job.likesList.length;
 
     try {
       await $fetch(`/api/jobs/${jId}/like`, {

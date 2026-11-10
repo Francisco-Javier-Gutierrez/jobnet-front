@@ -19,6 +19,7 @@
       :post="post"
       :current-user-id="currentUserId"
       :is-bookmarked="isBookmarked"
+      :is-liked="isLiked"
       :is-detail="true"
       @like="toggleLike"
       @bookmark="toggleBookmark"
@@ -314,33 +315,63 @@ const toggleLike = async () => {
   }
   if (!post.value) return;
 
+  if (!post.value.likesList) {
+    post.value.likesList = [];
+  }
+
+  const originalLikesList = [...post.value.likesList];
+  const originalLikes = post.value.likes || 0;
+  const originalLikesCount = post.value.likesCount;
+
+  const idx = post.value.likesList.indexOf(currentUserId.value);
+  if (idx !== -1) {
+    post.value.likesList.splice(idx, 1);
+    if (typeof post.value.likesCount === "number") {
+      post.value.likesCount = Math.max(0, post.value.likesCount - 1);
+    }
+    post.value.isLiked = false;
+  } else {
+    post.value.likesList.push(currentUserId.value);
+    if (typeof post.value.likesCount === "number") {
+      post.value.likesCount = post.value.likesCount + 1;
+    } else {
+      post.value.likesCount = post.value.likesList.length;
+    }
+    post.value.isLiked = true;
+  }
+  post.value.likes = post.value.likesList.length;
+
   try {
     const res = await $fetch<any>(`/api/posts/${post.value.uniqueId}/like`, {
       method: "POST",
       body: { userUuid: currentUserId.value },
     });
 
-    if (!post.value.likesList) {
-      post.value.likesList = [];
-    }
-
-    const idx = post.value.likesList.indexOf(currentUserId.value);
-    if (res.liked) {
-      if (idx === -1) {
+    const idxNow = post.value.likesList.indexOf(currentUserId.value);
+    if (res?.liked) {
+      if (idxNow === -1) {
         post.value.likesList.push(currentUserId.value);
       }
-    } else {
-      if (idx !== -1) {
-        post.value.likesList.splice(idx, 1);
+      post.value.isLiked = true;
+    } else if (res?.liked === false) {
+      if (idxNow !== -1) {
+        post.value.likesList.splice(idxNow, 1);
       }
+      post.value.isLiked = false;
     }
     post.value.likes = post.value.likesList.length;
+    if (typeof res?.likesCount === "number") {
+      post.value.likesCount = res.likesCount;
+    }
   } catch (e) {
     console.error("Error toggling like:", e);
+    post.value.likesList = originalLikesList;
+    post.value.likes = originalLikes;
+    post.value.likesCount = originalLikesCount;
   }
 };
 
-const toggleBookmark = () => {
+const toggleBookmark = async () => {
   if (status.value !== "authenticated") {
     showAuthModal.value = true;
     return;
@@ -349,13 +380,43 @@ const toggleBookmark = () => {
   if (!post.value.bookmarksList) {
     post.value.bookmarksList = [];
   }
+  const originalBookmarksList = [...post.value.bookmarksList];
+  const originalBookmarksCount = post.value.bookmarksCount;
+
   const idx = post.value.bookmarksList.indexOf(currentUserId.value);
   if (idx !== -1) {
     post.value.bookmarksList.splice(idx, 1);
+    if (typeof post.value.bookmarksCount === "number") {
+      post.value.bookmarksCount = Math.max(0, post.value.bookmarksCount - 1);
+    }
+    post.value.isBookmarked = false;
   } else {
     post.value.bookmarksList.push(currentUserId.value);
+    if (typeof post.value.bookmarksCount === "number") {
+      post.value.bookmarksCount = post.value.bookmarksCount + 1;
+    } else {
+      post.value.bookmarksCount = post.value.bookmarksList.length;
+    }
+    post.value.isBookmarked = true;
   }
   updateGlobalPost();
+
+  try {
+    const res = await $fetch<any>(
+      `/api/posts/${post.value.uniqueId}/bookmark`,
+      {
+        method: "POST",
+        body: { userUuid: currentUserId.value },
+      },
+    );
+    if (typeof res?.bookmarksCount === "number") {
+      post.value.bookmarksCount = res.bookmarksCount;
+    }
+  } catch (e) {
+    console.error("Error toggling bookmark:", e);
+    post.value.bookmarksList = originalBookmarksList;
+    post.value.bookmarksCount = originalBookmarksCount;
+  }
 };
 
 const updateGlobalPost = () => {
