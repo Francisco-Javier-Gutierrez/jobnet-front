@@ -695,7 +695,7 @@
                 id="lat-input"
                 v-model.number="state.form.lat"
                 type="number"
-                step="0.0001"
+                step="any"
                 class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
               />
             </div>
@@ -712,7 +712,7 @@
                 id="lng-input"
                 v-model.number="state.form.lng"
                 type="number"
-                step="0.0001"
+                step="any"
                 class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
               />
             </div>
