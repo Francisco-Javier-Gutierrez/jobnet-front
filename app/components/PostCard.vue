@@ -324,11 +324,13 @@ const props = withDefaults(
   defineProps<{
     post: Post;
     currentUserId?: string;
+    isLiked?: boolean;
     isBookmarked?: boolean;
     isDetail?: boolean;
   }>(),
   {
     isDetail: false,
+    isLiked: undefined,
     isBookmarked: undefined,
   },
 );
@@ -423,8 +425,13 @@ const handleShareClick = (e: Event) => {
         `shared-posts-${currentUserId}`,
         JSON.stringify(shared),
       );
-      isSharedLocally.value = true;
     }
+    isSharedLocally.value = true;
+  }
+
+  // Optimistic UI increment for shares
+  if (props.post) {
+    props.post.sharesCount = (props.post.sharesCount || 0) + 1;
   }
 
   emit("share", props.post);
@@ -440,6 +447,8 @@ const openReportModal = () => {
 };
 
 const isLiked = computed(() => {
+  if (props.isLiked !== undefined) return props.isLiked;
+
   const post = props.post;
   if (!post) return false;
 
@@ -464,6 +473,8 @@ const isLiked = computed(() => {
 });
 
 const effectiveIsBookmarked = computed(() => {
+  if (props.isBookmarked !== undefined) return props.isBookmarked;
+
   const post = props.post;
   if (!post) return false;
 
@@ -486,15 +497,14 @@ const effectiveIsBookmarked = computed(() => {
     if (foundInList) return true;
   }
 
-  if (props.isBookmarked === true) return true;
-
   return Boolean(post.isBookmarked);
 });
 
 const likesCount = computed(() => {
+  if (Array.isArray(props.post?.likesList)) return props.post.likesList.length;
   if (typeof props.post?.likesCount === "number") return props.post.likesCount;
   if (typeof props.post?.likes === "number") return props.post.likes;
-  return props.post?.likesList ? props.post.likesList.length : 0;
+  return 0;
 });
 
 const commentsCount = computed(() => {
@@ -510,13 +520,14 @@ const sharesCount = computed(() => {
 });
 
 const bookmarksCount = computed(() => {
-  if (typeof props.post?.bookmarksCount === "number")
-    return props.post.bookmarksCount;
   const bookmarks =
     props.post?.bookmarksList ||
     props.post?.bookmarkedBy ||
     props.post?.bookmarks ||
     [];
+  if (Array.isArray(bookmarks) && bookmarks.length > 0) return bookmarks.length;
+  if (typeof props.post?.bookmarksCount === "number")
+    return props.post.bookmarksCount;
   return Array.isArray(bookmarks) ? bookmarks.length : 0;
 });
 

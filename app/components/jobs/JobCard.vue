@@ -322,9 +322,9 @@ const isLiked = computed(() => {
 });
 
 const likesCount = computed(() => {
+  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
   if (typeof props.job?.likesCount === "number") return props.job.likesCount;
   if (typeof props.job?.likes === "number") return props.job.likes;
-  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
   return likesList.value.length;
 });
 
@@ -381,11 +381,14 @@ const sharesCount = computed(() => {
 });
 
 const bookmarksCount = computed(() => {
+  const bList =
+    props.job?.bookmarksList ||
+    (props.job as any)?.savedBy ||
+    (props.job as any)?.bookmarks;
+  if (Array.isArray(bList) && bList.length > 0) return bList.length;
   if (typeof props.job?.bookmarksCount === "number")
     return props.job.bookmarksCount;
-  if (Array.isArray(props.job?.bookmarksList))
-    return props.job.bookmarksList.length;
-  return bookmarksList.value.length;
+  return Array.isArray(bList) ? bList.length : bookmarksList.value.length;
 });
 
 // Click handlers
@@ -454,8 +457,13 @@ const handleShareClick = (e: Event) => {
         `shared-jobs-${currentUserId}`,
         JSON.stringify(shared),
       );
-      isSharedLocally.value = true;
     }
+    isSharedLocally.value = true;
+  }
+
+  // Optimistic UI increment for shares
+  if (props.job) {
+    props.job.sharesCount = (props.job.sharesCount || 0) + 1;
   }
 
   emit("share", props.job);

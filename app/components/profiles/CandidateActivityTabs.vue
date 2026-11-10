@@ -56,6 +56,7 @@
           :current-user-id="
             (authData?.user as any)?.id || authData?.user?.email || ''
           "
+          :is-liked="post.isLiked"
           :is-bookmarked="isBookmarked(post)"
           @navigate="(id) => $router.push(`/posts/${id}`)"
           @like="$emit('like', $event)"
@@ -216,6 +217,7 @@
               :current-user-id="
                 (authData?.user as any)?.id || authData?.user?.email || ''
               "
+              :is-liked="post.isLiked"
               :is-bookmarked="true"
               @navigate="(id) => $router.push(`/posts/${id}`)"
               @like="$emit('like', $event)"

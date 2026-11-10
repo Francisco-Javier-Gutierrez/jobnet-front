@@ -340,11 +340,39 @@ const displayedIncidents = computed(() => {
   return list;
 });
 
+const getAuthHeaders = (): Record<string, string> => {
+  const token =
+    (session.value as any)?.idToken ||
+    (session.value as any)?.accessToken ||
+    (session.value as any)?.token ||
+    "";
+  const role =
+    session.value?.user?.tipoUsuario ||
+    session.value?.user?.role ||
+    (session.value as any)?.tipoUsuario ||
+    "MODERADOR";
+  const userId =
+    session.value?.user?.id || (session.value?.user as any)?.uuid || "";
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "x-user-id": userId,
+    "x-user-role": role,
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+};
+
 const fetchIncidents = async () => {
   loading.value = true;
   try {
     const data = await $fetch<any>(
       `${config.public.apiUrl}/moderator/incidents`,
+      {
+        headers: getAuthHeaders(),
+      },
     );
     const fetched =
       data?.value || data?.Items || (Array.isArray(data) ? data : []);
@@ -371,6 +399,7 @@ const resolve = async (id: string, action: string) => {
   try {
     await $fetch(`${config.public.apiUrl}/moderator/incidents/${id}/resolve`, {
       method: "POST",
+      headers: getAuthHeaders(),
       body: {
         action: mappedAction,
       },

@@ -27,6 +27,7 @@
       :selected-post="selectedPost"
       :current-user-id="currentUserId"
       :is-bookmarked="isBookmarked"
+      :is-liked="isLiked"
       :comments-count="commentsCount"
       :comment-tree="commentTree"
       :can-delete-comment="canDeleteComment"

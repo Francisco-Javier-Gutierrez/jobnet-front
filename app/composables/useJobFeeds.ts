@@ -236,14 +236,28 @@ export function useJobFeeds() {
     }
 
     const originalLikesList = [...item.likesList];
-    const originalLikesCount = item.likes || 0;
+    const originalLikesCount =
+      item.likesCount ?? item.likes ?? item.likesList.length;
+    const originalIsLiked = item.isLiked;
 
     const idx = item.likesList.indexOf(currentUserId.value);
     const wasLiked = idx !== -1;
     if (wasLiked) {
       item.likesList.splice(idx, 1);
+      if (typeof item.likesCount === "number") {
+        item.likesCount = Math.max(0, item.likesCount - 1);
+      } else {
+        item.likesCount = item.likesList.length;
+      }
+      item.isLiked = false;
     } else {
       item.likesList.push(currentUserId.value);
+      if (typeof item.likesCount === "number") {
+        item.likesCount = item.likesCount + 1;
+      } else {
+        item.likesCount = item.likesList.length;
+      }
+      item.isLiked = true;
     }
     item.likes = item.likesList.length;
 
@@ -260,20 +274,27 @@ export function useJobFeeds() {
       });
 
       const idxNow = item.likesList.indexOf(currentUserId.value);
-      if (res.liked) {
+      if (res?.liked) {
         if (idxNow === -1) {
           item.likesList.push(currentUserId.value);
         }
-      } else {
+        item.isLiked = true;
+      } else if (res?.liked === false) {
         if (idxNow !== -1) {
           item.likesList.splice(idxNow, 1);
         }
+        item.isLiked = false;
       }
       item.likes = item.likesList.length;
+      if (typeof res?.likesCount === "number") {
+        item.likesCount = res.likesCount;
+      }
     } catch (e) {
       console.error("Error toggling like:", e);
       item.likesList = originalLikesList;
       item.likes = originalLikesCount;
+      item.likesCount = originalLikesCount;
+      item.isLiked = originalIsLiked;
     }
   };
 
@@ -287,13 +308,28 @@ export function useJobFeeds() {
     }
 
     const originalBookmarksList = [...item.bookmarksList];
+    const originalBookmarksCount =
+      item.bookmarksCount ?? item.bookmarksList.length;
+    const originalIsBookmarked = item.isBookmarked;
 
     const idx = item.bookmarksList.indexOf(currentUserId.value);
     const wasBookmarked = idx !== -1;
     if (wasBookmarked) {
       item.bookmarksList.splice(idx, 1);
+      if (typeof item.bookmarksCount === "number") {
+        item.bookmarksCount = Math.max(0, item.bookmarksCount - 1);
+      } else {
+        item.bookmarksCount = item.bookmarksList.length;
+      }
+      item.isBookmarked = false;
     } else {
       item.bookmarksList.push(currentUserId.value);
+      if (typeof item.bookmarksCount === "number") {
+        item.bookmarksCount = item.bookmarksCount + 1;
+      } else {
+        item.bookmarksCount = item.bookmarksList.length;
+      }
+      item.isBookmarked = true;
     }
 
     try {
@@ -309,18 +345,25 @@ export function useJobFeeds() {
       });
 
       const idxNow = item.bookmarksList.indexOf(currentUserId.value);
-      if (res.bookmarked) {
+      if (res?.bookmarked) {
         if (idxNow === -1) {
           item.bookmarksList.push(currentUserId.value);
         }
-      } else {
+        item.isBookmarked = true;
+      } else if (res?.bookmarked === false) {
         if (idxNow !== -1) {
           item.bookmarksList.splice(idxNow, 1);
         }
+        item.isBookmarked = false;
+      }
+      if (typeof res?.bookmarksCount === "number") {
+        item.bookmarksCount = res.bookmarksCount;
       }
     } catch (e) {
       console.error("Error toggling bookmark:", e);
       item.bookmarksList = originalBookmarksList;
+      item.bookmarksCount = originalBookmarksCount;
+      item.isBookmarked = originalIsBookmarked;
     }
   };
 

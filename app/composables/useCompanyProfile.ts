@@ -363,27 +363,43 @@ export const useCompanyProfile = () => {
 
   const toggleLike = async (postId: string) => {
     if (!currentUserId.value) return;
+
+    const targetPost = allCompanyPosts.value.find((p) => p.uniqueId === postId);
+    const targetBookmark = allCompanyBookmarkedPosts.value.find(
+      (p) => p.uniqueId === postId,
+    );
+    [targetPost, targetBookmark].forEach((target) => {
+      if (target) {
+        if (!target.likesList) target.likesList = [];
+        const idx = target.likesList.indexOf(currentUserId.value);
+        if (idx !== -1) {
+          target.likesList.splice(idx, 1);
+          if (typeof target.likesCount === "number") {
+            target.likesCount = Math.max(0, target.likesCount - 1);
+          }
+          target.isLiked = false;
+        } else {
+          target.likesList.push(currentUserId.value);
+          if (typeof target.likesCount === "number") {
+            target.likesCount = target.likesCount + 1;
+          } else {
+            target.likesCount = target.likesList.length;
+          }
+          target.isLiked = true;
+        }
+        target.likes = target.likesList.length;
+      }
+    });
+
     try {
       const res = await $fetch<any>(`/api/posts/${postId}/like`, {
         method: "POST",
         body: { userUuid: currentUserId.value, userId: currentUserId.value },
       });
-      const targetPost = allCompanyPosts.value.find(
-        (p) => p.uniqueId === postId,
-      );
-      const targetBookmark = allCompanyBookmarkedPosts.value.find(
-        (p) => p.uniqueId === postId,
-      );
       [targetPost, targetBookmark].forEach((target) => {
-        if (target) {
-          if (res?.likesList) {
-            target.likesList = res.likesList;
-          } else {
-            if (!target.likesList) target.likesList = [];
-            const idx = target.likesList.indexOf(currentUserId.value);
-            if (idx !== -1) target.likesList.splice(idx, 1);
-            else target.likesList.push(currentUserId.value);
-          }
+        if (target && res?.likesList) {
+          target.likesList = res.likesList;
+          target.likes = target.likesList.length;
         }
       });
     } catch (e) {
@@ -393,27 +409,41 @@ export const useCompanyProfile = () => {
 
   const toggleBookmark = async (postId: string) => {
     if (!currentUserId.value) return;
+
+    const targetPost = allCompanyPosts.value.find((p) => p.uniqueId === postId);
+    const targetBookmark = allCompanyBookmarkedPosts.value.find(
+      (p) => p.uniqueId === postId,
+    );
+    [targetPost, targetBookmark].forEach((target) => {
+      if (target) {
+        if (!target.bookmarksList) target.bookmarksList = [];
+        const idx = target.bookmarksList.indexOf(currentUserId.value);
+        if (idx !== -1) {
+          target.bookmarksList.splice(idx, 1);
+          if (typeof target.bookmarksCount === "number") {
+            target.bookmarksCount = Math.max(0, target.bookmarksCount - 1);
+          }
+          target.isBookmarked = false;
+        } else {
+          target.bookmarksList.push(currentUserId.value);
+          if (typeof target.bookmarksCount === "number") {
+            target.bookmarksCount = target.bookmarksCount + 1;
+          } else {
+            target.bookmarksCount = target.bookmarksList.length;
+          }
+          target.isBookmarked = true;
+        }
+      }
+    });
+
     try {
       const res = await $fetch<any>(`/api/posts/${postId}/bookmark`, {
         method: "POST",
         body: { userUuid: currentUserId.value, userId: currentUserId.value },
       });
-      const targetPost = allCompanyPosts.value.find(
-        (p) => p.uniqueId === postId,
-      );
-      const targetBookmark = allCompanyBookmarkedPosts.value.find(
-        (p) => p.uniqueId === postId,
-      );
       [targetPost, targetBookmark].forEach((target) => {
-        if (target) {
-          if (res?.bookmarksList) {
-            target.bookmarksList = res.bookmarksList;
-          } else {
-            if (!target.bookmarksList) target.bookmarksList = [];
-            const idx = target.bookmarksList.indexOf(currentUserId.value);
-            if (idx !== -1) target.bookmarksList.splice(idx, 1);
-            else target.bookmarksList.push(currentUserId.value);
-          }
+        if (target && res?.bookmarksList) {
+          target.bookmarksList = res.bookmarksList;
         }
       });
     } catch (e) {
@@ -429,11 +459,22 @@ export const useCompanyProfile = () => {
     const idx = job.likesList.indexOf(currentUserId.value);
     if (idx !== -1) {
       job.likesList.splice(idx, 1);
+      if (typeof job.likesCount === "number") {
+        job.likesCount = Math.max(0, job.likesCount - 1);
+      }
+      job.isLiked = false;
     } else {
       job.likesList.push(currentUserId.value);
+      if (typeof job.likesCount === "number") {
+        job.likesCount = job.likesCount + 1;
+      } else {
+        job.likesCount = job.likesList.length;
+      }
+      job.isLiked = true;
       const dislikeIdx = job.dislikesList.indexOf(currentUserId.value);
       if (dislikeIdx !== -1) job.dislikesList.splice(dislikeIdx, 1);
     }
+    job.likes = job.likesList.length;
 
     try {
       await $fetch(`/api/jobs/${job.id}/like`, {
@@ -452,8 +493,18 @@ export const useCompanyProfile = () => {
     const idx = job.bookmarksList.indexOf(currentUserId.value);
     if (idx !== -1) {
       job.bookmarksList.splice(idx, 1);
+      if (typeof job.bookmarksCount === "number") {
+        job.bookmarksCount = Math.max(0, job.bookmarksCount - 1);
+      }
+      job.isBookmarked = false;
     } else {
       job.bookmarksList.push(currentUserId.value);
+      if (typeof job.bookmarksCount === "number") {
+        job.bookmarksCount = job.bookmarksCount + 1;
+      } else {
+        job.bookmarksCount = job.bookmarksList.length;
+      }
+      job.isBookmarked = true;
     }
 
     try {
