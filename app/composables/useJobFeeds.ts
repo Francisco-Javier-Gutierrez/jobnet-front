@@ -104,7 +104,10 @@ export function useJobFeeds() {
   // Load Posts from API
   const loadPosts = async () => {
     try {
-      const data = await $fetch<any[]>("/api/posts");
+      const config = useRuntimeConfig();
+      const baseUrl = config.public.apiUrl || "";
+      const targetUrl = baseUrl ? `${baseUrl}/posts` : "/api/posts";
+      const data = await $fetch<any[]>(targetUrl);
       postsList.value = data;
     } catch (error) {
       console.error("Error loading posts:", error);
