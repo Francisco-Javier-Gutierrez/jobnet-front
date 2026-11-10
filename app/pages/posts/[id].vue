@@ -266,7 +266,10 @@ const isSubmittingReply = ref(false);
 // Load post details from localStorage
 const loadPost = async () => {
   try {
-    const list = await $fetch<any[]>("/api/posts");
+    const config = useRuntimeConfig();
+    const baseUrl = config.public.apiUrl || "";
+    const targetUrl = baseUrl ? `${baseUrl}/posts` : "/api/posts";
+    const list = await $fetch<any[]>(targetUrl);
     post.value = list.find((p: any) => p.uniqueId === postId) || null;
   } catch (error) {
     console.error("Error loading post:", error);
