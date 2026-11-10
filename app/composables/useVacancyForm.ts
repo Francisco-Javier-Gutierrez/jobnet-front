@@ -472,12 +472,32 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
           : undefined,
       };
 
+      const token =
+        (session.value as any)?.idToken ||
+        (session.value as any)?.accessToken ||
+        "";
+      const userId =
+        session.value.user.id || (session.value?.user as any)?.sub || "";
+      const userRole =
+        (session.value?.user as any)?.role ||
+        (session.value?.user as any)?.tipoUsuario ||
+        "ORGANIZACION";
+
+      const reqHeaders: Record<string, string> = {
+        "x-user-id": userId,
+        "x-user-role": userRole,
+      };
+      if (token) {
+        reqHeaders.Authorization = `Bearer ${token}`;
+      }
+
       let response;
       if (options.isEdit && route.params.id) {
         response = await $fetch<any>(
           `${config.public.apiUrl}/jobs/${route.params.id}`,
           {
             method: "PUT",
+            headers: reqHeaders,
             body: payload,
           },
         );
@@ -487,6 +507,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
       } else {
         response = await $fetch<any>(`${config.public.apiUrl}/jobs`, {
           method: "POST",
+          headers: reqHeaders,
           body: payload,
         });
         if (response) {

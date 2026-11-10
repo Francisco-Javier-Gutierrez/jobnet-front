@@ -355,6 +355,20 @@ onMounted(() => {
   fetchVacancies();
 });
 
+const getAuthHeaders = () => {
+  const token =
+    (session.value as any)?.idToken ||
+    (session.value as any)?.accessToken ||
+    "";
+  const userId = companyId.value;
+  const headers: Record<string, string> = {
+    "x-user-id": userId,
+    "x-user-role": (session.value?.user as any)?.role || "ORGANIZACION",
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+};
+
 const deleteJob = async (id: string) => {
   if (
     !confirm(
@@ -366,6 +380,7 @@ const deleteJob = async (id: string) => {
   try {
     await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
       method: "DELETE",
+      headers: getAuthHeaders(),
     });
     // Remove from local list
     vacancies.value = vacancies.value.filter((j) => j.id !== id);
@@ -379,6 +394,7 @@ const togglePause = async (id: string, nuevoEstado: string) => {
   try {
     await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
       method: "PUT",
+      headers: getAuthHeaders(),
       body: { estado: nuevoEstado, empresaUuid: companyId.value },
     });
     const job = vacancies.value.find((j) => j.id === id);

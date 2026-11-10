@@ -257,22 +257,24 @@
         </button>
 
         <!-- Nota de Seguridad sobre Segregación de Roles -->
-        <div class="mt-2 text-center px-1">
+        <div class="mt-2.5 text-center px-1">
           <p
-            class="text-[11px] text-on-surface-variant/85 dark:text-slate-400 leading-tight"
+            class="text-[11px] text-on-surface-variant/85 dark:text-slate-400 leading-normal"
           >
             <span
-              class="inline-flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400"
+              class="inline-flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400 align-middle"
             >
               <span
-                class="material-symbols-outlined text-[13px]"
+                class="material-symbols-outlined text-[13px] leading-none select-none shrink-0"
                 aria-hidden="true"
                 >shield</span
               >
-              Acceso exclusivo como Candidato:
+              <span>Acceso exclusivo como Candidato:</span>
             </span>
-            Cuentas de Administrador, Moderador u Organización deben ingresar
-            con correo y contraseña.
+            <span class="align-middle ml-1">
+              Cuentas de Administrador, Moderador u Organización deben ingresar
+              con correo y contraseña.
+            </span>
           </p>
         </div>
       </form>
