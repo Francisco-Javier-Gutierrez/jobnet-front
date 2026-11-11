@@ -137,4 +137,31 @@ describe("useAppNavigation", () => {
       expect(fraudItem?.label).toBe("Reportes de Fraude");
     });
   });
+
+  describe("primaryAction per role", () => {
+    it("should show 'Crear Nuevo recurso' for organization role", () => {
+      mockAuthData.value = {
+        user: {
+          id: "org-1",
+          name: "Acme Corp",
+          tipoUsuario: "EMPRESA",
+        },
+      };
+      const { primaryAction } = useAppNavigation();
+      expect(primaryAction.value?.label).toBe("Crear Nuevo recurso");
+      expect(primaryAction.value?.to).toBe("/create");
+    });
+
+    it("should show 'Crear Publicación' for candidate role", () => {
+      mockAuthData.value = {
+        user: {
+          id: "cand-1",
+          name: "Dev Candidate",
+          tipoUsuario: "CANDIDATO",
+        },
+      };
+      const { primaryAction } = useAppNavigation();
+      expect(primaryAction.value?.label).toBe("Crear Publicación");
+    });
+  });
 });
