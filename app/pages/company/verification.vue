@@ -107,7 +107,7 @@ const handleVerificationRequest = async () => {
   }
   submittingVerification.value = true;
   try {
-    await $fetch(`${config.public.apiUrl}/profile/${companyId.value}`, {
+    await apiFetch(`/profile/${companyId.value}`, {
       method: "POST",
       body: {
         taxId: taxId.value,

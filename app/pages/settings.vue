@@ -225,13 +225,8 @@ onMounted(async () => {
   catalogStore.fetchCatalog();
   if (session.value?.user?.id) {
     try {
-      const config = useRuntimeConfig();
-      const apiBase =
-        config.public.apiBase ||
-        "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
-      const res = await fetch(`${apiBase}/profile/${session.value.user.id}`);
-      if (res.ok) {
-        const profile = await res.json();
+      const profile = await apiFetch<any>(`/profile/${session.value.user.id}`);
+      if (profile) {
         formData.value.name =
           profile.nombre || profile.name || session.value.user.name || "";
         formData.value.tituloProfesional =
@@ -288,10 +283,6 @@ async function saveProfile() {
 
   try {
     const userId = session.value?.user?.id || "anonymous";
-    const config = useRuntimeConfig();
-    const apiBase =
-      config.public.apiBase ||
-      "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
 
     const payload = {
       nombre: formData.value.name,
@@ -320,39 +311,34 @@ async function saveProfile() {
       lng: formData.value.lng,
     };
 
-    const res = await fetch(`${apiBase}/profile/${userId}`, {
+    await apiFetch(`/profile/${userId}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: payload,
     });
 
-    if (res.ok) {
-      showFeedback({
-        type: "success",
-        title: "Perfil Actualizado",
-        message:
-          "Tus datos personales y profesionales han sido guardados exitosamente.",
-        autoCloseTimeout: 3500,
-        onClose: () => {
-          navigateTo("/profile");
-        },
-      });
+    showFeedback({
+      type: "success",
+      title: "Perfil Actualizado",
+      message:
+        "Tus datos personales y profesionales han sido guardados exitosamente.",
+      autoCloseTimeout: 3500,
+      onClose: () => {
+        navigateTo("/profile");
+      },
+    });
 
-      const { setProfilePic } = useProfileState();
-      setProfilePic(formData.value.fotoPerfil);
+    const { setProfilePic } = useProfileState();
+    setProfilePic(formData.value.fotoPerfil);
 
-      // Explicitly clear Nuxt cache for this profile to fetch fresh data on redirect
-      clearNuxtData(`candidate-profile-${userId}`);
-      clearNuxtData(); // Fallback to clear all payload caches if needed
+    // Explicitly clear Nuxt cache for this profile to fetch fresh data on redirect
+    clearNuxtData(`candidate-profile-${userId}`);
+    clearNuxtData(); // Fallback to clear all payload caches if needed
 
-      discardDraft();
-    } else {
-      throw new Error("No se pudo guardar la información en el servidor.");
-    }
+    discardDraft();
   } catch (err: any) {
     showError(
       "Error al Guardar Perfil",
-      err.message || "Error al actualizar perfil.",
+      err?.data?.error || err.message || "Error al actualizar perfil.",
       null,
     );
   } finally {

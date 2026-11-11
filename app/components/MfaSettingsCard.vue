@@ -276,7 +276,7 @@ const disableMfa = async () => {
     }
 
     // 2. Disable in DynamoDB profile
-    await $fetch<any>(`${config.public.apiUrl}/profile/${props.userId}`, {
+    await apiFetch(`/profile/${props.userId}`, {
       method: "POST",
       body: {
         mfaConfigured: false,
