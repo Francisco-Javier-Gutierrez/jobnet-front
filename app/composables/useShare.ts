@@ -87,6 +87,7 @@ export function useShare() {
 
   /**
    * Shares a publication/post link using the dynamic browser origin.
+   * Optimistically increments sharesCount by exactly 1 and registers the share in the backend.
    */
   const sharePost = async (post: any) => {
     const id = post?.uniqueId || post?.id;
@@ -94,10 +95,21 @@ export function useShare() {
     const origin = getOrigin();
     const fullUrl = `${origin}/posts/${id}`;
     await shareUrl(fullUrl, "Enlace de la publicación copiado al portapapeles");
+
+    if (post && typeof post === "object") {
+      post.sharesCount = (post.sharesCount || 0) + 1;
+    }
+
+    try {
+      await $fetch(`/api/posts/${id}/share`, { method: "POST" });
+    } catch (error) {
+      console.error("Error sharing post:", error);
+    }
   };
 
   /**
    * Shares a vacancy/job link using the dynamic browser origin.
+   * Optimistically increments sharesCount by exactly 1 and registers the share in the backend.
    */
   const shareJob = async (job: any) => {
     const id = job?.id || job?.uniqueId;
@@ -105,6 +117,16 @@ export function useShare() {
     const origin = getOrigin();
     const fullUrl = `${origin}/jobs/${id}`;
     await shareUrl(fullUrl, "Enlace de la vacante copiado al portapapeles");
+
+    if (job && typeof job === "object") {
+      job.sharesCount = (job.sharesCount || 0) + 1;
+    }
+
+    try {
+      await $fetch(`/api/jobs/${id}/share`, { method: "POST" });
+    } catch (error) {
+      console.error("Error sharing job:", error);
+    }
   };
 
   return {

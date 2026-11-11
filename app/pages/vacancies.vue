@@ -785,21 +785,8 @@ const toggleJobBookmark = async (job: any) => {
   }
 };
 
-const shareJobAction = async (job: any) => {
-  job.sharesCount = (job.sharesCount || 0) + 1;
-  try {
-    await $fetch(`/api/jobs/${job.id}/share`, {
-      method: "POST",
-      body: {},
-    });
-  } catch (e) {
-    // Silently ignore errors
-  }
-};
-
-const handleShareJob = (job: any) => {
-  shareJob(job);
-  shareJobAction(job);
+const handleShareJob = async (job: any) => {
+  await shareJob(job);
 };
 
 const handleClickOutside = (e: MouseEvent) => {
