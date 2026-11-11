@@ -429,11 +429,6 @@ const handleShareClick = (e: Event) => {
     isSharedLocally.value = true;
   }
 
-  // Optimistic UI increment for shares
-  if (props.post) {
-    props.post.sharesCount = (props.post.sharesCount || 0) + 1;
-  }
-
   emit("share", props.post);
 };
 

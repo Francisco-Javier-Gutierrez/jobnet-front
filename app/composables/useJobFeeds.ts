@@ -454,29 +454,11 @@ export function useJobFeeds() {
   };
 
   const handleSharePost = async (post: any) => {
-    sharePost(post);
-    const id = post?.uniqueId || post?.id;
-    if (!id) return;
-
-    post.sharesCount = (post.sharesCount || 0) + 1;
-    try {
-      await $fetch(`/api/posts/${id}/share`, { method: "POST" });
-    } catch (error) {
-      console.error("Error sharing post:", error);
-    }
+    await sharePost(post);
   };
 
   const handleShareJob = async (job: any) => {
-    shareJob(job);
-    const id = job?.uniqueId || job?.id;
-    if (!id) return;
-
-    job.sharesCount = (job.sharesCount || 0) + 1;
-    try {
-      await $fetch(`/api/jobs/${id}/share`, { method: "POST" });
-    } catch (error) {
-      console.error("Error sharing job:", error);
-    }
+    await shareJob(job);
   };
 
   interface CommentItem {

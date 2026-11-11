@@ -250,7 +250,6 @@ const showReportModal = ref(false);
 
 const { status, data: session } = useAuth();
 const { openProtectedModal } = useProtectedAction();
-const { shareJob } = useShare();
 const router = useRouter();
 
 const isSharedLocally = ref(false);
@@ -442,7 +441,6 @@ const handleLikeClick = (e: Event) => {
 
 const handleShareClick = (e: Event) => {
   e.stopPropagation();
-  shareJob(props.job);
 
   if (process.client) {
     const currentUserId =
@@ -459,11 +457,6 @@ const handleShareClick = (e: Event) => {
       );
     }
     isSharedLocally.value = true;
-  }
-
-  // Optimistic UI increment for shares
-  if (props.job) {
-    props.job.sharesCount = (props.job.sharesCount || 0) + 1;
   }
 
   emit("share", props.job);
