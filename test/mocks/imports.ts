@@ -48,3 +48,24 @@ export const useAppFeedback = (...args: any[]) =>
   (globalThis as any).useAppFeedback
     ? (globalThis as any).useAppFeedback(...args)
     : { showError: () => {}, showSuccess: () => {}, showInfo: () => {} };
+
+export const apiFetch = (...args: any[]) =>
+  (globalThis as any).apiFetch
+    ? (globalThis as any).apiFetch(...args)
+    : (globalThis as any).$fetch
+      ? (globalThis as any).$fetch(...args)
+      : Promise.resolve({});
+
+export const useApiClient = () => ({
+  apiFetch,
+  apiClient: {
+    get: apiFetch,
+    post: apiFetch,
+    put: apiFetch,
+    patch: apiFetch,
+    delete: apiFetch,
+  },
+  getAuthHeaders: () => ({}),
+  resolveApiUrl: (url: string) => url,
+  apiUrl: "https://api.jobnet.test",
+});

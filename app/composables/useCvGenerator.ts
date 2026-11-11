@@ -2,6 +2,7 @@ import type { CandidateProfile } from "~/types/candidate";
 import type { CvData, CvOptions, CvTemplateId, CvColorTheme } from "~/types/cv";
 import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import { apiFetch } from "~/composables/useApiClient";
 
 export const CV_COLOR_THEMES: CvColorTheme[] = [
   {
@@ -376,7 +377,7 @@ export function useCvGenerator() {
 
       if (uploadRes.success && uploadRes.url) {
         statusMessage.value = "Actualizando perfil...";
-        await $fetch(`${config.public.apiUrl}/profile/${userId}`, {
+        await apiFetch(`/profile/${userId}`, {
           method: "POST",
           body: {
             cvUrl: uploadRes.url,

@@ -395,32 +395,29 @@ const handleSave = async () => {
   if (!companyId.value) return;
   saving.value = true;
   try {
-    const response = await $fetch(
-      `${config.public.apiUrl}/profile/${companyId.value}`,
-      {
-        method: "POST",
-        body: {
-          nombre: nombreComercial.value,
-          nombreComercial: nombreComercial.value,
-          sector: sector.value,
-          biografia: descripcion.value,
-          descripcion: descripcion.value,
-          mision: mision.value,
-          vision: vision.value,
-          beneficios: beneficios.value,
-          culturaLaboral: beneficios.value,
-          fotoPerfil: fotoPerfil.value,
-          documentosCorporativos: documentosCorporativos.value,
-          ubicacion: {
-            lat: latitude.value,
-            lng: longitude.value,
-            name: locationName.value,
-          },
-          taxId: taxId.value,
-          enlacesWeb: { website: website.value, linkedin: linkedin.value },
+    const response = await apiFetch(`/profile/${companyId.value}`, {
+      method: "POST",
+      body: {
+        nombre: nombreComercial.value,
+        nombreComercial: nombreComercial.value,
+        sector: sector.value,
+        biografia: descripcion.value,
+        descripcion: descripcion.value,
+        mision: mision.value,
+        vision: vision.value,
+        beneficios: beneficios.value,
+        culturaLaboral: beneficios.value,
+        fotoPerfil: fotoPerfil.value,
+        documentosCorporativos: documentosCorporativos.value,
+        ubicacion: {
+          lat: latitude.value,
+          lng: longitude.value,
+          name: locationName.value,
         },
+        taxId: taxId.value,
+        enlacesWeb: { website: website.value, linkedin: linkedin.value },
       },
-    );
+    });
 
     if (response) {
       if (process.client) {
@@ -469,7 +466,7 @@ const handleVerificationRequest = async () => {
   }
   submittingVerification.value = true;
   try {
-    await $fetch(`${config.public.apiUrl}/profile/${companyId.value}`, {
+    await apiFetch(`/profile/${companyId.value}`, {
       method: "POST",
       body: {
         taxId: taxId.value,
