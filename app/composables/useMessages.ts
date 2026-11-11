@@ -196,6 +196,7 @@ export const useMessages = () => {
         id: targetId,
         jobId,
         candidateId,
+        companyId: jobDetail?.empresaUuid || jobDetail?.companyId || "",
         name: conversationName,
         jobTitle: jobDetail?.title || jobDetail?.titulo || "Vacante",
         status: "En Contacto",
@@ -253,6 +254,7 @@ export const useMessages = () => {
             id: `${app.jobId}#${userId.value}`,
             jobId: app.jobId,
             candidateId: userId.value,
+            companyId: job?.empresaUuid || job?.companyId || "",
             name: job?.company || job?.nombreEmpresa || "Organización",
             jobTitle: job?.title || job?.titulo || "Vacante",
             status: statusMap[app.status] || app.status || "Pendiente",
@@ -290,6 +292,7 @@ export const useMessages = () => {
               id: `${job.id}#${app.candidateId}`,
               jobId: job.id,
               candidateId: app.candidateId,
+              companyId: job.empresaUuid || job.companyId || userId.value,
               name:
                 profile.nombre ||
                 profile.name ||

@@ -62,6 +62,17 @@
         >
           Organizaciones
         </button>
+        <button
+          @click="activeTab = 'CHAT'"
+          :class="[
+            'px-3 py-1.5 text-xs font-semibold rounded-md transition',
+            activeTab === 'CHAT'
+              ? 'bg-primary text-white'
+              : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-low',
+          ]"
+        >
+          Chats
+        </button>
       </div>
     </div>
 
@@ -145,7 +156,9 @@
                   ? "Vacante"
                   : inc.targetType === "ORGANIZACION"
                     ? "Organización"
-                    : "Contenido"
+                    : inc.targetType === "CHAT"
+                      ? "Conversación"
+                      : "Contenido"
             }}: {{ inc.targetTitle || inc.jobTitle }}
           </h3>
           <p class="text-xs text-primary font-semibold mb-2">
@@ -191,6 +204,7 @@
           <template
             v-if="
               inc.targetType === 'VACANTE' ||
+              inc.targetType === 'CHAT' ||
               inc.jobId ||
               isSeriousInfraction(inc.infraccion)
             "

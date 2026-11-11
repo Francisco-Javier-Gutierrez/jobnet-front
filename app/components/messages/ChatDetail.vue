@@ -27,6 +27,19 @@
             </p>
           </div>
         </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            @click="isReportModalOpen = true"
+            class="px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition flex items-center gap-1.5 text-xs font-semibold cursor-pointer border border-transparent hover:border-rose-200 dark:hover:border-rose-900/50"
+            title="Reportar esta conversación ante moderación"
+            aria-label="Reportar conversación"
+          >
+            <span class="material-symbols-outlined text-base">flag</span>
+            <span class="hidden sm:inline">Reportar</span>
+          </button>
+        </div>
       </div>
 
       <!-- Chat messages area -->
@@ -442,10 +455,29 @@
         </div>
       </div>
     </div>
+
+    <!-- Report Modal for Dispute / Chat Audit -->
+    <ReportModal
+      v-if="activeChat"
+      :is-open="isReportModalOpen"
+      target-type="CHAT"
+      :target-id="`${activeChat.jobId}#${activeChat.candidateId}`"
+      :target-title="`Conversación con ${activeChat.name} (${activeChat.jobTitle})`"
+      :job-id="activeChat.jobId"
+      :job-title="activeChat.jobTitle"
+      :candidate-id="activeChat.candidateId"
+      :candidate-name="activeChat.name"
+      :company-id="activeChat.companyId"
+      :company-name="activeChat.name"
+      @close="isReportModalOpen = false"
+      @submitted="onReportSubmitted"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import ReportModal from "~/components/ReportModal.vue";
+import { useAppFeedback } from "~/composables/useAppFeedback";
 import type { ChatConversation, ChatMessage } from "~/types";
 import type {
   StagedFile,
@@ -510,6 +542,16 @@ const isChatClosed = computed(() => {
     "APROBADO",
   ].includes(status);
 });
+
+const isReportModalOpen = ref(false);
+const { showSuccess } = useAppFeedback();
+
+const onReportSubmitted = () => {
+  showSuccess(
+    "Reporte Registrado",
+    "La conversación ha sido reportada ante el equipo de moderación para su auditoría.",
+  );
+};
 </script>
 
 <style scoped>

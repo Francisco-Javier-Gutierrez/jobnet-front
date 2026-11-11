@@ -93,9 +93,15 @@
 <script setup lang="ts">
 const props = defineProps<{
   isOpen: boolean;
-  targetType: "POST" | "VACANTE" | "ORGANIZACION" | "EMPRESA";
+  targetType: "POST" | "VACANTE" | "ORGANIZACION" | "EMPRESA" | "CHAT";
   targetId: string;
   targetTitle?: string;
+  jobId?: string;
+  jobTitle?: string;
+  candidateId?: string;
+  candidateName?: string;
+  companyId?: string;
+  companyName?: string;
 }>();
 
 const emit = defineEmits<{
@@ -106,9 +112,9 @@ const emit = defineEmits<{
 const config = useRuntimeConfig();
 const { data: authSession } = useAuth();
 
-const reason = ref("Contenido Inapropiado / Ofensivo");
 const comments = ref("");
-const reasonOptions = [
+
+const defaultReasons = [
   "Contenido Inapropiado / Ofensivo",
   "Fraude, Estafa o Publicación Falsa",
   "Spam o Publicidad No Deseada",
@@ -117,6 +123,31 @@ const reasonOptions = [
   "Discrepancia Salarial / Oferta Engañosa",
   "Otro",
 ];
+
+const chatReasons = [
+  "Fraude o Solicitud de Pagos Indebidos",
+  "Discrepancia Salarial o Condiciones Engañosas",
+  "Acoso u Hostigamiento",
+  "Discriminación o Lenguaje Ofensivo",
+  "Spam o Enlaces No Autorizados",
+  "Otro",
+];
+
+const reasonOptions = computed(() => {
+  return props.targetType === "CHAT" ? chatReasons : defaultReasons;
+});
+
+const reason = ref(
+  props.targetType === "CHAT" ? chatReasons[0] : defaultReasons[0],
+);
+
+watch(
+  () => props.targetType,
+  (newType) => {
+    reason.value = newType === "CHAT" ? chatReasons[0] : defaultReasons[0];
+  },
+);
+
 const isSubmitting = ref(false);
 const submittedSuccess = ref(false);
 
@@ -129,6 +160,8 @@ const targetLabel = computed(() => {
     case "ORGANIZACION":
     case "EMPRESA":
       return "Organización";
+    case "CHAT":
+      return "Conversación";
     default:
       return "Contenido";
   }
@@ -150,28 +183,56 @@ const submitReport = async () => {
       authSession.value?.user?.id ||
       "Usuario Registrado";
 
+    const token =
+      (authSession.value as any)?.idToken ||
+      (authSession.value as any)?.accessToken ||
+      (authSession.value as any)?.token ||
+      "";
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const rUpper = reason.value.toUpperCase();
+    const isSerious =
+      rUpper.includes("FRAUDE") ||
+      rUpper.includes("SALARIO") ||
+      rUpper.includes("DISCREPANCIA") ||
+      rUpper.includes("ACOSO") ||
+      rUpper.includes("DISCRIMINACION");
+    const severity =
+      isSerious || props.targetType === "CHAT" ? "alta" : "media";
+
     await $fetch(`${config.public.apiUrl}/moderator/incidents`, {
       method: "POST",
+      headers,
       body: {
         targetType: props.targetType,
         targetId: props.targetId,
         targetTitle: props.targetTitle || "",
         postId: props.targetType === "POST" ? props.targetId : undefined,
         postTitle: props.targetType === "POST" ? props.targetTitle : undefined,
-        jobId: props.targetType === "VACANTE" ? props.targetId : undefined,
+        jobId:
+          props.targetType === "VACANTE"
+            ? props.targetId
+            : props.jobId || undefined,
         jobTitle:
-          props.targetType === "VACANTE" ? props.targetTitle : undefined,
+          props.targetType === "VACANTE"
+            ? props.targetTitle
+            : props.jobTitle || undefined,
+        candidateId: props.candidateId || undefined,
+        candidateName: props.candidateName || undefined,
         companyId:
           props.targetType === "ORGANIZACION" || props.targetType === "EMPRESA"
             ? props.targetId
-            : undefined,
+            : props.companyId || undefined,
         companyName:
           props.targetType === "ORGANIZACION" || props.targetType === "EMPRESA"
             ? props.targetTitle
-            : undefined,
+            : props.companyName || undefined,
         reporter,
         reason: `${reason.value}: ${comments.value.trim()}`,
-        severity: "media",
+        severity,
         infraccion: reason.value,
       },
     });

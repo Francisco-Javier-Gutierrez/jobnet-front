@@ -27,6 +27,7 @@ export interface ChatConversation {
   id: string;
   jobId: string;
   candidateId: string;
+  companyId?: string;
   name: string;
   avatar?: string;
   jobTitle: string;
