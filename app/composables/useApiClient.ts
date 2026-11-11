@@ -53,9 +53,6 @@ export function getAuthHeaders(
     if (role) {
       headers["x-user-role"] = String(role);
     }
-    if (email) {
-      headers["x-user-email"] = String(email);
-    }
   }
 
   if (customHeaders) {

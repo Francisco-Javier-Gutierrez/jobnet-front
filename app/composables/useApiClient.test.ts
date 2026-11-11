@@ -49,13 +49,12 @@ describe("useApiClient Composable", () => {
   });
 
   describe("getAuthHeaders", () => {
-    it("should extract token, userId, role, and email from session", () => {
+    it("should extract token, userId, and role from session", () => {
       const headers = getAuthHeaders();
 
       expect(headers["Authorization"]).toBe("Bearer mock-id-token-12345");
       expect(headers["x-user-id"]).toBe("usr-candidate-99");
       expect(headers["x-user-role"]).toBe("CANDIDATO");
-      expect(headers["x-user-email"]).toBe("candidato@jobnet.com");
     });
 
     it("should handle session where properties are flat", () => {
@@ -65,7 +64,6 @@ describe("useApiClient Composable", () => {
             accessToken: "token-flat",
             userId: "u-flat",
             role: "ORGANIZACION",
-            email: "org@jobnet.com",
           },
         },
       }));
@@ -74,7 +72,6 @@ describe("useApiClient Composable", () => {
       expect(headers["Authorization"]).toBe("Bearer token-flat");
       expect(headers["x-user-id"]).toBe("u-flat");
       expect(headers["x-user-role"]).toBe("ORGANIZACION");
-      expect(headers["x-user-email"]).toBe("org@jobnet.com");
     });
 
     it("should return empty headers if unauthenticated or useAuth fails", () => {
@@ -188,7 +185,6 @@ describe("useApiClient Composable", () => {
             Authorization: "Bearer mock-id-token-12345",
             "x-user-id": "usr-candidate-99",
             "x-user-role": "CANDIDATO",
-            "x-user-email": "candidato@jobnet.com",
             "Content-Type": "application/json",
           }),
           body: { name: "Test User" },
