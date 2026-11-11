@@ -120,7 +120,7 @@ export const useAppNavigation = () => {
         return {
           to: "/create",
           icon: "add_circle",
-          label: "Publicar Oferta",
+          label: "Crear Nuevo recurso",
           protected: true,
         };
       case "admin":
