@@ -21,6 +21,39 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = (await readBody(event)) || {};
+  const config = useRuntimeConfig();
+
+  // 1. Forward to backend AWS Lambda / DynamoDB if apiUrl is configured
+  if (config.public?.apiUrl) {
+    const authHeader = getHeader(event, "authorization");
+    const userIdHeader = getHeader(event, "x-user-id");
+    const userRoleHeader = getHeader(event, "x-user-role");
+
+    const forwardHeaders: Record<string, string> = {};
+    if (authHeader) forwardHeaders["Authorization"] = authHeader;
+    if (userIdHeader) forwardHeaders["x-user-id"] = userIdHeader;
+    if (userRoleHeader) forwardHeaders["x-user-role"] = userRoleHeader;
+
+    try {
+      const backendRes = await $fetch<any>(
+        `${config.public.apiUrl}/profile/${candidateId}/cv-interaction`,
+        {
+          method: "POST",
+          body,
+          headers: forwardHeaders,
+        },
+      );
+      if (backendRes) {
+        return backendRes;
+      }
+    } catch (backendErr: any) {
+      console.warn(
+        "[Nitro cv-interaction] Backend forwarding returned error:",
+        backendErr?.message || backendErr,
+      );
+    }
+  }
+
   const action = (body.action || "VIEW").toUpperCase();
   const companyName = body.companyName || "Una organización reclutadora";
   const recruiterName = body.recruiterName || "";

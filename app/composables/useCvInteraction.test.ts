@@ -110,4 +110,31 @@ describe("useCvInteraction", () => {
     const result = await notifyCvInteraction("cand-789");
     expect(result).toEqual({ success: false });
   });
+
+  it("should forward authorization headers if session has idToken", async () => {
+    mockSession.value = {
+      user: {
+        id: "recruiter-123",
+        role: "ORGANIZACION",
+        name: "Admin Org",
+        companyName: "Org Corp",
+      },
+      idToken: "test-auth-token-xyz",
+    };
+    mockFetch.mockResolvedValue({ success: true, sentPush: true });
+    const { notifyCvInteraction } = useCvInteraction();
+
+    const result = await notifyCvInteraction("cand-999");
+    expect(result.success).toBe(true);
+    expect(mockFetch).toHaveBeenCalledWith(
+      "https://api.jobnet.test/profile/cand-999/cv-interaction",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer test-auth-token-xyz",
+          "x-user-id": "recruiter-123",
+          "x-user-role": "ORGANIZACION",
+        }),
+      }),
+    );
+  });
 });

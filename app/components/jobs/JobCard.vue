@@ -311,19 +311,46 @@ const salaryDisplay = computed(() => {
 // Likes count & state
 const likesList = computed<string[]>(() => {
   if (Array.isArray(props.job?.likesList)) return props.job.likesList;
+  if (Array.isArray((props.job as any)?.likedBy))
+    return (props.job as any).likedBy;
   return [];
 });
 
 const isLiked = computed(() => {
   if (props.isLiked !== undefined) return props.isLiked;
-  if (!props.currentUserId) return false;
-  return likesList.value.includes(props.currentUserId);
+
+  const authUser = session.value?.user as any;
+  const loggedEmail = authUser?.email?.toLowerCase();
+  const loggedId = authUser?.id ? String(authUser.id).toLowerCase() : "";
+  const passedUserId = props.currentUserId
+    ? String(props.currentUserId).toLowerCase()
+    : "";
+
+  const likes =
+    props.job?.likesList ||
+    (props.job as any)?.likedBy ||
+    (props.job as any)?.likes_list ||
+    [];
+
+  if (Array.isArray(likes) && likes.length > 0) {
+    const found = likes.some((item: unknown) => {
+      const s = String(item).toLowerCase();
+      return (
+        (passedUserId && s === passedUserId) ||
+        (loggedEmail && s === loggedEmail) ||
+        (loggedId && s === loggedId)
+      );
+    });
+    if (found) return true;
+  }
+
+  return Boolean((props.job as any)?.isLiked || (props.job as any)?.liked);
 });
 
 const likesCount = computed(() => {
-  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
   if (typeof props.job?.likesCount === "number") return props.job.likesCount;
   if (typeof props.job?.likes === "number") return props.job.likes;
+  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
   return likesList.value.length;
 });
 

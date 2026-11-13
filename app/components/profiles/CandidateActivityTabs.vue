@@ -48,7 +48,7 @@
       >
         No hay publicaciones para mostrar.
       </div>
-      <div v-else class="grid grid-cols-1 gap-4">
+      <div v-else class="max-w-xl mx-auto w-full space-y-4">
         <PostCard
           v-for="post in userPosts"
           :key="post.uniqueId"
@@ -176,7 +176,7 @@
               >Ofertas Laborales Guardadas ({{ bookmarkedJobs.length }})</span
             >
           </h4>
-          <div class="grid grid-cols-1 gap-4">
+          <div class="max-w-3xl mx-auto w-full space-y-4">
             <JobCard
               v-for="job in bookmarkedJobs"
               :key="job.id || job.uniqueId"
@@ -185,6 +185,7 @@
                 (authData?.user as any)?.id || authData?.user?.email || ''
               "
               :is-bookmarked="true"
+              :is-liked="job.isLiked"
               @navigate="(id) => $router.push(`/jobs/${id}`)"
               @like="$emit('like-job', $event)"
               @bookmark="$emit('bookmark-job', $event)"
@@ -209,7 +210,7 @@
             >
             <span>Publicaciones Guardadas ({{ bookmarkedPosts.length }})</span>
           </h4>
-          <div class="grid grid-cols-1 gap-4">
+          <div class="max-w-xl mx-auto w-full space-y-4">
             <PostCard
               v-for="post in bookmarkedPosts"
               :key="post.uniqueId"

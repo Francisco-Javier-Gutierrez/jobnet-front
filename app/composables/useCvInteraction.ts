@@ -1,3 +1,5 @@
+import { getAuthHeaders } from "./useApiClient";
+
 export interface CvInteractionOptions {
   action?: "VIEW" | "DOWNLOAD" | "OPEN";
   recruiterName?: string;
@@ -16,7 +18,7 @@ export function useCvInteraction() {
   const notifyCvInteraction = async (
     candidateId: string,
     options: CvInteractionOptions = {},
-  ): Promise<{ success: boolean; sentPush?: boolean }> => {
+  ): Promise<{ success: boolean; sentPush?: boolean; notifId?: string }> => {
     if (!candidateId) return { success: false };
 
     const action = options.action || "VIEW";
@@ -39,20 +41,24 @@ export function useCvInteraction() {
       timestamp: new Date().toISOString(),
     };
 
+    const authHeaders = getAuthHeaders();
+
     try {
-      // 1. Invocar endpoint local Nitro
+      // 1. Invocar endpoint local Nitro con cabeceras de autorización
       await $fetch(`/api/candidates/${candidateId}/cv-interaction`, {
         method: "POST",
         body: payload,
+        headers: authHeaders,
       }).catch(() => null);
 
-      // 2. Invocar backend en AWS Lambda / DynamoDB
+      // 2. Invocar backend en AWS Lambda / DynamoDB con cabeceras de autorización
       if (config.public?.apiUrl) {
         await $fetch(
           `${config.public.apiUrl}/profile/${candidateId}/cv-interaction`,
           {
             method: "POST",
             body: payload,
+            headers: authHeaders,
           },
         ).catch(() => null);
       }

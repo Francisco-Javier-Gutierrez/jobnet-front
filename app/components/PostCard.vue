@@ -453,8 +453,8 @@ const isLiked = computed(() => {
   const passedUserId = props.currentUserId?.toLowerCase();
 
   const likes = post.likesList || post.likedBy || post.likes_list || [];
-  if (Array.isArray(likes)) {
-    return likes.some((item: unknown) => {
+  if (Array.isArray(likes) && likes.length > 0) {
+    const foundInList = likes.some((item: unknown) => {
       const s = String(item).toLowerCase();
       return (
         (passedUserId && s === passedUserId) ||
@@ -462,6 +462,7 @@ const isLiked = computed(() => {
         (loggedId && s === String(loggedId).toLowerCase())
       );
     });
+    if (foundInList) return true;
   }
 
   return Boolean(post.isLiked);
@@ -480,7 +481,7 @@ const effectiveIsBookmarked = computed(() => {
 
   const bookmarks =
     post.bookmarksList || post.bookmarkedBy || post.bookmarks || [];
-  if (Array.isArray(bookmarks)) {
+  if (Array.isArray(bookmarks) && bookmarks.length > 0) {
     const foundInList = bookmarks.some((item: unknown) => {
       const s = String(item).toLowerCase();
       return (
@@ -496,9 +497,9 @@ const effectiveIsBookmarked = computed(() => {
 });
 
 const likesCount = computed(() => {
-  if (Array.isArray(props.post?.likesList)) return props.post.likesList.length;
   if (typeof props.post?.likesCount === "number") return props.post.likesCount;
   if (typeof props.post?.likes === "number") return props.post.likes;
+  if (Array.isArray(props.post?.likesList)) return props.post.likesList.length;
   return 0;
 });
 
