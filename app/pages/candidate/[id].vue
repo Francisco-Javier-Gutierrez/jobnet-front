@@ -84,7 +84,12 @@
     />
 
     <!-- Documents Horizontal Scroll -->
-    <CandidateDocumentsList :documents="documents" @open="openDocViewer" />
+    <CandidateDocumentsList
+      :documents="documents"
+      :candidate-id="isOwner ? undefined : candidateId"
+      :is-owner="isOwner"
+      @open="openDocViewer"
+    />
 
     <!-- Standardized Universal Document Viewer -->
     <AppDocumentViewer

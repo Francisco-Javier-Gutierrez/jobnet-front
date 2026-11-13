@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
   const action = (body.action || "VIEW").toUpperCase();
   const companyName = body.companyName || "Una organización reclutadora";
   const recruiterName = body.recruiterName || "";
-  const vacancyTitle = body.vacancyTitle || "una vacante activa";
+  const vacancyTitle = body.vacancyTitle || "";
 
   const recruiterEntity = recruiterName
     ? `${recruiterName} (${companyName})`
@@ -68,9 +68,14 @@ export default defineEventHandler(async (event) => {
     ? "Tu CV ha sido descargado"
     : "Tu CV ha sido visualizado";
 
+  const contextText =
+    vacancyTitle && vacancyTitle !== "Vacante seleccionada"
+      ? `para la vacante "${vacancyTitle}"`
+      : `desde tu perfil profesional`;
+
   const message = isDownload
-    ? `${recruiterEntity} ha descargado tu Currículum Vitae para la vacante "${vacancyTitle}".`
-    : `${recruiterEntity} acaba de abrir y visualizar tu Currículum Vitae para la vacante "${vacancyTitle}".`;
+    ? `${recruiterEntity} ha descargado tu Currículum Vitae ${contextText}.`
+    : `${recruiterEntity} acaba de abrir y visualizar tu Currículum Vitae ${contextText}.`;
 
   let sentPush = false;
 

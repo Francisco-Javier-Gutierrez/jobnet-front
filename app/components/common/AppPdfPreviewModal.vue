@@ -44,6 +44,7 @@
             :href="url"
             target="_blank"
             rel="noopener noreferrer"
+            @click="handleOpenExternal"
             class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition active:scale-95 shadow-sm"
             title="Abrir en pantalla completa / nueva pestaña"
           >
@@ -103,6 +104,7 @@
       <a
         :href="url"
         target="_blank"
+        @click="handleOpenExternal"
         class="px-2.5 py-1 bg-indigo-600 text-white font-bold text-[10px] rounded-lg shadow flex-shrink-0 flex items-center gap-1"
       >
         Ver Completo
@@ -196,6 +198,15 @@ const googleViewerUrl = computed(() => {
 });
 
 const isDownloading = ref(false);
+
+const handleOpenExternal = () => {
+  if (props.candidateId) {
+    notifyCvInteraction(props.candidateId, {
+      action: "OPEN",
+      vacancyTitle: props.vacancyTitle,
+    });
+  }
+};
 
 const triggerDirectDownload = async () => {
   if (!props.url || isDownloading.value) return;

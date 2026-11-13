@@ -21,8 +21,29 @@ export function useCvInteraction() {
   ): Promise<{ success: boolean; sentPush?: boolean; notifId?: string }> => {
     if (!candidateId) return { success: false };
 
-    const action = options.action || "VIEW";
     const recruiterUser = (session.value?.user as any) || {};
+    const rawRole = (
+      recruiterUser.tipoUsuario ||
+      recruiterUser.role ||
+      (session.value as any)?.tipoUsuario ||
+      ""
+    ).toUpperCase();
+
+    // Solo notificar si la interacción la realiza una ORGANIZACIÓN/EMPRESA
+    // Nunca notificar si es un CANDIDATO o si el usuario interactúa con su propio CV
+    const isCandidate = rawRole === "CANDIDATO";
+    const currentUserId =
+      recruiterUser.id || recruiterUser.uuid || recruiterUser.sub;
+    if (
+      isCandidate ||
+      (currentUserId &&
+        String(currentUserId).toLowerCase() ===
+          String(candidateId).toLowerCase())
+    ) {
+      return { success: false };
+    }
+
+    const action = options.action || "VIEW";
     const recruiterName =
       options.recruiterName || recruiterUser.name || recruiterUser.nombre || "";
     const companyName =
@@ -31,7 +52,7 @@ export function useCvInteraction() {
       recruiterUser.nombreComercial ||
       recruiterUser.empresa ||
       "Organización Reclutadora";
-    const vacancyTitle = options.vacancyTitle || "Vacante seleccionada";
+    const vacancyTitle = options.vacancyTitle || "";
 
     const payload = {
       action,

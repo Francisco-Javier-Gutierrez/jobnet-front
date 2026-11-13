@@ -1,5 +1,6 @@
 import { useRuntimeConfig } from "#imports";
 import type { ApplicantCandidate } from "~/types";
+import { apiClient } from "./useApiClient";
 
 const successMsg = ref("");
 const pendingCandidateItem = ref<ApplicantCandidate | null>(null);
@@ -54,14 +55,11 @@ export const useApplicantActions = () => {
   ) => {
     try {
       if (!candidate.id.startsWith("cand-demo")) {
-        await $fetch(
-          `${config.public.apiUrl}/applications/${candidate.jobId}/${candidate.id}/status`,
+        await apiClient.put(
+          `/applications/${candidate.jobId}/${candidate.id}/status`,
           {
-            method: "PUT",
-            body: {
-              status: backendStatus,
-              detallesEntrevista: details || null,
-            },
+            status: backendStatus,
+            detallesEntrevista: details || null,
           },
         );
       }
@@ -107,14 +105,11 @@ export const useApplicantActions = () => {
     const candidate = pendingCandidateItem.value;
     try {
       if (!candidate.id.startsWith("cand-demo")) {
-        await $fetch(
-          `${config.public.apiUrl}/applications/${candidate.jobId}/${candidate.id}/status`,
+        await apiClient.put(
+          `/applications/${candidate.jobId}/${candidate.id}/status`,
           {
-            method: "PUT",
-            body: {
-              status: "RECHAZADO",
-              motivoRechazo: rejectionReason.value,
-            },
+            status: "RECHAZADO",
+            motivoRechazo: rejectionReason.value,
           },
         );
       }
