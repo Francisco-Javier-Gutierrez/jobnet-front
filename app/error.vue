@@ -8,21 +8,20 @@
       <div
         class="w-20 h-20 bg-indigo-50 dark:bg-indigo-950/60 rounded-full flex items-center justify-center mx-auto text-indigo-600 dark:text-indigo-400"
       >
-        <span class="material-symbols-outlined text-4xl">search_off</span>
+        <span class="material-symbols-outlined text-4xl">{{ iconName }}</span>
       </div>
 
       <div class="space-y-2">
         <h1
           class="text-6xl font-black tracking-tight text-indigo-600 dark:text-indigo-400"
         >
-          404
+          {{ statusCode }}
         </h1>
         <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">
-          Página no encontrada
+          {{ title }}
         </h2>
         <p class="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
-          La dirección a la que intentas acceder no existe o no está disponible
-          en este momento.
+          {{ message }}
         </p>
       </div>
 
@@ -38,8 +37,33 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+
 const props = defineProps({
-  error: Object,
+  error: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+
+const statusCode = computed(() => Number(props.error?.statusCode) || 404);
+const is404 = computed(() => statusCode.value === 404);
+
+const iconName = computed(() => (is404.value ? "search_off" : "error"));
+
+const title = computed(() => {
+  if (is404.value) return "Página no encontrada";
+  return props.error?.statusMessage || "Ocurrió un error inesperado";
+});
+
+const message = computed(() => {
+  if (is404.value) {
+    return "La dirección a la que intentas acceder no existe o no está disponible en este momento.";
+  }
+  return (
+    props.error?.message ||
+    "Hemos registrado este inconveniente y estamos trabajando para solucionarlo."
+  );
 });
 
 const handleError = () => {

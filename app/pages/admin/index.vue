@@ -937,7 +937,9 @@ const handleSanctionFromAlert = (org: {
   }
 };
 
-const handleApplySanction = async (action: "FREEZE" | "SUSPEND" | "BAN") => {
+const handleApplySanction = async (
+  action: "INITIATE" | "CANCEL" | "CONFIRM" | any,
+) => {
   await applySanction(action);
 };
 </script>

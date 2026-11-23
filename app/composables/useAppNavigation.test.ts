@@ -144,7 +144,7 @@ describe("useAppNavigation", () => {
         user: {
           id: "org-1",
           name: "Acme Corp",
-          tipoUsuario: "EMPRESA",
+          tipoUsuario: "ORGANIZACION",
         },
       };
       const { primaryAction } = useAppNavigation();

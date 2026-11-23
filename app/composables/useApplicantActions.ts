@@ -114,7 +114,7 @@ export const useApplicantActions = () => {
         );
       }
       candidate.status = "RECHAZADO";
-      successMsg.value = `Postulante ${candidate.name} descartado con éxito. Se le ha enviado un correo automático.`;
+      successMsg.value = `Candidato ${candidate.name} descartado con éxito. Se le ha enviado un correo automático.`;
       setTimeout(() => (successMsg.value = ""), 4500);
     } catch (e) {
       console.error("Error rejecting candidate application:", e);

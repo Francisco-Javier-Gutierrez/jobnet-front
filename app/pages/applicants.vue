@@ -76,6 +76,7 @@
     </div>
 
     <CandidateModals />
+    <ApplicantsAiComparisonModal />
 
     <!-- Standardized ATS Applicant Document Viewer -->
     <AppDocumentViewer

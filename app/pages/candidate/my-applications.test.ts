@@ -168,4 +168,22 @@ describe("Historial de Solicitudes de Candidatos", () => {
       expect(getBadgeClass("Pretensión salarial")).toContain("bg-emerald-500");
     });
   });
+
+  describe("Restricción de Acceso por Rol", () => {
+    it("solo debe permitir acceso a usuarios con rol CANDIDATO", () => {
+      const isRoleAllowed = (role: string) => {
+        const normalized = (role || "").toUpperCase();
+        return normalized === "CANDIDATO";
+      };
+
+      expect(isRoleAllowed("CANDIDATO")).toBe(true);
+      expect(isRoleAllowed("candidato")).toBe(true);
+      expect(isRoleAllowed("POSTULANTE")).toBe(false);
+      expect(isRoleAllowed("EMPRESA")).toBe(false);
+      expect(isRoleAllowed("ORGANIZACION")).toBe(false);
+      expect(isRoleAllowed("MODERATOR")).toBe(false);
+      expect(isRoleAllowed("ADMIN")).toBe(false);
+      expect(isRoleAllowed("")).toBe(false);
+    });
+  });
 });

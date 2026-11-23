@@ -254,6 +254,15 @@ export function useCvGenerator() {
     isGenerating.value = true;
     statusMessage.value = "Generando PDF en formato Carta...";
 
+    const origScrollX = typeof window !== "undefined" ? window.scrollX : 0;
+    const origScrollY = typeof window !== "undefined" ? window.scrollY : 0;
+    if (
+      typeof window !== "undefined" &&
+      (window.scrollX !== 0 || window.scrollY !== 0)
+    ) {
+      window.scrollTo(0, 0);
+    }
+
     try {
       // Dynamic import to avoid SSR errors
       const html2pdfModule = await import("html2pdf.js");
@@ -276,10 +285,17 @@ export function useCvGenerator() {
           format: "letter", // 215.9mm x 279.4mm (8.5in x 11in)
           orientation: "portrait",
         },
-        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+        pagebreak: { mode: ["css", "legacy"] },
       };
 
-      let worker = html2pdf().set(opt).from(element).toPdf();
+      const printTarget =
+        element.matches && element.matches(".cv-letter-page")
+          ? element
+          : (element.querySelector &&
+              (element.querySelector(".cv-letter-page") as HTMLElement)) ||
+            element;
+
+      let worker = html2pdf().set(opt).from(printTarget).toPdf();
 
       if (pdfMeta) {
         worker = worker.get("pdf").then((pdf: any) => {
@@ -298,6 +314,12 @@ export function useCvGenerator() {
 
       return pdfBlob;
     } finally {
+      if (
+        typeof window !== "undefined" &&
+        (origScrollX !== 0 || origScrollY !== 0)
+      ) {
+        window.scrollTo(origScrollX, origScrollY);
+      }
       isGenerating.value = false;
       statusMessage.value = "";
     }

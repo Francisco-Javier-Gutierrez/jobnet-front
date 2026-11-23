@@ -52,11 +52,9 @@ export const useMessages = () => {
     const role = (userRole.value || "").toUpperCase();
     return (
       role === "ORGANIZACION" ||
-      role === "EMPRESA" ||
-      role === "COMPANY" ||
-      role === "ORGANIZATION" ||
       role === "ADMIN" ||
-      role === "MODERATOR"
+      role === "MODERATOR" ||
+      role === "MODERADOR"
     );
   });
 

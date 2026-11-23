@@ -40,7 +40,6 @@ export function useAdminOrganizations() {
       .filter(
         (p: any) =>
           p.tipoUsuario === "ORGANIZACION" ||
-          p.tipoUsuario === "EMPRESA" ||
           !p.tipoUsuario,
       )
       .map((p: any) => {

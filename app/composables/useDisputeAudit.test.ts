@@ -90,7 +90,7 @@ describe("useDisputeAudit Composable (Auditoría de Mensajería para Disputas)",
         },
         {
           id: "m2",
-          senderRole: "EMPRESA",
+          senderRole: "ORGANIZACION",
           text: "Solo ofrecemos $18,000 en el contrato adjunto.",
           attachmentUrl: "/docs/contrato.pdf",
           attachmentName: "contrato.pdf",
@@ -131,7 +131,7 @@ describe("useDisputeAudit Composable (Auditoría de Mensajería para Disputas)",
         auditState: "AUDIT_ACTIVE",
       };
 
-      const dictum = "SANCION_EMPRESA";
+      const dictum = "SANCION_ORGANIZACION";
       const notes = "Infracción comprobada en evidencia probatoria.";
 
       const concludedIncident = {
@@ -145,7 +145,7 @@ describe("useDisputeAudit Composable (Auditoría de Mensajería para Disputas)",
       };
 
       expect(concludedIncident.auditState).toBe("AUDIT_CONCLUDED");
-      expect(concludedIncident.auditDictum).toBe("SANCION_EMPRESA");
+      expect(concludedIncident.auditDictum).toBe("SANCION_ORGANIZACION");
       expect(concludedIncident.estatus).toBe("RESUELTO");
     });
   });
