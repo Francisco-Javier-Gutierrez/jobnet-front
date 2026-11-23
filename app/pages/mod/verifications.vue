@@ -137,22 +137,21 @@
 </template>
 
 <script setup lang="ts">
+import { apiFetch } from "~/composables/useApiClient";
+
 useSeoMeta({
   title: "Verificaciones Corporativas - JobNet",
   description:
     "Bandeja de verificación de documentos tributarios corporativos para moderadores",
 });
 
-const config = useRuntimeConfig();
 const requests = ref<any[]>([]);
 const loading = ref(true);
 
 const fetchRequests = async () => {
   loading.value = true;
   try {
-    const data = await $fetch<any[]>(
-      `${config.public.apiUrl}/moderator/verifications`,
-    );
+    const data = await apiFetch<any[]>("/moderator/verifications");
     requests.value = Array.isArray(data) ? data : [];
   } catch (e) {
     console.error("Error loading verification requests:", e);
@@ -168,15 +167,12 @@ onMounted(() => {
 
 const handleAction = async (companyId: string, approve: boolean) => {
   try {
-    await $fetch(
-      `${config.public.apiUrl}/moderator/verifications/${companyId}/resolve`,
-      {
-        method: "POST",
-        body: {
-          approve,
-        },
+    await apiFetch(`/moderator/verifications/${companyId}/resolve`, {
+      method: "POST",
+      body: {
+        approve,
       },
-    );
+    });
     requests.value = requests.value.filter((r) => r.companyId !== companyId);
   } catch (e) {
     console.error("Error updating company verification:", e);

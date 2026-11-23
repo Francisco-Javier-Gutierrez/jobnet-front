@@ -73,6 +73,9 @@ export interface Incident {
   auditDictumNotes?: string;
   supervisionStatus?: string;
   auditOpenedAt?: string;
+  assignedModeratorId?: string | null;
+  assignedModeratorName?: string | null;
+  assignedAt?: string | null;
 }
 
 export interface AuditLog {

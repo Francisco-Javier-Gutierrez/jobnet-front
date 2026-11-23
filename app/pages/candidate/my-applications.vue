@@ -419,6 +419,17 @@ const fetchApplications = async () => {
     return;
   }
 
+  const userRole = (
+    (session.value?.user as any)?.tipoUsuario ||
+    (session.value?.user as any)?.role ||
+    ""
+  ).toUpperCase();
+
+  if (userRole && userRole !== "CANDIDATO") {
+    router.push("/");
+    return;
+  }
+
   loading.value = true;
   try {
     const candidateId = session.value?.user?.id || "";

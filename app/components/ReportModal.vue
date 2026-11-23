@@ -93,7 +93,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   isOpen: boolean;
-  targetType: "POST" | "VACANTE" | "ORGANIZACION" | "EMPRESA" | "CHAT";
+  targetType: "POST" | "VACANTE" | "ORGANIZACION" | "CHAT";
   targetId: string;
   targetTitle?: string;
   jobId?: string;
@@ -158,7 +158,6 @@ const targetLabel = computed(() => {
     case "VACANTE":
       return "Vacante";
     case "ORGANIZACION":
-    case "EMPRESA":
       return "Organización";
     case "CHAT":
       return "Conversación";
@@ -223,11 +222,11 @@ const submitReport = async () => {
         candidateId: props.candidateId || undefined,
         candidateName: props.candidateName || undefined,
         companyId:
-          props.targetType === "ORGANIZACION" || props.targetType === "EMPRESA"
+          props.targetType === "ORGANIZACION"
             ? props.targetId
             : props.companyId || undefined,
         companyName:
-          props.targetType === "ORGANIZACION" || props.targetType === "EMPRESA"
+          props.targetType === "ORGANIZACION"
             ? props.targetTitle
             : props.companyName || undefined,
         reporter,

@@ -222,6 +222,20 @@
               <span class="material-symbols-outlined text-sm">forum</span>
               Apelar Decisión
             </button>
+            <NuxtLink
+              v-if="
+                notif.type === 'AUDIT_CHANNEL_SUPERVISED' ||
+                notif.type === 'AUDIT_RESOLVED' ||
+                notif.type === 'FORMAL_WARNING' ||
+                notif.type === 'INCIDENT_REPORTED' ||
+                notif.type === 'INCIDENT_UNDER_REVIEW'
+              "
+              to="/messages"
+              class="bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-sm">chat</span>
+              Ver Conversación
+            </NuxtLink>
             <button
               v-if="!notif.read"
               @click="markAsRead(notif.id)"
@@ -244,6 +258,8 @@
 </template>
 
 <script setup lang="ts">
+import { apiFetch } from "~/composables/useApiClient";
+
 useSeoMeta({
   title: "Notificaciones - JobNet",
   description:
@@ -259,7 +275,12 @@ interface NotificationItem {
     | "system"
     | "SUSPENSION_NOTICE"
     | "SUSPENSION_CANCELLED"
-    | "SUSPENSION_CONFIRMED";
+    | "SUSPENSION_CONFIRMED"
+    | "AUDIT_CHANNEL_SUPERVISED"
+    | "AUDIT_RESOLVED"
+    | "FORMAL_WARNING"
+    | "INCIDENT_REPORTED"
+    | "INCIDENT_UNDER_REVIEW";
   title: string;
   message: string;
   createdAt: string;
@@ -314,11 +335,19 @@ const getIconName = (type: NotificationItem["type"]) => {
     case "application":
       return "work";
     case "SUSPENSION_NOTICE":
+    case "FORMAL_WARNING":
       return "warning";
     case "SUSPENSION_CANCELLED":
       return "task_alt";
     case "SUSPENSION_CONFIRMED":
       return "block";
+    case "AUDIT_CHANNEL_SUPERVISED":
+    case "INCIDENT_UNDER_REVIEW":
+      return "policy";
+    case "INCIDENT_REPORTED":
+      return "flag";
+    case "AUDIT_RESOLVED":
+      return "gavel";
     default:
       return "info";
   }
@@ -333,11 +362,19 @@ const getIconBgClass = (type: NotificationItem["type"]) => {
     case "application":
       return "bg-tertiary/10 border border-tertiary/10 dark:bg-blue-950/40 dark:border-blue-900";
     case "SUSPENSION_NOTICE":
+    case "FORMAL_WARNING":
       return "bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-800";
     case "SUSPENSION_CANCELLED":
       return "bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-800";
     case "SUSPENSION_CONFIRMED":
       return "bg-rose-50 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-800";
+    case "AUDIT_CHANNEL_SUPERVISED":
+    case "INCIDENT_UNDER_REVIEW":
+      return "bg-indigo-50 border border-indigo-200 dark:bg-indigo-950/40 dark:border-indigo-800";
+    case "INCIDENT_REPORTED":
+      return "bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-800";
+    case "AUDIT_RESOLVED":
+      return "bg-purple-50 border border-purple-200 dark:bg-purple-950/40 dark:border-purple-800";
     default:
       return "bg-slate-50 border border-slate-100 dark:bg-slate-900 dark:border-slate-800";
   }
@@ -352,11 +389,19 @@ const getIconTextClass = (type: NotificationItem["type"]) => {
     case "application":
       return "text-tertiary dark:text-inverse-primary";
     case "SUSPENSION_NOTICE":
+    case "FORMAL_WARNING":
       return "text-amber-600 dark:text-amber-400";
     case "SUSPENSION_CANCELLED":
       return "text-emerald-600 dark:text-emerald-400";
     case "SUSPENSION_CONFIRMED":
       return "text-rose-600 dark:text-rose-400";
+    case "AUDIT_CHANNEL_SUPERVISED":
+    case "INCIDENT_UNDER_REVIEW":
+      return "text-indigo-600 dark:text-indigo-400";
+    case "INCIDENT_REPORTED":
+      return "text-amber-600 dark:text-amber-400";
+    case "AUDIT_RESOLVED":
+      return "text-purple-600 dark:text-purple-400";
     default:
       return "text-slate-600 dark:text-slate-400";
   }
@@ -384,8 +429,8 @@ const loadNotifications = async () => {
   }
 
   try {
-    const res = await $fetch<NotificationItem[]>(
-      `${config.public.apiUrl}/profile/${userId.value}/notifications`,
+    const res = await apiFetch<NotificationItem[]>(
+      `/profile/${userId.value}/notifications`,
     );
     notifications.value = Array.isArray(res) ? res : [];
   } catch (e) {
@@ -404,10 +449,9 @@ const markAsRead = async (id: string) => {
 
   if (userId.value) {
     try {
-      await $fetch(
-        `${config.public.apiUrl}/profile/${userId.value}/notifications/${id}/read`,
-        { method: "POST" },
-      );
+      await apiFetch(`/profile/${userId.value}/notifications/${id}/read`, {
+        method: "POST",
+      });
     } catch (e) {
       console.error("Error marking notification as read:", e);
     }
@@ -421,10 +465,9 @@ const markAllAsRead = async () => {
 
   if (userId.value) {
     try {
-      await $fetch(
-        `${config.public.apiUrl}/profile/${userId.value}/notifications/read-all`,
-        { method: "POST" },
-      );
+      await apiFetch(`/profile/${userId.value}/notifications/read-all`, {
+        method: "POST",
+      });
     } catch (e) {
       console.error("Error marking all notifications as read:", e);
     }

@@ -73,7 +73,7 @@
               >person</span
             >
             <span class="text-on-surface-variant dark:text-slate-400"
-              >Postulante:</span
+              >Candidato:</span
             >
             <span class="font-bold text-on-surface dark:text-slate-200">{{
               incident.candidateName || incident.reporter || "Candidato"
@@ -90,7 +90,7 @@
               >Organización:</span
             >
             <span class="font-bold text-on-surface dark:text-slate-200">{{
-              incident.companyName || "Empresa"
+              incident.companyName || "Organización"
             }}</span>
           </div>
         </div>
@@ -226,10 +226,10 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <button
             type="button"
-            @click="dictum = 'SANCION_EMPRESA'"
+            @click="dictum = 'SANCION_ORGANIZACION'"
             :class="[
               'p-2.5 rounded-xl border text-left text-xs transition duration-150 flex flex-col gap-1',
-              dictum === 'SANCION_EMPRESA'
+              dictum === 'SANCION_ORGANIZACION'
                 ? 'border-rose-500 bg-rose-50/70 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 shadow-xs'
                 : 'border-outline-variant/60 dark:border-slate-800 hover:bg-surface-container-low text-on-surface-variant',
             ]"
@@ -350,7 +350,7 @@ const props = defineProps<{
   loading: boolean;
   submitting: boolean;
   error?: string;
-  dictumAction: "SANCION_EMPRESA" | "ADVERTENCIA" | "DESESTIMADA";
+  dictumAction: "SANCION_ORGANIZACION" | "ADVERTENCIA" | "DESESTIMADA";
   dictumNotes: string;
 }>();
 
@@ -358,7 +358,7 @@ const emit = defineEmits<{
   (e: "update:modelValue", val: boolean): void;
   (
     e: "update:dictumAction",
-    val: "SANCION_EMPRESA" | "ADVERTENCIA" | "DESESTIMADA",
+    val: "SANCION_ORGANIZACION" | "ADVERTENCIA" | "DESESTIMADA",
   ): void;
   (e: "update:dictumNotes", val: string): void;
   (e: "submit"): void;

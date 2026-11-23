@@ -156,8 +156,8 @@ const userEmail = computed(() => user.value?.email || "");
 const nativeRoleText = computed(() => {
   const role = String(user.value?.nativeRole || "").toUpperCase();
   if (role === "ADMIN") return "Administrador";
-  if (role === "MODERATOR") return "Moderador";
-  if (role === "ORGANIZACION" || role === "EMPRESA") return "Organización";
+  if (role === "MODERATOR" || role === "MODERADOR") return "Moderador";
+  if (role === "ORGANIZACION") return "Organización";
   return role || "Rol Privilegiado";
 });
 

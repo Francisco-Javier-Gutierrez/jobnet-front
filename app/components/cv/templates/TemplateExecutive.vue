@@ -1,9 +1,9 @@
 <template>
   <div
-    class="cv-letter-page cv-template-executive text-slate-800 bg-white shadow-lg mx-auto p-9 flex flex-col justify-between font-sans"
+    class="cv-letter-page cv-template-executive text-slate-800 bg-white mx-auto p-9 flex flex-col justify-between font-sans"
     :style="{
       width: '215.9mm',
-      minHeight: '279.4mm',
+      minHeight: '279mm',
       fontSize: fontSizePx,
     }"
   >
@@ -207,6 +207,5 @@ const fontSizePx = computed(() => {
 <style scoped>
 .cv-letter-page {
   box-sizing: border-box;
-  page-break-after: always;
 }
 </style>

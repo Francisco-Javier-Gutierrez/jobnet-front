@@ -1,6 +1,9 @@
 <template>
   <div
-    class="lg:col-span-7 flex flex-col h-full bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 relative"
+    :class="[
+      'lg:col-span-7 flex flex-col h-full bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 relative min-h-0',
+      activeChat ? 'flex' : 'hidden lg:flex',
+    ]"
   >
     <template v-if="activeChat">
       <!-- Header for active chat -->
@@ -8,6 +11,15 @@
         class="p-4 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/20 flex-shrink-0"
       >
         <div class="flex items-center gap-3">
+          <button
+            type="button"
+            @click="$emit('back-to-list')"
+            class="lg:hidden p-1.5 -ml-1 text-on-surface-variant hover:text-on-background rounded-lg hover:bg-surface-container-high transition flex items-center justify-center cursor-pointer"
+            title="Volver a la lista de conversaciones"
+            aria-label="Volver a la lista"
+          >
+            <span class="material-symbols-outlined text-xl">arrow_back</span>
+          </button>
           <div
             class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs"
           >
@@ -45,7 +57,7 @@
       <!-- Chat messages area -->
       <div
         ref="messageContainer"
-        class="flex-grow p-4 overflow-y-auto max-h-[460px] flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
+        class="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
       >
         <div
           v-if="isLoadingMessages"
@@ -218,17 +230,17 @@
       <!-- Active Message Input Area -->
       <div
         v-else
-        class="flex flex-col border-t border-outline-variant/60 bg-surface-container-low/25"
+        class="flex-shrink-0 sticky bottom-0 z-10 flex flex-col border-t border-outline-variant/60 bg-surface-container-lowest dark:bg-slate-900"
       >
         <!-- Staged File Pre-send Preview Bar -->
         <div
           v-if="stagedFile"
-          class="px-4 py-2.5 bg-primary/5 dark:bg-slate-800/80 border-b border-outline-variant/40 flex items-center justify-between gap-3 animate-fadeIn"
+          class="px-4 py-2 bg-primary/5 dark:bg-slate-800/80 border-b border-outline-variant/40 flex items-center justify-between gap-3 animate-fadeIn"
         >
           <div class="flex items-center gap-3 min-w-0">
             <div
               v-if="stagedFile.isImage && stagedFile.previewUrl"
-              class="w-10 h-10 rounded-lg overflow-hidden border border-outline-variant/60 flex-shrink-0"
+              class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg overflow-hidden border border-outline-variant/60 flex-shrink-0"
             >
               <img
                 :src="stagedFile.previewUrl"
@@ -238,7 +250,7 @@
             </div>
             <div
               v-else
-              class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-600 flex items-center justify-center flex-shrink-0"
+              class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-rose-500/10 text-rose-600 flex items-center justify-center flex-shrink-0"
             >
               <span class="material-symbols-outlined text-xl"
                 >picture_as_pdf</span
@@ -268,7 +280,7 @@
         </div>
 
         <!-- Input Row -->
-        <div class="p-3.5 flex items-center gap-3">
+        <div class="p-2.5 sm:p-3.5 flex items-center gap-2 sm:gap-3">
           <!-- Hidden File Input -->
           <input
             type="file"
@@ -282,7 +294,7 @@
           <button
             @click="triggerFileInput"
             :disabled="isUploading"
-            class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
+            class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
             title="Adjuntar PDF o Imagen (máx. 5MB)"
           >
             <span
@@ -300,12 +312,12 @@
             @keyup.enter="handleSend"
             type="text"
             placeholder="Escribe un mensaje o añade una descripción..."
-            class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-xs text-on-background dark:text-slate-100 outline-none transition"
+            class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs text-on-background dark:text-slate-100 outline-none transition"
           />
           <button
             @click="handleSend"
             :disabled="(!newMessage.trim() && !stagedFile) || isUploading"
-            class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
+            class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
             title="Enviar mensaje"
           >
             <span
@@ -502,6 +514,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
+  (e: "back-to-list"): void;
   (e: "update:newMessage", value: string): void;
   (e: "handle-send"): void;
   (e: "handle-file-upload", event: Event): void;

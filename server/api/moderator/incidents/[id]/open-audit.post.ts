@@ -6,6 +6,10 @@ export default defineEventHandler(async (event) => {
     getHeader(event, "x-user-role") || "MODERATOR"
   ).toUpperCase();
 
+  const userIdHeader = getHeader(event, "x-user-id");
+  const userNameHeader = getHeader(event, "x-user-name");
+  const userEmailHeader = getHeader(event, "x-user-email");
+
   // Role verification: ONLY MODERATOR or ADMIN allowed
   if (
     userRoleHeader !== "MODERATOR" &&
@@ -29,6 +33,9 @@ export default defineEventHandler(async (event) => {
         headers: {
           ...(authHeader ? { Authorization: authHeader } : {}),
           "x-user-role": userRoleHeader,
+          ...(userIdHeader ? { "x-user-id": userIdHeader } : {}),
+          ...(userNameHeader ? { "x-user-name": userNameHeader } : {}),
+          ...(userEmailHeader ? { "x-user-email": userEmailHeader } : {}),
         },
         body,
       },

@@ -18,7 +18,7 @@ const mockFetch = vi.fn();
 });
 
 const mockSession = ref<any>({
-  user: { id: "empresa-1", tipoUsuario: "EMPRESA" },
+  user: { id: "org-1", tipoUsuario: "ORGANIZACION" },
 });
 
 (globalThis as any).useAuth = () => ({
@@ -32,7 +32,7 @@ describe("useMessages composable", () => {
     vi.clearAllMocks();
     mockFetch.mockReset();
     mockSession.value = {
-      user: { id: "empresa-1", tipoUsuario: "EMPRESA" },
+      user: { id: "org-1", tipoUsuario: "ORGANIZACION" },
     };
     if (typeof URL.createObjectURL !== "function") {
       URL.createObjectURL = vi.fn(() => "blob:mock-url");

@@ -31,7 +31,7 @@ export function useJobComments(jobId: string, jobRef: any) {
     )
       return true;
     const role = (session.value?.user as any)?.tipoUsuario?.toUpperCase();
-    return role === "ADMIN" || role === "MODERATOR";
+    return role === "ADMIN" || role === "MODERATOR" || role === "MODERADOR";
   };
 
   const commentTree = computed<CommentNode[]>(() => {

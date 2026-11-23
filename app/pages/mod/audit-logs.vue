@@ -174,22 +174,21 @@
 </template>
 
 <script setup lang="ts">
+import { apiFetch } from "~/composables/useApiClient";
+
 useSeoMeta({
   title: "Auditoría de Infracciones - JobNet",
   description:
     "Registro de auditoría inmutable de sanciones y bloqueos en JobNet",
 });
 
-const config = useRuntimeConfig();
 const auditLogs = ref<any[]>([]);
 const loading = ref(true);
 
 const fetchAuditLogs = async () => {
   loading.value = true;
   try {
-    const data = await $fetch<any[]>(
-      `${config.public.apiUrl}/moderator/audit-logs`,
-    );
+    const data = await apiFetch<any[]>("/moderator/audit-logs");
     auditLogs.value = data || [];
   } catch (e) {
     console.error("Error loading audit logs:", e);
