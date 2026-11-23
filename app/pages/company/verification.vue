@@ -16,8 +16,9 @@
           Verificación de Organización
         </h1>
         <p class="text-xs text-on-surface-variant dark:text-slate-300 mt-1">
-          Las organizaciones con correo de dominio corporativo se verifican automáticamente al registrarse.
-          Cuentas con correo de dominio público pueden certificar su identidad subiendo su constancia fiscal.
+          Las organizaciones con correo de dominio corporativo se verifican
+          automáticamente al registrarse. Cuentas con correo de dominio público
+          pueden certificar su identidad subiendo su constancia fiscal.
         </p>
       </div>
     </div>
@@ -114,7 +115,7 @@ const handleVerificationRequest = async () => {
   }
   submittingVerification.value = true;
   try {
-    await $fetch(`${config.public.apiUrl}/profile/${companyId.value}`, {
+    await apiFetch(`/profile/${companyId.value}`, {
       method: "POST",
       body: {
         taxId: taxId.value,

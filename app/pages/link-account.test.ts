@@ -222,4 +222,79 @@ describe("Vinculación de Cuentas Nativas con Google OAuth (Account Linking Inte
       });
     });
   });
+
+  describe("4. Estatuto de Seguridad para Cuentas Privilegiadas (Segregación Estricta de Roles)", () => {
+    it("debe exigir la aceptación expresa del estatuto de candidato si la cuenta nativa es ADMIN", () => {
+      const validateAccountLinking = (options: {
+        password: string;
+        nativeRole: string;
+        acceptStatute: boolean;
+      }) => {
+        const isPrivileged = ["ADMIN", "MODERATOR", "ORGANIZACION"].includes(
+          options.nativeRole.toUpperCase(),
+        );
+
+        if (!options.password) {
+          return { valid: false, error: "Contraseña requerida" };
+        }
+
+        if (isPrivileged && !options.acceptStatute) {
+          return {
+            valid: false,
+            error:
+              "Debes aceptar el estatuto de seguridad que establece el acceso con Google estrictamente como Candidato.",
+          };
+        }
+
+        return { valid: true };
+      };
+
+      // Sin aceptar el estatuto para cuenta ADMIN -> Inválido
+      const adminSinAceptar = validateAccountLinking({
+        password: "AdminPassword#2026",
+        nativeRole: "ADMIN",
+        acceptStatute: false,
+      });
+      expect(adminSinAceptar.valid).toBe(false);
+      expect(adminSinAceptar.error).toContain(
+        "estatuto de seguridad que establece el acceso con Google estrictamente como Candidato",
+      );
+
+      // Aceptando el estatuto para cuenta ADMIN -> Válido
+      const adminAceptado = validateAccountLinking({
+        password: "AdminPassword#2026",
+        nativeRole: "ADMIN",
+        acceptStatute: true,
+      });
+      expect(adminAceptado.valid).toBe(true);
+
+      // Para cuenta regular CANDIDATO -> Válido directamente sin requerir estatuto de privilegio
+      const candidatoRegular = validateAccountLinking({
+        password: "CandidatePassword#123",
+        nativeRole: "CANDIDATO",
+        acceptStatute: false,
+      });
+      expect(candidatoRegular.valid).toBe(true);
+    });
+
+    it("debe propagar el parámetro role en la URL de vinculación hacia link-account", () => {
+      const buildLinkAccountUrl = (
+        userEmail: string,
+        googleSub: string,
+        userName: string,
+        nativeRole: string,
+      ) => {
+        return `/link-account?email=${encodeURIComponent(userEmail)}&googleSub=${encodeURIComponent(googleSub)}&name=${encodeURIComponent(userName)}&role=${encodeURIComponent(nativeRole)}`;
+      };
+
+      const url = buildLinkAccountUrl(
+        "chinopaco.05@gmail.com",
+        "google-sub-12345",
+        "Francisco Admin",
+        "ADMIN",
+      );
+      expect(url).toContain("role=ADMIN");
+      expect(url).toContain("email=chinopaco.05%40gmail.com");
+    });
+  });
 });

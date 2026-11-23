@@ -58,7 +58,7 @@ export function detectCognitoRole(payload: any) {
       (g: string) =>
         g.toUpperCase() === "MODERATOR" || g.toUpperCase().includes("MOD"),
     ) ||
-    scopes.some((s: string) => s.includes("moderator") || s.includes("mod"),) ||
+    scopes.some((s: string) => s.includes("moderator") || s.includes("mod")) ||
     customRole === "MODERATOR"
   ) {
     cognitoRole = "MODERATOR";
@@ -80,9 +80,12 @@ export function detectCognitoRole(payload: any) {
   } else if (
     groups.some(
       (g: string) =>
-        g.toUpperCase() === "CANDIDATO" || g.toUpperCase().includes("CANDIDATE"),
+        g.toUpperCase() === "CANDIDATO" ||
+        g.toUpperCase().includes("CANDIDATE"),
     ) ||
-    scopes.some((s: string) => s.includes("candidate") || s.includes("candidato")) ||
+    scopes.some(
+      (s: string) => s.includes("candidate") || s.includes("candidato"),
+    ) ||
     customRole === "CANDIDATO" ||
     customRole === "CANDIDATE"
   ) {

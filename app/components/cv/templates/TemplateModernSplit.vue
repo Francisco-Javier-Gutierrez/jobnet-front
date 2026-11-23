@@ -1,9 +1,9 @@
 <template>
   <div
-    class="cv-letter-page cv-template-modern-split text-slate-800 bg-white shadow-lg mx-auto flex flex-row font-sans"
+    class="cv-letter-page cv-template-modern-split text-slate-800 bg-white mx-auto flex flex-row font-sans"
     :style="{
       width: '215.9mm',
-      minHeight: '279.4mm',
+      minHeight: '279mm',
       fontSize: fontSizePx,
     }"
   >
@@ -16,6 +16,7 @@
         <div v-if="options.showPhoto && cv.photoUrl" class="text-center">
           <img
             :src="cv.photoUrl"
+            crossorigin="anonymous"
             alt="Foto"
             class="w-24 h-24 rounded-2xl mx-auto object-cover border-4 border-white shadow-md"
           />
@@ -249,6 +250,5 @@ const fontSizePx = computed(() => {
 <style scoped>
 .cv-letter-page {
   box-sizing: border-box;
-  page-break-after: always;
 }
 </style>

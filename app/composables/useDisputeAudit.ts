@@ -5,7 +5,7 @@ import { useAuth, useRuntimeConfig } from "#imports";
 export interface AuditMessage {
   id: string;
   senderId: string;
-  senderRole: "CANDIDATO" | "EMPRESA" | "SISTEMA";
+  senderRole: "CANDIDATO" | "ORGANIZACION" | "SISTEMA";
   senderName: string;
   text: string;
   attachmentUrl?: string | null;
@@ -20,7 +20,9 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
   const chatMessages = ref<AuditMessage[]>([]);
   const isLoadingChat = ref(false);
   const isSubmittingDictum = ref(false);
-  const dictumAction = ref<"SANCION_EMPRESA" | "ADVERTENCIA" | "DESESTIMADA">("SANCION_EMPRESA");
+  const dictumAction = ref<
+    "SANCION_ORGANIZACION" | "ADVERTENCIA" | "DESESTIMADA"
+  >("SANCION_ORGANIZACION");
   const dictumNotes = ref("");
   const graceDays = ref(4);
   const successMsg = ref("");
@@ -37,6 +39,33 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
     return r === "MODERATOR" || r === "MODERADOR" || r === "ADMIN";
   });
 
+  const getAuthHeaders = (): Record<string, string> => {
+    const token =
+      (sessionData.value as any)?.idToken ||
+      (sessionData.value as any)?.accessToken ||
+      (sessionData.value as any)?.token ||
+      "";
+    const role =
+      (sessionData.value?.user as any)?.tipoUsuario ||
+      (sessionData.value?.user as any)?.role ||
+      userRole.value ||
+      "MODERATOR";
+    const userId =
+      (sessionData.value?.user as any)?.id ||
+      (sessionData.value?.user as any)?.uuid ||
+      "";
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "x-user-id": userId,
+      "x-user-role": role,
+    };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    return headers;
+  };
+
   const loadChat = async (incidentId: string) => {
     isLoadingChat.value = true;
     errorMsg.value = "";
@@ -44,14 +73,13 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
       const res = await $fetch<any>(
         `/api/moderator/incidents/${incidentId}/audit-chat`,
         {
-          headers: {
-            "x-user-role": userRole.value || "MODERATOR",
-          },
+          headers: getAuthHeaders(),
         },
       );
       chatMessages.value = res?.messages || [];
     } catch (err: any) {
-      errorMsg.value = err.message || "No se pudo cargar el historial de mensajes.";
+      errorMsg.value =
+        err.message || "No se pudo cargar el historial de mensajes.";
     } finally {
       isLoadingChat.value = false;
     }
@@ -68,11 +96,9 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
         `/api/moderator/incidents/${incident.id}/open-audit`,
         {
           method: "POST",
-          headers: {
-            "x-user-role": userRole.value || "MODERATOR",
-          },
+          headers: getAuthHeaders(),
           body: {
-            notes: `Apertura formal de auditoría por controversia de ${incident.infraccion || 'infracción grave'}.`,
+            notes: `Apertura formal de auditoría por controversia de ${incident.infraccion || "infracción grave"}.`,
           },
         },
       );
@@ -88,7 +114,7 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
 
       // Automatically inspect the audit chat
       selectedIncident.value = incident;
-      dictumAction.value = "SANCION_EMPRESA";
+      dictumAction.value = "SANCION_ORGANIZACION";
       dictumNotes.value = "";
       graceDays.value = 4;
       await loadChat(incident.id);
@@ -97,7 +123,8 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
       setTimeout(() => (successMsg.value = ""), 6000);
       if (onRefresh) await onRefresh();
     } catch (err: any) {
-      errorMsg.value = err.message || "Error al abrir la auditoría de mensajería.";
+      errorMsg.value =
+        err.message || "Error al abrir la auditoría de mensajería.";
       setTimeout(() => (errorMsg.value = ""), 6000);
     }
   };
@@ -107,7 +134,7 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
    */
   const inspectAuditChat = async (incident: Incident) => {
     selectedIncident.value = incident;
-    dictumAction.value = "SANCION_EMPRESA";
+    dictumAction.value = "SANCION_ORGANIZACION";
     dictumNotes.value = "";
     graceDays.value = 4;
     await loadChat(incident.id);
@@ -132,9 +159,7 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
         `/api/moderator/incidents/${incidentId}/audit-dictum`,
         {
           method: "POST",
-          headers: {
-            "x-user-role": userRole.value || "MODERATOR",
-          },
+          headers: getAuthHeaders(),
           body: {
             dictum: dictumAction.value,
             notes: dictumNotes.value.trim(),
@@ -153,13 +178,15 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
       }
 
       successMsg.value =
-        res?.message || "Dictamen oficial registrado con éxito. Expediente concluido.";
+        res?.message ||
+        "Dictamen oficial registrado con éxito. Expediente concluido.";
       isAuditModalOpen.value = false;
 
       setTimeout(() => (successMsg.value = ""), 6000);
       if (onRefresh) await onRefresh();
     } catch (err: any) {
-      errorMsg.value = err.message || "Error al emitir el dictamen de auditoría.";
+      errorMsg.value =
+        err.message || "Error al emitir el dictamen de auditoría.";
     } finally {
       isSubmittingDictum.value = false;
     }

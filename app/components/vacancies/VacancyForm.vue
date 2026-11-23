@@ -168,10 +168,14 @@
               class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1.5"
               for="fecha-cierre"
             >
-              <span class="material-symbols-outlined text-sm text-primary">calendar_clock</span>
+              <span class="material-symbols-outlined text-sm text-primary"
+                >calendar_clock</span
+              >
               Fecha de Cierre / Vigencia Estipulada
             </label>
-            <span class="text-[10px] text-on-surface-variant dark:text-slate-400">
+            <span
+              class="text-[10px] text-on-surface-variant dark:text-slate-400"
+            >
               Recordatorio automático 3 días antes de expirar
             </span>
           </div>
@@ -254,8 +258,8 @@
             >
               {{
                 state.form.salarioConfidencial
-                  ? 'Salario Confidencial'
-                  : 'Salario Visible'
+                  ? "Salario Confidencial"
+                  : "Salario Visible"
               }}
             </span>
           </div>
@@ -550,30 +554,46 @@
         </div>
 
         <!-- Preguntas Filtro de Precalificación (Hasta 3 Preguntas Obligatorias) -->
-        <div class="flex flex-col gap-3 pt-2 border-t border-outline-variant/30">
+        <div
+          class="flex flex-col gap-3 pt-2 border-t border-outline-variant/30"
+        >
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <label class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm text-primary">quiz</span>
+              <label
+                class="text-xs font-bold text-on-surface-variant dark:text-slate-300 flex items-center gap-1.5"
+              >
+                <span class="material-symbols-outlined text-sm text-primary"
+                  >quiz</span
+                >
                 Preguntas Filtro de Precalificación
               </label>
-              <p class="text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5">
-                Configura hasta 3 preguntas de respuesta obligatoria que los candidatos responderán al postularse.
+              <p
+                class="text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5"
+              >
+                Configura hasta 3 preguntas de respuesta obligatoria que los
+                candidatos responderán al postularse.
               </p>
             </div>
-            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+            <span
+              class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20"
+            >
               {{ state.form.preguntasFiltro.length }} / 3 preguntas
             </span>
           </div>
 
           <!-- Question inputs list -->
-          <div v-if="state.form.preguntasFiltro.length > 0" class="flex flex-col gap-3">
+          <div
+            v-if="state.form.preguntasFiltro.length > 0"
+            class="flex flex-col gap-3"
+          >
             <div
               v-for="(pregunta, index) in state.form.preguntasFiltro"
               :key="index"
               class="flex items-center gap-2 bg-surface-container-low/30 border border-outline-variant/60 rounded-xl p-3"
             >
-              <span class="w-6 h-6 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center flex-shrink-0">
+              <span
+                class="w-6 h-6 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center flex-shrink-0"
+              >
                 {{ index + 1 }}
               </span>
               <input
@@ -605,7 +625,8 @@
             v-else
             class="text-xs text-on-surface-variant dark:text-slate-400 italic bg-surface-container-low/20 border border-dashed border-outline-variant/60 rounded-xl p-4 text-center"
           >
-            No has agregado preguntas filtro. Puedes agregar hasta 3 preguntas para precalificar a los candidatos.
+            No has agregado preguntas filtro. Puedes agregar hasta 3 preguntas
+            para precalificar a los candidatos.
           </div>
 
           <!-- Add question button -->
@@ -616,7 +637,10 @@
               class="inline-flex items-center gap-1.5 px-4 py-2 bg-surface border border-outline-variant hover:border-primary hover:bg-primary/5 text-primary text-xs font-bold rounded-xl transition"
             >
               <span class="material-symbols-outlined text-sm">add</span>
-              Agregar Pregunta Filtro ({{ 3 - state.form.preguntasFiltro.length }} disponibles)
+              Agregar Pregunta Filtro ({{
+                3 - state.form.preguntasFiltro.length
+              }}
+              disponibles)
             </button>
           </div>
         </div>
@@ -625,15 +649,24 @@
       <!-- SECTION: Ubicación -->
       <section v-show="activeTab === 'ubicacion'" class="flex flex-col gap-6">
         <!-- Municipio del Estado de México y Coordenadas -->
-        <div class="bg-surface-container-low/30 border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-4">
+        <div
+          class="bg-surface-container-low/30 border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-4"
+        >
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h3 class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm text-primary">location_city</span>
+              <h3
+                class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5"
+              >
+                <span class="material-symbols-outlined text-sm text-primary"
+                  >location_city</span
+                >
                 Municipio del Estado de México
               </h3>
-              <p class="text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5">
-                Selecciona el municipio correspondiente para centrar automáticamente las coordenadas geográficas.
+              <p
+                class="text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5"
+              >
+                Selecciona el municipio correspondiente para centrar
+                automáticamente las coordenadas geográficas.
               </p>
             </div>
           </div>
@@ -652,28 +685,34 @@
 
             <!-- Latitud -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[10px] font-bold text-on-surface-variant dark:text-slate-300" for="lat-input">
+              <label
+                class="text-[10px] font-bold text-on-surface-variant dark:text-slate-300"
+                for="lat-input"
+              >
                 Latitud Geográfica
               </label>
               <input
                 id="lat-input"
                 v-model.number="state.form.lat"
                 type="number"
-                step="0.0001"
+                step="any"
                 class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
               />
             </div>
 
             <!-- Longitud -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[10px] font-bold text-on-surface-variant dark:text-slate-300" for="lng-input">
+              <label
+                class="text-[10px] font-bold text-on-surface-variant dark:text-slate-300"
+                for="lng-input"
+              >
                 Longitud Geográfica
               </label>
               <input
                 id="lng-input"
                 v-model.number="state.form.lng"
                 type="number"
-                step="0.0001"
+                step="any"
                 class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 py-2 text-xs text-on-background outline-none transition"
               />
             </div>
@@ -689,8 +728,12 @@
             height="300px"
           />
           <template #fallback>
-            <div class="h-[300px] w-full rounded-2xl bg-surface-container-low/40 dark:bg-slate-900/60 border border-outline-variant/40 animate-pulse flex items-center justify-center">
-              <span class="text-xs text-on-surface-variant dark:text-slate-400">Cargando mapa de ubicación...</span>
+            <div
+              class="h-[300px] w-full rounded-2xl bg-surface-container-low/40 dark:bg-slate-900/60 border border-outline-variant/40 animate-pulse flex items-center justify-center"
+            >
+              <span class="text-xs text-on-surface-variant dark:text-slate-400"
+                >Cargando mapa de ubicación...</span
+              >
             </div>
           </template>
         </ClientOnly>
@@ -807,13 +850,20 @@ const mockJobPreview = computed(() => {
       state.form.description.trim() || "Descripción de las actividades...",
     habilidadesRequeridas: state.form.skills,
     sectores: state.form.sectors,
-    sector: state.form.sector || (state.form.sectors && state.form.sectors[0]) || "Tecnología",
+    sector:
+      state.form.sector ||
+      (state.form.sectors && state.form.sectors[0]) ||
+      "Tecnología",
     aptitudes: state.form.aptitudes,
     experienciaAnos: state.form.experienceYears || 0,
     vacantesDisponibles: state.form.vacantesDisponibles || 1,
     maxPostulantes: state.form.maxPostulantes || null,
-    preguntasFiltro: state.form.preguntasFiltro.filter((q) => q.trim().length > 0),
-    screeningQuestions: state.form.preguntasFiltro.filter((q) => q.trim().length > 0),
+    preguntasFiltro: state.form.preguntasFiltro.filter(
+      (q) => q.trim().length > 0,
+    ),
+    screeningQuestions: state.form.preguntasFiltro.filter(
+      (q) => q.trim().length > 0,
+    ),
     pdfUrl: state.vacancyPdfPreviewUrl || undefined,
     pdfName: state.selectedVacancyFile?.name || undefined,
   };

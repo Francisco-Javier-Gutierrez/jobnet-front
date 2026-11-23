@@ -57,6 +57,7 @@
           :post="item"
           :current-user-id="currentUserId"
           :is-bookmarked="isBookmarked(item)"
+          :is-liked="isLiked(item)"
           @like="$emit('toggle-like', item)"
           @bookmark="$emit('toggle-bookmark', item)"
           @share="$emit('share-post', item)"

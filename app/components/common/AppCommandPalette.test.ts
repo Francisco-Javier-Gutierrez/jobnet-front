@@ -11,7 +11,9 @@ const mockSignOut = vi.fn();
 const mockToggleTheme = vi.fn();
 const mockIsDark = ref(false);
 
-const mockAuthStatus = ref<"authenticated" | "unauthenticated" | "loading">("unauthenticated");
+const mockAuthStatus = ref<"authenticated" | "unauthenticated" | "loading">(
+  "unauthenticated",
+);
 const mockAuthData = ref<any>(null);
 
 vi.stubGlobal("useAuth", () => ({
@@ -48,13 +50,6 @@ vi.mock("~/stores/jobs", () => ({
   }),
 }));
 
-vi.mock("~/composables/useCommunityCvTemplates", () => ({
-  useCommunityCvTemplates: () => ({
-    filteredTemplates: ref([]),
-    fetchTemplates: vi.fn(),
-  }),
-}));
-
 describe("AppCommandPalette.vue Role-Based Filtering", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -77,7 +72,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
     // Guest actions should be present
     expect(renderedText).toContain("Iniciar Sesión");
     expect(renderedText).toContain("Registrarse como Candidato");
-    expect(renderedText).toContain("Registrar Organización o Empresa");
+    expect(renderedText).toContain("Registrar Organización");
     expect(renderedText).toContain("Explorar Vacantes");
 
     // Company, candidate private, and admin actions MUST NOT be present
@@ -104,7 +99,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Candidate quick actions and navigation
     expect(renderedText).toContain("Ver Mis Postulaciones");
-    expect(renderedText).toContain("Comunidad de Plantillas de CV");
+    expect(renderedText).toContain("Generar y Administrar CV");
     expect(renderedText).toContain("Vacantes Guardadas");
     expect(renderedText).toContain("Mi Perfil Profesional");
     expect(renderedText).toContain("Mensajes y Chat");
@@ -116,13 +111,13 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Company or Admin actions MUST NOT appear for Candidate
     expect(renderedText).not.toContain("Publicar Oferta de Empleo");
-    expect(renderedText).not.toContain("Tablero ATS de Postulantes");
+    expect(renderedText).not.toContain("Tablero ATS de Candidatos");
     expect(renderedText).not.toContain("Mis Vacantes Activas");
     expect(renderedText).not.toContain("Estatus de Verificación");
     expect(renderedText).not.toContain("Métricas y Analítica Global");
   });
 
-  it("filters command palette correctly for ORGANIZATION / EMPRESA role", () => {
+  it("filters command palette correctly for ORGANIZACION role", () => {
     mockAuthStatus.value = "authenticated";
     mockAuthData.value = {
       user: {
@@ -137,7 +132,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Organization specific quick actions and navigation
     expect(renderedText).toContain("Publicar Oferta de Empleo");
-    expect(renderedText).toContain("Tablero ATS de Postulantes");
+    expect(renderedText).toContain("Tablero ATS de Candidatos");
     expect(renderedText).toContain("Mis Vacantes Activas");
     expect(renderedText).toContain("Estatus de Verificación");
     expect(renderedText).toContain("Perfil de la Organización");
@@ -150,7 +145,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Blocked routes for company MUST NOT appear
     expect(renderedText).not.toContain("Explorar Vacantes");
-    expect(renderedText).not.toContain("Comunidad de Plantillas de CV");
+    expect(renderedText).not.toContain("Generar y Administrar CV");
     expect(renderedText).not.toContain("Ver Mis Postulaciones");
     expect(renderedText).not.toContain("Métricas y Analítica Global");
   });
@@ -178,7 +173,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Company publication or candidate CV templates MUST NOT appear for Admin
     expect(renderedText).not.toContain("Publicar Oferta de Empleo");
-    expect(renderedText).not.toContain("Comunidad de Plantillas de CV");
+    expect(renderedText).not.toContain("Generar y Administrar CV");
     expect(renderedText).not.toContain("Ver Mis Postulaciones");
   });
 });

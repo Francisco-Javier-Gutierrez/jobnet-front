@@ -20,6 +20,10 @@ logs
 *.tfstate*
 .terraform.lock.hcl
 
+# Secrets & credentials
+client_secret*.json
+credentials*.json
+
 # Archives & Binaries
 *.zip
 *.tar.gz

@@ -5,11 +5,7 @@ import { useShare } from "~/composables/useShare";
 import type { Post, Job, CompanyProfile } from "~/types";
 
 export type CompanyProfileTab =
-  | "ficha"
-  | "vacancies"
-  | "posts"
-  | "verification"
-  | "bookmarks";
+  "ficha" | "vacancies" | "posts" | "verification" | "bookmarks";
 
 export const useCompanyProfile = () => {
   const route = useRoute();
@@ -89,8 +85,12 @@ export const useCompanyProfile = () => {
     const uid = user.id ? String(user.id).toLowerCase() : "";
     const uemail = user.email ? String(user.email).toLowerCase() : "";
     const cidLower = String(companyId || "").toLowerCase();
-    const compId = company.value.id ? String(company.value.id).toLowerCase() : "";
-    const compEmail = company.value.email ? String(company.value.email).toLowerCase() : "";
+    const compId = company.value.id
+      ? String(company.value.id).toLowerCase()
+      : "";
+    const compEmail = company.value.email
+      ? String(company.value.email).toLowerCase()
+      : "";
     const compUuid = (company.value as any)?.usuarioUuid
       ? String((company.value as any).usuarioUuid).toLowerCase()
       : "";
@@ -119,24 +119,20 @@ export const useCompanyProfile = () => {
     data: profileData,
     pending: profilePending,
     refresh: refreshProfile,
-  } = useLazyAsyncData(
-    `company-profile-${companyId}`,
-    () =>
-      $fetch(`${config.public.apiUrl}/profile/${companyId}`)
-        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-        .catch(() => null),
+  } = useLazyAsyncData(`company-profile-${companyId}`, () =>
+    $fetch(`${config.public.apiUrl}/profile/${companyId}`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => null),
   );
 
   const {
     data: vacanciesData,
     pending: vacanciesPending,
     refresh: refreshVacancies,
-  } = useLazyAsyncData(
-    `company-vacancies-${companyId}`,
-    () =>
-      $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
-        .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-        .catch(() => ({ data: [] })),
+  } = useLazyAsyncData(`company-vacancies-${companyId}`, () =>
+    $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
+      .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
+      .catch(() => ({ data: [] })),
   );
 
   const { data: postsData, pending: postsPending } = useLazyAsyncData(
@@ -155,7 +151,8 @@ export const useCompanyProfile = () => {
     `company-bookmarks-${companyId}`,
     () => {
       // Directiva de privacidad: los elementos guardados son estrictamente privados del propietario
-      if (!isOwner.value || !currentUserId.value) return Promise.resolve({ data: [] });
+      if (!isOwner.value || !currentUserId.value)
+        return Promise.resolve({ data: [] });
       const targetId = effectiveBookmarkUserId.value;
       const uid = currentUserId.value;
       return $fetch(
@@ -235,7 +232,10 @@ export const useCompanyProfile = () => {
           p.nombre || p.nombreComercial || p.name || "Sin Nombre";
         company.value.nombre = company.value.name;
         company.value.nombreComercial =
-          p.nombreComercial || p.nombre || p.name || company.value.nombreComercial;
+          p.nombreComercial ||
+          p.nombre ||
+          p.name ||
+          company.value.nombreComercial;
         company.value.razonSocial =
           p.razonSocial || company.value.razonSocial || company.value.name;
         company.value.rfc = p.rfc || company.value.rfc || "No registrado";
@@ -244,27 +244,32 @@ export const useCompanyProfile = () => {
         company.value.email =
           p.email || p.correoContacto || company.value.email || "";
         company.value.tamanoEmpresa =
-          p.tamanoEmpresa || company.value.tamanoEmpresa || "50 - 200 colaboradores";
+          p.tamanoEmpresa ||
+          company.value.tamanoEmpresa ||
+          "50 - 200 colaboradores";
         company.value.suspensionStatus = p.suspensionStatus || "";
         company.value.estatus = p.estatus || "";
         company.value.estadoCuenta = p.estadoCuenta || "";
-        company.value.logo =
-          p.fotoPerfil ||
-          p.logo ||
-          company.value.logo;
-        company.value.sector = p.sector || company.value.sector || "Sector no especificado";
+        company.value.logo = p.fotoPerfil || p.logo || company.value.logo;
+        company.value.sector =
+          p.sector || company.value.sector || "Sector no especificado";
         company.value.about =
-          p.biografia || p.descripcion || company.value.about || "Sin descripción corporativa.";
+          p.biografia ||
+          p.descripcion ||
+          company.value.about ||
+          "Sin descripción corporativa.";
         company.value.mision = p.mision || company.value.mision || "";
         company.value.vision = p.vision || company.value.vision || "";
         company.value.beneficios =
           p.beneficios || p.culturaLaboral || company.value.beneficios || "";
         company.value.documents =
-          Array.isArray(p.documentosCorporativos) && p.documentosCorporativos.length > 0
+          Array.isArray(p.documentosCorporativos) &&
+          p.documentosCorporativos.length > 0
             ? p.documentosCorporativos
             : company.value.documents;
         company.value.documentosVerificacion =
-          Array.isArray(p.documentosVerificacion) && p.documentosVerificacion.length > 0
+          Array.isArray(p.documentosVerificacion) &&
+          p.documentosVerificacion.length > 0
             ? p.documentosVerificacion
             : company.value.documentosVerificacion;
         company.value.location =
@@ -285,7 +290,8 @@ export const useCompanyProfile = () => {
         company.value.metodoVerificacion =
           p.metodoVerificacion ||
           (p.rfc ? "VALIDACION_SAT" : "DOMINIO_CORPORATIVO");
-        company.value.website = p.enlacesWeb?.website || p.website || company.value.website;
+        company.value.website =
+          p.enlacesWeb?.website || p.website || company.value.website;
         company.value.websiteDisplay =
           company.value.website
             .replace("https://", "")
@@ -294,23 +300,78 @@ export const useCompanyProfile = () => {
 
         const rawJobs = (vacanciesData.value?.data || []) as any[];
         company.value.vacancies = rawJobs.map((j: any) => ({
+          ...j,
           id: j.id || j.uniqueId,
+          uniqueId: j.uniqueId || j.id,
           title: j.title || j.titulo || "Vacante",
+          modalidad: j.modalidad || j.type || "Presencial",
           type: j.type || j.modalidad || "Presencial",
           schedule: j.schedule || "Tiempo Completo",
-          salary:
+          salario: j.salario,
+          salary: j.salary || j.salario,
+          salarioFormatted:
             typeof j.salario === "number"
               ? `$${(j.salario / 1000).toFixed(0)}k MXN`
               : j.salario || "No especificado",
+          company: j.company || j.empresaNombre || company.value.name,
+          empresaNombre: j.empresaNombre || j.company || company.value.name,
+          companyLogo: j.companyLogo || j.empresaLogo || company.value.avatar,
+          empresaLogo: j.empresaLogo || j.companyLogo || company.value.avatar,
+          empresaUuid: j.empresaUuid || companyId,
+          companyId: j.companyId || j.empresaUuid || companyId,
+          descripcion: j.descripcion || j.description || "",
+          description: j.description || j.descripcion || "",
+          location:
+            typeof j.ubicacion === "string"
+              ? j.ubicacion
+              : j.ubicacion?.name ||
+                j.ubicacion?.city ||
+                j.location ||
+                company.value.location,
+          sector: j.sector || company.value.sector,
+          createdAt: j.createdAt,
+          tags: j.tags || j.skills || [],
+          skills: j.skills || j.tags || [],
+          vacantesDisponibles: j.vacantesDisponibles || 1,
+          likesCount:
+            typeof j.likesCount === "number"
+              ? j.likesCount
+              : Array.isArray(j.likesList)
+                ? j.likesList.length
+                : 0,
+          likesList: Array.isArray(j.likesList) ? j.likesList : [],
+          isLiked:
+            j.isLiked !== undefined
+              ? Boolean(j.isLiked)
+              : Array.isArray(j.likesList) && currentUserId.value
+                ? j.likesList.includes(currentUserId.value)
+                : false,
+          bookmarksCount:
+            typeof j.bookmarksCount === "number"
+              ? j.bookmarksCount
+              : Array.isArray(j.bookmarksList)
+                ? j.bookmarksList.length
+                : 0,
+          bookmarksList: Array.isArray(j.bookmarksList) ? j.bookmarksList : [],
+          isBookmarked:
+            j.isBookmarked !== undefined
+              ? Boolean(j.isBookmarked)
+              : Array.isArray(j.bookmarksList) && currentUserId.value
+                ? j.bookmarksList.includes(currentUserId.value)
+                : false,
+          commentsCount:
+            typeof j.commentsCount === "number" ? j.commentsCount : 0,
+          sharesCount: typeof j.sharesCount === "number" ? j.sharesCount : 0,
         }));
       }
     },
     { immediate: true },
   );
 
-  const companyTab = ref<CompanyProfileTab>("ficha");
+  const companyTab = ref<CompanyProfileTab>("vacancies");
   const allCompanyPosts = ref<any[]>([]);
   const allCompanyBookmarkedPosts = ref<any[]>([]);
+  const allCompanyBookmarkedJobs = ref<any[]>([]);
 
   watch(
     postsData,
@@ -329,9 +390,29 @@ export const useCompanyProfile = () => {
         if (Array.isArray(val.posts) && val.posts.length > 0) {
           allCompanyBookmarkedPosts.value = val.posts;
         } else if (Array.isArray(val.data)) {
-          allCompanyBookmarkedPosts.value = val.data;
+          allCompanyBookmarkedPosts.value = val.data.filter(
+            (i: any) =>
+              (i.PK && i.PK.startsWith("POST#")) ||
+              i.uniqueId ||
+              (i.content && !i.modalidad),
+          );
         } else {
           allCompanyBookmarkedPosts.value = [];
+        }
+
+        if (Array.isArray(val.jobs) && val.jobs.length > 0) {
+          allCompanyBookmarkedJobs.value = val.jobs;
+        } else if (Array.isArray(val.data)) {
+          allCompanyBookmarkedJobs.value = val.data.filter(
+            (i: any) =>
+              (i.PK && i.PK.startsWith("VACANCY#")) ||
+              i.empresaUuid !== undefined ||
+              i.modalidad !== undefined ||
+              i.salario !== undefined ||
+              i.title !== undefined,
+          );
+        } else {
+          allCompanyBookmarkedJobs.value = [];
         }
       }
     },
@@ -342,6 +423,7 @@ export const useCompanyProfile = () => {
   const companyBookmarkedPosts = computed(
     () => allCompanyBookmarkedPosts.value,
   );
+  const companyBookmarkedJobs = computed(() => allCompanyBookmarkedJobs.value);
 
   // UI State Modals
   const showReportCompanyModal = ref(false);
@@ -355,29 +437,59 @@ export const useCompanyProfile = () => {
     isPdfModalOpen.value = true;
   };
 
-  const toggleLike = async (postId: string) => {
+  const toggleLike = async (itemOrId: any) => {
     if (!currentUserId.value) return;
+
+    const postId =
+      typeof itemOrId === "string"
+        ? itemOrId
+        : itemOrId?.uniqueId || itemOrId?.id;
+    if (!postId) return;
+
+    const targetPost = allCompanyPosts.value.find(
+      (p) => (p.uniqueId || p.id) === postId,
+    );
+    const targetBookmark = allCompanyBookmarkedPosts.value.find(
+      (p) => (p.uniqueId || p.id) === postId,
+    );
+    const targets = [
+      targetPost,
+      targetBookmark,
+      typeof itemOrId === "object" ? itemOrId : null,
+    ].filter(Boolean);
+
+    targets.forEach((target) => {
+      if (target) {
+        if (!target.likesList) target.likesList = [];
+        const idx = target.likesList.indexOf(currentUserId.value);
+        if (idx !== -1) {
+          target.likesList.splice(idx, 1);
+          if (typeof target.likesCount === "number") {
+            target.likesCount = Math.max(0, target.likesCount - 1);
+          }
+          target.isLiked = false;
+        } else {
+          target.likesList.push(currentUserId.value);
+          if (typeof target.likesCount === "number") {
+            target.likesCount = target.likesCount + 1;
+          } else {
+            target.likesCount = target.likesList.length;
+          }
+          target.isLiked = true;
+        }
+        target.likes = target.likesList.length;
+      }
+    });
+
     try {
       const res = await $fetch<any>(`/api/posts/${postId}/like`, {
         method: "POST",
         body: { userUuid: currentUserId.value, userId: currentUserId.value },
       });
-      const targetPost = allCompanyPosts.value.find(
-        (p) => p.uniqueId === postId,
-      );
-      const targetBookmark = allCompanyBookmarkedPosts.value.find(
-        (p) => p.uniqueId === postId,
-      );
-      [targetPost, targetBookmark].forEach((target) => {
-        if (target) {
-          if (res?.likesList) {
-            target.likesList = res.likesList;
-          } else {
-            if (!target.likesList) target.likesList = [];
-            const idx = target.likesList.indexOf(currentUserId.value);
-            if (idx !== -1) target.likesList.splice(idx, 1);
-            else target.likesList.push(currentUserId.value);
-          }
+      targets.forEach((target) => {
+        if (target && res?.likesList) {
+          target.likesList = res.likesList;
+          target.likes = target.likesList.length;
         }
       });
     } catch (e) {
@@ -385,29 +497,57 @@ export const useCompanyProfile = () => {
     }
   };
 
-  const toggleBookmark = async (postId: string) => {
+  const toggleBookmark = async (itemOrId: any) => {
     if (!currentUserId.value) return;
+
+    const postId =
+      typeof itemOrId === "string"
+        ? itemOrId
+        : itemOrId?.uniqueId || itemOrId?.id;
+    if (!postId) return;
+
+    const targetPost = allCompanyPosts.value.find(
+      (p) => (p.uniqueId || p.id) === postId,
+    );
+    const targetBookmark = allCompanyBookmarkedPosts.value.find(
+      (p) => (p.uniqueId || p.id) === postId,
+    );
+    const targets = [
+      targetPost,
+      targetBookmark,
+      typeof itemOrId === "object" ? itemOrId : null,
+    ].filter(Boolean);
+
+    targets.forEach((target) => {
+      if (target) {
+        if (!target.bookmarksList) target.bookmarksList = [];
+        const idx = target.bookmarksList.indexOf(currentUserId.value);
+        if (idx !== -1) {
+          target.bookmarksList.splice(idx, 1);
+          if (typeof target.bookmarksCount === "number") {
+            target.bookmarksCount = Math.max(0, target.bookmarksCount - 1);
+          }
+          target.isBookmarked = false;
+        } else {
+          target.bookmarksList.push(currentUserId.value);
+          if (typeof target.bookmarksCount === "number") {
+            target.bookmarksCount = target.bookmarksCount + 1;
+          } else {
+            target.bookmarksCount = target.bookmarksList.length;
+          }
+          target.isBookmarked = true;
+        }
+      }
+    });
+
     try {
       const res = await $fetch<any>(`/api/posts/${postId}/bookmark`, {
         method: "POST",
         body: { userUuid: currentUserId.value, userId: currentUserId.value },
       });
-      const targetPost = allCompanyPosts.value.find(
-        (p) => p.uniqueId === postId,
-      );
-      const targetBookmark = allCompanyBookmarkedPosts.value.find(
-        (p) => p.uniqueId === postId,
-      );
-      [targetPost, targetBookmark].forEach((target) => {
-        if (target) {
-          if (res?.bookmarksList) {
-            target.bookmarksList = res.bookmarksList;
-          } else {
-            if (!target.bookmarksList) target.bookmarksList = [];
-            const idx = target.bookmarksList.indexOf(currentUserId.value);
-            if (idx !== -1) target.bookmarksList.splice(idx, 1);
-            else target.bookmarksList.push(currentUserId.value);
-          }
+      targets.forEach((target) => {
+        if (target && res?.bookmarksList) {
+          target.bookmarksList = res.bookmarksList;
         }
       });
     } catch (e) {
@@ -415,48 +555,133 @@ export const useCompanyProfile = () => {
     }
   };
 
-  const toggleJobLike = async (job: any) => {
+  const toggleJobLike = async (itemOrJob: any) => {
     if (!currentUserId.value) return;
-    if (!job.likesList) job.likesList = [];
-    if (!job.dislikesList) job.dislikesList = [];
+    const uid = currentUserId.value;
 
-    const idx = job.likesList.indexOf(currentUserId.value);
-    if (idx !== -1) {
-      job.likesList.splice(idx, 1);
+    const jobId =
+      typeof itemOrJob === "string"
+        ? itemOrJob
+        : itemOrJob?.id || itemOrJob?.uniqueId;
+
+    const job =
+      typeof itemOrJob === "object"
+        ? itemOrJob
+        : (company.value.vacancies || []).find(
+            (j: any) => (j.id || j.uniqueId) === jobId,
+          ) ||
+          allCompanyBookmarkedJobs.value.find(
+            (j: any) => (j.id || j.uniqueId) === jobId,
+          );
+
+    if (!job) return;
+
+    if (!job.likesList) job.likesList = [];
+    const wasLiked = Boolean(
+      job.isLiked ||
+      (Array.isArray(job.likesList) && job.likesList.includes(uid)),
+    );
+
+    if (wasLiked) {
+      job.isLiked = false;
+      job.likesList = job.likesList.filter((id: string) => id !== uid);
+      job.likesCount = Math.max(
+        0,
+        (typeof job.likesCount === "number"
+          ? job.likesCount
+          : job.likesList.length + 1) - 1,
+      );
     } else {
-      job.likesList.push(currentUserId.value);
-      const dislikeIdx = job.dislikesList.indexOf(currentUserId.value);
-      if (dislikeIdx !== -1) job.dislikesList.splice(dislikeIdx, 1);
+      job.isLiked = true;
+      if (!job.likesList.includes(uid)) job.likesList.push(uid);
+      job.likesCount =
+        (typeof job.likesCount === "number"
+          ? job.likesCount
+          : job.likesList.length - 1) + 1;
     }
+    job.likes = job.likesCount;
 
     try {
-      await $fetch(`/api/jobs/${job.id}/like`, {
+      await $fetch(`/api/jobs/${jobId}/like`, {
         method: "POST",
-        body: { userUuid: currentUserId.value, userId: currentUserId.value },
+        body: { userUuid: uid, userId: uid },
       });
     } catch (e) {
-      // Local optimistic state preserved
+      // Revert on error
+      job.isLiked = wasLiked;
+      if (wasLiked) {
+        if (!job.likesList.includes(uid)) job.likesList.push(uid);
+        job.likesCount = job.likesCount + 1;
+      } else {
+        job.likesList = job.likesList.filter((id: string) => id !== uid);
+        job.likesCount = Math.max(0, job.likesCount - 1);
+      }
+      job.likes = job.likesCount;
     }
   };
 
-  const toggleJobBookmark = async (job: any) => {
+  const toggleJobBookmark = async (itemOrJob: any) => {
     if (!currentUserId.value) return;
-    if (!job.bookmarksList) job.bookmarksList = [];
+    const uid = currentUserId.value;
 
-    const idx = job.bookmarksList.indexOf(currentUserId.value);
-    if (idx !== -1) {
-      job.bookmarksList.splice(idx, 1);
+    const jobId =
+      typeof itemOrJob === "string"
+        ? itemOrJob
+        : itemOrJob?.id || itemOrJob?.uniqueId;
+
+    const job =
+      typeof itemOrJob === "object"
+        ? itemOrJob
+        : (company.value.vacancies || []).find(
+            (j: any) => (j.id || j.uniqueId) === jobId,
+          ) ||
+          allCompanyBookmarkedJobs.value.find(
+            (j: any) => (j.id || j.uniqueId) === jobId,
+          );
+
+    if (!job) return;
+
+    if (!job.bookmarksList) job.bookmarksList = [];
+    const wasBookmarked = Boolean(
+      job.isBookmarked ||
+      (Array.isArray(job.bookmarksList) && job.bookmarksList.includes(uid)),
+    );
+
+    if (wasBookmarked) {
+      job.isBookmarked = false;
+      job.bookmarksList = job.bookmarksList.filter((id: string) => id !== uid);
+      job.bookmarksCount = Math.max(
+        0,
+        (typeof job.bookmarksCount === "number"
+          ? job.bookmarksCount
+          : job.bookmarksList.length + 1) - 1,
+      );
     } else {
-      job.bookmarksList.push(currentUserId.value);
+      job.isBookmarked = true;
+      if (!job.bookmarksList.includes(uid)) job.bookmarksList.push(uid);
+      job.bookmarksCount =
+        (typeof job.bookmarksCount === "number"
+          ? job.bookmarksCount
+          : job.bookmarksList.length - 1) + 1;
     }
 
     try {
-      await $fetch(`/api/jobs/${job.id}/bookmark`, {
+      await $fetch(`/api/jobs/${jobId}/bookmark`, {
         method: "POST",
-        body: { userUuid: currentUserId.value, userId: currentUserId.value },
+        body: { userUuid: uid, userId: uid },
       });
     } catch (e) {
-      // Local optimistic state preserved
+      // Revert on error
+      job.isBookmarked = wasBookmarked;
+      if (wasBookmarked) {
+        if (!job.bookmarksList.includes(uid)) job.bookmarksList.push(uid);
+        job.bookmarksCount = job.bookmarksCount + 1;
+      } else {
+        job.bookmarksList = job.bookmarksList.filter(
+          (id: string) => id !== uid,
+        );
+        job.bookmarksCount = Math.max(0, job.bookmarksCount - 1);
+      }
     }
   };
 
@@ -478,6 +703,7 @@ export const useCompanyProfile = () => {
     loadingCompanyPosts,
     companyPosts,
     companyBookmarkedPosts,
+    companyBookmarkedJobs,
     currentUserId,
     showReportCompanyModal,
     isPdfModalOpen,

@@ -28,7 +28,8 @@
         Postulaciones pausadas temporalmente
       </p>
       <p>
-        Esta oferta de empleo ha sido pausada temporalmente por la organización. No se admiten nuevas solicitudes de empleo por el momento.
+        Esta oferta de empleo ha sido pausada temporalmente por la organización.
+        No se admiten nuevas solicitudes de empleo por el momento.
       </p>
     </div>
 
@@ -207,16 +208,23 @@
         class="space-y-3 bg-primary/5 border border-primary/20 p-4 rounded-2xl"
       >
         <div class="flex items-center justify-between flex-wrap gap-2">
-          <label class="text-xs font-bold text-on-background flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm text-primary">quiz</span>
+          <label
+            class="text-xs font-bold text-on-background flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-sm text-primary"
+              >quiz</span
+            >
             Preguntas Filtro de la Empresa
           </label>
-          <span class="text-[10px] font-bold text-rose-500 uppercase tracking-wider bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20">
+          <span
+            class="text-[10px] font-bold text-rose-500 uppercase tracking-wider bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20"
+          >
             * Respuestas Obligatorias ({{ screeningQuestions.length }})
           </span>
         </div>
         <p class="text-[11px] text-on-surface-variant dark:text-slate-400">
-          La organización requiere que respondas a las siguientes preguntas para precalificar tu postulación:
+          La organización requiere que respondas a las siguientes preguntas para
+          precalificar tu postulación:
         </p>
 
         <div class="space-y-3">
@@ -225,8 +233,12 @@
             :key="idx"
             class="space-y-1"
           >
-            <label class="text-xs font-semibold text-on-background flex items-start gap-1.5">
-              <span class="w-5 h-5 rounded-full bg-primary/10 text-primary font-bold text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <label
+              class="text-xs font-semibold text-on-background flex items-start gap-1.5"
+            >
+              <span
+                class="w-5 h-5 rounded-full bg-primary/10 text-primary font-bold text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5"
+              >
                 {{ idx + 1 }}
               </span>
               <span>{{ pregunta }}</span>
@@ -234,7 +246,12 @@
             </label>
             <textarea
               :value="(filterAnswers && filterAnswers[pregunta]) || ''"
-              @input="updateAnswer(pregunta, ($event.target as HTMLTextAreaElement).value)"
+              @input="
+                updateAnswer(
+                  pregunta,
+                  ($event.target as HTMLTextAreaElement).value,
+                )
+              "
               rows="2"
               required
               :placeholder="`Escribe tu respuesta a: ${pregunta}`"
@@ -256,7 +273,9 @@
         <button
           type="button"
           @click="$emit('easyApply')"
-          :disabled="isApplying || hasMissingFilterAnswers || job.estado === 'PAUSADA'"
+          :disabled="
+            isApplying || hasMissingFilterAnswers || job.estado === 'PAUSADA'
+          "
           class="w-full sm:w-auto bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-primary/20 active:scale-95 disabled:opacity-50 flex-shrink-0"
         >
           <span
@@ -264,7 +283,11 @@
             class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
             aria-hidden="true"
           ></span>
-          <span v-else-if="job.estado === 'PAUSADA'" class="material-symbols-outlined text-sm">pause_circle</span>
+          <span
+            v-else-if="job.estado === 'PAUSADA'"
+            class="material-symbols-outlined text-sm"
+            >pause_circle</span
+          >
           <span v-else class="material-symbols-outlined text-sm">send</span>
           <span>{{
             isApplying

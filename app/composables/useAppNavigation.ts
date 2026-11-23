@@ -56,7 +56,7 @@ export const useAppNavigation = () => {
     if (status.value !== "authenticated") return "guest";
     const user = data.value?.user;
     const tipo = (user?.tipoUsuario || "").toUpperCase();
-    if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
+    if (tipo === "ORGANIZACION") return "organization";
     if (tipo === "ADMIN") return "admin";
     if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
     return "candidate";
@@ -97,10 +97,36 @@ export const useAppNavigation = () => {
 
   const profileRoute = computed(() => "/profile");
 
+  const normalizePath = (p: string) => p.replace(/\/+$/, "") || "/";
+
   const isActive = (path: string | null): boolean => {
     if (!path) return false;
-    if (path === "/") return route.path === "/";
-    return route.path.startsWith(path);
+
+    const current = normalizePath(route.path);
+    const target = normalizePath(path);
+
+    // 1. Coincidencia exacta (ej: /admin === /admin, / === /, /admin/analytics === /admin/analytics)
+    if (current === target) return true;
+
+    // 2. Rutas raíz que NUNCA deben coincidir con subrutas hermanas
+    if (target === "/" || target === "/admin") {
+      return false;
+    }
+
+    // 3. Casos especiales de detalle asociados a listas principales
+    if (target === "/vacancies" && current.startsWith("/jobs/")) {
+      return true;
+    }
+    if (target === "/companies" && current.startsWith("/company/")) {
+      return true;
+    }
+    if (target === "/my-vacancies" && current.startsWith("/edit-vacancy/")) {
+      return true;
+    }
+
+    // 4. Subrutas jerárquicas reales (requiere frontera de segmento '/')
+    // Evita falsos positivos como /create coincidiendo con /create-vacancy
+    return current.startsWith(`${target}/`);
   };
 
   const handleNavClick = (item: NavItem, onBeforeNavigate?: () => void) => {
@@ -121,7 +147,7 @@ export const useAppNavigation = () => {
         return {
           to: "/create",
           icon: "add_circle",
-          label: "Publicar Oferta",
+          label: "Crear Nuevo recurso",
           protected: true,
         };
       case "admin":
@@ -187,6 +213,12 @@ export const useAppNavigation = () => {
             title: "Moderación & Auditoría",
             items: [
               {
+                to: "/admin/fraud",
+                icon: "find_in_page",
+                label: "Reportes de Fraude",
+                protected: true,
+              },
+              {
                 to: "/mod/incidents",
                 icon: "report_problem",
                 label: "Incidencias",
@@ -208,6 +240,12 @@ export const useAppNavigation = () => {
                 to: "/saved",
                 icon: "bookmark",
                 label: "Guardados",
+                protected: true,
+              },
+              {
+                to: "/support",
+                icon: "report_problem",
+                label: "Reportar un problema",
                 protected: true,
               },
             ],
@@ -253,6 +291,12 @@ export const useAppNavigation = () => {
                 to: "/saved",
                 icon: "bookmark",
                 label: "Guardados",
+                protected: true,
+              },
+              {
+                to: "/support",
+                icon: "report_problem",
+                label: "Reportar un problema",
                 protected: true,
               },
               {
@@ -312,10 +356,16 @@ export const useAppNavigation = () => {
                 label: "Guardados",
                 protected: true,
               },
+              {
+                to: "/support",
+                icon: "report_problem",
+                label: "Reportar un problema",
+                protected: true,
+              },
             ],
           },
           {
-            title: "Empresa & Soporte",
+            title: "Organización & Soporte",
             items: [
               {
                 to: "/company/verification",
@@ -325,8 +375,8 @@ export const useAppNavigation = () => {
               },
               {
                 to: "/support",
-                icon: "gavel",
-                label: "Soporte y Apelaciones",
+                icon: "report_problem",
+                label: "Reportar un problema",
                 protected: true,
               },
             ],
@@ -374,15 +424,21 @@ export const useAppNavigation = () => {
             title: "Mi Actividad",
             items: [
               {
-                to: "/candidate/cv-templates",
-                icon: "auto_stories",
-                label: "Plantillas de CV",
+                to: "/candidate/my-applications",
+                icon: "fact_check",
+                label: "Mis Postulaciones",
                 protected: true,
               },
               {
                 to: "/saved",
                 icon: "bookmark",
                 label: "Guardados",
+                protected: true,
+              },
+              {
+                to: "/support",
+                icon: "report_problem",
+                label: "Reportar un problema",
                 protected: true,
               },
             ],

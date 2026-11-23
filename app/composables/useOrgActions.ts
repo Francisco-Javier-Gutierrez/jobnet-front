@@ -1,5 +1,6 @@
 import { useRuntimeConfig } from "#imports";
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import { apiFetch } from "~/composables/useApiClient";
 
 export function useOrgActions(refreshData: () => Promise<void>) {
   const config = useRuntimeConfig();
@@ -21,7 +22,7 @@ export function useOrgActions(refreshData: () => Promise<void>) {
     try {
       const nextStatus = !org.organizacionVerificada;
       org.organizacionVerificada = nextStatus;
-      await $fetch(`${config.public.apiUrl}/profile/${org.id}`, {
+      await apiFetch(`/profile/${org.id}`, {
         method: "POST",
         body: { organizacionVerificada: nextStatus },
       });
@@ -73,8 +74,8 @@ export function useOrgActions(refreshData: () => Promise<void>) {
 
     try {
       if (actionType === "INITIATE") {
-        await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${orgId}/initiate-suspension`,
+        await apiFetch(
+          `/moderator/organizations/${orgId}/initiate-suspension`,
           {
             method: "POST",
             body: {
@@ -88,8 +89,8 @@ export function useOrgActions(refreshData: () => Promise<void>) {
         );
         successMsg.value = `Fase 1 completada: Notificación enviada a ${orgName}. Cuenta en revisión (${graceDaysInput.value || 4} días de gracia).`;
       } else if (actionType === "CANCEL") {
-        await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${orgId}/cancel-suspension`,
+        await apiFetch(
+          `/moderator/organizations/${orgId}/cancel-suspension`,
           {
             method: "POST",
             body: {
@@ -100,8 +101,8 @@ export function useOrgActions(refreshData: () => Promise<void>) {
         );
         successMsg.value = `Apelación aprobada. Cuenta de ${orgName} restablecida.`;
       } else if (actionType === "CONFIRM") {
-        await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${orgId}/confirm-suspension`,
+        await apiFetch(
+          `/moderator/organizations/${orgId}/confirm-suspension`,
           {
             method: "POST",
             body: {
@@ -116,6 +117,13 @@ export function useOrgActions(refreshData: () => Promise<void>) {
 
       isSanctionModalOpen.value = false;
       setTimeout(() => (successMsg.value = ""), 5000);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("incident-sync", {
+            detail: { orgId, actionType },
+          }),
+        );
+      }
       await refreshData();
     } catch (e: any) {
       console.error("Error applying sanction status:", e);

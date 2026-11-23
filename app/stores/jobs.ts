@@ -41,7 +41,10 @@ export const useJobsStore = defineStore("jobs", {
         if (params?.page) query.page = params.page;
         if (params?.limit) query.limit = params.limit;
 
-        const res = await $fetch<any>("/api/jobs", { query });
+        const config = useRuntimeConfig();
+        const baseUrl = config.public.apiUrl || "";
+        const targetUrl = baseUrl ? `${baseUrl}/jobs` : "/api/jobs";
+        const res = await $fetch<any>(targetUrl, { query });
         if (res && Array.isArray(res.data)) {
           this.jobs = res.data;
         } else if (Array.isArray(res)) {

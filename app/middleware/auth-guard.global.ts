@@ -15,7 +15,7 @@ export default defineNuxtRouteMiddleware((to) => {
         : status.value;
 
   const rawRole =
-    isMockEnabled.value && mockUser
+isMockEnabled.value && mockUser
       ? mockUser.tipoUsuario || mockUser.role
       : isMockEnabled.value && mockRole.value === "GUEST"
         ? ""
@@ -105,7 +105,7 @@ export default defineNuxtRouteMiddleware((to) => {
     if (userRole === "ADMIN") {
       return navigateTo("/admin");
     }
-    if (userRole === "ORGANIZACION" || userRole === "EMPRESA") {
+    if (userRole === "ORGANIZACION") {
       return navigateTo("/applicants");
     }
     throw createError({
@@ -115,7 +115,7 @@ export default defineNuxtRouteMiddleware((to) => {
     });
   }
 
-  // 4b. Organization Routes (/my-vacancies, /applicants, /company/edit, /create-vacancy) -> Allowed ONLY for ORGANIZACION or EMPRESA
+  // 4b. Organization Routes (/my-vacancies, /applicants, /company/edit, /create-vacancy) -> Allowed ONLY for ORGANIZACION
   const orgRoutes = [
     "/my-vacancies",
     "/applicants",
@@ -127,7 +127,7 @@ export default defineNuxtRouteMiddleware((to) => {
   if (orgRoutes.some((r) => path === r || path.startsWith(`${r}/`))) {
     if (
       effectiveStatus !== "authenticated" ||
-      (userRole !== "ORGANIZACION" && userRole !== "EMPRESA")
+      userRole !== "ORGANIZACION"
     ) {
       throw createError({
         statusCode: 404,
@@ -137,14 +137,13 @@ export default defineNuxtRouteMiddleware((to) => {
     }
   }
 
-  // 5. Candidate Edit Routes (/settings) -> POSTULANTE, CANDIDATO, ADMIN, MODERADOR, or no role (default user)
+  // 5. Candidate Edit Routes (/settings) -> CANDIDATO, ADMIN, MODERADOR, or no role (default user)
   const candidateRoutes = ["/settings"];
 
   if (candidateRoutes.some((r) => path === r || path.startsWith(`${r}/`))) {
     if (
       effectiveStatus !== "authenticated" ||
-      (userRole !== "POSTULANTE" &&
-        userRole !== "CANDIDATO" &&
+      (userRole !== "CANDIDATO" &&
         userRole !== "ADMIN" &&
         userRole !== "MODERATOR" &&
         userRole !== "MODERADOR" &&
@@ -158,11 +157,25 @@ export default defineNuxtRouteMiddleware((to) => {
     }
   }
 
-  // 6. Public Job Search Routes (/vacancies, /jobs) -> BLOCKED for ORGANIZACION / EMPRESA
+  // 5b. Candidate My Applications (/candidate/my-applications) -> Allowed ONLY for CANDIDATO
+  if (path === "/candidate/my-applications" || path.startsWith("/candidate/my-applications/")) {
+    if (
+      effectiveStatus !== "authenticated" ||
+      userRole !== "CANDIDATO"
+    ) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Página no encontrada",
+        fatal: true,
+      });
+    }
+  }
+
+  // 6. Public Job Search Routes (/vacancies, /jobs) -> BLOCKED for ORGANIZACION
   const searchRoutes = ["/vacancies", "/jobs"];
 
   if (searchRoutes.some((r) => path === r || path.startsWith(`${r}/`))) {
-    if (userRole === "ORGANIZACION" || userRole === "EMPRESA") {
+    if (userRole === "ORGANIZACION") {
       return navigateTo("/dashboard");
     }
   }

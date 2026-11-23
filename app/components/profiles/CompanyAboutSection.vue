@@ -12,7 +12,8 @@
           Ficha Institucional y Legal
         </h2>
         <p class="text-xs text-on-surface-variant dark:text-slate-400 mt-1">
-          Identificación formal, registro fiscal y datos de contacto de la organización.
+          Identificación formal, registro fiscal y datos de contacto de la
+          organización.
         </p>
       </div>
 
@@ -21,11 +22,18 @@
         <div
           class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
         >
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-primary">apartment</span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-primary"
+              >apartment</span
+            >
             Razón Social
           </span>
-          <p class="text-xs font-bold text-on-surface truncate" :title="corporateRazonSocial">
+          <p
+            class="text-xs font-bold text-on-surface truncate"
+            :title="corporateRazonSocial"
+          >
             {{ corporateRazonSocial }}
           </p>
         </div>
@@ -34,11 +42,18 @@
         <div
           class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
         >
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-secondary">store</span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-secondary"
+              >store</span
+            >
             Nombre Comercial
           </span>
-          <p class="text-xs font-bold text-on-surface truncate" :title="corporateNombreComercial">
+          <p
+            class="text-xs font-bold text-on-surface truncate"
+            :title="corporateNombreComercial"
+          >
             {{ corporateNombreComercial }}
           </p>
         </div>
@@ -47,8 +62,12 @@
         <div
           class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
         >
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-emerald-600">badge</span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-emerald-600"
+              >badge</span
+            >
             RFC (Identificador Fiscal)
           </span>
           <p class="text-xs font-mono font-bold text-on-surface">
@@ -60,8 +79,12 @@
         <div
           class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
         >
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-indigo-600">category</span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-indigo-600"
+              >category</span
+            >
             Sector / Industria
           </span>
           <p class="text-xs font-medium text-on-surface truncate">
@@ -73,8 +96,12 @@
         <div
           class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
         >
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-amber-600">groups</span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-amber-600"
+              >groups</span
+            >
             Tamaño de Organización
           </span>
           <p class="text-xs font-medium text-on-surface">
@@ -86,11 +113,18 @@
         <div
           class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
         >
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-rose-600">location_on</span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-rose-600"
+              >location_on</span
+            >
             Sede Principal
           </span>
-          <p class="text-xs font-medium text-on-surface truncate" :title="company.location">
+          <p
+            class="text-xs font-medium text-on-surface truncate"
+            :title="company.location"
+          >
             {{ company.location || "Ubicación no especificada" }}
           </p>
         </div>
@@ -100,12 +134,19 @@
           v-if="company.email"
           class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
         >
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-primary">mail</span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-primary"
+              >mail</span
+            >
             Correo Institucional
           </span>
           <p class="text-xs font-medium text-on-surface truncate">
-            <a :href="`mailto:${company.email}`" class="text-primary hover:underline">
+            <a
+              :href="`mailto:${company.email}`"
+              class="text-primary hover:underline"
+            >
               {{ company.email }}
             </a>
           </p>
@@ -116,8 +157,12 @@
           v-if="company.telefono"
           class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
         >
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-emerald-600">call</span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-emerald-600"
+              >call</span
+            >
             Teléfono de Contacto
           </span>
           <p class="text-xs font-medium text-on-surface">
@@ -130,8 +175,12 @@
           v-if="company.website"
           class="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-800/40 border border-outline-variant/30 space-y-1"
         >
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-secondary">language</span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-secondary"
+              >language</span
+            >
             Portal Web Oficial
           </span>
           <p class="text-xs font-medium text-on-surface truncate">

@@ -1,5 +1,10 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-[99900] flex items-start justify-center pt-14 sm:pt-20 px-4 bg-slate-950/60 backdrop-blur-md" @click.self="closeCommandPalette" data-modal-active="true">
+  <div
+    v-if="isOpen"
+    class="fixed inset-0 z-[99900] flex items-start justify-center pt-14 sm:pt-20 px-4 bg-slate-950/60 backdrop-blur-md"
+    @click.self="closeCommandPalette"
+    data-modal-active="true"
+  >
     <div
       class="w-full max-w-2xl bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] transition-all duration-200"
       role="dialog"
@@ -7,8 +12,12 @@
       aria-label="Paleta de Comandos"
     >
       <!-- Top Search Header -->
-      <div class="p-3.5 border-b border-outline-variant/50 dark:border-slate-800 flex items-center gap-3 bg-surface-container-low/40 dark:bg-slate-900/60">
-        <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 animate-pulse">
+      <div
+        class="p-3.5 border-b border-outline-variant/50 dark:border-slate-800 flex items-center gap-3 bg-surface-container-low/40 dark:bg-slate-900/60"
+      >
+        <span
+          class="material-symbols-outlined text-primary text-2xl flex-shrink-0 animate-pulse"
+        >
           search
         </span>
         <input
@@ -32,28 +41,47 @@
           >
             <span class="material-symbols-outlined text-base">close</span>
           </button>
-          <kbd class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono font-bold bg-surface-container dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 text-on-surface-variant dark:text-slate-400 rounded-md shadow-2xs">
+          <kbd
+            class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono font-bold bg-surface-container dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 text-on-surface-variant dark:text-slate-400 rounded-md shadow-2xs"
+          >
             ESC
           </kbd>
         </div>
       </div>
 
       <!-- Results Body -->
-      <div ref="resultsContainerRef" class="flex-1 overflow-y-auto p-2 space-y-4 min-h-[160px] max-h-[55vh]">
+      <div
+        ref="resultsContainerRef"
+        class="flex-1 overflow-y-auto p-2 space-y-4 min-h-[160px] max-h-[55vh]"
+      >
         <!-- Empty Results -->
-        <div v-if="filteredItems.length === 0" class="py-12 text-center space-y-2">
-          <span class="material-symbols-outlined text-4xl text-on-surface-variant/60 dark:text-slate-500">search_off</span>
-          <p class="text-sm font-bold text-on-surface dark:text-slate-200">No se encontraron resultados</p>
-          <p class="text-xs text-on-surface-variant dark:text-slate-400 max-w-sm mx-auto">
+        <div
+          v-if="filteredItems.length === 0"
+          class="py-12 text-center space-y-2"
+        >
+          <span
+            class="material-symbols-outlined text-4xl text-on-surface-variant/60 dark:text-slate-500"
+            >search_off</span
+          >
+          <p class="text-sm font-bold text-on-surface dark:text-slate-200">
+            No se encontraron resultados
+          </p>
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-400 max-w-sm mx-auto"
+          >
             {{ emptyStateTip }}
           </p>
         </div>
 
         <!-- Grouped List -->
         <div v-for="group in groupedItems" :key="group.title" class="space-y-1">
-          <div class="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/70 dark:text-slate-400 flex items-center justify-between">
+          <div
+            class="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/70 dark:text-slate-400 flex items-center justify-between"
+          >
             <span>{{ group.title }}</span>
-            <span class="text-[10px] font-mono opacity-80">{{ group.items.length }}</span>
+            <span class="text-[10px] font-mono opacity-80">{{
+              group.items.length
+            }}</span>
           </div>
 
           <button
@@ -67,19 +95,26 @@
             :class="[
               activeIndex === item.flatIndex
                 ? 'bg-primary/10 text-primary dark:bg-indigo-950/70 dark:text-indigo-300 font-semibold shadow-xs ring-1 ring-primary/20'
-                : 'text-on-surface dark:text-slate-200 hover:bg-surface-container/60 dark:hover:bg-slate-800/60'
+                : 'text-on-surface dark:text-slate-200 hover:bg-surface-container/60 dark:hover:bg-slate-800/60',
             ]"
           >
             <div class="flex items-center gap-3 min-w-0">
               <span
                 class="material-symbols-outlined text-[20px] flex-shrink-0 transition-transform group-hover:scale-110"
-                :class="activeIndex === item.flatIndex ? 'text-primary dark:text-indigo-400' : 'text-on-surface-variant dark:text-slate-400'"
+                :class="
+                  activeIndex === item.flatIndex
+                    ? 'text-primary dark:text-indigo-400'
+                    : 'text-on-surface-variant dark:text-slate-400'
+                "
               >
                 {{ item.icon }}
               </span>
               <div class="min-w-0">
                 <p class="truncate font-semibold">{{ item.title }}</p>
-                <p v-if="item.subtitle" class="text-[10px] text-on-surface-variant dark:text-slate-400 truncate font-normal">
+                <p
+                  v-if="item.subtitle"
+                  class="text-[10px] text-on-surface-variant dark:text-slate-400 truncate font-normal"
+                >
                   {{ item.subtitle }}
                 </p>
               </div>
@@ -105,23 +140,39 @@
       </div>
 
       <!-- Bottom Keyboard Navigation Tips -->
-      <div class="p-2.5 px-4 bg-surface-container-low/50 dark:bg-slate-900/80 border-t border-outline-variant/40 dark:border-slate-800 flex items-center justify-between text-[11px] text-on-surface-variant dark:text-slate-400">
+      <div
+        class="p-2.5 px-4 bg-surface-container-low/50 dark:bg-slate-900/80 border-t border-outline-variant/40 dark:border-slate-800 flex items-center justify-between text-[11px] text-on-surface-variant dark:text-slate-400"
+      >
         <div class="flex items-center gap-4 flex-wrap">
           <span class="flex items-center gap-1">
-            <kbd class="px-1.5 py-0.5 font-mono text-[9px] bg-surface dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded shadow-2xs">↑</kbd>
-            <kbd class="px-1.5 py-0.5 font-mono text-[9px] bg-surface dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded shadow-2xs">↓</kbd>
+            <kbd
+              class="px-1.5 py-0.5 font-mono text-[9px] bg-surface dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded shadow-2xs"
+              >↑</kbd
+            >
+            <kbd
+              class="px-1.5 py-0.5 font-mono text-[9px] bg-surface dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded shadow-2xs"
+              >↓</kbd
+            >
             Navegar
           </span>
           <span class="flex items-center gap-1">
-            <kbd class="px-1.5 py-0.5 font-mono text-[9px] bg-surface dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded shadow-2xs">↵</kbd>
+            <kbd
+              class="px-1.5 py-0.5 font-mono text-[9px] bg-surface dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded shadow-2xs"
+              >↵</kbd
+            >
             Ejecutar
           </span>
           <span class="flex items-center gap-1">
-            <kbd class="px-1.5 py-0.5 font-mono text-[9px] bg-surface dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded shadow-2xs">Esc</kbd>
+            <kbd
+              class="px-1.5 py-0.5 font-mono text-[9px] bg-surface dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded shadow-2xs"
+              >Esc</kbd
+            >
             Cerrar
           </span>
         </div>
-        <div class="hidden sm:flex items-center gap-1 text-[10px] font-semibold text-primary dark:text-indigo-400">
+        <div
+          class="hidden sm:flex items-center gap-1 text-[10px] font-semibold text-primary dark:text-indigo-400"
+        >
           <span>{{ roleLabel }}</span>
         </div>
       </div>
@@ -135,14 +186,13 @@ import { useRouter } from "vue-router";
 import { useCommandPalette } from "~/composables/useCommandPalette";
 import { useTheme } from "~/composables/useTheme";
 import { useJobsStore } from "~/stores/jobs";
-import { useCommunityCvTemplates } from "~/composables/useCommunityCvTemplates";
 
 interface CommandItem {
   id: string;
   title: string;
   subtitle?: string;
   icon: string;
-  group: "Acciones Rápidas" | "Navegación" | "Vacantes" | "Plantillas de CV";
+  group: "Acciones Rápidas" | "Navegación" | "Vacantes";
   badge?: string;
   badgeVariant?: "primary" | "secondary" | "accent" | "neutral";
   keywords?: string[];
@@ -155,18 +205,20 @@ const router = useRouter();
 const { toggleTheme, isDark } = useTheme();
 const { status, data: session, signOut } = useAuth();
 const jobsStore = useJobsStore();
-const { filteredTemplates: communityTemplates, fetchTemplates } = useCommunityCvTemplates();
 
 const searchQuery = ref("");
 const activeIndex = ref(0);
 const searchInputRef = ref<HTMLInputElement | null>(null);
 const resultsContainerRef = ref<HTMLElement | null>(null);
 
-const userRole = computed<"guest" | "candidate" | "organization" | "admin" | "moderator">(() => {
+const userRole = computed<
+  "guest" | "candidate" | "organization" | "admin" | "moderator"
+>(() => {
   if (status.value !== "authenticated") return "guest";
   const user = session.value?.user as any;
   const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
-  if (tipo === "ORGANIZACION" || tipo === "ORGANIZATION" || tipo === "EMPRESA") return "organization";
+  if (tipo === "ORGANIZACION")
+    return "organization";
   if (tipo === "ADMIN") return "admin";
   if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
   return "candidate";
@@ -234,7 +286,16 @@ const staticItems = computed<CommandItem[]>(() => {
     group: "Acciones Rápidas",
     badge: "Tema",
     badgeVariant: "accent",
-    keywords: ["tema", "oscuro", "claro", "dark", "light", "modo", "color", "apariencia"],
+    keywords: [
+      "tema",
+      "oscuro",
+      "claro",
+      "dark",
+      "light",
+      "modo",
+      "color",
+      "apariencia",
+    ],
     action: () => toggleTheme(),
   });
 
@@ -252,7 +313,14 @@ const staticItems = computed<CommandItem[]>(() => {
         group: "Acciones Rápidas",
         badge: "Cuenta",
         badgeVariant: "primary",
-        keywords: ["login", "entrar", "ingresar", "iniciar", "sesion", "cuenta"],
+        keywords: [
+          "login",
+          "entrar",
+          "ingresar",
+          "iniciar",
+          "sesion",
+          "cuenta",
+        ],
         action: () => router.push("/login"),
       },
       {
@@ -263,20 +331,33 @@ const staticItems = computed<CommandItem[]>(() => {
         group: "Acciones Rápidas",
         badge: "Registro",
         badgeVariant: "secondary",
-        keywords: ["registro", "registrarme", "cuenta", "nuevo", "candidato", "postulante"],
+        keywords: [
+          "registro",
+          "registrarme",
+          "cuenta",
+          "nuevo",
+          "candidato",
+          "postulante",
+        ],
         action: () => router.push("/register"),
       },
       {
         id: "action-register-company",
-        title: "Registrar Organización o Empresa",
+        title: "Registrar Organización",
         subtitle: "Publicar ofertas laborales y captar talento",
         icon: "domain_add",
         group: "Acciones Rápidas",
-        badge: "Empresas",
+        badge: "Organizaciones",
         badgeVariant: "neutral",
-        keywords: ["empresa", "organizacion", "corporativo", "reclutador", "registro empresa"],
+        keywords: [
+          "empresa",
+          "organizacion",
+          "corporativo",
+          "reclutador",
+          "registro empresa",
+        ],
         action: () => router.push("/register-company"),
-      }
+      },
     );
 
     // Guest Navigation
@@ -288,7 +369,15 @@ const staticItems = computed<CommandItem[]>(() => {
       group: "Navegación",
       badge: "Empleos",
       badgeVariant: "neutral",
-      keywords: ["vacantes", "empleos", "trabajo", "jobs", "remoto", "hibrido", "ofertas"],
+      keywords: [
+        "vacantes",
+        "empleos",
+        "trabajo",
+        "jobs",
+        "remoto",
+        "hibrido",
+        "ofertas",
+      ],
       action: () => router.push("/vacancies"),
     });
   } else if (role === "candidate") {
@@ -302,19 +391,33 @@ const staticItems = computed<CommandItem[]>(() => {
         group: "Acciones Rápidas",
         badge: "Postulaciones",
         badgeVariant: "primary",
-        keywords: ["postulaciones", "candidaturas", "mis aplicaciones", "seguimiento", "estado"],
+        keywords: [
+          "postulaciones",
+          "candidaturas",
+          "mis aplicaciones",
+          "seguimiento",
+          "estado",
+        ],
         action: () => router.push("/candidate/my-applications"),
       },
       {
-        id: "action-cv-templates",
-        title: "Comunidad de Plantillas de CV",
-        subtitle: "Formatos profesionales y optimizados para filtros ATS",
-        icon: "auto_stories",
+        id: "action-cv-builder",
+        title: "Generar y Administrar CV",
+        subtitle: "Crea y descarga tu currículum profesional en formato Carta",
+        icon: "picture_as_pdf",
         group: "Acciones Rápidas",
-        badge: "Comunidad",
-        badgeVariant: "secondary",
-        keywords: ["cv", "curriculum", "plantillas", "templates", "ats", "habilidades", "rol"],
-        action: () => router.push("/candidate/cv-templates"),
+        badge: "CV",
+        badgeVariant: "primary",
+        keywords: [
+          "cv",
+          "curriculum",
+          "hoja de vida",
+          "builder",
+          "pdf",
+          "descargar",
+          "carta",
+        ],
+        action: () => router.push("/candidate/profile"),
       },
       {
         id: "action-saved",
@@ -324,9 +427,15 @@ const staticItems = computed<CommandItem[]>(() => {
         group: "Acciones Rápidas",
         badge: "Guardados",
         badgeVariant: "neutral",
-        keywords: ["guardados", "favoritos", "bookmarks", "marcadores", "guardar"],
+        keywords: [
+          "guardados",
+          "favoritos",
+          "bookmarks",
+          "marcadores",
+          "guardar",
+        ],
         action: () => router.push("/saved"),
-      }
+      },
     );
 
     // Candidate Navigation
@@ -339,7 +448,15 @@ const staticItems = computed<CommandItem[]>(() => {
         group: "Navegación",
         badge: "Empleos",
         badgeVariant: "neutral",
-        keywords: ["vacantes", "empleos", "trabajo", "jobs", "remoto", "hibrido", "ofertas"],
+        keywords: [
+          "vacantes",
+          "empleos",
+          "trabajo",
+          "jobs",
+          "remoto",
+          "hibrido",
+          "ofertas",
+        ],
         action: () => router.push("/vacancies"),
       },
       {
@@ -350,7 +467,14 @@ const staticItems = computed<CommandItem[]>(() => {
         group: "Navegación",
         badge: "Perfil",
         badgeVariant: "neutral",
-        keywords: ["perfil", "cuenta", "usuario", "cv", "habilidades", "experiencia"],
+        keywords: [
+          "perfil",
+          "cuenta",
+          "usuario",
+          "cv",
+          "habilidades",
+          "experiencia",
+        ],
         action: () => router.push("/profile"),
       },
       {
@@ -374,7 +498,7 @@ const staticItems = computed<CommandItem[]>(() => {
         badgeVariant: "neutral",
         keywords: ["notificaciones", "avisos", "alertas", "novedades"],
         action: () => router.push("/notifications"),
-      }
+      },
     );
   } else if (role === "organization") {
     // Organization Quick Actions
@@ -387,18 +511,33 @@ const staticItems = computed<CommandItem[]>(() => {
         group: "Acciones Rápidas",
         badge: "Empresa",
         badgeVariant: "primary",
-        keywords: ["crear", "publicar", "nueva", "vacante", "oferta", "reclutar", "empleo"],
+        keywords: [
+          "crear",
+          "publicar",
+          "nueva",
+          "vacante",
+          "oferta",
+          "reclutar",
+          "empleo",
+        ],
         action: () => router.push("/create-vacancy"),
       },
       {
         id: "action-applicants",
-        title: "Tablero ATS de Postulantes",
+        title: "Tablero ATS de Candidatos",
         subtitle: "Gestionar candidatos en el embudo de contratación",
         icon: "dashboard_customize",
         group: "Acciones Rápidas",
         badge: "ATS",
         badgeVariant: "secondary",
-        keywords: ["ats", "postulantes", "candidatos", "embudo", "talento", "revision"],
+        keywords: [
+          "ats",
+          "postulantes",
+          "candidatos",
+          "embudo",
+          "talento",
+          "revision",
+        ],
         action: () => router.push("/applicants"),
       },
       {
@@ -409,7 +548,12 @@ const staticItems = computed<CommandItem[]>(() => {
         group: "Acciones Rápidas",
         badge: "Gestión",
         badgeVariant: "neutral",
-        keywords: ["mis vacantes", "activas", "ofertas publicadas", "gestionar vacantes"],
+        keywords: [
+          "mis vacantes",
+          "activas",
+          "ofertas publicadas",
+          "gestionar vacantes",
+        ],
         action: () => router.push("/my-vacancies"),
       },
       {
@@ -422,7 +566,7 @@ const staticItems = computed<CommandItem[]>(() => {
         badgeVariant: "neutral",
         keywords: ["verificacion", "validar", "documentos", "rfc", "estatus"],
         action: () => router.push("/company/verification"),
-      }
+      },
     );
 
     // Organization Navigation
@@ -433,10 +577,10 @@ const staticItems = computed<CommandItem[]>(() => {
         subtitle: "Información corporativa, logotipo y cultura",
         icon: "business",
         group: "Navegación",
-        badge: "Empresa",
+        badge: "Organización",
         badgeVariant: "neutral",
-        keywords: ["perfil empresa", "organizacion", "logo", "datos fiscales"],
-        action: () => router.push("/company/profile"),
+        keywords: ["perfil organizacion", "organizacion", "logo", "datos fiscales"],
+        action: () => router.push("/company/edit"),
       },
       {
         id: "nav-messages",
@@ -470,7 +614,7 @@ const staticItems = computed<CommandItem[]>(() => {
         badgeVariant: "neutral",
         keywords: ["soporte", "apelaciones", "ayuda", "contacto"],
         action: () => router.push("/support"),
-      }
+      },
     );
   } else if (role === "admin") {
     // Admin Quick Actions
@@ -478,23 +622,40 @@ const staticItems = computed<CommandItem[]>(() => {
       {
         id: "action-admin-dashboard",
         title: "Panel Principal y Monitoreo",
-        subtitle: "Métricas del sistema, salud de infraestructura y resumen general",
+        subtitle:
+          "Métricas del sistema, salud de infraestructura y resumen general",
         icon: "dashboard",
         group: "Acciones Rápidas",
         badge: "Admin",
         badgeVariant: "primary",
-        keywords: ["admin", "dashboard", "panel", "monitoreo", "metricas", "sistema", "salud"],
+        keywords: [
+          "admin",
+          "dashboard",
+          "panel",
+          "monitoreo",
+          "metricas",
+          "sistema",
+          "salud",
+        ],
         action: () => router.push("/admin"),
       },
       {
         id: "action-admin-analytics",
         title: "Métricas y Analítica Global",
-        subtitle: "Habilidades en demanda, distribución geográfica y postulaciones",
+        subtitle:
+          "Habilidades en demanda, distribución geográfica y postulaciones",
         icon: "insights",
         group: "Acciones Rápidas",
         badge: "Analítica",
         badgeVariant: "secondary",
-        keywords: ["analitica", "metricas", "kpi", "estadisticas", "habilidades", "mercado"],
+        keywords: [
+          "analitica",
+          "metricas",
+          "kpi",
+          "estadisticas",
+          "habilidades",
+          "mercado",
+        ],
         action: () => router.push("/admin/analytics"),
       },
       {
@@ -529,7 +690,7 @@ const staticItems = computed<CommandItem[]>(() => {
         badgeVariant: "accent",
         keywords: ["fraude", "seguridad", "anomalias", "auditoria"],
         action: () => router.push("/admin/fraud"),
-      }
+      },
     );
 
     // Admin Navigation
@@ -566,7 +727,7 @@ const staticItems = computed<CommandItem[]>(() => {
         badgeVariant: "neutral",
         keywords: ["notificaciones", "alertas"],
         action: () => router.push("/notifications"),
-      }
+      },
     );
   } else if (role === "moderator") {
     // Moderator Quick Actions
@@ -614,7 +775,7 @@ const staticItems = computed<CommandItem[]>(() => {
         badgeVariant: "neutral",
         keywords: ["soporte", "tickets", "asistencia"],
         action: () => router.push("/mod/support"),
-      }
+      },
     );
 
     // Moderator Navigation
@@ -640,7 +801,7 @@ const staticItems = computed<CommandItem[]>(() => {
         badgeVariant: "neutral",
         keywords: ["notificaciones", "alertas"],
         action: () => router.push("/notifications"),
-      }
+      },
     );
   }
 
@@ -654,7 +815,15 @@ const staticItems = computed<CommandItem[]>(() => {
       group: "Navegación",
       badge: "Edoméx",
       badgeVariant: "secondary",
-      keywords: ["mapa", "geolocalizacion", "edomex", "ubicacion", "distancia", "gps", "toluca"],
+      keywords: [
+        "mapa",
+        "geolocalizacion",
+        "edomex",
+        "ubicacion",
+        "distancia",
+        "gps",
+        "toluca",
+      ],
       action: () => router.push("/map"),
     },
     {
@@ -665,9 +834,15 @@ const staticItems = computed<CommandItem[]>(() => {
       group: "Navegación",
       badge: "Empresas",
       badgeVariant: "neutral",
-      keywords: ["empresas", "organizaciones", "directorio", "empleadores", "companias"],
+      keywords: [
+        "empresas",
+        "organizaciones",
+        "directorio",
+        "empleadores",
+        "companias",
+      ],
       action: () => router.push("/companies"),
-    }
+    },
   );
 
   // Logout action for any authenticated user
@@ -701,19 +876,24 @@ const filteredItems = computed<CommandItem[]>(() => {
   const matchingStatic = staticItems.value.filter((item) => {
     const inTitle = item.title.toLowerCase().includes(query);
     const inSubtitle = (item.subtitle || "").toLowerCase().includes(query);
-    const inKeywords = (item.keywords || []).some((kw) => kw.toLowerCase().includes(query));
+    const inKeywords = (item.keywords || []).some((kw) =>
+      kw.toLowerCase().includes(query),
+    );
     return inTitle || inSubtitle || inKeywords;
   });
 
   // 2. Dynamic Vacancies matches (ONLY for candidates and guests searching for jobs)
-  const isCandidateOrGuest = userRole.value === "candidate" || userRole.value === "guest";
+  const isCandidateOrGuest =
+    userRole.value === "candidate" || userRole.value === "guest";
   const matchingJobs: CommandItem[] = isCandidateOrGuest
     ? (jobsStore.jobs || [])
         .filter((job) => {
           const inTitle = (job.title || "").toLowerCase().includes(query);
           const inCompany = (job.company || "").toLowerCase().includes(query);
           const inDesc = (job.descripcion || "").toLowerCase().includes(query);
-          const inSkills = (job.habilidadesRequeridas || []).some((s) => s.toLowerCase().includes(query));
+          const inSkills = (job.habilidadesRequeridas || []).some((s) =>
+            s.toLowerCase().includes(query),
+          );
           return inTitle || inCompany || inDesc || inSkills;
         })
         .slice(0, 5)
@@ -729,30 +909,7 @@ const filteredItems = computed<CommandItem[]>(() => {
         }))
     : [];
 
-  // 3. Dynamic CV Templates matches (ONLY for candidates and guests)
-  const matchingTemplates: CommandItem[] = isCandidateOrGuest
-    ? (communityTemplates.value || [])
-        .filter((tpl) => {
-          const inTitle = (tpl.titulo || "").toLowerCase().includes(query);
-          const inRole = (tpl.rol || "").toLowerCase().includes(query);
-          const inSkills = (tpl.habilidadesClave || []).some((s) => s.toLowerCase().includes(query));
-          const inTags = (tpl.tags || []).some((t) => t.toLowerCase().includes(query));
-          return inTitle || inRole || inSkills || inTags;
-        })
-        .slice(0, 5)
-        .map((tpl) => ({
-          id: `tpl-${tpl.id}`,
-          title: tpl.titulo,
-          subtitle: `${tpl.rol} · Nivel ${tpl.nivel.toUpperCase()}`,
-          icon: "description",
-          group: "Plantillas de CV",
-          badge: tpl.idioma === "en" ? "EN" : tpl.idioma === "bilingual" ? "Bilingüe" : "ES",
-          badgeVariant: "secondary",
-          action: () => router.push("/candidate/cv-templates"),
-        }))
-    : [];
-
-  return [...matchingStatic, ...matchingJobs, ...matchingTemplates];
+  return [...matchingStatic, ...matchingJobs];
 });
 
 // Group items for display
@@ -762,7 +919,6 @@ const groupedItems = computed(() => {
     "Acciones Rápidas",
     "Navegación",
     "Vacantes",
-    "Plantillas de CV",
   ];
 
   let currentFlatIndex = 0;
@@ -837,7 +993,7 @@ const executeItem = (item: CommandItem) => {
 const scrollToActive = () => {
   nextTick(() => {
     const el = resultsContainerRef.value?.querySelector(
-      `[data-item-index="${activeIndex.value}"]`
+      `[data-item-index="${activeIndex.value}"]`,
     );
     if (el) {
       el.scrollIntoView({ block: "nearest" });
@@ -859,7 +1015,6 @@ watch(isOpen, async (opened) => {
       if (jobsStore.jobs.length === 0) {
         jobsStore.fetchJobs();
       }
-      fetchTemplates();
     }
     await nextTick();
     searchInputRef.value?.focus();

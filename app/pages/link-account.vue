@@ -66,7 +66,7 @@
 
       <!-- Banner explicativo de seguridad -->
       <div
-        class="mb-6 p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-300 text-xs flex items-start gap-2.5"
+        class="mb-4 p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-300 text-xs flex items-start gap-2.5"
       >
         <span
           class="material-symbols-outlined text-base mt-0.5 flex-shrink-0 text-blue-500"
@@ -82,13 +82,60 @@
         </div>
       </div>
 
+      <!-- Estatuto de Seguridad para Cuentas Privilegiadas (Admin / Moderador / Organización) -->
+      <div
+        v-if="isPrivilegedRole"
+        class="mb-5 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs space-y-2.5"
+      >
+        <div
+          class="flex items-start gap-2 font-bold text-amber-800 dark:text-amber-300 text-sm"
+        >
+          <span
+            class="material-symbols-outlined text-base mt-0.5 flex-shrink-0 text-amber-600 dark:text-amber-400"
+            >gavel</span
+          >
+          <span>Estatuto de Seguridad para Cuentas de {{ roleTitle }}</span>
+        </div>
+        <p class="leading-relaxed">
+          Tu cuenta registrada en JobNet posee el rol de
+          <strong>{{ roleTitle }}</strong
+          >. De acuerdo con los estatutos de seguridad de la plataforma,
+          <strong
+            >siempre que decidas ingresar mediante Google operarás Estrictamente
+            como CANDIDATO</strong
+          >.
+        </p>
+        <p class="leading-relaxed">
+          Las facultades y herramientas de {{ roleTitle.toLowerCase() }} no se
+          transferirán a sesiones sociales. Para administrar o gestionar tu rol
+          principal deberás ingresar directamente con correo y contraseña.
+        </p>
+        <label
+          class="flex items-start gap-2.5 pt-1 cursor-pointer select-none font-medium text-amber-950 dark:text-amber-100"
+        >
+          <input
+            v-model="acceptStatute"
+            type="checkbox"
+            required
+            class="w-4 h-4 text-amber-600 bg-white dark:bg-slate-800 border-amber-500/50 rounded focus:ring-amber-500 mt-0.5 flex-shrink-0"
+          />
+          <span>
+            Acepto que todo acceso con Google será
+            <strong>estrictamente en calidad de Candidato</strong> sin
+            privilegios de {{ roleTitle.toLowerCase() }}.
+          </span>
+        </label>
+      </div>
+
       <!-- Alerta de Error -->
       <div
         v-if="errorMessage"
         role="alert"
         class="mb-5 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-3 rounded-xl text-sm flex items-start gap-2"
       >
-        <span class="material-symbols-outlined text-sm mt-0.5" aria-hidden="true"
+        <span
+          class="material-symbols-outlined text-sm mt-0.5"
+          aria-hidden="true"
           >error</span
         >
         <span>{{ errorMessage }}</span>
@@ -100,7 +147,9 @@
         role="status"
         class="mb-5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 p-3 rounded-xl text-sm flex items-start gap-2"
       >
-        <span class="material-symbols-outlined text-sm mt-0.5" aria-hidden="true"
+        <span
+          class="material-symbols-outlined text-sm mt-0.5"
+          aria-hidden="true"
           >check_circle</span
         >
         <span>{{ successMessage }}</span>
@@ -153,7 +202,9 @@
         <div class="pt-2 flex flex-col gap-2.5">
           <button
             type="submit"
-            :disabled="loading || !password"
+            :disabled="
+              loading || !password || (isPrivilegedRole && !acceptStatute)
+            "
             class="w-full h-12 bg-primary hover:bg-primary-container disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition shadow-sm hover:shadow active:scale-[0.99]"
           >
             <span
@@ -198,9 +249,26 @@ const { isMockEnabled } = useMockSession();
 
 const email = computed(() => String(route.query.email || (isMockEnabled.value ? "juan.perez.mock@jobnet-demo.test" : "")));
 const googleSub = computed(() => String(route.query.googleSub || (isMockEnabled.value ? "google-oauth2|mock-123456789" : "")));
+const nativeRole = computed(() => String(route.query.role || "").toUpperCase());
+const isPrivilegedRole = computed(() => {
+  return (
+    nativeRole.value === "ADMIN" ||
+    nativeRole.value === "MODERATOR" ||
+    nativeRole.value === "MODERADOR" ||
+    nativeRole.value === "ORGANIZACION"
+  );
+});
+const roleTitle = computed(() => {
+  if (nativeRole.value === "ADMIN") return "Administrador";
+  if (nativeRole.value === "MODERATOR" || nativeRole.value === "MODERADOR")
+    return "Moderador";
+  if (nativeRole.value === "ORGANIZACION") return "Organización";
+  return "";
+});
 
 const password = ref("");
 const showPassword = ref(false);
+const acceptStatute = ref(false);
 const loading = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
@@ -224,6 +292,11 @@ const handleDeclineLinking = () => {
 
 const handleLinkAccount = async () => {
   if (!password.value) return;
+  if (isPrivilegedRole.value && !acceptStatute.value) {
+    errorMessage.value =
+      "Debes aceptar el estatuto de seguridad que establece el acceso con Google estrictamente como Candidato.";
+    return;
+  }
   loading.value = true;
   errorMessage.value = "";
   successMessage.value = "";

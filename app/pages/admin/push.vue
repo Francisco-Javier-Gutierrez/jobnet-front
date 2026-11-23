@@ -219,6 +219,19 @@
           {{ selectedUserIds.length }}
         </span>
       </button>
+
+      <button
+        @click="activeTab = 'terms'"
+        class="px-4 py-2.5 rounded-xl font-bold text-sm transition flex items-center gap-2 relative"
+        :class="[
+          activeTab === 'terms'
+            ? 'text-primary bg-primary/10 dark:bg-primary/20'
+            : 'text-on-surface-variant hover:text-on-background dark:text-slate-300',
+        ]"
+      >
+        <span class="material-symbols-outlined text-lg">gavel</span>
+        <span>Actualización de Términos & Notificación</span>
+      </button>
     </div>
 
     <!-- TAB 1: SUBSCRIBERS LIST -->
@@ -998,17 +1011,402 @@
         </div>
       </div>
     </div>
+
+    <!-- TAB 3: TERMS & CONDITIONS UPDATE & BROADCAST -->
+    <div v-if="activeTab === 'terms'" class="space-y-8">
+      <!-- Current Version Status Card -->
+      <div
+        class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"
+          >
+            <span class="material-symbols-outlined text-2xl"
+              >verified_user</span
+            >
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary/10 text-primary border border-primary/20"
+              >
+                Versión Vigente: v{{ currentTerms.version }}
+              </span>
+              <span class="text-xs text-on-surface-variant dark:text-slate-400">
+                Entrada en vigor: {{ currentTerms.effectiveDate }}
+              </span>
+            </div>
+            <h2
+              class="text-lg font-extrabold text-on-background dark:text-slate-100"
+            >
+              {{ currentTerms.title }}
+            </h2>
+            <p
+              class="text-xs text-on-surface-variant dark:text-slate-300 mt-1 max-w-2xl leading-relaxed"
+            >
+              {{ currentTerms.summary }}
+            </p>
+          </div>
+        </div>
+
+        <NuxtLink
+          to="/terms"
+          target="_blank"
+          class="px-4 py-2.5 rounded-xl border border-outline-variant/60 text-xs font-bold text-primary hover:bg-primary/5 transition flex items-center gap-2 self-start md:self-auto flex-shrink-0"
+        >
+          <span class="material-symbols-outlined text-sm">visibility</span>
+          <span>Ver Términos en Vivo</span>
+        </NuxtLink>
+      </div>
+
+      <!-- Composer & Preview Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Form Column -->
+        <div class="lg:col-span-7 space-y-6">
+          <div
+            class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-5"
+          >
+            <div
+              class="flex items-center gap-2 pb-3 border-b border-outline-variant/30"
+            >
+              <span class="material-symbols-outlined text-primary text-xl"
+                >edit_document</span
+              >
+              <h3
+                class="font-bold text-sm text-on-background dark:text-slate-100"
+              >
+                Publicar Nueva Versión de Términos
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  class="block text-xs font-bold text-on-surface-variant dark:text-slate-300 mb-1"
+                >
+                  Nueva Versión <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  v-model="termsForm.version"
+                  type="text"
+                  placeholder="Ej: 1.1.0"
+                  class="w-full px-4 py-2.5 bg-surface-container-low dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded-xl text-xs text-on-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-xs font-bold text-on-surface-variant dark:text-slate-300 mb-1"
+                >
+                  Fecha de Entrada en Vigor <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  v-model="termsForm.effectiveDate"
+                  type="date"
+                  class="w-full px-4 py-2.5 bg-surface-container-low dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded-xl text-xs text-on-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-bold text-on-surface-variant dark:text-slate-300 mb-1"
+              >
+                Título del Documento
+              </label>
+              <input
+                v-model="termsForm.title"
+                type="text"
+                placeholder="Términos y Condiciones de Uso"
+                class="w-full px-4 py-2.5 bg-surface-container-low dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded-xl text-xs text-on-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
+              />
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-bold text-on-surface-variant dark:text-slate-300 mb-1"
+              >
+                Resumen de Reformas y Modificaciones
+                <span class="text-rose-500">*</span>
+              </label>
+              <textarea
+                v-model="termsForm.summary"
+                rows="4"
+                placeholder="Describe los cambios realizados (ej: Actualización de políticas de mediación de disputas, supervisión de procesos de auditoría y tratamiento de datos)..."
+                class="w-full px-4 py-2.5 bg-surface-container-low dark:bg-slate-800 border border-outline-variant/60 dark:border-slate-700 rounded-xl text-xs text-on-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition resize-none"
+              ></textarea>
+              <span
+                class="text-[11px] text-on-surface-variant dark:text-slate-400 mt-1 block"
+              >
+                Este texto se guardará en DynamoDB y se enviará como contenido
+                de la notificación push e in-app.
+              </span>
+            </div>
+
+            <!-- Notification Broadcast Toggle -->
+            <div
+              class="p-4 bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-2xl flex items-start gap-3"
+            >
+              <input
+                v-model="termsForm.notifyUsers"
+                type="checkbox"
+                id="notifyTermsToggle"
+                class="mt-1 h-4 w-4 rounded text-primary focus:ring-primary border-outline-variant/60 cursor-pointer"
+              />
+              <label for="notifyTermsToggle" class="cursor-pointer">
+                <span
+                  class="block text-xs font-bold text-on-background dark:text-slate-200"
+                >
+                  Difundir Notificación Masiva a Todos los Usuarios
+                </span>
+                <span
+                  class="block text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5"
+                >
+                  Despacha una notificación Push en navegador (WebPush VAPID) y
+                  genera una notificación persistente in-app para cada usuario
+                  registrado.
+                </span>
+              </label>
+            </div>
+
+            <button
+              @click="handlePublishTerms"
+              :disabled="
+                updatingTerms ||
+                !termsForm.version.trim() ||
+                !termsForm.summary.trim()
+              "
+              class="w-full py-3 bg-primary text-white font-bold rounded-xl text-xs hover:bg-primary/90 transition shadow-md disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span
+                v-if="updatingTerms"
+                class="material-symbols-outlined text-base animate-spin"
+                >refresh</span
+              >
+              <span v-else class="material-symbols-outlined text-base"
+                >send</span
+              >
+              <span>
+                {{
+                  updatingTerms
+                    ? "Publicando y Notificando..."
+                    : "Publicar Versión y Difundir"
+                }}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview Column -->
+        <div class="lg:col-span-5 space-y-6">
+          <div
+            class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4"
+          >
+            <div
+              class="flex items-center gap-2 pb-3 border-b border-outline-variant/30"
+            >
+              <span class="material-symbols-outlined text-primary text-xl"
+                >preview</span
+              >
+              <h3
+                class="font-bold text-sm text-on-background dark:text-slate-100"
+              >
+                Previsualización de Notificación
+              </h3>
+            </div>
+
+            <!-- WebPush Notification Card Preview -->
+            <div
+              class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider"
+            >
+              Notificación Push (Navegador)
+            </div>
+            <div
+              class="p-4 bg-slate-900 text-slate-100 rounded-2xl shadow-xl border border-slate-700 space-y-2"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <img
+                    src="/logotipo.svg"
+                    alt="JobNet"
+                    class="w-4 h-4 object-contain"
+                  />
+                  <span
+                    class="text-[11px] font-bold tracking-wide text-slate-300"
+                    >JobNet • Ahora</span
+                  >
+                </div>
+                <span class="material-symbols-outlined text-xs text-slate-400"
+                  >close</span
+                >
+              </div>
+              <p class="font-bold text-xs text-white">
+                Actualización de Términos (v{{ termsForm.version || "1.1.0" }})
+                📜
+              </p>
+              <p
+                class="text-[11px] text-slate-300 leading-relaxed line-clamp-3"
+              >
+                {{
+                  termsForm.summary ||
+                  "Hemos actualizado los términos y condiciones de uso de la plataforma. Conoce los detalles de las nuevas políticas vigentes."
+                }}
+              </p>
+              <div
+                class="pt-1 flex items-center justify-end text-[10px] text-primary font-bold"
+              >
+                <span>Ver Términos &rarr;</span>
+              </div>
+            </div>
+
+            <!-- In-App Notification Card Preview -->
+            <div
+              class="text-[11px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider pt-2"
+            >
+              Notificación In-App (/notifications)
+            </div>
+            <div
+              class="p-3.5 bg-surface-container-low dark:bg-slate-800/80 rounded-2xl border border-outline-variant/40 flex items-start gap-3"
+            >
+              <div
+                class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 mt-0.5"
+              >
+                <span class="material-symbols-outlined text-lg">gavel</span>
+              </div>
+              <div class="flex-1 min-w-0 text-xs">
+                <p class="font-bold text-on-background dark:text-slate-100">
+                  Actualización de Términos (v{{
+                    termsForm.version || "1.1.0"
+                  }}) 📜
+                </p>
+                <p
+                  class="text-on-surface-variant dark:text-slate-300 text-[11px] mt-0.5 line-clamp-2"
+                >
+                  {{
+                    termsForm.summary ||
+                    "Hemos actualizado los términos y condiciones de uso de la plataforma."
+                  }}
+                </p>
+                <span
+                  class="text-[10px] text-on-surface-variant dark:text-slate-400 mt-1 block"
+                >
+                  Hace un momento · In-App
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Table -->
+      <div
+        class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4"
+      >
+        <div
+          class="flex items-center justify-between pb-3 border-b border-outline-variant/30"
+        >
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-xl"
+              >history</span
+            >
+            <h3
+              class="font-bold text-sm text-on-background dark:text-slate-100"
+            >
+              Historial de Versiones en DynamoDB (CONFIG#TERMS)
+            </h3>
+          </div>
+          <button
+            @click="fetchTermsHistory"
+            class="text-xs text-primary font-bold hover:underline flex items-center gap-1 cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-sm">refresh</span>
+            <span>Refrescar Historial</span>
+          </button>
+        </div>
+
+        <div
+          v-if="termsHistory.length === 0"
+          class="py-8 text-center text-xs text-on-surface-variant"
+        >
+          No hay registros históricos previos guardados.
+        </div>
+
+        <div v-else class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr
+                class="border-b border-outline-variant/40 text-[11px] font-bold text-on-surface-variant uppercase"
+              >
+                <th class="py-2.5 px-3">Versión</th>
+                <th class="py-2.5 px-3">Entrada en Vigor</th>
+                <th class="py-2.5 px-3">Publicado Por</th>
+                <th class="py-2.5 px-3">Fecha de Registro</th>
+                <th class="py-2.5 px-3">Resumen de Cambios</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/20">
+              <tr
+                v-for="(h, idx) in termsHistory"
+                :key="idx"
+                class="hover:bg-surface-container-low/50 dark:hover:bg-slate-800/40 transition"
+              >
+                <td class="py-3 px-3 font-bold text-primary">
+                  v{{ h.version }}
+                </td>
+                <td class="py-3 px-3 text-on-surface-variant">
+                  {{ h.effectiveDate }}
+                </td>
+                <td
+                  class="py-3 px-3 text-on-surface-variant font-mono text-[11px]"
+                >
+                  {{ h.updatedBy || "ADMIN" }}
+                </td>
+                <td class="py-3 px-3 text-on-surface-variant">
+                  {{ formatDate(h.updatedAt) }}
+                </td>
+                <td
+                  class="py-3 px-3 text-on-surface-variant max-w-md truncate"
+                  :title="h.summary"
+                >
+                  {{ h.summary }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
+import { useAuth } from "#imports";
+import { useTerms } from "~/composables/useTerms";
 
 definePageMeta({
   title: "Notificaciones Push - Consola de Admin",
 });
 
 const config = useRuntimeConfig();
+const { data: session } = useAuth();
+
+const getAuthHeaders = (): Record<string, string> => {
+  const token =
+    (session.value as any)?.idToken || (session.value as any)?.accessToken;
+  const role =
+    (session.value?.user as any)?.tipoUsuario ||
+    (session.value as any)?.tipoUsuario ||
+    "ADMIN";
+  const headers: Record<string, string> = {
+    "x-user-role": role,
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+};
 
 // State
 const subscribers = ref<any[]>([]);
@@ -1020,8 +1418,8 @@ const filterDevice = ref("ALL");
 const roleFilterOptions = [
   { value: "ALL", label: "Todos los roles" },
   { value: "CANDIDATO", label: "Candidatos" },
-  { value: "EMPRESA", label: "Empresas" },
-  { value: "MODERATOR", label: "Moderadores" },
+  { value: "ORGANIZACION", label: "Organizaciones" },
+  { value: "MODERADOR", label: "Moderadores" },
   { value: "ADMIN", label: "Administradores" },
   { value: "PENDIENTE", label: "Pendientes de Rol" },
 ];
@@ -1038,9 +1436,28 @@ const deviceFilterOptions = [
 ];
 const selectedUserIds = ref<string[]>([]);
 
-const activeTab = ref<"subscribers" | "composer">("subscribers");
+const activeTab = ref<"subscribers" | "composer" | "terms">("subscribers");
 const previewStyle = ref<"windows" | "android">("windows");
 const targetMode = ref<"all" | "selected">("all");
+
+// Terms & Conditions State
+const {
+  currentTerms,
+  history: termsHistory,
+  loading: loadingTerms,
+  updating: updatingTerms,
+  fetchCurrentTerms,
+  fetchTermsHistory,
+  updateTermsAndBroadcast,
+} = useTerms();
+
+const termsForm = ref({
+  version: "",
+  title: "Términos y Condiciones de Uso",
+  effectiveDate: new Date().toISOString().split("T")[0],
+  summary: "",
+  notifyUsers: true,
+});
 
 const sendingPush = ref(false);
 const feedbackSuccess = ref<{ title: string; message: string } | null>(null);
@@ -1196,11 +1613,9 @@ const getRoleBadgeClass = (role?: string) => {
     case "MODERATOR":
     case "MODERADOR":
       return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20";
-    case "EMPRESA":
     case "ORGANIZACION":
       return "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20";
     case "CANDIDATO":
-    case "POSTULANTE":
       return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20";
     default:
       return "bg-slate-500/10 text-slate-600 dark:text-slate-300 border border-slate-500/20";
@@ -1214,11 +1629,9 @@ const getAvatarBg = (role?: string) => {
     case "MODERATOR":
     case "MODERADOR":
       return "bg-amber-600";
-    case "EMPRESA":
     case "ORGANIZACION":
       return "bg-purple-600";
     case "CANDIDATO":
-    case "POSTULANTE":
       return "bg-blue-600";
     default:
       return "bg-slate-600";
@@ -1334,6 +1747,7 @@ const fetchSubscribers = async () => {
     const apiUrl = config.public.apiUrl;
     const res: any = await $fetch(`${apiUrl}/admin/push-subscribers`, {
       method: "GET",
+      headers: getAuthHeaders(),
     });
 
     if (res && Array.isArray(res.subscribers) && res.subscribers.length > 0) {
@@ -1372,6 +1786,7 @@ const triggerSendPush = async () => {
 
     const res: any = await $fetch(`${apiUrl}/admin/push-broadcast`, {
       method: "POST",
+      headers: getAuthHeaders(),
       body: payload,
     });
 
@@ -1392,7 +1807,37 @@ const triggerSendPush = async () => {
   }
 };
 
+const handlePublishTerms = async () => {
+  if (!termsForm.value.version.trim() || !termsForm.value.summary.trim())
+    return;
+
+  feedbackError.value = null;
+  feedbackSuccess.value = null;
+
+  try {
+    const res = await updateTermsAndBroadcast({
+      version: termsForm.value.version.trim(),
+      title: termsForm.value.title.trim() || "Términos y Condiciones de Uso",
+      effectiveDate: termsForm.value.effectiveDate,
+      summary: termsForm.value.summary.trim(),
+      notifyUsers: termsForm.value.notifyUsers,
+    });
+
+    feedbackSuccess.value = {
+      title: "¡Términos y Condiciones Actualizados!",
+      message: `Versión ${res.version} registrada en DynamoDB. Notificaciones enviadas a ${res.notifiedCount || 0} usuario(s) registrados.`,
+    };
+
+    termsForm.value.summary = "";
+    await fetchTermsHistory();
+  } catch (err: any) {
+    feedbackError.value = err.message || "Error al actualizar términos.";
+  }
+};
+
 onMounted(() => {
   fetchSubscribers();
+  fetchCurrentTerms();
+  fetchTermsHistory();
 });
 </script>

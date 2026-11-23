@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
       if (Array.isArray(data) && data.length > 0) return data;
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) return data;
     } catch (error: any) {
-      // Fall through to mock data
+      console.warn("Failed to fetch jobs from backend API:", error?.message);
     }
   }
 

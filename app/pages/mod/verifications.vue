@@ -139,6 +139,7 @@
 <script setup lang="ts">
 import { MOCK_VERIFICATIONS } from "~/utils/mockData";
 import { useMockSession } from "~/composables/useMockSession";
+import { apiFetch } from "~/composables/useApiClient";
 
 useSeoMeta({
   title: "Verificaciones Corporativas - JobNet",
@@ -146,7 +147,6 @@ useSeoMeta({
     "Bandeja de verificación de documentos tributarios corporativos para moderadores",
 });
 
-const config = useRuntimeConfig();
 const requests = ref<any[]>([]);
 const loading = ref(true);
 
@@ -159,13 +159,11 @@ const fetchRequests = async () => {
     return;
   }
   try {
-    const data = await $fetch<any[]>(
-      `${config.public.apiUrl}/moderator/verifications`,
-    );
-    requests.value = data && data.length > 0 ? data : MOCK_VERIFICATIONS;
+    const data = await apiFetch<any[]>("/moderator/verifications");
+    requests.value = Array.isArray(data) ? data : [];
   } catch (e) {
     console.error("Error loading verification requests:", e);
-    requests.value = MOCK_VERIFICATIONS;
+    requests.value = [];
   } finally {
     loading.value = false;
   }
@@ -177,15 +175,12 @@ onMounted(() => {
 
 const handleAction = async (companyId: string, approve: boolean) => {
   try {
-    await $fetch(
-      `${config.public.apiUrl}/moderator/verifications/${companyId}/resolve`,
-      {
-        method: "POST",
-        body: {
-          approve,
-        },
+    await apiFetch(`/moderator/verifications/${companyId}/resolve`, {
+      method: "POST",
+      body: {
+        approve,
       },
-    );
+    });
     requests.value = requests.value.filter((r) => r.companyId !== companyId);
   } catch (e) {
     console.error("Error updating company verification:", e);

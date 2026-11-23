@@ -1,10 +1,7 @@
 <template>
   <span
     class="material-symbols-outlined select-none inline-block align-middle"
-    :class="[
-      fill ? 'font-fill-1' : '',
-      sizeClass,
-    ]"
+    :class="[fill ? 'font-fill-1' : '', sizeClass]"
     :style="customStyle"
     :role="ariaLabel ? 'img' : undefined"
     :aria-label="ariaLabel"
@@ -33,7 +30,7 @@ const props = withDefaults(
     name: "",
     icon: "",
     fill: false,
-  }
+  },
 );
 
 const iconName = computed(() => props.name || props.icon || "");
@@ -77,7 +74,11 @@ const customStyle = computed(() => {
     styles.color = props.color;
   }
 
-  if (props.weight !== undefined || props.grade !== undefined || props.opticalSize !== undefined) {
+  if (
+    props.weight !== undefined ||
+    props.grade !== undefined ||
+    props.opticalSize !== undefined
+  ) {
     const f = props.fill ? 1 : 0;
     const w = props.weight ?? 400;
     const g = props.grade ?? 0;

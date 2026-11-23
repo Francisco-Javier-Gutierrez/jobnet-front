@@ -19,6 +19,7 @@
       :post="post"
       :current-user-id="currentUserId"
       :is-bookmarked="isBookmarked"
+      :is-liked="isLiked"
       :is-detail="true"
       @like="toggleLike"
       @bookmark="toggleBookmark"
@@ -266,7 +267,10 @@ const isSubmittingReply = ref(false);
 // Load post details from localStorage
 const loadPost = async () => {
   try {
-    const list = await $fetch<any[]>("/api/posts");
+    const config = useRuntimeConfig();
+    const baseUrl = config.public.apiUrl || "";
+    const targetUrl = baseUrl ? `${baseUrl}/posts` : "/api/posts";
+    const list = await $fetch<any[]>(targetUrl);
     post.value = list.find((p: any) => p.uniqueId === postId) || null;
   } catch (error) {
     console.error("Error loading post:", error);
@@ -311,33 +315,63 @@ const toggleLike = async () => {
   }
   if (!post.value) return;
 
+  if (!post.value.likesList) {
+    post.value.likesList = [];
+  }
+
+  const originalLikesList = [...post.value.likesList];
+  const originalLikes = post.value.likes || 0;
+  const originalLikesCount = post.value.likesCount;
+
+  const idx = post.value.likesList.indexOf(currentUserId.value);
+  if (idx !== -1) {
+    post.value.likesList.splice(idx, 1);
+    if (typeof post.value.likesCount === "number") {
+      post.value.likesCount = Math.max(0, post.value.likesCount - 1);
+    }
+    post.value.isLiked = false;
+  } else {
+    post.value.likesList.push(currentUserId.value);
+    if (typeof post.value.likesCount === "number") {
+      post.value.likesCount = post.value.likesCount + 1;
+    } else {
+      post.value.likesCount = post.value.likesList.length;
+    }
+    post.value.isLiked = true;
+  }
+  post.value.likes = post.value.likesList.length;
+
   try {
     const res = await $fetch<any>(`/api/posts/${post.value.uniqueId}/like`, {
       method: "POST",
       body: { userUuid: currentUserId.value },
     });
 
-    if (!post.value.likesList) {
-      post.value.likesList = [];
-    }
-
-    const idx = post.value.likesList.indexOf(currentUserId.value);
-    if (res.liked) {
-      if (idx === -1) {
+    const idxNow = post.value.likesList.indexOf(currentUserId.value);
+    if (res?.liked) {
+      if (idxNow === -1) {
         post.value.likesList.push(currentUserId.value);
       }
-    } else {
-      if (idx !== -1) {
-        post.value.likesList.splice(idx, 1);
+      post.value.isLiked = true;
+    } else if (res?.liked === false) {
+      if (idxNow !== -1) {
+        post.value.likesList.splice(idxNow, 1);
       }
+      post.value.isLiked = false;
     }
     post.value.likes = post.value.likesList.length;
+    if (typeof res?.likesCount === "number") {
+      post.value.likesCount = res.likesCount;
+    }
   } catch (e) {
     console.error("Error toggling like:", e);
+    post.value.likesList = originalLikesList;
+    post.value.likes = originalLikes;
+    post.value.likesCount = originalLikesCount;
   }
 };
 
-const toggleBookmark = () => {
+const toggleBookmark = async () => {
   if (status.value !== "authenticated") {
     showAuthModal.value = true;
     return;
@@ -346,13 +380,43 @@ const toggleBookmark = () => {
   if (!post.value.bookmarksList) {
     post.value.bookmarksList = [];
   }
+  const originalBookmarksList = [...post.value.bookmarksList];
+  const originalBookmarksCount = post.value.bookmarksCount;
+
   const idx = post.value.bookmarksList.indexOf(currentUserId.value);
   if (idx !== -1) {
     post.value.bookmarksList.splice(idx, 1);
+    if (typeof post.value.bookmarksCount === "number") {
+      post.value.bookmarksCount = Math.max(0, post.value.bookmarksCount - 1);
+    }
+    post.value.isBookmarked = false;
   } else {
     post.value.bookmarksList.push(currentUserId.value);
+    if (typeof post.value.bookmarksCount === "number") {
+      post.value.bookmarksCount = post.value.bookmarksCount + 1;
+    } else {
+      post.value.bookmarksCount = post.value.bookmarksList.length;
+    }
+    post.value.isBookmarked = true;
   }
   updateGlobalPost();
+
+  try {
+    const res = await $fetch<any>(
+      `/api/posts/${post.value.uniqueId}/bookmark`,
+      {
+        method: "POST",
+        body: { userUuid: currentUserId.value },
+      },
+    );
+    if (typeof res?.bookmarksCount === "number") {
+      post.value.bookmarksCount = res.bookmarksCount;
+    }
+  } catch (e) {
+    console.error("Error toggling bookmark:", e);
+    post.value.bookmarksList = originalBookmarksList;
+    post.value.bookmarksCount = originalBookmarksCount;
+  }
 };
 
 const updateGlobalPost = () => {
@@ -372,16 +436,8 @@ const updateGlobalPost = () => {
 const { sharePost: sharePostUtil, shareUrl } = useShare();
 const sharePost = async () => {
   if (post.value) {
-    sharePostUtil(post.value);
-    post.value.sharesCount = (post.value.sharesCount || 0) + 1;
+    await sharePostUtil(post.value);
     updateGlobalPost();
-    try {
-      await $fetch(`/api/posts/${post.value.uniqueId}/share`, {
-        method: "POST",
-      });
-    } catch (e) {
-      console.error("Error sharing post:", e);
-    }
   } else if (process.client) {
     shareUrl(window.location.href);
   }
@@ -537,7 +593,7 @@ const canDeleteComment = (node: any) => {
   if (status.value !== "authenticated") return false;
   if (node.user === session.value?.user?.name) return true;
   const role = (session.value?.user as any)?.tipoUsuario?.toUpperCase();
-  return role === "ADMIN" || role === "MODERATOR";
+  return role === "ADMIN" || role === "MODERATOR" || role === "MODERADOR";
 };
 
 // Delete comment (prunes entirely if alone/reply, or placeholder if it has children)

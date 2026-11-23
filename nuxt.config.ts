@@ -42,7 +42,7 @@ export default defineNuxtConfig({
         "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com",
       wsUrl:
         process.env.NUXT_PUBLIC_WS_URL ||
-        "wss://lzvcx59zaa.execute-api.us-east-1.amazonaws.com/prod",
+        "wss://v9b53l2zr2.execute-api.us-east-1.amazonaws.com/prod",
       vapidPublicKey:
         process.env.NUXT_PUBLIC_VAPID_KEY ||
         "BOIrktuQCHHiOWcKICA7YEwdKJf8WNYCmBS_PI338wnaB9VqXPQfCRwTN5NLYokujXBp5pdD83av6DACG2rAYok",

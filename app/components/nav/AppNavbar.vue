@@ -12,16 +12,24 @@
           type="button"
           @click="toggleMenu"
           class="w-10 h-10 rounded-xl flex items-center justify-center text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container/60 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer"
-          :class="isMobileMenuOpen ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400' : ''"
+          :class="
+            isMobileMenuOpen
+              ? 'bg-primary/10 text-primary dark:bg-indigo-950/60 dark:text-indigo-400'
+              : ''
+          "
           :aria-expanded="isMobileMenuOpen"
           aria-label="Alternar menú de navegación"
           :title="isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'"
         >
           <span
             class="material-symbols-outlined text-[24px] transition-transform duration-200"
-            :class="isMobileMenuOpen ? 'rotate-90 text-primary dark:text-indigo-400' : 'rotate-0'"
+            :class="
+              isMobileMenuOpen
+                ? 'rotate-90 text-primary dark:text-indigo-400'
+                : 'rotate-0'
+            "
           >
-            {{ isMobileMenuOpen ? 'close' : 'menu' }}
+            {{ isMobileMenuOpen ? "close" : "menu" }}
           </span>
         </button>
 
@@ -63,10 +71,16 @@
               to="/notifications"
               @click="closeMenu"
               class="w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant dark:text-slate-300 hover:text-primary hover:bg-surface-container/60 dark:hover:bg-slate-800 transition active:scale-95 relative"
-              :class="[isActive('/notifications') ? 'text-primary bg-primary/10 dark:bg-indigo-950/60 font-bold' : '']"
+              :class="[
+                isActive('/notifications')
+                  ? 'text-primary bg-primary/10 dark:bg-indigo-950/60 font-bold'
+                  : '',
+              ]"
               aria-label="Notificaciones"
             >
-              <span class="material-symbols-outlined text-[22px]">notifications</span>
+              <span class="material-symbols-outlined text-[22px]"
+                >notifications</span
+              >
             </NuxtLink>
 
             <!-- User Profile Avatar Pill -->
@@ -104,7 +118,9 @@
           </template>
 
           <template #fallback>
-            <div class="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-slate-700/50 animate-pulse ml-0.5"></div>
+            <div
+              class="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-slate-700/50 animate-pulse ml-0.5"
+            ></div>
           </template>
         </ClientOnly>
       </div>
@@ -144,14 +160,26 @@
           <!-- Quick Search Bar inside Dropdown -->
           <button
             type="button"
-            @click="closeMenu(); openCommandPalette();"
+            @click="
+              closeMenu();
+              openCommandPalette();
+            "
             class="w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-on-surface-variant dark:text-slate-400 bg-surface-container/60 hover:bg-surface-container dark:bg-slate-800/60 rounded-xl border border-outline-variant/40 dark:border-slate-700/60 transition cursor-pointer shadow-2xs active:scale-[0.99]"
           >
             <div class="flex items-center gap-2.5">
-              <span class="material-symbols-outlined text-[18px] text-primary dark:text-indigo-400">search</span>
-              <span class="font-medium text-on-surface-variant dark:text-slate-300">Buscar empleo, empresa o comando...</span>
+              <span
+                class="material-symbols-outlined text-[18px] text-primary dark:text-indigo-400"
+                >search</span
+              >
+              <span
+                class="font-medium text-on-surface-variant dark:text-slate-300"
+                >Buscar empleo, empresa o comando...</span
+              >
             </div>
-            <span class="text-[10px] font-bold text-on-surface-variant/60 bg-surface dark:bg-slate-700/60 px-1.5 py-0.5 rounded border border-outline-variant/30">Ctrl+K</span>
+            <span
+              class="text-[10px] font-bold text-on-surface-variant/60 bg-surface dark:bg-slate-700/60 px-1.5 py-0.5 rounded border border-outline-variant/30"
+              >Ctrl+K</span
+            >
           </button>
 
           <!-- Primary CTA Button per Role -->
@@ -161,7 +189,9 @@
               @click="handleNavClick(primaryAction, closeMenu)"
               class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/95 text-white text-xs font-bold shadow-md shadow-primary/20 transition-all duration-200 cursor-pointer active:scale-[0.98]"
             >
-              <span class="material-symbols-outlined text-[18px] font-bold">add</span>
+              <span class="material-symbols-outlined text-[18px] font-bold"
+                >add</span
+              >
               <span>{{ primaryAction.label }}</span>
             </button>
           </div>
@@ -173,7 +203,9 @@
               :key="section.title"
               class="space-y-1"
             >
-              <p class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant/60 dark:text-slate-500 select-none">
+              <p
+                class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant/60 dark:text-slate-500 select-none"
+              >
                 {{ section.title }}
               </p>
               <div class="space-y-0.5">
@@ -191,7 +223,11 @@
                 >
                   <span
                     class="material-symbols-outlined text-[20px]"
-                    :class="isActive(item.to) ? 'text-primary dark:text-indigo-400' : 'text-on-surface-variant dark:text-slate-400'"
+                    :class="
+                      isActive(item.to)
+                        ? 'text-primary dark:text-indigo-400'
+                        : 'text-on-surface-variant dark:text-slate-400'
+                    "
                   >
                     {{ item.icon }}
                   </span>
@@ -203,20 +239,24 @@
         </div>
 
         <!-- Bottom Actions (Theme Toggle & Account Management) -->
-        <div class="flex-shrink-0 pt-3 border-t border-outline-variant/60 dark:border-slate-800 space-y-3 mt-auto bg-white dark:bg-slate-950">
+        <div
+          class="flex-shrink-0 pt-3 border-t border-outline-variant/60 dark:border-slate-800 space-y-3 mt-auto bg-white dark:bg-slate-950"
+        >
           <!-- Appearance Toggle -->
-          <div class="flex items-center justify-between px-3 py-2 bg-surface-container/50 dark:bg-slate-800/60 rounded-xl">
-            <span class="text-xs font-semibold text-on-surface-variant dark:text-slate-400">Apariencia</span>
+          <div
+            class="flex items-center justify-between px-3 py-2 bg-surface-container/50 dark:bg-slate-800/60 rounded-xl"
+          >
+            <span
+              class="text-xs font-semibold text-on-surface-variant dark:text-slate-400"
+              >Apariencia</span
+            >
             <ThemeToggle mode="pills" />
           </div>
 
           <!-- Dynamic Auth State Card (ClientOnly) -->
           <ClientOnly>
             <!-- Authenticated Profile Card & Logout -->
-            <div
-              v-if="effectiveStatus === 'authenticated'"
-              class="space-y-2"
-            >
+            <div v-if="effectiveStatus === 'authenticated'" class="space-y-2">
               <NuxtLink
                 :to="profileRoute"
                 @click="closeMenu"
@@ -240,22 +280,31 @@
                     {{ userInitial }}
                   </div>
                   <div class="truncate min-w-0 flex-1">
-                    <p class="text-xs font-bold text-on-surface dark:text-slate-200 truncate group-hover:text-primary transition">
+                    <p
+                      class="text-xs font-bold text-on-surface dark:text-slate-200 truncate group-hover:text-primary transition"
+                    >
                       {{ userName }}
                     </p>
-                    <p class="text-[10px] text-on-surface-variant dark:text-slate-400 capitalize truncate">
+                    <p
+                      class="text-[10px] text-on-surface-variant dark:text-slate-400 capitalize truncate"
+                    >
                       {{ roleBadge }}
                     </p>
                   </div>
                 </div>
-                <span class="material-symbols-outlined text-sm text-on-surface-variant group-hover:text-primary transition">arrow_forward_ios</span>
+                <span
+                  class="material-symbols-outlined text-sm text-on-surface-variant group-hover:text-primary transition"
+                  >arrow_forward_ios</span
+                >
               </NuxtLink>
 
               <button
                 @click="onSignOutClick"
                 class="w-full flex items-center justify-center gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/60 transition cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[18px]">logout</span>
+                <span class="material-symbols-outlined text-[18px]"
+                  >logout</span
+                >
                 <span>Cerrar sesión</span>
               </button>
             </div>
@@ -280,7 +329,9 @@
             </div>
 
             <template #fallback>
-              <div class="h-10 bg-slate-200/50 dark:bg-slate-700/50 animate-pulse rounded-xl"></div>
+              <div
+                class="h-10 bg-slate-200/50 dark:bg-slate-700/50 animate-pulse rounded-xl"
+              ></div>
             </template>
           </ClientOnly>
         </div>

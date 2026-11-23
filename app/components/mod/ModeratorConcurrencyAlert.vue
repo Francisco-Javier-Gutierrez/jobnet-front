@@ -55,7 +55,9 @@
           <div class="flex flex-wrap items-center gap-1.5">
             <!-- Anomaly Category Badge -->
             <span
-              v-if="item.category === 'BOT_SPAM' || item.type === 'RAPID_VACANCIES'"
+              v-if="
+                item.category === 'BOT_SPAM' || item.type === 'RAPID_VACANCIES'
+              "
               class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300/60 dark:border-amber-800"
             >
               <span class="material-symbols-outlined text-xs">smart_toy</span>
@@ -73,7 +75,11 @@
             <span
               class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-surface-container-low dark:bg-slate-800 text-on-surface-variant dark:text-slate-300 border border-outline-variant/40"
             >
-              <span>{{ item.count }} / Umbral: >{{ item.threshold }} ({{ item.timeWindow }})</span>
+              <span
+                >{{ item.count }} / Umbral: >{{ item.threshold }} ({{
+                  item.timeWindow
+                }})</span
+              >
             </span>
           </div>
 
@@ -82,21 +88,27 @@
             <h4
               class="text-xs font-bold text-on-surface dark:text-slate-100 flex items-center gap-1.5 truncate"
             >
-              <span class="material-symbols-outlined text-xs text-amber-600">corporate_fare</span>
+              <span class="material-symbols-outlined text-xs text-amber-600"
+                >corporate_fare</span
+              >
               <span class="truncate">{{ item.organizationName }}</span>
               <span
                 class="text-[10px] font-mono text-on-surface-variant/70 dark:text-slate-400 font-normal"
                 >({{ item.organizationId }})</span
               >
             </h4>
-            <p class="text-[11px] text-on-surface-variant dark:text-slate-300 mt-0.5">
+            <p
+              class="text-[11px] text-on-surface-variant dark:text-slate-300 mt-0.5"
+            >
               {{ item.description }}
             </p>
           </div>
         </div>
 
         <!-- Moderator actions -->
-        <div class="flex items-center gap-2 flex-shrink-0 self-start md:self-auto">
+        <div
+          class="flex items-center gap-2 flex-shrink-0 self-start md:self-auto"
+        >
           <!-- Action: Pausar preventivamente -->
           <button
             type="button"
@@ -104,7 +116,9 @@
             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white text-xs font-bold rounded-lg shadow-xs transition"
             title="Pausar preventivamente la cuenta y colocarla en estado de revisión"
           >
-            <span class="material-symbols-outlined text-[15px]">pause_circle</span>
+            <span class="material-symbols-outlined text-[15px]"
+              >pause_circle</span
+            >
             <span>Pausar preventivamente</span>
           </button>
 

@@ -255,6 +255,28 @@
             <span>Continuar con Google</span>
           </template>
         </button>
+
+        <!-- Nota de Seguridad sobre Segregación de Roles -->
+        <div class="mt-2.5 text-center px-1">
+          <p
+            class="text-[11px] text-on-surface-variant/85 dark:text-slate-400 leading-normal"
+          >
+            <span
+              class="inline-flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400 align-middle"
+            >
+              <span
+                class="material-symbols-outlined text-[13px] leading-none select-none shrink-0"
+                aria-hidden="true"
+                >shield</span
+              >
+              <span>Acceso exclusivo como Candidato:</span>
+            </span>
+            <span class="align-middle ml-1">
+              Cuentas de Administrador, Moderador u Organización deben ingresar
+              con correo y contraseña.
+            </span>
+          </p>
+        </div>
       </form>
     </div>
   </div>
@@ -321,7 +343,7 @@ const handleGoogleSignIn = async () => {
 
   try {
     await signIn("cognito", {
-      callbackUrl: "/",
+      callbackUrl: "/?google_login=1",
     });
   } catch (err: any) {
     console.error("Error during Google OAuth sign-in:", err);
@@ -404,14 +426,14 @@ const handleLogin = async () => {
       // Success, route to dashboard or home based on role
       await new Promise((resolve) => setTimeout(resolve, 150));
       const userRole = (session.value?.user as any)?.tipoUsuario;
-      if (
-        userRole?.toUpperCase() === "EMPRESA" ||
-        userRole?.toUpperCase() === "ORGANIZACION"
-      ) {
+      if (userRole?.toUpperCase() === "ORGANIZACION") {
         router.push("/applicants");
       } else if (userRole?.toUpperCase() === "ADMIN") {
         router.push("/admin");
-      } else if (userRole?.toUpperCase() === "MODERATOR") {
+      } else if (
+        userRole?.toUpperCase() === "MODERATOR" ||
+        userRole?.toUpperCase() === "MODERADOR"
+      ) {
         router.push("/mod/incidents");
       } else {
         router.push("/");

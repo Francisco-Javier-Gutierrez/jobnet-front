@@ -146,8 +146,12 @@
           @locationName="(name: string) => $emit('update:locationName', name)"
         />
         <template #fallback>
-          <div class="h-[320px] w-full rounded-2xl bg-surface-container-low/40 dark:bg-slate-900/60 border border-outline-variant/40 animate-pulse flex items-center justify-center">
-            <span class="text-xs text-on-surface-variant dark:text-slate-400">Cargando mapa de ubicación...</span>
+          <div
+            class="h-[320px] w-full rounded-2xl bg-surface-container-low/40 dark:bg-slate-900/60 border border-outline-variant/40 animate-pulse flex items-center justify-center"
+          >
+            <span class="text-xs text-on-surface-variant dark:text-slate-400"
+              >Cargando mapa de ubicación...</span
+            >
           </div>
         </template>
       </ClientOnly>

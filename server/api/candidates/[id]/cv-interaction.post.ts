@@ -5,8 +5,7 @@ import webpush from "web-push";
 
 const DEFAULT_VAPID_PUBLIC_KEY =
   "BOIrktuQCHHiOWcKICA7YEwdKJf8WNYCmBS_PI338wnaB9VqXPQfCRwTN5NLYokujXBp5pdD83av6DACG2rAYok";
-const DEFAULT_VAPID_PRIVATE_KEY =
-  "oJXO_P5wuj45JaC8taPC1E3pPR8Hu1zi_kAiv5yAaNg";
+const DEFAULT_VAPID_PRIVATE_KEY = "oJXO_P5wuj45JaC8taPC1E3pPR8Hu1zi_kAiv5yAaNg";
 const DEFAULT_VAPID_SUBJECT = "mailto:contacto@franciscojgh.com";
 
 webpush.setVapidDetails(
@@ -22,10 +21,43 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = (await readBody(event)) || {};
+  const config = useRuntimeConfig();
+
+  // 1. Forward to backend AWS Lambda / DynamoDB if apiUrl is configured
+  if (config.public?.apiUrl) {
+    const authHeader = getHeader(event, "authorization");
+    const userIdHeader = getHeader(event, "x-user-id");
+    const userRoleHeader = getHeader(event, "x-user-role");
+
+    const forwardHeaders: Record<string, string> = {};
+    if (authHeader) forwardHeaders["Authorization"] = authHeader;
+    if (userIdHeader) forwardHeaders["x-user-id"] = userIdHeader;
+    if (userRoleHeader) forwardHeaders["x-user-role"] = userRoleHeader;
+
+    try {
+      const backendRes = await $fetch<any>(
+        `${config.public.apiUrl}/profile/${candidateId}/cv-interaction`,
+        {
+          method: "POST",
+          body,
+          headers: forwardHeaders,
+        },
+      );
+      if (backendRes) {
+        return backendRes;
+      }
+    } catch (backendErr: any) {
+      console.warn(
+        "[Nitro cv-interaction] Backend forwarding returned error:",
+        backendErr?.message || backendErr,
+      );
+    }
+  }
+
   const action = (body.action || "VIEW").toUpperCase();
   const companyName = body.companyName || "Una organización reclutadora";
   const recruiterName = body.recruiterName || "";
-  const vacancyTitle = body.vacancyTitle || "una vacante activa";
+  const vacancyTitle = body.vacancyTitle || "";
 
   const recruiterEntity = recruiterName
     ? `${recruiterName} (${companyName})`
@@ -36,15 +68,24 @@ export default defineEventHandler(async (event) => {
     ? "Tu CV ha sido descargado"
     : "Tu CV ha sido visualizado";
 
+  const contextText =
+    vacancyTitle && vacancyTitle !== "Vacante seleccionada"
+      ? `para la vacante "${vacancyTitle}"`
+      : `desde tu perfil profesional`;
+
   const message = isDownload
-    ? `${recruiterEntity} ha descargado tu Currículum Vitae para la vacante "${vacancyTitle}".`
-    : `${recruiterEntity} acaba de abrir y visualizar tu Currículum Vitae para la vacante "${vacancyTitle}".`;
+    ? `${recruiterEntity} ha descargado tu Currículum Vitae ${contextText}.`
+    : `${recruiterEntity} acaba de abrir y visualizar tu Currículum Vitae ${contextText}.`;
 
   let sentPush = false;
 
   // Intentar notificar via web-push local si existe suscripción persistida
   try {
-    const subPath = path.resolve(process.cwd(), "..", ".push-subscription.json");
+    const subPath = path.resolve(
+      process.cwd(),
+      "..",
+      ".push-subscription.json",
+    );
     if (fs.existsSync(subPath)) {
       const subRaw = fs.readFileSync(subPath, "utf-8");
       const subscription = JSON.parse(subRaw);
@@ -70,7 +111,10 @@ export default defineEventHandler(async (event) => {
       }
     }
   } catch (err: any) {
-    console.warn("[CV Interaction Push] Could not send local webpush notification:", err?.message || err);
+    console.warn(
+      "[CV Interaction Push] Could not send local webpush notification:",
+      err?.message || err,
+    );
   }
 
   return {

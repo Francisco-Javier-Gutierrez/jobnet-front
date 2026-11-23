@@ -1,13 +1,25 @@
 <template>
   <div
-    class="lg:col-span-7 flex flex-col h-full bg-surface-container-lowest dark:bg-slate-900"
+    :class="[
+      'lg:col-span-7 flex flex-col h-full bg-surface-container-lowest dark:bg-slate-900 min-h-0',
+      activeAppeal ? 'flex' : 'hidden lg:flex',
+    ]"
   >
     <template v-if="activeAppeal">
       <!-- Chat Header & Dictamen Actions -->
       <div
-        class="p-4 border-b border-outline-variant/60 flex flex-wrap items-center justify-between gap-3 bg-surface-container-low/20"
+        class="p-4 border-b border-outline-variant/60 flex flex-wrap items-center justify-between gap-3 bg-surface-container-low/20 flex-shrink-0"
       >
         <div class="flex items-center gap-3">
+          <button
+            type="button"
+            @click="$emit('back-to-list')"
+            class="lg:hidden p-1.5 -ml-1 text-on-surface-variant hover:text-on-background rounded-lg hover:bg-surface-container-high transition flex items-center justify-center cursor-pointer"
+            title="Volver a la lista de apelaciones"
+            aria-label="Volver a la lista"
+          >
+            <span class="material-symbols-outlined text-xl">arrow_back</span>
+          </button>
           <div
             class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-sm flex-shrink-0"
           >
@@ -84,7 +96,7 @@
 
       <!-- Counter Banner -->
       <div
-        class="px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-between text-xs text-amber-900 dark:text-amber-200"
+        class="flex-shrink-0 px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-between text-xs text-amber-900 dark:text-amber-200"
       >
         <span class="flex items-center gap-1 font-medium">
           <span class="material-symbols-outlined text-base text-amber-600"
@@ -102,7 +114,7 @@
       <!-- Messages Scroll Area -->
       <div
         ref="chatContainerRef"
-        class="flex-grow p-4 overflow-y-auto max-h-[440px] flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
+        class="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
       >
         <div
           v-if="activeAppeal.messages.length === 0"
@@ -161,15 +173,14 @@
                   :src="msg.attachmentUrl"
                   alt="Adjunto"
                   class="w-full h-auto object-cover max-h-[180px] cursor-pointer hover:opacity-90 transition"
-                  @click="openImagePreview(msg.attachmentUrl)"
+                  @click="openAttachment(msg.attachmentUrl)"
                 />
               </div>
-              <a
+              <button
                 v-else
-                :href="msg.attachmentUrl"
-                target="_blank"
-                rel="noopener"
-                class="flex items-center gap-2 p-2.5 rounded-xl bg-black/10 hover:bg-black/20 text-current transition font-medium border border-white/10"
+                type="button"
+                @click="openAttachment(msg.attachmentUrl)"
+                class="flex items-center gap-2 p-2.5 rounded-xl bg-black/10 hover:bg-black/20 text-current transition font-medium border border-white/10 text-left cursor-pointer"
               >
                 <span class="material-symbols-outlined text-base"
                   >description</span
@@ -180,7 +191,7 @@
                 <span class="material-symbols-outlined text-xs ml-auto"
                   >download</span
                 >
-              </a>
+              </button>
             </div>
 
             <span
@@ -199,7 +210,7 @@
 
       <!-- Message Input Bar with Attachments -->
       <div
-        class="p-4 border-t border-outline-variant/60 bg-surface-container-low/25 flex items-center gap-3"
+        class="flex-shrink-0 sticky bottom-0 z-10 p-2.5 sm:p-4 border-t border-outline-variant/60 bg-surface-container-lowest dark:bg-slate-900 flex items-center gap-2 sm:gap-3"
       >
         <!-- Hidden File Input -->
         <input
@@ -214,7 +225,7 @@
         <button
           @click="triggerFileInput"
           :disabled="isUploading"
-          class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-indigo-600 text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-indigo-600 text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
           title="Adjuntar PDF o Imagen de evidencia"
         >
           <span
@@ -232,12 +243,12 @@
           @keyup.enter="handleSendMessage"
           type="text"
           placeholder="Escribe una respuesta para la organización en apelación..."
-          class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-indigo-600 rounded-xl px-4 py-3 text-xs text-on-background dark:text-slate-100 outline-none transition"
+          class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-indigo-600 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs text-on-background dark:text-slate-100 outline-none transition"
         />
         <button
           @click="handleSendMessage"
           :disabled="!newMessageText.trim() && !pendingAttachment"
-          class="w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
           title="Enviar mensaje"
         >
           <span class="material-symbols-outlined text-lg">send</span>
@@ -283,13 +294,18 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
+  (e: "back-to-list"): void;
   (e: "resolve-org", action: "approve" | "confirm"): void;
   (e: "resolve-vacancy", action: "approve" | "block"): void;
   (e: "send-message", text: string, attachment: AppealAttachment | null): void;
   (e: "chat-ref", ref: HTMLDivElement | null): void;
 }>();
 
-const { uploadFile, uploadError: s3UploadError } = useS3Upload();
+const {
+  uploadFile,
+  uploadError: s3UploadError,
+  getSecureViewUrl,
+} = useS3Upload();
 const { data: session } = useAuth();
 const { showInfo, showError } = useAppFeedback();
 
@@ -321,8 +337,8 @@ const handleFileUpload = async (event: Event) => {
   if (!file) return;
 
   const isImg =
-    file.type.startsWith("image/") ||
-    /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(file.name);
+    (file.type.startsWith("image/") && !file.type.includes("svg")) ||
+    /\.(jpg|jpeg|png|webp|gif)$/i.test(file.name);
   const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
 
   if (!isImg && !isPdf) {
@@ -370,10 +386,14 @@ const handleSendMessage = () => {
 const isImageUrl = (url?: string) => {
   if (!url) return false;
   const cleanUrl = url.split("?")[0];
-  return /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(cleanUrl);
+  return /\.(jpg|jpeg|png|webp|gif)$/i.test(cleanUrl);
 };
 
-const openImagePreview = (url: string) => {
-  window.open(url, "_blank");
+const openAttachment = async (url: string) => {
+  if (!url) return;
+  const secureUrl = await getSecureViewUrl(url);
+  if (secureUrl) {
+    window.open(secureUrl, "_blank", "noopener,noreferrer");
+  }
 };
 </script>

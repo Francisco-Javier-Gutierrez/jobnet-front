@@ -250,7 +250,6 @@ const showReportModal = ref(false);
 
 const { status, data: session } = useAuth();
 const { openProtectedModal } = useProtectedAction();
-const { shareJob } = useShare();
 const router = useRouter();
 
 const isSharedLocally = ref(false);
@@ -312,19 +311,46 @@ const salaryDisplay = computed(() => {
 // Likes count & state
 const likesList = computed<string[]>(() => {
   if (Array.isArray(props.job?.likesList)) return props.job.likesList;
+  if (Array.isArray((props.job as any)?.likedBy))
+    return (props.job as any).likedBy;
   return [];
 });
 
 const isLiked = computed(() => {
   if (props.isLiked !== undefined) return props.isLiked;
-  if (!props.currentUserId) return false;
-  return likesList.value.includes(props.currentUserId);
+
+  const authUser = session.value?.user as any;
+  const loggedEmail = authUser?.email?.toLowerCase();
+  const loggedId = authUser?.id ? String(authUser.id).toLowerCase() : "";
+  const passedUserId = props.currentUserId
+    ? String(props.currentUserId).toLowerCase()
+    : "";
+
+  const likes =
+    props.job?.likesList ||
+    (props.job as any)?.likedBy ||
+    (props.job as any)?.likes_list ||
+    [];
+
+  if (Array.isArray(likes) && likes.length > 0) {
+    const found = likes.some((item: unknown) => {
+      const s = String(item).toLowerCase();
+      return (
+        (passedUserId && s === passedUserId) ||
+        (loggedEmail && s === loggedEmail) ||
+        (loggedId && s === loggedId)
+      );
+    });
+    if (found) return true;
+  }
+
+  return Boolean((props.job as any)?.isLiked || (props.job as any)?.liked);
 });
 
 const likesCount = computed(() => {
-  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
   if (typeof props.job?.likesCount === "number") return props.job.likesCount;
   if (typeof props.job?.likes === "number") return props.job.likes;
+  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
   return likesList.value.length;
 });
 
@@ -341,7 +367,9 @@ const effectiveIsBookmarked = computed(() => {
   const authUser = session.value?.user as any;
   const loggedEmail = authUser?.email?.toLowerCase();
   const loggedId = authUser?.id ? String(authUser.id).toLowerCase() : "";
-  const passedUserId = props.currentUserId ? String(props.currentUserId).toLowerCase() : "";
+  const passedUserId = props.currentUserId
+    ? String(props.currentUserId).toLowerCase()
+    : "";
 
   const bookmarks =
     props.job?.bookmarksList ||
@@ -361,7 +389,9 @@ const effectiveIsBookmarked = computed(() => {
     if (found) return true;
   }
 
-  return Boolean((props.job as any)?.isBookmarked || (props.job as any)?.bookmarked);
+  return Boolean(
+    (props.job as any)?.isBookmarked || (props.job as any)?.bookmarked,
+  );
 });
 
 // Comments count
@@ -377,11 +407,14 @@ const sharesCount = computed(() => {
 });
 
 const bookmarksCount = computed(() => {
-  if (Array.isArray(props.job?.bookmarksList))
-    return props.job.bookmarksList.length;
+  const bList =
+    props.job?.bookmarksList ||
+    (props.job as any)?.savedBy ||
+    (props.job as any)?.bookmarks;
+  if (Array.isArray(bList) && bList.length > 0) return bList.length;
   if (typeof props.job?.bookmarksCount === "number")
     return props.job.bookmarksCount;
-  return bookmarksList.value.length;
+  return Array.isArray(bList) ? bList.length : bookmarksList.value.length;
 });
 
 // Click handlers
@@ -435,7 +468,6 @@ const handleLikeClick = (e: Event) => {
 
 const handleShareClick = (e: Event) => {
   e.stopPropagation();
-  shareJob(props.job);
 
   if (process.client) {
     const currentUserId =
@@ -450,8 +482,8 @@ const handleShareClick = (e: Event) => {
         `shared-jobs-${currentUserId}`,
         JSON.stringify(shared),
       );
-      isSharedLocally.value = true;
     }
+    isSharedLocally.value = true;
   }
 
   emit("share", props.job);

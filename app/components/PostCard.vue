@@ -99,30 +99,34 @@
       class="border-y border-outline-variant/20 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 prevent-post-nav"
     >
       <div
-        class="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+        class="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0"
       >
-        <div class="flex items-center gap-2 text-xs">
-          <span class="material-symbols-outlined text-rose-600 text-[24px]"
+        <div class="flex items-center gap-2.5 text-xs min-w-0 flex-1">
+          <span
+            class="material-symbols-outlined text-rose-600 text-[24px] shrink-0"
             >picture_as_pdf</span
           >
-          <div class="text-left">
+          <div class="text-left min-w-0 flex-1">
             <p
-              class="font-bold text-on-background dark:text-slate-100 max-w-[200px] sm:max-w-[240px] truncate select-text"
+              class="font-bold text-on-background dark:text-slate-100 truncate select-text"
+              :title="post.pdfName || 'Documento PDF'"
             >
               {{ post.pdfName || "Documento PDF" }}
             </p>
             <p
-              class="text-[10px] text-on-surface-variant dark:text-slate-400 select-none"
+              class="text-[10px] text-on-surface-variant dark:text-slate-400 select-none truncate"
             >
               Documento Adjunto
             </p>
           </div>
         </div>
-        <div class="flex gap-2 justify-end sm:justify-start">
+        <div
+          class="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap justify-end sm:justify-start"
+        >
           <button
             @click.stop="showPdfModal = true"
             type="button"
-            class="bg-primary/10 dark:bg-indigo-500/20 hover:bg-primary/20 text-primary dark:text-indigo-400 font-bold text-xs px-3.5 py-1.5 rounded-lg transition flex items-center gap-1 active:scale-95"
+            class="bg-primary/10 dark:bg-indigo-500/20 hover:bg-primary/20 text-primary dark:text-indigo-400 font-bold text-xs px-3.5 py-1.5 rounded-lg transition flex items-center gap-1 active:scale-95 whitespace-nowrap shrink-0"
           >
             <span class="material-symbols-outlined text-xs">visibility</span>
             Vista Previa
@@ -130,7 +134,7 @@
           <a
             :href="post.pdfUrl"
             target="_blank"
-            class="bg-white dark:bg-slate-800 border border-outline-variant dark:border-slate-700 hover:border-primary text-primary dark:text-indigo-400 font-bold text-xs px-3.5 py-1.5 rounded-lg transition active:scale-95"
+            class="bg-white dark:bg-slate-800 border border-outline-variant dark:border-slate-700 hover:border-primary text-primary dark:text-indigo-400 font-bold text-xs px-3.5 py-1.5 rounded-lg transition active:scale-95 whitespace-nowrap shrink-0 inline-flex items-center"
             @click.stop
           >
             Ver Documento
@@ -320,11 +324,13 @@ const props = withDefaults(
   defineProps<{
     post: Post;
     currentUserId?: string;
+    isLiked?: boolean;
     isBookmarked?: boolean;
     isDetail?: boolean;
   }>(),
   {
     isDetail: false,
+    isLiked: undefined,
     isBookmarked: undefined,
   },
 );
@@ -366,7 +372,6 @@ const displayRole = computed(() => {
   const upperRole = rawRole.toUpperCase();
 
   if (
-    upperRole === "EMPRESA" ||
     upperRole === "ORGANIZACION" ||
     props.post?.isCompany
   ) {
@@ -419,8 +424,8 @@ const handleShareClick = (e: Event) => {
         `shared-posts-${currentUserId}`,
         JSON.stringify(shared),
       );
-      isSharedLocally.value = true;
     }
+    isSharedLocally.value = true;
   }
 
   emit("share", props.post);
@@ -436,6 +441,8 @@ const openReportModal = () => {
 };
 
 const isLiked = computed(() => {
+  if (props.isLiked !== undefined) return props.isLiked;
+
   const post = props.post;
   if (!post) return false;
 
@@ -445,8 +452,8 @@ const isLiked = computed(() => {
   const passedUserId = props.currentUserId?.toLowerCase();
 
   const likes = post.likesList || post.likedBy || post.likes_list || [];
-  if (Array.isArray(likes)) {
-    return likes.some((item: unknown) => {
+  if (Array.isArray(likes) && likes.length > 0) {
+    const foundInList = likes.some((item: unknown) => {
       const s = String(item).toLowerCase();
       return (
         (passedUserId && s === passedUserId) ||
@@ -454,12 +461,15 @@ const isLiked = computed(() => {
         (loggedId && s === String(loggedId).toLowerCase())
       );
     });
+    if (foundInList) return true;
   }
 
   return Boolean(post.isLiked);
 });
 
 const effectiveIsBookmarked = computed(() => {
+  if (props.isBookmarked !== undefined) return props.isBookmarked;
+
   const post = props.post;
   if (!post) return false;
 
@@ -470,7 +480,7 @@ const effectiveIsBookmarked = computed(() => {
 
   const bookmarks =
     post.bookmarksList || post.bookmarkedBy || post.bookmarks || [];
-  if (Array.isArray(bookmarks)) {
+  if (Array.isArray(bookmarks) && bookmarks.length > 0) {
     const foundInList = bookmarks.some((item: unknown) => {
       const s = String(item).toLowerCase();
       return (
@@ -482,18 +492,19 @@ const effectiveIsBookmarked = computed(() => {
     if (foundInList) return true;
   }
 
-  if (props.isBookmarked === true) return true;
-
   return Boolean(post.isBookmarked);
 });
 
 const likesCount = computed(() => {
-  return props.post?.likesList
-    ? props.post.likesList.length
-    : props.post?.likes || 0;
+  if (typeof props.post?.likesCount === "number") return props.post.likesCount;
+  if (typeof props.post?.likes === "number") return props.post.likes;
+  if (Array.isArray(props.post?.likesList)) return props.post.likesList.length;
+  return 0;
 });
 
 const commentsCount = computed(() => {
+  if (typeof props.post?.commentsCount === "number")
+    return props.post.commentsCount;
   return props.post?.comments?.length || 0;
 });
 
@@ -504,13 +515,14 @@ const sharesCount = computed(() => {
 });
 
 const bookmarksCount = computed(() => {
-  if (typeof props.post?.bookmarksCount === "number")
-    return props.post.bookmarksCount;
   const bookmarks =
     props.post?.bookmarksList ||
     props.post?.bookmarkedBy ||
     props.post?.bookmarks ||
     [];
+  if (Array.isArray(bookmarks) && bookmarks.length > 0) return bookmarks.length;
+  if (typeof props.post?.bookmarksCount === "number")
+    return props.post.bookmarksCount;
   return Array.isArray(bookmarks) ? bookmarks.length : 0;
 });
 

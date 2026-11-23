@@ -134,9 +134,11 @@
             required
             class="w-full bg-surface-container-low dark:bg-slate-800/80 border border-outline-variant/40 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-on-background dark:text-slate-100 outline-none focus:border-primary transition"
           />
-          <p class="text-[10px] text-on-surface-variant dark:text-slate-400 mt-1">
-            La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas,
-            minúsculas y un número.
+          <p
+            class="text-[10px] text-on-surface-variant dark:text-slate-400 mt-1"
+          >
+            La contraseña debe tener al menos 8 caracteres, incluyendo
+            mayúsculas, minúsculas y un número.
           </p>
         </div>
 
@@ -190,9 +192,9 @@ const isFederatedUser = computed(() => {
   if (!user) return false;
   return Boolean(
     user.isFederated ||
-      user.provider === "cognito" ||
-      (typeof user.id === "string" &&
-        user.id.toLowerCase().startsWith("google_")),
+    user.provider === "cognito" ||
+    (typeof user.id === "string" &&
+      user.id.toLowerCase().startsWith("google_")),
   );
 });
 

@@ -94,7 +94,9 @@ export function useS3Upload() {
         config.public.apiUrl ||
         config.public.apiBase ||
         "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
-      const res = await fetch(`${apiBase}/view-url?url=${encodeURIComponent(keyOrUrl)}`);
+      const res = await fetch(
+        `${apiBase}/view-url?url=${encodeURIComponent(keyOrUrl)}`,
+      );
       if (res.ok) {
         const data = await res.json();
         return data.url || keyOrUrl;

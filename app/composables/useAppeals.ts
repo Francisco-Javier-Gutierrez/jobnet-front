@@ -1,6 +1,6 @@
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import { apiFetch } from "~/composables/useApiClient";
 import type { Appeal, AppealMessage, AppealAttachment } from "~/types";
-import { MOCK_APPEALS } from "~/utils/mockData";
 
 export const useAppeals = () => {
   const { showError, showSuccess, showInfo } = useAppFeedback();
@@ -71,12 +71,12 @@ export const useAppeals = () => {
   const fetchAppeals = async () => {
     isLoading.value = true;
     try {
-      const data = await $fetch<any[]>(
-        `${config.public.apiUrl}/moderator/appeals`,
+      const data = await apiFetch<any[]>(
+        "/moderator/appeals",
       ).catch(() => []);
 
-      const list = data && data.length > 0 ? data : MOCK_APPEALS;
-      appeals.value = (list || []).map((item) => ({
+      const list = Array.isArray(data) ? data : [];
+      appeals.value = list.map((item) => ({
         ...item,
         messages: item.messages || [],
       }));
@@ -86,10 +86,7 @@ export const useAppeals = () => {
       }
     } catch (err) {
       console.error("Error fetching appeals:", err);
-      appeals.value = MOCK_APPEALS;
-      if (MOCK_APPEALS.length > 0 && !selectedAppealId.value) {
-        await selectAppeal(MOCK_APPEALS[0]);
-      }
+      appeals.value = [];
     } finally {
       isLoading.value = false;
     }
@@ -216,8 +213,8 @@ export const useAppeals = () => {
     const compId = appeal.id;
 
     try {
-      const msgs = await $fetch<any[]>(
-        `${config.public.apiUrl}/moderator/appeals/${compId}/messages`,
+      const msgs = await apiFetch<any[]>(
+        `/moderator/appeals/${compId}/messages`,
       ).catch(() => []);
 
       appeal.messages = (msgs || []).map((m) => ({
@@ -248,8 +245,8 @@ export const useAppeals = () => {
 
     try {
       if (actionType === "cancel") {
-        await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${compId}/cancel-suspension`,
+        await apiFetch(
+          `/moderator/organizations/${compId}/cancel-suspension`,
           {
             method: "POST",
             body: { notes: "Apelación aprobada tras revisión en tiempo real" },
@@ -260,8 +257,8 @@ export const useAppeals = () => {
           "Apelación aprobada con éxito. La organización ha sido reactivada.",
         );
       } else {
-        await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${compId}/confirm-suspension`,
+        await apiFetch(
+          `/moderator/organizations/${compId}/confirm-suspension`,
           {
             method: "POST",
             body: {
@@ -272,6 +269,13 @@ export const useAppeals = () => {
         showInfo(
           "Notificación",
           "Suspensión confirmada. La organización ha sido suspendida definitivamente.",
+        );
+      }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("incident-sync", {
+            detail: { compId, actionType },
+          }),
         );
       }
       appeals.value = appeals.value.filter(
@@ -291,8 +295,8 @@ export const useAppeals = () => {
     isProcessingAction.value = true;
 
     try {
-      await $fetch(
-        `${config.public.apiUrl}/moderator/incidents/${activeAppeal.value.id}/resolve`,
+      await apiFetch(
+        `/moderator/incidents/${activeAppeal.value.id}/resolve`,
         {
           method: "POST",
           body: { action },
@@ -306,6 +310,13 @@ export const useAppeals = () => {
           : "Vacante sancionada y cerrada definitivamente.",
       );
 
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("incident-sync", {
+            detail: { appealId: activeAppeal.value?.id, action },
+          }),
+        );
+      }
       appeals.value = appeals.value.filter(
         (a) => a.id !== activeAppeal.value?.id,
       );

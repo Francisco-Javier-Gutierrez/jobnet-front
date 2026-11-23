@@ -6,7 +6,8 @@ export type CvTemplateId =
   | "creative"
   | "harvard-classic"
   | "compact-ats"
-  | "modern-split";
+  | "modern-split"
+  | "standard";
 
 export interface CvColorTheme {
   id: string;

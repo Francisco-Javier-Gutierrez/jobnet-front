@@ -80,7 +80,10 @@ export function useAdminAnalytics() {
   });
 
   const queryParams = computed(() => ({
-    region: selectedRegion.value === "Todas las Regiones" ? "ALL" : selectedRegion.value,
+    region:
+      selectedRegion.value === "Todas las Regiones"
+        ? "ALL"
+        : selectedRegion.value,
     period: selectedPeriod.value,
   }));
 
@@ -119,16 +122,51 @@ export function useAdminAnalytics() {
       ],
       selectedRegion: selectedRegion.value,
       topSkills: [
-        { name: "Vue.js / Nuxt 3", count: 34, percentage: 89, category: "Frontend" },
+        {
+          name: "Vue.js / Nuxt 3",
+          count: 34,
+          percentage: 89,
+          category: "Frontend",
+        },
         { name: "TypeScript", count: 31, percentage: 81, category: "Lenguaje" },
         { name: "Tailwind CSS", count: 28, percentage: 73, category: "UI/UX" },
-        { name: "AWS (Cloud / Lambda / DynamoDB)", count: 26, percentage: 68, category: "Cloud" },
-        { name: "Node.js / Express", count: 23, percentage: 60, category: "Backend" },
-        { name: "Docker / Contenedores", count: 19, percentage: 50, category: "DevOps" },
-        { name: "Python / Data Science", count: 16, percentage: 42, category: "Data / AI" },
+        {
+          name: "AWS (Cloud / Lambda / DynamoDB)",
+          count: 26,
+          percentage: 68,
+          category: "Cloud",
+        },
+        {
+          name: "Node.js / Express",
+          count: 23,
+          percentage: 60,
+          category: "Backend",
+        },
+        {
+          name: "Docker / Contenedores",
+          count: 19,
+          percentage: 50,
+          category: "DevOps",
+        },
+        {
+          name: "Python / Data Science",
+          count: 16,
+          percentage: 42,
+          category: "Data / AI",
+        },
         { name: "Git & CI/CD", count: 15, percentage: 39, category: "DevOps" },
-        { name: "Figma & UI Design", count: 13, percentage: 34, category: "Diseño" },
-        { name: "SQL & Bases de Datos", count: 11, percentage: 28, category: "Database" },
+        {
+          name: "Figma & UI Design",
+          count: 13,
+          percentage: 34,
+          category: "Diseño",
+        },
+        {
+          name: "SQL & Bases de Datos",
+          count: 11,
+          percentage: 28,
+          category: "Database",
+        },
       ],
       monthlyOrganizations: [
         { month: "Nov 2025", count: 3, label: "Nov 2025" },
@@ -160,40 +198,7 @@ export function useAdminAnalytics() {
           { range: "20+ postulaciones", count: 2, percentage: 5.3 },
         ],
       },
-      anomalies: [
-        {
-          id: "anom-vac-demo-01",
-          type: "RAPID_VACANCIES",
-          severity: "CRITICAL",
-          organizationId: "org-bot-recruitment-99",
-          organizationName: "FastHiring Express Latam S.A.S.",
-          count: 14,
-          threshold: 10,
-          timeWindow: "38 min (< 1 hora)",
-          detectedAt: new Date(Date.now() - 38 * 60 * 1000).toISOString(),
-          title: "Concurrencia Anómala: Posible Bot / Spam de Vacantes",
-          description:
-            "Se detectaron 14 vacantes publicadas en 38 minutos por FastHiring Express Latam S.A.S. Supera el límite de seguridad de 10 vacantes/hora.",
-          category: "BOT_SPAM",
-          status: "ACTIVE",
-        },
-        {
-          id: "anom-rep-demo-02",
-          type: "REPORT_SURGE",
-          severity: "CRITICAL",
-          organizationId: "org-fake-corp-77",
-          organizationName: "Inversiones & Créditos Inmediatos México",
-          count: 7,
-          threshold: 5,
-          timeWindow: "24 min (< 1 hora)",
-          detectedAt: new Date(Date.now() - 24 * 60 * 1000).toISOString(),
-          title: "Concurrencia Anómala: Avalancha de Reportes por Fraude Masivo",
-          description:
-            "Se acumularon 7 denuncias independientes por cobro previo indebido y estafa en 24 minutos contra Inversiones & Créditos Inmediatos México. Supera el límite de 5 reportes/hora.",
-          category: "MASS_FRAUD",
-          status: "ACTIVE",
-        },
-      ],
+      anomalies: [],
       kpis: {
         totalVacancies: 41,
         totalOrganizations: 38,
@@ -203,7 +208,7 @@ export function useAdminAnalytics() {
         topSkillName: "Vue.js / Nuxt 3",
         topSkillCount: 34,
         monthlyGrowthRate: "+15.2%",
-        activeAnomaliesCount: 2,
+        activeAnomaliesCount: 0,
       },
     };
   });
@@ -243,7 +248,8 @@ export function useAdminAnalytics() {
 
     // 1. Top 10 Skills
     csv += "TOP 10 HABILIDADES TECNICAS MAS DEMANDADAS\n";
-    csv += "Posición,Habilidad Técnica,Vacantes que la demandan,Porcentaje de Ofertas,Categoría\n";
+    csv +=
+      "Posición,Habilidad Técnica,Vacantes que la demandan,Porcentaje de Ofertas,Categoría\n";
     data.topSkills.forEach((s, idx) => {
       csv += `${idx + 1},"${s.name}",${s.count},${s.percentage}%,${s.category}\n`;
     });
@@ -270,7 +276,10 @@ export function useAdminAnalytics() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `jobnet-analitica-avanzada-${Date.now()}.csv`);
+    link.setAttribute(
+      "download",
+      `jobnet-analitica-avanzada-${Date.now()}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -10,8 +10,11 @@
         <h1 class="text-2xl font-bold text-on-background mb-1">
           Historial de Solicitudes
         </h1>
-        <p class="text-on-surface-variant dark:text-slate-300 text-xs sm:text-sm">
-          Registro histórico de todas las vacantes en las que te has postulado, con su estatus vigente de selección y retroalimentación transparente.
+        <p
+          class="text-on-surface-variant dark:text-slate-300 text-xs sm:text-sm"
+        >
+          Registro histórico de todas las vacantes en las que te has postulado,
+          con su estatus vigente de selección y retroalimentación transparente.
         </p>
       </div>
 
@@ -20,7 +23,10 @@
         <span
           class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-surface-container-low dark:bg-slate-900 border border-outline-variant/60 text-on-surface"
         >
-          Total: <strong class="text-primary">{{ filteredApplications.length }}</strong>
+          Total:
+          <strong class="text-primary">{{
+            filteredApplications.length
+          }}</strong>
         </span>
         <span
           class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300"
@@ -83,7 +89,9 @@
           class="material-symbols-outlined text-3xl animate-spin text-primary"
           >sync</span
         >
-        <p class="mt-2 text-xs font-semibold">Cargando historial de solicitudes...</p>
+        <p class="mt-2 text-xs font-semibold">
+          Cargando historial de solicitudes...
+        </p>
       </div>
 
       <!-- Empty State -->
@@ -101,9 +109,9 @@
         </h2>
         <p class="text-xs max-w-sm mx-auto mb-4">
           {{
-            searchQuery || selectedStatusFilter !== 'ALL'
-              ? 'No hay registros que coincidan con los filtros seleccionados.'
-              : 'Aún no te has postulado a ninguna vacante. Explora las oportunidades laborales disponibles.'
+            searchQuery || selectedStatusFilter !== "ALL"
+              ? "No hay registros que coincidan con los filtros seleccionados."
+              : "Aún no te has postulado a ninguna vacante. Explora las oportunidades laborales disponibles."
           }}
         </p>
         <NuxtLink
@@ -123,20 +131,26 @@
             >
               <th scope="col" class="py-3 px-4">Puesto / Vacante</th>
               <th scope="col" class="py-3 px-4">Organización Receptora</th>
-              <th scope="col" class="py-3 px-4 whitespace-nowrap">Fecha Postulación</th>
+              <th scope="col" class="py-3 px-4 whitespace-nowrap">
+                Fecha Postulación
+              </th>
               <th scope="col" class="py-3 px-4">Estatus Vigente</th>
               <th scope="col" class="py-3 px-4">Retroalimentación / Motivo</th>
               <th scope="col" class="py-3 px-4 text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-outline-variant/30 dark:divide-slate-800">
+          <tbody
+            class="divide-y divide-outline-variant/30 dark:divide-slate-800"
+          >
             <tr
               v-for="app in filteredApplications"
               :key="app.jobId"
               class="hover:bg-surface-container-low/20 transition-colors"
             >
               <!-- 1. Puesto / Vacante -->
-              <td class="py-3.5 px-4 font-semibold text-on-background dark:text-slate-100 max-w-xs">
+              <td
+                class="py-3.5 px-4 font-semibold text-on-background dark:text-slate-100 max-w-xs"
+              >
                 <NuxtLink
                   :to="`/jobs/${app.jobId}`"
                   class="hover:text-primary hover:underline block truncate font-bold text-xs"
@@ -144,15 +158,20 @@
                 >
                   {{ app.jobTitle }}
                 </NuxtLink>
-                <span class="text-[10px] text-on-surface-variant/70 font-normal">
+                <span
+                  class="text-[10px] text-on-surface-variant/70 font-normal"
+                >
                   ID: {{ app.jobId }}
                 </span>
               </td>
 
               <!-- 2. Organización Receptora -->
-              <td class="py-3.5 px-4 text-on-surface-variant dark:text-slate-300">
+              <td
+                class="py-3.5 px-4 text-on-surface-variant dark:text-slate-300"
+              >
                 <div class="flex items-center gap-1.5 font-medium">
-                  <span class="material-symbols-outlined text-sm text-slate-400 shrink-0"
+                  <span
+                    class="material-symbols-outlined text-sm text-slate-400 shrink-0"
                     >business</span
                   >
                   <span class="truncate max-w-[160px]" :title="app.companyName">
@@ -162,7 +181,9 @@
               </td>
 
               <!-- 3. Fecha de Postulación -->
-              <td class="py-3.5 px-4 text-slate-500 dark:text-slate-400 whitespace-nowrap">
+              <td
+                class="py-3.5 px-4 text-slate-500 dark:text-slate-400 whitespace-nowrap"
+              >
                 {{ formatDate(app.appliedAt) }}
               </td>
 
@@ -192,7 +213,9 @@
                       <span class="material-symbols-outlined text-[12px]">
                         {{ getStandardReasonIcon(app.motivoRechazo) }}
                       </span>
-                      <span>{{ getStandardReasonCategory(app.motivoRechazo) }}</span>
+                      <span>{{
+                        getStandardReasonCategory(app.motivoRechazo)
+                      }}</span>
                     </span>
                   </div>
 
@@ -201,13 +224,20 @@
                     class="text-[11px] text-slate-600 dark:text-slate-300 italic line-clamp-2"
                     :title="app.motivoRechazo || 'Proceso concluido'"
                   >
-                    "{{ app.motivoRechazo || 'Perfil cubierto durante el proceso de selección.' }}"
+                    "{{
+                      app.motivoRechazo ||
+                      "Perfil cubierto durante el proceso de selección."
+                    }}"
                   </p>
                 </div>
 
                 <!-- Caso En Proceso / Seleccionado / Contratado -->
-                <div v-else class="text-[11px] text-on-surface-variant flex items-center gap-1">
-                  <span class="material-symbols-outlined text-xs text-primary shrink-0"
+                <div
+                  v-else
+                  class="text-[11px] text-on-surface-variant flex items-center gap-1"
+                >
+                  <span
+                    class="material-symbols-outlined text-xs text-primary shrink-0"
                     >check_circle</span
                   >
                   <span>{{ getActiveStageFeedback(app.status) }}</span>
@@ -231,7 +261,9 @@
                     class="p-1 rounded-lg text-primary hover:bg-primary/10 transition cursor-pointer"
                     title="Ver publicación completa"
                   >
-                    <span class="material-symbols-outlined text-base">open_in_new</span>
+                    <span class="material-symbols-outlined text-base"
+                      >open_in_new</span
+                    >
                   </NuxtLink>
                 </div>
               </td>
@@ -251,18 +283,26 @@
     >
       <div v-if="selectedApp" class="space-y-4">
         <!-- Resumen de Puesto y Empresa -->
-        <div class="p-3.5 rounded-xl bg-surface-container-low dark:bg-slate-800/80 border border-outline-variant/40 space-y-1">
+        <div
+          class="p-3.5 rounded-xl bg-surface-container-low dark:bg-slate-800/80 border border-outline-variant/40 space-y-1"
+        >
           <h3 class="text-xs font-bold text-on-background dark:text-slate-100">
             {{ selectedApp.jobTitle }}
           </h3>
-          <p class="text-xs text-on-surface-variant flex items-center gap-1 font-medium">
+          <p
+            class="text-xs text-on-surface-variant flex items-center gap-1 font-medium"
+          >
             <span class="material-symbols-outlined text-sm">business</span>
             {{ selectedApp.companyName }}
           </p>
-          <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-1 flex items-center gap-3">
+          <div
+            class="text-[10px] text-slate-500 dark:text-slate-400 pt-1 flex items-center gap-3"
+          >
             <span>Fecha: {{ formatDate(selectedApp.appliedAt) }}</span>
             <span>•</span>
-            <span class="font-bold text-primary">Estatus: {{ getStatusLabel(selectedApp.status) }}</span>
+            <span class="font-bold text-primary"
+              >Estatus: {{ getStatusLabel(selectedApp.status) }}</span
+            >
           </div>
         </div>
 
@@ -271,12 +311,16 @@
           v-if="selectedApp.status === 'RECHAZADO'"
           class="p-4 rounded-xl border border-rose-500/20 bg-rose-50/50 dark:bg-rose-950/20 space-y-2"
         >
-          <div class="flex items-center gap-2 text-rose-700 dark:text-rose-300 font-bold text-xs">
+          <div
+            class="flex items-center gap-2 text-rose-700 dark:text-rose-300 font-bold text-xs"
+          >
             <span class="material-symbols-outlined text-base">feedback</span>
             <span>Retroalimentación Transparente del Proceso:</span>
           </div>
 
-          <div class="bg-surface dark:bg-slate-900 p-3 rounded-lg border border-outline-variant/40">
+          <div
+            class="bg-surface dark:bg-slate-900 p-3 rounded-lg border border-outline-variant/40"
+          >
             <div class="flex items-center gap-2 mb-1">
               <span
                 class="px-2 py-0.5 rounded text-[10px] font-bold border"
@@ -285,12 +329,18 @@
                 {{ getStandardReasonCategory(selectedApp.motivoRechazo) }}
               </span>
             </div>
-            <p class="text-xs text-on-background dark:text-slate-200 italic leading-relaxed">
-              "{{ selectedApp.motivoRechazo || 'La organización concluyó la selección con perfiles que se alineaban estrechamente a la vacante.' }}"
+            <p
+              class="text-xs text-on-background dark:text-slate-200 italic leading-relaxed"
+            >
+              "{{
+                selectedApp.motivoRechazo ||
+                "La organización concluyó la selección con perfiles que se alineaban estrechamente a la vacante."
+              }}"
             </p>
           </div>
           <p class="text-[10px] text-on-surface-variant dark:text-slate-400">
-            Esta retroalimentación constructiva busca apoyarte en enfocar tus próximas postulaciones laborales.
+            Esta retroalimentación constructiva busca apoyarte en enfocar tus
+            próximas postulaciones laborales.
           </p>
         </div>
 
@@ -299,7 +349,9 @@
           <label class="text-[11px] font-bold text-on-surface-variant block">
             Mensaje o Carta de Presentación Enviada:
           </label>
-          <div class="p-3 bg-surface-container-low dark:bg-slate-800 rounded-xl border border-outline-variant/40 text-xs text-on-background whitespace-pre-wrap">
+          <div
+            class="p-3 bg-surface-container-low dark:bg-slate-800 rounded-xl border border-outline-variant/40 text-xs text-on-background whitespace-pre-wrap"
+          >
             {{ selectedApp.coverLetter }}
           </div>
         </div>
@@ -335,7 +387,8 @@ import { useAuth, useRuntimeConfig, useRouter } from "#imports";
 
 useSeoMeta({
   title: "Historial de Solicitudes - JobNet",
-  description: "Registro histórico de postulaciones con estatus y retroalimentación transparente",
+  description:
+    "Registro histórico de postulaciones con estatus y retroalimentación transparente",
 });
 
 const { data: session, status } = useAuth();
@@ -359,56 +412,6 @@ const statusFilters = [
   { label: "Descartadas", value: "RECHAZADO" },
 ];
 
-const MOCK_MY_APPLICATIONS = [
-  {
-    jobId: "vac-frontend-sr-01",
-    jobTitle: "Ingeniero Frontend Senior (Vue 3 / Nuxt / Tailwind)",
-    companyName: "TechSolutions México",
-    status: "EN_CONTACTO",
-    appliedAt: "2026-10-12T14:30:00Z",
-    motivoRechazo: null,
-    coverLetter:
-      "Cuento con más de 5 años diseñando aplicaciones empresariales con Vue 3 y Nuxt.",
-  },
-  {
-    jobId: "vac-devops-aws-02",
-    jobTitle: "Especialista Cloud AWS & DevOps Platform",
-    companyName: "Innovatech Global",
-    status: "SELECCIONADO",
-    appliedAt: "2026-10-10T10:00:00Z",
-    motivoRechazo: null,
-    coverLetter:
-      "Interesado en la gestión de infraestructura cloud con Terraform.",
-  },
-  {
-    jobId: "vac-fullstack-ts-03",
-    jobTitle: "Desarrollador Fullstack TypeScript / Node.js",
-    companyName: "SoftMX Technologies",
-    status: "RECHAZADO",
-    motivoRechazo: "Perfil cubierto",
-    appliedAt: "2026-10-08T09:15:00Z",
-    coverLetter: "Experiencia en APIs serverless y Vue 3.",
-  },
-  {
-    jobId: "vac-arquitecto-cloud-04",
-    jobTitle: "Arquitecto de Soluciones Cloud",
-    companyName: "DataCloud Networks",
-    status: "RECHAZADO",
-    motivoRechazo: "Experiencia requerida",
-    appliedAt: "2026-10-05T16:20:00Z",
-    coverLetter: "Certificado en AWS Solutions Architect Associate.",
-  },
-  {
-    jobId: "vac-lead-engineer-05",
-    jobTitle: "Tech Lead Engineer",
-    companyName: "Fintech Growth Latam",
-    status: "RECHAZADO",
-    motivoRechazo: "Pretensión salarial",
-    appliedAt: "2026-10-01T11:00:00Z",
-    coverLetter: "Liderazgo de equipos de desarrollo ágiles.",
-  },
-];
-
 const fetchApplications = async () => {
   if (isMockEnabled.value) {
     applications.value = JSON.parse(JSON.stringify(MOCK_MY_APPLICATIONS));
@@ -417,6 +420,17 @@ const fetchApplications = async () => {
   }
   if (!isMockEnabled.value && status.value !== "authenticated") {
     router.push("/login");
+    return;
+  }
+
+  const userRole = (
+    (session.value?.user as any)?.tipoUsuario ||
+    (session.value?.user as any)?.role ||
+    ""
+  ).toUpperCase();
+
+  if (userRole && userRole !== "CANDIDATO") {
+    router.push("/");
     return;
   }
 
@@ -455,11 +469,11 @@ const fetchApplications = async () => {
           new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
       );
     } else {
-      applications.value = MOCK_MY_APPLICATIONS;
+      applications.value = [];
     }
   } catch (e) {
     console.error("Error loading candidate applications:", e);
-    applications.value = MOCK_MY_APPLICATIONS;
+    applications.value = [];
   } finally {
     loading.value = false;
   }
@@ -598,10 +612,19 @@ function getStandardReasonCategory(reason?: string): string {
   if (lower.includes("perfil cubierto") || lower.includes("vacante cubierta")) {
     return "Perfil cubierto";
   }
-  if (lower.includes("experiencia") || lower.includes("técnica") || lower.includes("trayectoria")) {
+  if (
+    lower.includes("experiencia") ||
+    lower.includes("técnica") ||
+    lower.includes("trayectoria")
+  ) {
     return "Experiencia requerida";
   }
-  if (lower.includes("salarial") || lower.includes("pretensión") || lower.includes("sueldo") || lower.includes("remuneración")) {
+  if (
+    lower.includes("salarial") ||
+    lower.includes("pretensión") ||
+    lower.includes("sueldo") ||
+    lower.includes("remuneración")
+  ) {
     return "Pretensión salarial";
   }
   return "Retroalimentación técnica";

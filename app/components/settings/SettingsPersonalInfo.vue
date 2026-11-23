@@ -81,7 +81,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="flex flex-col gap-1.5">
         <label
           class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
@@ -96,6 +96,28 @@
           "
           id="name"
           type="text"
+          class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label
+          class="text-xs font-bold text-on-surface-variant dark:text-slate-300"
+          for="tituloProfesional"
+        >
+          Título / Rol Profesional
+        </label>
+        <input
+          :value="tituloProfesional"
+          @input="
+            $emit(
+              'update:tituloProfesional',
+              ($event.target as HTMLInputElement).value,
+            )
+          "
+          id="tituloProfesional"
+          type="text"
+          placeholder="Ej. Desarrollador Full Stack, Contador Público..."
           class="w-full bg-surface border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-2.5 text-sm text-on-background outline-none transition"
         />
       </div>
@@ -123,15 +145,22 @@
 <script setup lang="ts">
 import { useS3Upload } from "~/composables/useS3Upload";
 
-const props = defineProps<{
-  name: string;
-  location: string;
-  bio: string;
-  fotoPerfil: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    name: string;
+    tituloProfesional?: string;
+    location: string;
+    bio: string;
+    fotoPerfil: string;
+  }>(),
+  {
+    tituloProfesional: "",
+  },
+);
 
 const emit = defineEmits<{
   (e: "update:name", value: string): void;
+  (e: "update:tituloProfesional", value: string): void;
   (e: "update:location", value: string): void;
   (e: "update:bio", value: string): void;
   (e: "update:fotoPerfil", value: string): void;

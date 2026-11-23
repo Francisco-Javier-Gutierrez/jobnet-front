@@ -1,5 +1,4 @@
-import { defineEventHandler } from "h3";
-import { MOCK_VACANCIES } from "../../utils/mockData";
+import { defineEventHandler, createError } from "h3";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -11,15 +10,11 @@ export default defineEventHandler(async (event) => {
       return data;
     }
   } catch (error: any) {
-    // Fall through to mock data
+    console.warn(`Failed to fetch job ${id} from backend API:`, error?.message);
   }
 
-  // Fallback to MOCK_VACANCIES
-  const found = MOCK_VACANCIES.find((j) => j.id === id || j.uniqueId === id);
-  if (found) {
-    return found;
-  }
-
-  // Return the first one as default demo if not matched
-  return MOCK_VACANCIES[0];
+  throw createError({
+    statusCode: 404,
+    statusMessage: "Vacante no encontrada",
+  });
 });

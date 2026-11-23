@@ -48,7 +48,7 @@
       >
         No hay publicaciones para mostrar.
       </div>
-      <div v-else class="grid grid-cols-1 gap-4">
+      <div v-else class="max-w-xl mx-auto w-full space-y-4">
         <PostCard
           v-for="post in userPosts"
           :key="post.uniqueId"
@@ -56,6 +56,7 @@
           :current-user-id="
             (authData?.user as any)?.id || authData?.user?.email || ''
           "
+          :is-liked="post.isLiked"
           :is-bookmarked="isBookmarked(post)"
           @navigate="(id) => $router.push(`/posts/${id}`)"
           @like="$emit('like', $event)"
@@ -72,9 +73,14 @@
         class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 rounded-xl text-xs text-indigo-900 dark:text-indigo-200"
       >
         <div class="flex items-center gap-2.5">
-          <span class="material-symbols-outlined text-indigo-600 text-lg flex-shrink-0">lock</span>
+          <span
+            class="material-symbols-outlined text-indigo-600 text-lg flex-shrink-0"
+            >lock</span
+          >
           <span>
-            <strong>Privacidad de Guardados:</strong> Tus vacantes y publicaciones guardadas son estrictamente confidenciales. Solo tú puedes verlas.
+            <strong>Privacidad de Guardados:</strong> Tus vacantes y
+            publicaciones guardadas son estrictamente confidenciales. Solo tú
+            puedes verlas.
           </span>
         </div>
         <NuxtLink
@@ -139,30 +145,47 @@
         v-else-if="displayedBookmarksCount === 0"
         class="py-10 text-center text-xs text-on-surface-variant dark:text-slate-400 space-y-2"
       >
-        <span class="material-symbols-outlined text-3xl text-outline-variant">bookmark_border</span>
-        <p class="font-medium">No tienes elementos guardados en esta categoría.</p>
+        <span class="material-symbols-outlined text-3xl text-outline-variant"
+          >bookmark_border</span
+        >
+        <p class="font-medium">
+          No tienes elementos guardados en esta categoría.
+        </p>
         <p class="text-[11px] text-on-surface-variant/70">
-          Explora ofertas o publicaciones en el portal y presiona el botón de guardar para agregarlas a tu panel confidencial.
+          Explora ofertas o publicaciones en el portal y presiona el botón de
+          guardar para agregarlas a tu panel confidencial.
         </p>
       </div>
 
       <div v-else class="space-y-6">
         <!-- Ofertas Laborales Guardadas -->
         <div
-          v-if="(favoriteSubTab === 'ALL' || favoriteSubTab === 'JOBS') && bookmarkedJobs.length > 0"
+          v-if="
+            (favoriteSubTab === 'ALL' || favoriteSubTab === 'JOBS') &&
+            bookmarkedJobs.length > 0
+          "
           class="space-y-3"
         >
-          <h4 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-slate-400 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm text-primary">work</span>
-            <span>Ofertas Laborales Guardadas ({{ bookmarkedJobs.length }})</span>
+          <h4
+            class="text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-slate-400 flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-sm text-primary"
+              >work</span
+            >
+            <span
+              >Ofertas Laborales Guardadas ({{ bookmarkedJobs.length }})</span
+            >
           </h4>
-          <div class="grid grid-cols-1 gap-4">
+          <div class="max-w-3xl mx-auto w-full space-y-4">
             <JobCard
               v-for="job in bookmarkedJobs"
               :key="job.id || job.uniqueId"
               :job="job"
-              :current-user-id="(authData?.user as any)?.id || authData?.user?.email || ''"
+              :current-user-id="
+                (authData?.user as any)?.id || authData?.user?.email || ''
+              "
               :is-bookmarked="true"
+              :is-liked="job.isLiked"
               @navigate="(id) => $router.push(`/jobs/${id}`)"
               @like="$emit('like-job', $event)"
               @bookmark="$emit('bookmark-job', $event)"
@@ -173,14 +196,21 @@
 
         <!-- Publicaciones Guardadas -->
         <div
-          v-if="(favoriteSubTab === 'ALL' || favoriteSubTab === 'POSTS') && bookmarkedPosts.length > 0"
+          v-if="
+            (favoriteSubTab === 'ALL' || favoriteSubTab === 'POSTS') &&
+            bookmarkedPosts.length > 0
+          "
           class="space-y-3"
         >
-          <h4 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-slate-400 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm text-primary">article</span>
+          <h4
+            class="text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-slate-400 flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-sm text-primary"
+              >article</span
+            >
             <span>Publicaciones Guardadas ({{ bookmarkedPosts.length }})</span>
           </h4>
-          <div class="grid grid-cols-1 gap-4">
+          <div class="max-w-xl mx-auto w-full space-y-4">
             <PostCard
               v-for="post in bookmarkedPosts"
               :key="post.uniqueId"
@@ -188,6 +218,7 @@
               :current-user-id="
                 (authData?.user as any)?.id || authData?.user?.email || ''
               "
+              :is-liked="post.isLiked"
               :is-bookmarked="true"
               @navigate="(id) => $router.push(`/posts/${id}`)"
               @like="$emit('like', $event)"

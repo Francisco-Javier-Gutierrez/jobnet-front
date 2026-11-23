@@ -1,6 +1,5 @@
 import { useRuntimeConfig, useLazyAsyncData } from "#imports";
 import type { AdminOrganization } from "~/types";
-import { MOCK_COMPANIES } from "~/utils/mockData";
 
 export function useAdminOrganizations() {
   const config = useRuntimeConfig();
@@ -26,7 +25,7 @@ export function useAdminOrganizations() {
       : "/api/profiles?tipoUsuario=ORGANIZACION";
     return $fetch<any[]>(url)
       .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => MOCK_COMPANIES);
+      .catch(() => []);
   });
 
   const loading = computed(() => profilesPending.value);
@@ -35,13 +34,12 @@ export function useAdminOrganizations() {
     const list =
       rawProfiles.value && rawProfiles.value.length > 0
         ? rawProfiles.value
-        : MOCK_COMPANIES;
+        : [];
 
     return list
       .filter(
         (p: any) =>
           p.tipoUsuario === "ORGANIZACION" ||
-          p.tipoUsuario === "EMPRESA" ||
           !p.tipoUsuario,
       )
       .map((p: any) => {

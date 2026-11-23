@@ -6,11 +6,11 @@
     aria-modal="true"
   >
     <div
-      class="bg-surface dark:bg-slate-900 border border-outline-variant/60 rounded-3xl max-w-2xl w-full flex flex-col h-[650px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      class="bg-surface dark:bg-slate-900 border border-outline-variant/60 rounded-2xl sm:rounded-3xl max-w-2xl w-full flex flex-col h-[90dvh] sm:h-[650px] max-h-[92vh] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 min-h-0"
     >
       <!-- Header (Identical to Messages.vue Header) -->
       <div
-        class="p-4 border-b border-outline-variant/60 bg-surface-container-low/20 flex items-center justify-between"
+        class="flex-shrink-0 p-3.5 sm:p-4 border-b border-outline-variant/60 bg-surface-container-low/20 flex items-center justify-between"
       >
         <div class="flex items-center gap-3">
           <div
@@ -47,7 +47,7 @@
 
       <!-- Info Banner / Counter -->
       <div
-        class="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-amber-900 dark:text-amber-200 font-medium"
+        class="flex-shrink-0 px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-amber-900 dark:text-amber-200 font-medium"
       >
         <div class="flex items-center gap-2 truncate">
           <span class="material-symbols-outlined text-base text-amber-600"
@@ -83,7 +83,7 @@
       <!-- Messages Scroll Area (Identical to Messages.vue) -->
       <div
         ref="chatContainer"
-        class="flex-grow p-4 overflow-y-auto max-h-[420px] flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
+        class="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
       >
         <div
           v-if="isLoading"
@@ -192,7 +192,7 @@
 
       <!-- Message Input Bar (Identical to Messages.vue) -->
       <div
-        class="p-4 border-t border-outline-variant/60 bg-surface-container-low/25 flex items-center gap-3"
+        class="flex-shrink-0 sticky bottom-0 z-10 p-2.5 sm:p-3.5 border-t border-outline-variant/60 bg-surface-container-lowest dark:bg-slate-900 flex items-center gap-2 sm:gap-3"
       >
         <!-- Hidden File Input -->
         <input
@@ -207,7 +207,7 @@
         <button
           @click="triggerFileInput"
           :disabled="isUploading"
-          class="w-10 h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0"
           title="Adjuntar PDF o Imagen"
         >
           <span
@@ -225,12 +225,12 @@
           @keyup.enter="sendMessage"
           type="text"
           placeholder="Escribe tu justificación o evidencia para moderación..."
-          class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-4 py-3 text-xs text-on-background dark:text-slate-100 outline-none transition"
+          class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs text-on-background dark:text-slate-100 outline-none transition"
         />
         <button
           @click="sendMessage"
           :disabled="!newMessageText.trim() && !pendingAttachment"
-          class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
         >
           <span class="material-symbols-outlined text-lg">send</span>
         </button>
@@ -238,7 +238,7 @@
 
       <!-- Footer Link to Full Page -->
       <div
-        class="px-5 py-2.5 bg-surface-container-low/30 border-t border-outline-variant/40 flex items-center justify-between text-[11px] text-on-surface-variant"
+        class="flex-shrink-0 px-4 sm:px-5 py-2 sm:py-2.5 bg-surface-container-low/30 border-t border-outline-variant/40 flex items-center justify-between text-[11px] text-on-surface-variant"
       >
         <span>Canal privado 1-a-1 cifrado en tránsito</span>
         <NuxtLink
@@ -257,6 +257,7 @@
 <script setup lang="ts">
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import type { AppealMessage, AppealAttachment } from "~/types";
+import { apiFetch } from "~/composables/useApiClient";
 const { showError, showSuccess, showInfo } = useAppFeedback();
 
 const props = defineProps<{
@@ -308,13 +309,13 @@ const fetchAppealMessages = async () => {
   const compId = props.targetId || props.companyId;
 
   try {
-    await $fetch(
-      `${config.public.apiUrl}/moderator/organizations/${compId}/join-appeal`,
+    await apiFetch(
+      `/moderator/organizations/${compId}/join-appeal`,
       { method: "POST" },
     ).catch(() => {});
 
-    const data = await $fetch<any[]>(
-      `${config.public.apiUrl}/moderator/appeals/${compId}/messages`,
+    const data = await apiFetch<any[]>(
+      `/moderator/appeals/${compId}/messages`,
     ).catch(() => []);
 
     messages.value = (data || []).map((m) => ({

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
       });
       if (Array.isArray(data) && data.length > 0) return data;
     } catch (error: any) {
-      // Fall through to mock data
+      console.warn("Failed to fetch profiles from backend API:", error?.message);
     }
   }
 

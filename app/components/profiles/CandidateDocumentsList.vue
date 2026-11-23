@@ -3,7 +3,9 @@
     <h2
       class="font-headline-md text-headline-md text-on-background dark:text-slate-100 mb-md flex items-center gap-sm px-1"
     >
-      <span class="material-symbols-outlined text-secondary">workspace_premium</span>
+      <span class="material-symbols-outlined text-secondary"
+        >workspace_premium</span
+      >
       Documentos y Certificaciones
     </h2>
     <div
@@ -65,9 +67,12 @@
                 :href="doc.url"
                 target="_blank"
                 rel="noopener noreferrer"
+                @click="handleExternalOpen(doc)"
                 class="text-blue-600 dark:text-blue-400 hover:underline font-label-sm text-xs font-bold flex items-center gap-1 cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[15px]">open_in_new</span>
+                <span class="material-symbols-outlined text-[15px]"
+                  >open_in_new</span
+                >
                 <span>Verificar</span>
               </a>
             </template>
@@ -77,7 +82,9 @@
                 @click="$emit('open', doc.url, doc.name)"
                 class="text-primary hover:underline font-label-sm text-xs font-bold flex items-center gap-0.5 cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[15px]">visibility</span>
+                <span class="material-symbols-outlined text-[15px]"
+                  >visibility</span
+                >
                 <span>Ver</span>
               </button>
               <a
@@ -85,9 +92,12 @@
                 download
                 target="_blank"
                 rel="noopener noreferrer"
+                @click="handleDownload(doc)"
                 class="text-secondary hover:underline font-label-sm text-xs font-bold flex items-center gap-0.5"
               >
-                <span class="material-symbols-outlined text-[15px]">download</span>
+                <span class="material-symbols-outlined text-[15px]"
+                  >download</span
+                >
                 <span>Descargar</span>
               </a>
             </template>
@@ -99,7 +109,9 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { useCvInteraction } from "~/composables/useCvInteraction";
+
+const props = defineProps<{
   documents: Array<{
     name: string;
     meta: string;
@@ -107,8 +119,36 @@ defineProps<{
     url: string;
     esEnlaceExterno?: boolean;
   }>;
+  candidateId?: string;
+  isOwner?: boolean;
 }>();
+
 defineEmits<{
   (e: "open", url: string, title: string): void;
 }>();
+
+const isCvDoc = (doc: any) => {
+  const name = (doc.name || "").toLowerCase();
+  const meta = (doc.meta || "").toLowerCase();
+  return (
+    name.includes("cv") ||
+    name.includes("curriculum") ||
+    meta.includes("cv") ||
+    meta.includes("curriculum")
+  );
+};
+
+const handleDownload = (doc: any) => {
+  if (!props.isOwner && props.candidateId && isCvDoc(doc)) {
+    const { notifyCvInteraction } = useCvInteraction();
+    notifyCvInteraction(props.candidateId, { action: "DOWNLOAD" });
+  }
+};
+
+const handleExternalOpen = (doc: any) => {
+  if (!props.isOwner && props.candidateId && isCvDoc(doc)) {
+    const { notifyCvInteraction } = useCvInteraction();
+    notifyCvInteraction(props.candidateId, { action: "OPEN" });
+  }
+};
 </script>

@@ -3,20 +3,22 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
+    "build": "nuxt build && node scripts/patch-pinia.cjs",
     "dev": "nuxt dev",
     "clean": "nuxi cleanup",
     "dev:clean": "nuxi cleanup && nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "nuxt prepare && node scripts/patch-pinia.cjs",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:coverage && npm run build"
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:coverage && npm run build",
+    "jenkins": "node scripts/publish-jenkins.mjs",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
     "@sidebase/nuxt-auth": "^0.9.1",

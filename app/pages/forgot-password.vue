@@ -47,8 +47,8 @@
             <div>
               <p class="font-bold text-sm">Cuenta vinculada a Google</p>
               <p class="mt-0.5">
-                Esta cuenta utiliza inicio de sesión único con Google y no dispone
-                de contraseña local.
+                Esta cuenta utiliza inicio de sesión único con Google y no
+                dispone de contraseña local.
               </p>
             </div>
           </div>

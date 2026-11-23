@@ -153,7 +153,9 @@
               v-if="isRfcValid"
               class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium"
             >
-              <span class="material-symbols-outlined text-sm">check_circle</span>
+              <span class="material-symbols-outlined text-sm"
+                >check_circle</span
+              >
               <span>
                 Sintaxis fiscal válida ({{
                   rfcType === "MORAL"
@@ -167,10 +169,17 @@
               class="flex items-center gap-1.5 text-rose-500 font-medium"
             >
               <span class="material-symbols-outlined text-sm">cancel</span>
-              <span>Formato de RFC inválido. Requiere 12 car. (Moral) o 13 car. (Física) con homoclave SAT.</span>
+              <span
+                >Formato de RFC inválido. Requiere 12 car. (Moral) o 13 car.
+                (Física) con homoclave SAT.</span
+              >
             </div>
-            <p v-else class="text-on-surface-variant dark:text-slate-400 text-[11px]">
-              Formato SAT: 12 caracteres (Moral) o 13 caracteres (Física con act. empresarial).
+            <p
+              v-else
+              class="text-on-surface-variant dark:text-slate-400 text-[11px]"
+            >
+              Formato SAT: 12 caracteres (Moral) o 13 caracteres (Física con
+              act. empresarial).
             </p>
           </div>
         </div>
@@ -213,33 +222,55 @@
           />
 
           <!-- Real-time Domain Verification / RN-3 Block Status Indicator -->
-          <div
-            v-if="email && email.includes('@')"
-            class="mt-2 text-xs"
-          >
+          <div v-if="email && email.includes('@')" class="mt-2 text-xs">
             <!-- RN-3 Fraud Domain Blocked Alert -->
             <div
               v-if="isBlockedDomain"
               class="flex items-start gap-2 p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-500/30 rounded-xl text-rose-700 dark:text-rose-300 font-medium"
             >
-              <span class="material-symbols-outlined text-[18px] text-rose-600 flex-shrink-0">block</span>
-              <span>Dominio bloqueado por fraude (RN-3): El dominio <strong>@{{ emailDomain }}</strong> está restringido por antecedentes fraudulentos o suplantación. No es posible registrarse con este correo.</span>
+              <span
+                class="material-symbols-outlined text-[18px] text-rose-600 flex-shrink-0"
+                >block</span
+              >
+              <span
+                >Dominio bloqueado por fraude (RN-3): El dominio
+                <strong>@{{ emailDomain }}</strong> está restringido por
+                antecedentes fraudulentos o suplantación. No es posible
+                registrarse con este correo.</span
+              >
             </div>
             <!-- Corporate Domain Auto-Verification -->
             <div
               v-else-if="isCorporateDomain"
               class="flex items-start gap-2 p-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-emerald-700 dark:text-emerald-300 font-medium"
             >
-              <span class="material-symbols-outlined text-[18px] text-emerald-600 flex-shrink-0">verified</span>
-              <span>Dominio corporativo privado detectado (<strong>@{{ emailDomain }}</strong>). El registro empresarial será aprobado automáticamente con estatus <strong>"Verificada"</strong>.</span>
+              <span
+                class="material-symbols-outlined text-[18px] text-emerald-600 flex-shrink-0"
+                >verified</span
+              >
+              <span
+                >Dominio corporativo privado detectado (<strong
+                  >@{{ emailDomain }}</strong
+                >). El registro empresarial será aprobado automáticamente con
+                estatus <strong>"Verificada"</strong>.</span
+              >
             </div>
             <!-- Public Domain Non-Verified Notice -->
             <div
               v-else-if="isPublicDomain"
               class="flex items-start gap-2 p-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-500/30 rounded-xl text-amber-700 dark:text-amber-300 font-medium"
             >
-              <span class="material-symbols-outlined text-[18px] text-amber-600 flex-shrink-0">info</span>
-              <span>Proveedor de correo público detectado (<strong>@{{ emailDomain }}</strong>). La cuenta se registrará inicialmente con estatus <strong>"No verificada"</strong> hasta completar su trámite probatorio fiscal.</span>
+              <span
+                class="material-symbols-outlined text-[18px] text-amber-600 flex-shrink-0"
+                >info</span
+              >
+              <span
+                >Proveedor de correo público detectado (<strong
+                  >@{{ emailDomain }}</strong
+                >). La cuenta se registrará inicialmente con estatus
+                <strong>"No verificada"</strong> hasta completar su trámite
+                probatorio fiscal.</span
+              >
             </div>
           </div>
         </div>

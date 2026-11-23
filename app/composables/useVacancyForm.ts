@@ -267,9 +267,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
           form.value.skills = job.habilidadesRequeridas || [];
           form.value.sectors = job.sectores || [];
           form.value.sector =
-            job.sector ||
-            (job.sectores && job.sectores[0]) ||
-            "Tecnología";
+            job.sector || (job.sectores && job.sectores[0]) || "Tecnología";
           form.value.aptitudes = job.aptitudes || "";
           form.value.experienceYears = job.experienciaAnos || null;
           form.value.vacantesDisponibles = job.vacantesDisponibles || 1;
@@ -292,7 +290,9 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
               ? job.screeningQuestions.slice(0, 3)
               : [];
           if (job.fechaCierre || job.fechaVigencia) {
-            form.value.fechaCierre = (job.fechaCierre || job.fechaVigencia).split("T")[0];
+            form.value.fechaCierre = (
+              job.fechaCierre || job.fechaVigencia
+            ).split("T")[0];
           }
         }
       } catch (e) {
@@ -388,7 +388,8 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
       return;
     }
     if (form.value.sectors.length === 0 && !form.value.sector.trim()) {
-      errorMessage.value = "Debes indicar o seleccionar el sector de la vacante.";
+      errorMessage.value =
+        "Debes indicar o seleccionar el sector de la vacante.";
       return;
     }
 
@@ -475,12 +476,32 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
           : undefined,
       };
 
+      const token =
+        (session.value as any)?.idToken ||
+        (session.value as any)?.accessToken ||
+        "";
+      const userId =
+        session.value.user.id || (session.value?.user as any)?.sub || "";
+      const userRole =
+        (session.value?.user as any)?.role ||
+        (session.value?.user as any)?.tipoUsuario ||
+        "ORGANIZACION";
+
+      const reqHeaders: Record<string, string> = {
+        "x-user-id": userId,
+        "x-user-role": userRole,
+      };
+      if (token) {
+        reqHeaders.Authorization = `Bearer ${token}`;
+      }
+
       let response;
       if (options.isEdit && route.params.id) {
         response = await $fetch<any>(
           `${config.public.apiUrl}/jobs/${route.params.id}`,
           {
             method: "PUT",
+            headers: reqHeaders,
             body: payload,
           },
         );
@@ -490,6 +511,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
       } else {
         response = await $fetch<any>(`${config.public.apiUrl}/jobs`, {
           method: "POST",
+          headers: reqHeaders,
           body: payload,
         });
         if (response) {
@@ -572,4 +594,3 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
     handleSubmit,
   };
 }
-

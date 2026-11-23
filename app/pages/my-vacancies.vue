@@ -88,11 +88,15 @@
                 v-if="job.estado === 'PAUSADA'"
                 class="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex items-center gap-1"
               >
-                <span class="material-symbols-outlined text-[12px]">pause_circle</span>
+                <span class="material-symbols-outlined text-[12px]"
+                  >pause_circle</span
+                >
                 Pausada
               </span>
               <span
-                v-else-if="job.estado === 'EVALUACION' || job.estado === 'APELADA'"
+                v-else-if="
+                  job.estado === 'EVALUACION' || job.estado === 'APELADA'
+                "
                 :class="[
                   'px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border',
                   job.estado === 'EVALUACION'
@@ -116,18 +120,34 @@
                 class="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20 flex items-center gap-1"
                 title="Esta oferta ha recibido 50 o más postulantes"
               >
-                <span class="material-symbols-outlined text-[12px]">trending_up</span>
+                <span class="material-symbols-outlined text-[12px]"
+                  >trending_up</span
+                >
                 Alta demanda
               </span>
 
               <!-- Badge Caducidad / Vencimiento Próximo (3 días o menos) -->
               <span
-                v-if="job.diasParaVencer !== undefined && job.diasParaVencer <= 3 && job.diasParaVencer >= 0 && job.estado !== 'PAUSADA' && job.estado !== 'CERRADA'"
+                v-if="
+                  job.diasParaVencer !== undefined &&
+                  job.diasParaVencer <= 3 &&
+                  job.diasParaVencer >= 0 &&
+                  job.estado !== 'PAUSADA' &&
+                  job.estado !== 'CERRADA'
+                "
                 class="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-700 dark:text-orange-300 border border-orange-500/20 flex items-center gap-1"
-                :title="job.fechaCierre ? `Fecha de cierre: ${new Date(job.fechaCierre).toLocaleDateString()}` : undefined"
+                :title="
+                  job.fechaCierre
+                    ? `Fecha de cierre: ${new Date(job.fechaCierre).toLocaleDateString()}`
+                    : undefined
+                "
               >
                 <span class="material-symbols-outlined text-[12px]">timer</span>
-                {{ job.diasParaVencer === 0 ? 'Vence hoy' : `Cierre en ${job.diasParaVencer} día${job.diasParaVencer > 1 ? 's' : ''}` }}
+                {{
+                  job.diasParaVencer === 0
+                    ? "Vence hoy"
+                    : `Cierre en ${job.diasParaVencer} día${job.diasParaVencer > 1 ? "s" : ""}`
+                }}
               </span>
             </div>
             <div
@@ -244,8 +264,6 @@
 </template>
 
 <script setup lang="ts">
-import { MOCK_VACANCIES } from "~/utils/mockData";
-
 useSeoMeta({
   title: "Mis Vacantes Publicadas - JobNet",
   description:
@@ -288,14 +306,7 @@ const fetchVacancies = async () => {
     let allJobs = await $fetch<any[]>(
       `${config.public.apiUrl}/jobs?companyId=${encodeURIComponent(targetCompanyId)}`,
     ).catch(() => []);
-    if (!allJobs || allJobs.length === 0) {
-      allJobs = MOCK_VACANCIES;
-    }
-    // Keep all jobs for the company regardless of active/evaluation/appeal status
-    let filtered = allJobs.filter((j) => j.empresaUuid === targetCompanyId);
-    if (filtered.length === 0) {
-      filtered = allJobs.slice(0, 3);
-    }
+    let filtered = Array.isArray(allJobs) ? allJobs : [];
 
     // Fetch counts
     const jobsWithCounts = await Promise.all(
@@ -349,6 +360,20 @@ onMounted(() => {
   fetchVacancies();
 });
 
+const getAuthHeaders = () => {
+  const token =
+    (session.value as any)?.idToken ||
+    (session.value as any)?.accessToken ||
+    "";
+  const userId = companyId.value;
+  const headers: Record<string, string> = {
+    "x-user-id": userId,
+    "x-user-role": (session.value?.user as any)?.role || "ORGANIZACION",
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+};
+
 const deleteJob = async (id: string) => {
   if (
     !confirm(
@@ -360,6 +385,7 @@ const deleteJob = async (id: string) => {
   try {
     await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
       method: "DELETE",
+      headers: getAuthHeaders(),
     });
     // Remove from local list
     vacancies.value = vacancies.value.filter((j) => j.id !== id);
@@ -373,6 +399,7 @@ const togglePause = async (id: string, nuevoEstado: string) => {
   try {
     await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
       method: "PUT",
+      headers: getAuthHeaders(),
       body: { estado: nuevoEstado, empresaUuid: companyId.value },
     });
     const job = vacancies.value.find((j) => j.id === id);

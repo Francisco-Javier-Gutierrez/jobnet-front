@@ -25,7 +25,9 @@ describe("AppBottomSheet.vue", () => {
     expect(dialog.exists()).toBe(true);
     expect(dialog.attributes("aria-modal")).toBe("true");
     expect(wrapper.text()).toContain("Opciones de Vacante");
-    expect(wrapper.text()).toContain("Gestiona tu postulación o guarda esta oferta");
+    expect(wrapper.text()).toContain(
+      "Gestiona tu postulación o guarda esta oferta",
+    );
     expect(wrapper.text()).toContain("Contenido del bottom sheet");
   });
 

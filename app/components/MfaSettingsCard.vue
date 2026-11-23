@@ -76,9 +76,9 @@
           <p
             class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
           >
-            Has iniciado sesión a través de Google Sign-In. La verificación en dos
-            pasos (MFA / 2FA), las llaves de seguridad físicas y las alertas de
-            acceso están protegidas directamente bajo tu cuenta de Google.
+            Has iniciado sesión a través de Google Sign-In. La verificación en
+            dos pasos (MFA / 2FA), las llaves de seguridad físicas y las alertas
+            de acceso están protegidas directamente bajo tu cuenta de Google.
           </p>
         </div>
       </div>
@@ -238,9 +238,9 @@ const isFederatedUser = computed(() => {
   if (!user) return false;
   return Boolean(
     user.isFederated ||
-      user.provider === "cognito" ||
-      (typeof user.id === "string" &&
-        user.id.toLowerCase().startsWith("google_")),
+    user.provider === "cognito" ||
+    (typeof user.id === "string" &&
+      user.id.toLowerCase().startsWith("google_")),
   );
 });
 
@@ -276,7 +276,7 @@ const disableMfa = async () => {
     }
 
     // 2. Disable in DynamoDB profile
-    await $fetch<any>(`${config.public.apiUrl}/profile/${props.userId}`, {
+    await apiFetch(`/profile/${props.userId}`, {
       method: "POST",
       body: {
         mfaConfigured: false,

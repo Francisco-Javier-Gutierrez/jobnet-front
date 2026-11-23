@@ -6,12 +6,18 @@
     aria-live="assertive"
   >
     <!-- Top Hazard Bar (Parpadeo y Encabezado Crítico) -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-rose-200/80 dark:border-rose-900/60">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-rose-200/80 dark:border-rose-900/60"
+    >
       <div class="flex items-center gap-3">
         <!-- Parpadeo / Flashing Beacon -->
         <span class="relative flex h-3.5 w-3.5 flex-shrink-0">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-90"></span>
-          <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-rose-600 animate-pulse"></span>
+          <span
+            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-90"
+          ></span>
+          <span
+            class="relative inline-flex rounded-full h-3.5 w-3.5 bg-rose-600 animate-pulse"
+          ></span>
         </span>
 
         <div class="flex flex-wrap items-center gap-2">
@@ -22,13 +28,23 @@
             <span>Alerta de Concurrencia Anómala</span>
           </span>
           <span class="text-xs font-semibold text-rose-800 dark:text-rose-200">
-            {{ anomalies.length }} {{ anomalies.length === 1 ? 'amenaza detectada' : 'amenazas detectadas' }} en &lt; 1 hora (Prevención de Spam, Bots y Fraude)
+            {{ anomalies.length }}
+            {{
+              anomalies.length === 1
+                ? "amenaza detectada"
+                : "amenazas detectadas"
+            }}
+            en &lt; 1 hora (Prevención de Spam, Bots y Fraude)
           </span>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 text-xs font-medium text-rose-700 dark:text-rose-300">
-        <span class="material-symbols-outlined text-[16px] animate-spin">autorenew</span>
+      <div
+        class="flex items-center gap-2 text-xs font-medium text-rose-700 dark:text-rose-300"
+      >
+        <span class="material-symbols-outlined text-[16px] animate-spin"
+          >autorenew</span
+        >
         <span>Monitoreo Activo en Tiempo Real</span>
       </div>
     </div>
@@ -45,10 +61,14 @@
           <div class="flex flex-wrap items-center gap-2">
             <!-- Anomaly Type Badge -->
             <span
-              v-if="item.category === 'BOT_SPAM' || item.type === 'RAPID_VACANCIES'"
+              v-if="
+                item.category === 'BOT_SPAM' || item.type === 'RAPID_VACANCIES'
+              "
               class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300/80 dark:border-amber-700"
             >
-              <span class="material-symbols-outlined text-[13px]">smart_toy</span>
+              <span class="material-symbols-outlined text-[13px]"
+                >smart_toy</span
+              >
               <span>Posible Bot / Spam de Vacantes</span>
             </span>
             <span
@@ -63,8 +83,14 @@
             <span
               class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
             >
-              <span class="material-symbols-outlined text-[12px] text-rose-500">speed</span>
-              <span>{{ item.count }} / Umbral: >{{ item.threshold }} ({{ item.timeWindow }})</span>
+              <span class="material-symbols-outlined text-[12px] text-rose-500"
+                >speed</span
+              >
+              <span
+                >{{ item.count }} / Umbral: >{{ item.threshold }} ({{
+                  item.timeWindow
+                }})</span
+              >
             </span>
 
             <span class="text-[11px] text-slate-600 dark:text-slate-300">
@@ -74,10 +100,17 @@
 
           <!-- Org Title & Description -->
           <div>
-            <h4 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5 truncate">
-              <span class="material-symbols-outlined text-rose-600 text-[18px]">corporate_fare</span>
+            <h4
+              class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5 truncate"
+            >
+              <span class="material-symbols-outlined text-rose-600 text-[18px]"
+                >corporate_fare</span
+              >
               <span class="truncate">{{ item.organizationName }}</span>
-              <span class="text-[11px] font-mono text-slate-600 dark:text-slate-300 font-normal">({{ item.organizationId }})</span>
+              <span
+                class="text-[11px] font-mono text-slate-600 dark:text-slate-300 font-normal"
+                >({{ item.organizationId }})</span
+              >
             </h4>
             <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               {{ item.description }}
@@ -86,7 +119,9 @@
         </div>
 
         <!-- Remediation Actions Column -->
-        <div class="flex flex-wrap items-center gap-2 self-start lg:self-auto flex-shrink-0">
+        <div
+          class="flex flex-wrap items-center gap-2 self-start lg:self-auto flex-shrink-0"
+        >
           <!-- Primary Action: Sancionar / Congelar Preventivamente -->
           <button
             type="button"
@@ -151,7 +186,8 @@ const handleDismiss = (id: string) => {
 
 <style scoped>
 @keyframes alert-hazard-blink {
-  0%, 100% {
+  0%,
+  100% {
     border-color: rgba(244, 63, 94, 0.95);
     box-shadow: 0 0 16px rgba(244, 63, 94, 0.28);
   }

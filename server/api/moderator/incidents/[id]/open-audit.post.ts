@@ -1,10 +1,14 @@
-import { MOCK_INCIDENTS } from "../../../../../app/utils/mockData";
-
 export default defineEventHandler(async (event) => {
   const incidentId = getRouterParam(event, "id");
   const config = useRuntimeConfig();
   const authHeader = getHeader(event, "authorization");
-  const userRoleHeader = (getHeader(event, "x-user-role") || "MODERATOR").toUpperCase();
+  const userRoleHeader = (
+    getHeader(event, "x-user-role") || "MODERATOR"
+  ).toUpperCase();
+
+  const userIdHeader = getHeader(event, "x-user-id");
+  const userNameHeader = getHeader(event, "x-user-name");
+  const userEmailHeader = getHeader(event, "x-user-email");
 
   // Role verification: ONLY MODERATOR or ADMIN allowed
   if (
@@ -21,7 +25,6 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event).catch(() => ({}));
 
-  // Try calling backend API
   try {
     const backendData = await $fetch<any>(
       `${config.public.apiUrl}/moderator/incidents/${incidentId}/open-audit`,
@@ -30,34 +33,20 @@ export default defineEventHandler(async (event) => {
         headers: {
           ...(authHeader ? { Authorization: authHeader } : {}),
           "x-user-role": userRoleHeader,
+          ...(userIdHeader ? { "x-user-id": userIdHeader } : {}),
+          ...(userNameHeader ? { "x-user-name": userNameHeader } : {}),
+          ...(userEmailHeader ? { "x-user-email": userEmailHeader } : {}),
         },
         body,
       },
     );
 
-    if (backendData?.success) {
-      return backendData;
-    }
-  } catch {
-    // Fallback to local / mock state update
+    return backendData;
+  } catch (error: any) {
+    throw createError({
+      statusCode: error?.statusCode || 500,
+      statusMessage:
+        error?.message || "Error al abrir la auditoría de mensajería.",
+    });
   }
-
-  // Update in local mock incidents
-  const incident = MOCK_INCIDENTS.find((i) => i.id === incidentId);
-  if (incident) {
-    incident.estatus = "AUDITORIA";
-    incident.status = "AUDITORIA";
-    incident.auditState = "AUDIT_ACTIVE";
-    incident.supervisionStatus = "UNDER_AUDIT";
-    incident.auditOpenedAt = new Date().toISOString();
-  }
-
-  return {
-    success: true,
-    message:
-      "Fase 1 completada: Notificación formal despachada a ambas partes. El canal de mensajería privada entra en periodo de revisión supervisada.",
-    incidentId,
-    auditState: "AUDIT_ACTIVE",
-    supervisionStatus: "UNDER_AUDIT",
-  };
 });

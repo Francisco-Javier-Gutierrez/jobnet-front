@@ -3,7 +3,9 @@
     class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4"
   >
     <!-- Region Selector -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 min-w-[280px]">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center gap-2.5 min-w-[280px]"
+    >
       <AppSelect
         :model-value="modelValue"
         @update:model-value="$emit('update:modelValue', $event)"

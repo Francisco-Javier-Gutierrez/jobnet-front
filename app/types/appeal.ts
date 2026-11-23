@@ -56,7 +56,14 @@ export interface Incident {
   severity?: string;
   severidad?: string;
   infraccion?: string;
-  status: "PENDIENTE" | "INVESTIGANDO" | "EVALUACION" | "AUDITORIA" | "RESUELTO" | "DESCARTADO" | string;
+  status:
+    | "PENDIENTE"
+    | "INVESTIGANDO"
+    | "EVALUACION"
+    | "AUDITORIA"
+    | "RESUELTO"
+    | "DESCARTADO"
+    | string;
   estatus?: string;
   createdAt: string;
   fechaCreacion?: string;
@@ -66,6 +73,9 @@ export interface Incident {
   auditDictumNotes?: string;
   supervisionStatus?: string;
   auditOpenedAt?: string;
+  assignedModeratorId?: string | null;
+  assignedModeratorName?: string | null;
+  assignedAt?: string | null;
 }
 
 export interface AuditLog {

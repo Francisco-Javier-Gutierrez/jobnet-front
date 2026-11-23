@@ -81,7 +81,9 @@ describe("useAdminAnalytics Composable (Panel de Analítica Avanzada [V2])", () 
     csv += `TASA PROMEDIO DE POSTULACIONES POR OFERTA LABORAL\n${applicationRate.averagePerJob}\n`;
 
     expect(csv).toContain("TOP 10 HABILIDADES TECNICAS MAS DEMANDADAS");
-    expect(csv).toContain("VOLUMEN MENSUAL DE NUEVAS ORGANIZACIONES REGISTRADAS");
+    expect(csv).toContain(
+      "VOLUMEN MENSUAL DE NUEVAS ORGANIZACIONES REGISTRADAS",
+    );
     expect(csv).toContain("TASA PROMEDIO DE POSTULACIONES POR OFERTA LABORAL");
     expect(csv).toContain("Vue 3");
     expect(csv).toContain("8.5");
@@ -97,7 +99,7 @@ describe("useAdminAnalytics Composable (Panel de Analítica Avanzada [V2])", () 
         ...Array.from({ length: 12 }, (_, i) => ({
           empresaUuid: "org-bot-1",
           company: "Bot Express Inc.",
-          createdAt: new Date(now - (i * 3 * 60 * 1000)).toISOString(), // 12 in 36 minutes
+          createdAt: new Date(now - i * 3 * 60 * 1000).toISOString(), // 12 in 36 minutes
         })),
         {
           empresaUuid: "org-legit-2",
@@ -107,11 +109,17 @@ describe("useAdminAnalytics Composable (Panel de Analítica Avanzada [V2])", () 
       ];
 
       // Evaluation algorithm
-      const orgVacanciesMap: Record<string, { companyName: string; dates: number[] }> = {};
+      const orgVacanciesMap: Record<
+        string,
+        { companyName: string; dates: number[] }
+      > = {};
       vacancies.forEach((vac) => {
         const time = new Date(vac.createdAt).getTime();
         if (!orgVacanciesMap[vac.empresaUuid]) {
-          orgVacanciesMap[vac.empresaUuid] = { companyName: vac.company, dates: [] };
+          orgVacanciesMap[vac.empresaUuid] = {
+            companyName: vac.company,
+            dates: [],
+          };
         }
         orgVacanciesMap[vac.empresaUuid].dates.push(time);
       });
@@ -122,7 +130,9 @@ describe("useAdminAnalytics Composable (Panel de Analítica Avanzada [V2])", () 
         for (let i = 0; i < data.dates.length; i++) {
           const windowStart = data.dates[i];
           const windowEnd = windowStart + oneHourMs;
-          const countInWindow = data.dates.filter((d) => d >= windowStart && d <= windowEnd).length;
+          const countInWindow = data.dates.filter(
+            (d) => d >= windowStart && d <= windowEnd,
+          ).length;
           if (countInWindow > 10) {
             detectedAnomalies.push({
               organizationId: orgId,
@@ -149,7 +159,7 @@ describe("useAdminAnalytics Composable (Panel de Analítica Avanzada [V2])", () 
         ...Array.from({ length: 7 }, (_, i) => ({
           companyId: "org-scam-9",
           companyName: "Fake Financials Ltd",
-          createdAt: new Date(now - (i * 5 * 60 * 1000)).toISOString(), // 7 in 35 min
+          createdAt: new Date(now - i * 5 * 60 * 1000).toISOString(), // 7 in 35 min
         })),
         {
           companyId: "org-normal-8",
@@ -158,11 +168,17 @@ describe("useAdminAnalytics Composable (Panel de Analítica Avanzada [V2])", () 
         },
       ];
 
-      const orgReportsMap: Record<string, { companyName: string; dates: number[] }> = {};
+      const orgReportsMap: Record<
+        string,
+        { companyName: string; dates: number[] }
+      > = {};
       reports.forEach((rep) => {
         const time = new Date(rep.createdAt).getTime();
         if (!orgReportsMap[rep.companyId]) {
-          orgReportsMap[rep.companyId] = { companyName: rep.companyName, dates: [] };
+          orgReportsMap[rep.companyId] = {
+            companyName: rep.companyName,
+            dates: [],
+          };
         }
         orgReportsMap[rep.companyId].dates.push(time);
       });
@@ -173,7 +189,9 @@ describe("useAdminAnalytics Composable (Panel de Analítica Avanzada [V2])", () 
         for (let i = 0; i < data.dates.length; i++) {
           const windowStart = data.dates[i];
           const windowEnd = windowStart + oneHourMs;
-          const countInWindow = data.dates.filter((d) => d >= windowStart && d <= windowEnd).length;
+          const countInWindow = data.dates.filter(
+            (d) => d >= windowStart && d <= windowEnd,
+          ).length;
           if (countInWindow > 5) {
             detectedAnomalies.push({
               organizationId: orgId,
@@ -197,13 +215,23 @@ describe("useAdminAnalytics Composable (Panel de Analítica Avanzada [V2])", () 
     it("should NOT trigger alert when vacancies <= 10 or reports <= 5 in < 1h", () => {
       const now = Date.now();
       // 8 vacancies (under 10)
-      const vacDates = Array.from({ length: 8 }, (_, i) => now - i * 5 * 60 * 1000);
-      const vacInWindow = vacDates.filter((d) => d >= now - oneHourMs && d <= now).length;
+      const vacDates = Array.from(
+        { length: 8 },
+        (_, i) => now - i * 5 * 60 * 1000,
+      );
+      const vacInWindow = vacDates.filter(
+        (d) => d >= now - oneHourMs && d <= now,
+      ).length;
       expect(vacInWindow > 10).toBe(false);
 
       // 4 reports (under 5)
-      const repDates = Array.from({ length: 4 }, (_, i) => now - i * 10 * 60 * 1000);
-      const repInWindow = repDates.filter((d) => d >= now - oneHourMs && d <= now).length;
+      const repDates = Array.from(
+        { length: 4 },
+        (_, i) => now - i * 10 * 60 * 1000,
+      );
+      const repInWindow = repDates.filter(
+        (d) => d >= now - oneHourMs && d <= now,
+      ).length;
       expect(repInWindow > 5).toBe(false);
     });
 

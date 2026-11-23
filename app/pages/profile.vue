@@ -28,7 +28,7 @@ const handleRedirect = () => {
       return;
     }
 
-    if (role === "EMPRESA" || role === "ORGANIZACION") {
+    if (role === "ORGANIZACION") {
       router.replace(`/company/${id}`);
     } else {
       // CANDIDATO, ADMIN, MODERATOR redirect to candidate profile page

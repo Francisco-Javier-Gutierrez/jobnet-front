@@ -14,16 +14,16 @@
           real.
         </p>
       </div>
-      <!-- Connection status badge -->
+      <!-- Connection status badge with truthful real-time state -->
       <div class="flex items-center gap-2">
         <span
           :class="[
             'w-2.5 h-2.5 rounded-full',
             wsStatus === 'connected'
-              ? 'bg-emerald-500 animate-pulse'
-              : wsStatus === 'connecting'
+              ? 'bg-emerald-500'
+              : wsStatus === 'connecting' || wsStatus === 'reconnecting'
                 ? 'bg-amber-500 animate-pulse'
-                : 'bg-emerald-500',
+                : 'bg-rose-500',
           ]"
         ></span>
         <span
@@ -34,7 +34,9 @@
               ? "En línea"
               : wsStatus === "connecting"
                 ? "Conectando..."
-                : "En línea"
+                : wsStatus === "reconnecting"
+                  ? "Reconectando..."
+                  : "Sin conexión"
           }}
         </span>
       </div>
@@ -42,7 +44,7 @@
 
     <!-- Main Chat/ATS Workspace Grid -->
     <div
-      class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl flex-grow overflow-hidden min-h-[550px] shadow-sm animate-fadeIn"
+      class="h-[calc(100dvh-11rem)] sm:h-[calc(100vh-10rem)] min-h-[520px] flex flex-col lg:grid lg:grid-cols-12 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl flex-grow overflow-hidden shadow-sm animate-fadeIn"
     >
       <ChatList
         v-model:searchQuery="searchQuery"
@@ -59,12 +61,18 @@
         :isLoadingMessages="isLoadingMessages"
         :userId="userId"
         :isUploading="isUploading"
-        :pendingAttachment="pendingAttachment"
+        :stagedFile="stagedFile"
+        :previewModal="previewModal"
         :isImageUrl="isImageUrl"
         :openImagePreview="openImagePreview"
+        :openPdfViewer="openPdfViewer"
+        :closePreviewModal="closePreviewModal"
+        :downloadAttachment="downloadAttachment"
         :formatTime="formatTime"
+        @back-to-list="activeChat = null"
         @handle-send="handleSend"
         @handle-file-upload="handleFileUpload"
+        @cancel-staged-file="cancelStagedFile"
         @set-message-container="messageContainer = $event"
         @set-file-input="fileInput = $event"
       />
@@ -93,13 +101,19 @@ const {
   filteredChats,
   fileInput,
   isUploading,
-  pendingAttachment,
+  stagedFile,
+  previewModal,
   messageContainer,
   selectChat,
   handleSend,
   handleFileUpload,
+  cancelStagedFile,
+  triggerFileInput,
   isImageUrl,
   openImagePreview,
+  openPdfViewer,
+  closePreviewModal,
+  downloadAttachment,
   formatTime,
 } = useMessages();
 </script>

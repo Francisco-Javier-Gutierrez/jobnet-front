@@ -80,8 +80,10 @@
       <section v-show="activeTab === 'personales'" class="flex flex-col gap-6">
         <SettingsPersonalInfo
           v-model:name="formData.name"
+          v-model:titulo-profesional="formData.tituloProfesional"
+          v-model:location="formData.location"
           v-model:bio="formData.bio"
-          v-model:fotoPerfil="formData.fotoPerfil"
+          v-model:foto-perfil="formData.fotoPerfil"
         />
         <SettingsLocationMap
           v-model:lat="formData.lat"
@@ -185,6 +187,7 @@ const tabItems = [
 
 const formData = ref({
   name: "",
+  tituloProfesional: "",
   location: "",
   bio: "",
   fotoPerfil: "",
@@ -206,10 +209,10 @@ const isFederatedUser = computed(() => {
   const user = session.value?.user as any;
   return Boolean(
     user?.isFederated ||
-      user?.provider === "cognito" ||
-      (typeof user?.id === "string" &&
-        user.id.toLowerCase().startsWith("google_")) ||
-      isFederatedProfile.value,
+    user?.provider === "cognito" ||
+    (typeof user?.id === "string" &&
+      user.id.toLowerCase().startsWith("google_")) ||
+    isFederatedProfile.value,
   );
 });
 
@@ -246,15 +249,16 @@ onMounted(async () => {
   }
   if (session.value?.user?.id) {
     try {
-      const config = useRuntimeConfig();
-      const apiBase =
-        config.public.apiBase ||
-        "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
-      const res = await fetch(`${apiBase}/profile/${session.value.user.id}`);
-      if (res.ok) {
-        const profile = await res.json();
+      const profile = await apiFetch<any>(`/profile/${session.value.user.id}`);
+      if (profile) {
         formData.value.name =
           profile.nombre || profile.name || session.value.user.name || "";
+        formData.value.tituloProfesional =
+          profile.tituloProfesional ||
+          profile.titularProfesional ||
+          profile.titular ||
+          profile.puestoDeseado ||
+          "";
         formData.value.location =
           profile.location || profile.ubicacionTexto || "";
         formData.value.bio = profile.bio || profile.biografia || "";
@@ -274,10 +278,7 @@ onMounted(async () => {
         formData.value.mfaEnabled = Boolean(
           profile.mfaEnabled || profile.mfaConfigured,
         );
-        if (
-          profile.isFederated ||
-          profile.origenRegistro === "GOOGLE_OAUTH"
-        ) {
+        if (profile.isFederated || profile.origenRegistro === "GOOGLE_OAUTH") {
           isFederatedProfile.value = true;
         }
         if (Array.isArray(profile.links)) {
@@ -306,13 +307,12 @@ async function saveProfile() {
 
   try {
     const userId = session.value?.user?.id || "anonymous";
-    const config = useRuntimeConfig();
-    const apiBase =
-      config.public.apiBase ||
-      "https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com";
 
     const payload = {
       nombre: formData.value.name,
+      tituloProfesional: formData.value.tituloProfesional,
+      titularProfesional: formData.value.tituloProfesional,
+      titular: formData.value.tituloProfesional,
       location: formData.value.location,
       bio: formData.value.bio,
       biografia: formData.value.bio,
@@ -335,39 +335,34 @@ async function saveProfile() {
       lng: formData.value.lng,
     };
 
-    const res = await fetch(`${apiBase}/profile/${userId}`, {
+    await apiFetch(`/profile/${userId}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: payload,
     });
 
-    if (res.ok) {
-      showFeedback({
-        type: "success",
-        title: "Perfil Actualizado",
-        message:
-          "Tus datos personales y profesionales han sido guardados exitosamente.",
-        autoCloseTimeout: 3500,
-        onClose: () => {
-          navigateTo("/profile");
-        },
-      });
+    showFeedback({
+      type: "success",
+      title: "Perfil Actualizado",
+      message:
+        "Tus datos personales y profesionales han sido guardados exitosamente.",
+      autoCloseTimeout: 3500,
+      onClose: () => {
+        navigateTo("/profile");
+      },
+    });
 
-      const { setProfilePic } = useProfileState();
-      setProfilePic(formData.value.fotoPerfil);
+    const { setProfilePic } = useProfileState();
+    setProfilePic(formData.value.fotoPerfil);
 
-      // Explicitly clear Nuxt cache for this profile to fetch fresh data on redirect
-      clearNuxtData(`candidate-profile-${userId}`);
-      clearNuxtData(); // Fallback to clear all payload caches if needed
+    // Explicitly clear Nuxt cache for this profile to fetch fresh data on redirect
+    clearNuxtData(`candidate-profile-${userId}`);
+    clearNuxtData(); // Fallback to clear all payload caches if needed
 
-      discardDraft();
-    } else {
-      throw new Error("No se pudo guardar la información en el servidor.");
-    }
+    discardDraft();
   } catch (err: any) {
     showError(
       "Error al Guardar Perfil",
-      err.message || "Error al actualizar perfil.",
+      err?.data?.error || err.message || "Error al actualizar perfil.",
       null,
     );
   } finally {

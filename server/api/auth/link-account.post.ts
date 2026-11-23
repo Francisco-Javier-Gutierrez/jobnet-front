@@ -25,11 +25,7 @@ export default defineEventHandler(async (event) => {
   };
 
   if (clientSecret) {
-    authParams.SECRET_HASH = calculateSecretHash(
-      email,
-      clientId,
-      clientSecret,
-    );
+    authParams.SECRET_HASH = calculateSecretHash(email, clientId, clientSecret);
   }
 
   let authResult: any;
@@ -67,9 +63,9 @@ export default defineEventHandler(async (event) => {
 
   // Si no se pudo extraer el UUID del token, buscar el perfil por email
   if (!nativeUserId) {
-    const profiles: any[] = await $fetch(`${config.public.apiUrl}/profiles`).catch(
-      () => [],
-    );
+    const profiles: any[] = await $fetch(
+      `${config.public.apiUrl}/profiles`,
+    ).catch(() => []);
     const matched = profiles.find(
       (p) =>
         p.email &&

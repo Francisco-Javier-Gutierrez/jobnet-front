@@ -1,6 +1,9 @@
 <template>
   <div
-    class="lg:col-span-5 border-r border-outline-variant/60 flex flex-col h-full bg-surface-container-low/40"
+    :class="[
+      'lg:col-span-5 border-b lg:border-b-0 lg:border-r border-outline-variant/60 flex flex-col h-full bg-surface-container-low/40 min-h-0',
+      activeChat ? 'hidden lg:flex' : 'flex',
+    ]"
   >
     <!-- Search bar -->
     <div class="p-4 border-b border-outline-variant/60">

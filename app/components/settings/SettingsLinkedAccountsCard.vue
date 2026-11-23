@@ -13,7 +13,8 @@
           Cuentas Vinculadas
         </h3>
         <p class="text-xs text-on-surface-variant dark:text-slate-300">
-          Gestiona los métodos de inicio de sesión rápido e identidades federadas.
+          Gestiona los métodos de inicio de sesión rápido e identidades
+          federadas.
         </p>
       </div>
     </div>
@@ -54,7 +55,9 @@
               v-if="isFederated"
               class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
             >
-              <span class="material-symbols-outlined text-xs">check_circle</span>
+              <span class="material-symbols-outlined text-xs"
+                >check_circle</span
+              >
               Vinculada
             </span>
             <span
@@ -67,7 +70,7 @@
           <p class="text-xs text-on-surface-variant dark:text-slate-400 mt-0.5">
             {{
               isFederated
-                ? (userEmail || "Cuenta de Google conectada")
+                ? userEmail || "Cuenta de Google conectada"
                 : "Permite iniciar sesión rápidamente sin escribir tu contraseña"
             }}
           </p>

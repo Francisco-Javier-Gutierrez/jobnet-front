@@ -3,17 +3,26 @@
     <!-- Map Header / Info Bar -->
     <div class="flex items-center justify-between flex-wrap gap-2 px-1">
       <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary text-lg">explore</span>
+        <span class="material-symbols-outlined text-primary text-lg"
+          >explore</span
+        >
         <h3 class="text-xs font-bold text-on-background dark:text-slate-200">
           Mapa de Oportunidades · Estado de México
         </h3>
       </div>
-      <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant dark:text-slate-400">
-        <span class="inline-flex items-center gap-1 font-semibold text-primary dark:text-indigo-400">
+      <div
+        class="flex items-center gap-1.5 text-[11px] text-on-surface-variant dark:text-slate-400"
+      >
+        <span
+          class="inline-flex items-center gap-1 font-semibold text-primary dark:text-indigo-400"
+        >
           <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
           {{ mappedJobs.length }} geolocalizadas
         </span>
-        <span v-if="remoteJobsCount > 0" class="text-on-surface-variant/60 dark:text-slate-500">
+        <span
+          v-if="remoteJobsCount > 0"
+          class="text-on-surface-variant/60 dark:text-slate-500"
+        >
           · {{ remoteJobsCount }} remotas
         </span>
       </div>
@@ -43,13 +52,19 @@
         >
           <div class="flex items-start justify-between gap-2">
             <div class="min-w-0">
-              <span class="text-[9px] font-bold uppercase tracking-wider text-primary dark:text-indigo-400">
+              <span
+                class="text-[9px] font-bold uppercase tracking-wider text-primary dark:text-indigo-400"
+              >
                 {{ activePreviewJob.modalidad || "Presencial" }}
               </span>
-              <h4 class="text-xs font-bold text-on-surface dark:text-slate-100 truncate">
+              <h4
+                class="text-xs font-bold text-on-surface dark:text-slate-100 truncate"
+              >
                 {{ activePreviewJob.title }}
               </h4>
-              <p class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate">
+              <p
+                class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate"
+              >
                 {{ activePreviewJob.company }}
               </p>
             </div>
@@ -62,7 +77,9 @@
             </button>
           </div>
 
-          <div class="flex items-center justify-between text-[11px] pt-1 border-t border-outline-variant/30">
+          <div
+            class="flex items-center justify-between text-[11px] pt-1 border-t border-outline-variant/30"
+          >
             <span class="font-bold text-emerald-600 dark:text-emerald-400">
               {{ formatSalary(activePreviewJob) }}
             </span>
@@ -72,7 +89,9 @@
               class="px-2.5 py-1 bg-primary text-white rounded-lg text-[10px] font-bold hover:bg-primary-container transition active:scale-95 flex items-center gap-1 cursor-pointer"
             >
               <span>Ver vacante</span>
-              <span class="material-symbols-outlined text-xs">arrow_forward</span>
+              <span class="material-symbols-outlined text-xs"
+                >arrow_forward</span
+              >
             </button>
           </div>
         </div>
@@ -102,7 +121,7 @@ const props = withDefaults(
   }>(),
   {
     highlightedJobId: null,
-  }
+  },
 );
 
 const emit = defineEmits<{
@@ -123,13 +142,17 @@ let resizeObserver: ResizeObserver | null = null;
 // Filter only jobs with valid latitude and longitude
 const mappedJobs = computed(() => {
   return (props.jobs || []).filter(
-    (j) => typeof j.lat === "number" && typeof j.lng === "number" && j.lat !== 0 && j.lng !== 0
+    (j) =>
+      typeof j.lat === "number" &&
+      typeof j.lng === "number" &&
+      j.lat !== 0 &&
+      j.lng !== 0,
   );
 });
 
 const remoteJobsCount = computed(() => {
   return (props.jobs || []).filter(
-    (j) => j.modalidad === "Remoto" || (!j.lat && !j.lng)
+    (j) => j.modalidad === "Remoto" || (!j.lat && !j.lng),
   ).length;
 });
 
@@ -197,7 +220,7 @@ const updateMarkers = () => {
         <p class="font-bold text-slate-900">${job.title}</p>
         <p class="text-[10px] text-slate-600">${job.company} · ${job.modalidad || "Presencial"}</p>
       </div>`,
-      { direction: "top", offset: [0, -30], opacity: 0.95 }
+      { direction: "top", offset: [0, -30], opacity: 0.95 },
     );
 
     marker.on("mouseover", () => {
@@ -246,7 +269,7 @@ watch(
         mapInstance.panTo([job.lat, job.lng], { animate: true });
       }
     });
-  }
+  },
 );
 
 // Re-render markers when filtered jobs list changes
@@ -257,7 +280,7 @@ watch(
       updateMarkers();
     });
   },
-  { deep: true }
+  { deep: true },
 );
 
 onMounted(async () => {
@@ -284,7 +307,8 @@ onMounted(async () => {
 
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(mapInstance);
 
   updateMarkers();

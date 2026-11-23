@@ -174,13 +174,14 @@
 </template>
 
 <script setup lang="ts">
+import { apiFetch } from "~/composables/useApiClient";
+
 useSeoMeta({
   title: "Auditoría de Infracciones - JobNet",
   description:
     "Registro de auditoría inmutable de sanciones y bloqueos en JobNet",
 });
 
-const config = useRuntimeConfig();
 const auditLogs = ref<any[]>([]);
 const loading = ref(true);
 
@@ -222,14 +223,14 @@ const MOCK_AUDIT_LOGS = [
 const fetchAuditLogs = async () => {
   loading.value = true;
   try {
-    const data = await $fetch<any[]>(
-      `${config.public.apiUrl}/moderator/audit-logs`,
-    ).catch(() => []);
-    if (data && data.length > 0) {
-      auditLogs.value = data;
-    } else {
+const { isMockEnabled } = useMockSession();
+    if (isMockEnabled.value) {
       auditLogs.value = MOCK_AUDIT_LOGS;
+      loading.value = false;
+      return;
     }
+    const data = await apiFetch<any[]>("/moderator/audit-logs");
+    auditLogs.value = data && data.length > 0 ? data : MOCK_AUDIT_LOGS;
   } catch (e) {
     auditLogs.value = MOCK_AUDIT_LOGS;
   } finally {

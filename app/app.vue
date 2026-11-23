@@ -7,7 +7,8 @@
       <AppProtectedModal />
       <AppFeedbackModal />
       <AppCommandPalette />
-      <DevMockToolbar />
+<DevMockToolbar />
+      <AppGoogleRoleNoticeModal />
     </ClientOnly>
   </div>
 </template>

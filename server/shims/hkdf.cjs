@@ -19,7 +19,7 @@ async function hkdf(digest, ikm, salt, info, keylen) {
       (err, arrayBuffer) => {
         if (err) reject(err);
         else resolve(new Uint8Array(arrayBuffer));
-      }
+      },
     );
   });
 }

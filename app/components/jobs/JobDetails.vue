@@ -27,7 +27,9 @@
               v-if="job.estado === 'PAUSADA'"
               class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex items-center gap-1"
             >
-              <span class="material-symbols-outlined text-xs">pause_circle</span>
+              <span class="material-symbols-outlined text-xs"
+                >pause_circle</span
+              >
               Pausada Temporalmente
             </span>
           </div>
@@ -66,7 +68,9 @@
               {{ job.sector }}
             </span>
             <span
-              v-if="job.municipio || (job.location && job.modalidad !== 'Remoto')"
+              v-if="
+                job.municipio || (job.location && job.modalidad !== 'Remoto')
+              "
               class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20"
             >
               <span class="material-symbols-outlined text-sm">location_on</span>
@@ -107,19 +111,29 @@
           type="button"
           @click="$emit('bookmark')"
           class="p-3 border rounded-2xl transition flex items-center justify-center shadow-sm"
-          :class="isBookmarked
-            ? 'text-amber-500 font-bold border-amber-300 bg-amber-50/50 dark:bg-amber-950/20'
-            : 'border-outline-variant hover:bg-surface-container text-on-surface-variant dark:text-slate-300'"
+          :class="
+            isBookmarked
+              ? 'text-amber-500 font-bold border-amber-300 bg-amber-50/50 dark:bg-amber-950/20'
+              : 'border-outline-variant hover:bg-surface-container text-on-surface-variant dark:text-slate-300'
+          "
           title="Guardar vacante en tus favoritos privados"
         >
-          <span class="material-symbols-outlined text-[20px]" :class="{ 'font-fill-1 text-amber-500': isBookmarked }">
-            {{ isBookmarked ? 'bookmark' : 'bookmark_border' }}
+          <span
+            class="material-symbols-outlined text-[20px]"
+            :class="{ 'font-fill-1 text-amber-500': isBookmarked }"
+          >
+            {{ isBookmarked ? "bookmark" : "bookmark_border" }}
           </span>
         </button>
 
         <button
           @click="$emit('easyApply')"
-          :disabled="hasApplied || isApplying || job.estado === 'EVALUACION' || job.estado === 'PAUSADA'"
+          :disabled="
+            hasApplied ||
+            isApplying ||
+            job.estado === 'EVALUACION' ||
+            job.estado === 'PAUSADA'
+          "
           class="px-6 py-3 bg-primary hover:bg-primary-container text-white font-bold text-xs rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-80"
         >
           <span
@@ -127,10 +141,14 @@
             class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
             aria-hidden="true"
           ></span>
-          <span v-else-if="job.estado === 'PAUSADA'" class="material-symbols-outlined text-base"
+          <span
+            v-else-if="job.estado === 'PAUSADA'"
+            class="material-symbols-outlined text-base"
             >pause_circle</span
           >
-          <span v-else-if="hasApplied" class="material-symbols-outlined text-base"
+          <span
+            v-else-if="hasApplied"
+            class="material-symbols-outlined text-base"
             >check_circle</span
           >
           <span v-else class="material-symbols-outlined text-base">send</span>
@@ -277,24 +295,37 @@
 
     <!-- Preguntas Filtro de Precalificación Section -->
     <div
-      v-if="(job.preguntasFiltro && job.preguntasFiltro.length > 0) || (job.screeningQuestions && job.screeningQuestions.length > 0)"
+      v-if="
+        (job.preguntasFiltro && job.preguntasFiltro.length > 0) ||
+        (job.screeningQuestions && job.screeningQuestions.length > 0)
+      "
       class="space-y-3 text-left"
     >
-      <h3 class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-primary text-base">quiz</span>
+      <h3
+        class="text-xs font-bold text-on-background uppercase tracking-wider flex items-center gap-1.5"
+      >
+        <span class="material-symbols-outlined text-primary text-base"
+          >quiz</span
+        >
         Preguntas de Precalificación Obligatorias
       </h3>
-      <div class="space-y-2 bg-surface-container-low/30 border border-outline-variant/40 rounded-2xl p-4">
+      <div
+        class="space-y-2 bg-surface-container-low/30 border border-outline-variant/40 rounded-2xl p-4"
+      >
         <p class="text-xs text-on-surface-variant dark:text-slate-400">
-          La organización requiere responder obligatoriamente a las siguientes preguntas al postularte:
+          La organización requiere responder obligatoriamente a las siguientes
+          preguntas al postularte:
         </p>
         <ul class="space-y-1.5 list-none">
           <li
-            v-for="(pregunta, idx) in (job.preguntasFiltro || job.screeningQuestions)"
+            v-for="(pregunta, idx) in job.preguntasFiltro ||
+            job.screeningQuestions"
             :key="idx"
             class="text-xs font-semibold text-on-background flex items-start gap-2"
           >
-            <span class="w-5 h-5 rounded-full bg-primary/10 text-primary font-bold text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span
+              class="w-5 h-5 rounded-full bg-primary/10 text-primary font-bold text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5"
+            >
               {{ idx + 1 }}
             </span>
             <span>{{ pregunta }}</span>

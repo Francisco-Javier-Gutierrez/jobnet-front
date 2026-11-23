@@ -5,7 +5,9 @@
       class="p-6 md:p-8 rounded-2xl border transition-all duration-300 shadow-sm"
       :class="statusCardClasses"
     >
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div
+        class="flex flex-col md:flex-row md:items-center justify-between gap-6"
+      >
         <div class="flex items-start gap-4">
           <div
             class="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md"
@@ -30,7 +32,9 @@
             <h2 class="text-xl md:text-2xl font-bold text-on-surface">
               {{ statusHeading }}
             </h2>
-            <p class="text-xs md:text-sm text-on-surface-variant dark:text-slate-300 max-w-2xl leading-relaxed">
+            <p
+              class="text-xs md:text-sm text-on-surface-variant dark:text-slate-300 max-w-2xl leading-relaxed"
+            >
               {{ statusDescription }}
             </p>
           </div>
@@ -41,17 +45,27 @@
           class="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 md:border-l border-outline-variant/30 pt-4 md:pt-0 md:pl-6 gap-2 flex-shrink-0"
         >
           <div class="text-left md:text-right">
-            <span class="text-[11px] uppercase tracking-wider text-slate-500 font-bold block">
+            <span
+              class="text-[11px] uppercase tracking-wider text-slate-500 font-bold block"
+            >
               Garantía de Confianza
             </span>
-            <span class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1 md:justify-end">
-              <span class="material-symbols-outlined text-[16px]">verified_user</span>
+            <span
+              class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1 md:justify-end"
+            >
+              <span class="material-symbols-outlined text-[16px]"
+                >verified_user</span
+              >
               Acreditación Oficial
             </span>
           </div>
           <div class="text-left md:text-right">
-            <span class="text-[10px] text-slate-400 block">Sello emitido por</span>
-            <span class="text-xs font-bold text-on-surface">JobNet Plataforma</span>
+            <span class="text-[10px] text-slate-400 block"
+              >Sello emitido por</span
+            >
+            <span class="text-xs font-bold text-on-surface"
+              >JobNet Plataforma</span
+            >
           </div>
         </div>
       </div>
@@ -64,7 +78,9 @@
       <h3
         class="text-base font-bold text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-3"
       >
-        <span class="material-symbols-outlined text-primary text-xl">fact_check</span>
+        <span class="material-symbols-outlined text-primary text-xl"
+          >fact_check</span
+        >
         Métodos de Validación Institucional
       </h3>
 
@@ -83,11 +99,17 @@
               <div class="flex items-center gap-2">
                 <span
                   class="material-symbols-outlined text-lg"
-                  :class="isDomainVerified ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'"
+                  :class="
+                    isDomainVerified
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-slate-400'
+                  "
                 >
                   alternate_email
                 </span>
-                <h4 class="font-bold text-xs uppercase tracking-wider text-on-surface">
+                <h4
+                  class="font-bold text-xs uppercase tracking-wider text-on-surface"
+                >
                   Dominio Corporativo Privado (RN-3)
                 </h4>
               </div>
@@ -105,12 +127,21 @@
                 {{ isDomainVerified ? "Acreditado" : "Pendiente" }}
               </span>
             </div>
-            <p class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed">
-              Verificación criptográfica del dominio de correo empresarial registrado (excluyendo proveedores genéricos o de riesgo), asegurando que los comunicados provienen de la institución legítima.
+            <p
+              class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+            >
+              Verificación criptográfica del dominio de correo empresarial
+              registrado (excluyendo proveedores genéricos o de riesgo),
+              asegurando que los comunicados provienen de la institución
+              legítima.
             </p>
           </div>
-          <div class="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-400 pt-2 border-t border-outline-variant/20 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm text-primary">link</span>
+          <div
+            class="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-400 pt-2 border-t border-outline-variant/20 flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-sm text-primary"
+              >link</span
+            >
             <span>Dominio: {{ companyDomainDisplay }}</span>
           </div>
         </div>
@@ -129,11 +160,17 @@
               <div class="flex items-center gap-2">
                 <span
                   class="material-symbols-outlined text-lg"
-                  :class="isFiscalVerified ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'"
+                  :class="
+                    isFiscalVerified
+                      ? 'text-indigo-600 dark:text-indigo-400'
+                      : 'text-slate-400'
+                  "
                 >
                   account_balance
                 </span>
-                <h4 class="font-bold text-xs uppercase tracking-wider text-on-surface">
+                <h4
+                  class="font-bold text-xs uppercase tracking-wider text-on-surface"
+                >
                   Cotejo Fiscal Documental (SAT)
                 </h4>
               </div>
@@ -151,12 +188,20 @@
                 {{ isFiscalVerified ? "Acreditado" : "Pendiente" }}
               </span>
             </div>
-            <p class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed">
-              Validación de la personalidad jurídica mediante cotejo de sintaxis y registro formal de RFC ante las autoridades tributarias, respaldado por la Constancia de Situación Fiscal.
+            <p
+              class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
+            >
+              Validación de la personalidad jurídica mediante cotejo de sintaxis
+              y registro formal de RFC ante las autoridades tributarias,
+              respaldado por la Constancia de Situación Fiscal.
             </p>
           </div>
-          <div class="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-400 pt-2 border-t border-outline-variant/20 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm text-indigo-600">badge</span>
+          <div
+            class="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-400 pt-2 border-t border-outline-variant/20 flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-sm text-indigo-600"
+              >badge</span
+            >
             <span>RFC Registrado: {{ company.rfc || "En trámite" }}</span>
           </div>
         </div>
@@ -170,48 +215,82 @@
       <h3
         class="text-base font-bold text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-3"
       >
-        <span class="material-symbols-outlined text-emerald-600 text-xl">shield</span>
+        <span class="material-symbols-outlined text-emerald-600 text-xl"
+          >shield</span
+        >
         Garantías de Confianza para Candidatos
       </h3>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="p-4 rounded-xl bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 space-y-2"
+        >
+          <div
+            class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center"
+          >
             <span class="material-symbols-outlined text-lg">gavel</span>
           </div>
-          <h4 class="font-bold text-xs text-on-surface">Autenticidad Jurídica</h4>
-          <p class="text-[11px] text-on-surface-variant dark:text-slate-300 leading-normal">
-            Persona moral acreditada legalmente, mitigando riesgos de suplantación corporativa.
+          <h4 class="font-bold text-xs text-on-surface">
+            Autenticidad Jurídica
+          </h4>
+          <p
+            class="text-[11px] text-on-surface-variant dark:text-slate-300 leading-normal"
+          >
+            Persona moral acreditada legalmente, mitigando riesgos de
+            suplantación corporativa.
           </p>
         </div>
 
-        <div class="p-4 rounded-xl bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 flex items-center justify-center">
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 space-y-2"
+        >
+          <div
+            class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 flex items-center justify-center"
+          >
             <span class="material-symbols-outlined text-lg">policy</span>
           </div>
           <h4 class="font-bold text-xs text-on-surface">Ofertas Legítimas</h4>
-          <p class="text-[11px] text-on-surface-variant dark:text-slate-300 leading-normal">
-            Supervisión activa contra cobros indebidos a postulantes, vacantes fantasma o discrepancias salariales.
+          <p
+            class="text-[11px] text-on-surface-variant dark:text-slate-300 leading-normal"
+          >
+            Supervisión activa contra cobros indebidos a postulantes, vacantes
+            fantasma o discrepancias salariales.
           </p>
         </div>
 
-        <div class="p-4 rounded-xl bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center">
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 space-y-2"
+        >
+          <div
+            class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center"
+          >
             <span class="material-symbols-outlined text-lg">forum</span>
           </div>
-          <h4 class="font-bold text-xs text-on-surface">Canal Directo Seguro</h4>
-          <p class="text-[11px] text-on-surface-variant dark:text-slate-300 leading-normal">
-            Interacción con reclutadores autorizados bajo protocolo de mensajería formal y auditable.
+          <h4 class="font-bold text-xs text-on-surface">
+            Canal Directo Seguro
+          </h4>
+          <p
+            class="text-[11px] text-on-surface-variant dark:text-slate-300 leading-normal"
+          >
+            Interacción con reclutadores autorizados bajo protocolo de
+            mensajería formal y auditable.
           </p>
         </div>
 
-        <div class="p-4 rounded-xl bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 flex items-center justify-center">
+        <div
+          class="p-4 rounded-xl bg-surface-container-low/40 dark:bg-slate-800/40 border border-outline-variant/40 space-y-2"
+        >
+          <div
+            class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 flex items-center justify-center"
+          >
             <span class="material-symbols-outlined text-lg">lock</span>
           </div>
           <h4 class="font-bold text-xs text-on-surface">Privacidad del CV</h4>
-          <p class="text-[11px] text-on-surface-variant dark:text-slate-300 leading-normal">
-            Tus datos curriculares se protegen bajo estrictas directivas de confidencialidad institucional.
+          <p
+            class="text-[11px] text-on-surface-variant dark:text-slate-300 leading-normal"
+          >
+            Tus datos curriculares se protegen bajo estrictas directivas de
+            confidencialidad institucional.
           </p>
         </div>
       </div>
@@ -225,7 +304,9 @@
       <h3
         class="text-base font-bold text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-3"
       >
-        <span class="material-symbols-outlined text-indigo-600 text-xl">description</span>
+        <span class="material-symbols-outlined text-indigo-600 text-xl"
+          >description</span
+        >
         Documentación Probatoria de Verificación
       </h3>
 
@@ -298,11 +379,15 @@ const normalizedStatus = computed(() => {
       : "PENDIENTE")
   ).toUpperCase();
 
-  if (props.company.suspensionStatus === "SUSPENDIDA" || props.company.estatus === "SUSPENDIDA") {
+  if (
+    props.company.suspensionStatus === "SUSPENDIDA" ||
+    props.company.estatus === "SUSPENDIDA"
+  ) {
     return "SUSPENDIDA";
   }
   if (status.includes("VERIFICAD")) return "VERIFICADA";
-  if (status.includes("REVISION") || status.includes("REVISIÓN")) return "EN_REVISION";
+  if (status.includes("REVISION") || status.includes("REVISIÓN"))
+    return "EN_REVISION";
   return "PENDIENTE";
 });
 
@@ -313,7 +398,7 @@ const isDomainVerified = computed(() => {
   if (isVerified.value) return true;
   return Boolean(
     props.company.metodoVerificacion === "DOMINIO_CORPORATIVO" ||
-      props.company.dominioVerificado,
+    props.company.dominioVerificado,
   );
 });
 
@@ -321,7 +406,7 @@ const isFiscalVerified = computed(() => {
   if (isVerified.value) return true;
   return Boolean(
     props.company.metodoVerificacion === "VALIDACION_SAT" ||
-      (props.company.rfc && props.company.rfc.length >= 12),
+    (props.company.rfc && props.company.rfc.length >= 12),
   );
 });
 
@@ -332,7 +417,8 @@ const statusLabel = computed(() => {
 });
 
 const statusHeading = computed(() => {
-  if (isVerified.value) return "Distintivo Oficial de Verificación Institucional";
+  if (isVerified.value)
+    return "Distintivo Oficial de Verificación Institucional";
   if (isRevision.value) return "Trámite de Verificación en Revisión Activa";
   return "Estatus de Registro No Verificado";
 });
@@ -402,7 +488,10 @@ const verificationDocs = computed(() => {
   ) {
     return props.company.documentosVerificacion;
   }
-  if (Array.isArray(props.company.documents) && props.company.documents.length > 0) {
+  if (
+    Array.isArray(props.company.documents) &&
+    props.company.documents.length > 0
+  ) {
     return props.company.documents;
   }
   return [];
