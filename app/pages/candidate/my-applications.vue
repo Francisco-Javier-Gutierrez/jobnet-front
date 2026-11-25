@@ -382,6 +382,7 @@
 
 <script setup lang="ts">
 import { useAuth, useRuntimeConfig, useRouter } from "#imports";
+import { getAuthHeaders } from "~/composables/useApiClient";
 
 definePageMeta({
   middleware: ["auth"],
@@ -419,12 +420,24 @@ const fetchApplications = async () => {
     return;
   }
 
+  const userRole = (
+    (session.value?.user as any)?.tipoUsuario ||
+    (session.value?.user as any)?.role ||
+    ""
+  ).toUpperCase();
+
+  if (userRole && userRole !== "CANDIDATO") {
+    router.push("/");
+    return;
+  }
+
   loading.value = true;
   try {
     const candidateId = session.value?.user?.id || "";
 
     const apps = await $fetch<any[]>(
       `${config.public.apiUrl}/applications?candidateId=${candidateId}`,
+      { headers: getAuthHeaders() },
     ).catch(() => []);
 
     if (apps && apps.length > 0) {

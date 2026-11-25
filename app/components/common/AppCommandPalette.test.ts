@@ -72,7 +72,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
     // Guest actions should be present
     expect(renderedText).toContain("Iniciar Sesión");
     expect(renderedText).toContain("Registrarse como Candidato");
-    expect(renderedText).toContain("Registrar Organización o Empresa");
+    expect(renderedText).toContain("Registrar Organización");
     expect(renderedText).toContain("Explorar Vacantes");
 
     // Company, candidate private, and admin actions MUST NOT be present
@@ -111,13 +111,13 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Company or Admin actions MUST NOT appear for Candidate
     expect(renderedText).not.toContain("Publicar Oferta de Empleo");
-    expect(renderedText).not.toContain("Tablero ATS de Postulantes");
+    expect(renderedText).not.toContain("Tablero ATS de Candidatos");
     expect(renderedText).not.toContain("Mis Vacantes Activas");
     expect(renderedText).not.toContain("Estatus de Verificación");
     expect(renderedText).not.toContain("Métricas y Analítica Global");
   });
 
-  it("filters command palette correctly for ORGANIZATION / EMPRESA role", () => {
+  it("filters command palette correctly for ORGANIZACION role", () => {
     mockAuthStatus.value = "authenticated";
     mockAuthData.value = {
       user: {
@@ -132,7 +132,7 @@ describe("AppCommandPalette.vue Role-Based Filtering", () => {
 
     // Organization specific quick actions and navigation
     expect(renderedText).toContain("Publicar Oferta de Empleo");
-    expect(renderedText).toContain("Tablero ATS de Postulantes");
+    expect(renderedText).toContain("Tablero ATS de Candidatos");
     expect(renderedText).toContain("Mis Vacantes Activas");
     expect(renderedText).toContain("Estatus de Verificación");
     expect(renderedText).toContain("Perfil de la Organización");

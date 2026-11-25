@@ -60,9 +60,16 @@ export default defineEventHandler(async (event) => {
 
   const { clientId, clientSecret } = getCognitoConfig();
 
+  const normalizedCustomRole =
+    role === "candidate" || role === "candidato"
+      ? "CANDIDATO"
+      : role === "company" || role === "empresa" || role === "organizacion"
+        ? "ORGANIZACION"
+        : role;
+
   const userAttributes = [
     { Name: "email", Value: email },
-    { Name: "custom:role", Value: role },
+    { Name: "custom:role", Value: normalizedCustomRole },
   ];
 
   const isIndividual =

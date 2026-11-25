@@ -2,6 +2,7 @@ import { useRuntimeConfig } from "#app";
 import { useAuth } from "#imports";
 import { useS3Upload } from "~/composables/useS3Upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import { apiFetch } from "~/composables/useApiClient";
 
 import type { SupportChat, ChatMessage, ChatAttachment } from "~/types";
 
@@ -22,12 +23,13 @@ export function useSupport() {
     return (user?.tipoUsuario || "").toUpperCase();
   });
 
-  const isOrganization = computed(
-    () => userRole.value === "ORGANIZACION" || userRole.value === "EMPRESA",
-  );
+  const isOrganization = computed(() => userRole.value === "ORGANIZACION");
 
   const isModeratorRole = computed(
-    () => userRole.value === "MODERATOR" || userRole.value === "ADMIN",
+    () =>
+      userRole.value === "MODERATOR" ||
+      userRole.value === "MODERADOR" ||
+      userRole.value === "ADMIN",
   );
 
   const searchQuery = ref("");
@@ -77,13 +79,12 @@ export function useSupport() {
 
     try {
       if (isOrganization.value) {
-        await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${userId.value}/join-appeal`,
-          { method: "POST" },
-        ).catch(() => {});
+        await apiFetch(`/moderator/organizations/${userId.value}/join-appeal`, {
+          method: "POST",
+        }).catch(() => {});
 
-        const statusRes = await $fetch<any>(
-          `${config.public.apiUrl}/moderator/organizations/${userId.value}/suspension-status`,
+        const statusRes = await apiFetch<any>(
+          `/moderator/organizations/${userId.value}/suspension-status`,
         ).catch(() => null);
 
         chats.value = [
@@ -100,9 +101,9 @@ export function useSupport() {
           },
         ];
       } else {
-        const data = await $fetch<any[]>(
-          `${config.public.apiUrl}/moderator/appeals`,
-        ).catch(() => []);
+        const data = await apiFetch<any[]>("/moderator/appeals").catch(
+          () => [],
+        );
 
         chats.value = (data || []).map((item) => ({
           id: item.id || item.companyId,
@@ -144,8 +145,8 @@ export function useSupport() {
     const companyId = chat.companyId || chat.id;
 
     try {
-      const data = await $fetch<any[]>(
-        `${config.public.apiUrl}/moderator/appeals/${appealId}/messages`,
+      const data = await apiFetch<any[]>(
+        `/moderator/appeals/${appealId}/messages`,
       ).catch(() => []);
 
       messages.value = (data || []).map((m) => ({
@@ -182,20 +183,17 @@ export function useSupport() {
 
     try {
       if (action === "approve") {
-        await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${compId}/cancel-suspension`,
-          {
-            method: "POST",
-            body: { notes: "Apelación aprobada tras revisión en tiempo real" },
-          },
-        );
+        await apiFetch(`/moderator/organizations/${compId}/cancel-suspension`, {
+          method: "POST",
+          body: { notes: "Apelación aprobada tras revisión en tiempo real" },
+        });
         showSuccess(
           "Éxito",
           "Apelación aprobada con éxito. La organización ha sido reactivada.",
         );
       } else {
-        await $fetch(
-          `${config.public.apiUrl}/moderator/organizations/${compId}/confirm-suspension`,
+        await apiFetch(
+          `/moderator/organizations/${compId}/confirm-suspension`,
           {
             method: "POST",
             body: {
@@ -206,6 +204,13 @@ export function useSupport() {
         showInfo(
           "Notificación",
           "Suspensión confirmada. La organización ha sido suspendida definitivamente.",
+        );
+      }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("incident-sync", {
+            detail: { compId, action },
+          }),
         );
       }
       chats.value = chats.value.filter((c) => (c.companyId || c.id) !== compId);

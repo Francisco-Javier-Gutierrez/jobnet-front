@@ -426,14 +426,14 @@ const handleLogin = async () => {
       // Success, route to dashboard or home based on role
       await new Promise((resolve) => setTimeout(resolve, 150));
       const userRole = (session.value?.user as any)?.tipoUsuario;
-      if (
-        userRole?.toUpperCase() === "EMPRESA" ||
-        userRole?.toUpperCase() === "ORGANIZACION"
-      ) {
+      if (userRole?.toUpperCase() === "ORGANIZACION") {
         router.push("/applicants");
       } else if (userRole?.toUpperCase() === "ADMIN") {
         router.push("/admin");
-      } else if (userRole?.toUpperCase() === "MODERATOR") {
+      } else if (
+        userRole?.toUpperCase() === "MODERATOR" ||
+        userRole?.toUpperCase() === "MODERADOR"
+      ) {
         router.push("/mod/incidents");
       } else {
         router.push("/");

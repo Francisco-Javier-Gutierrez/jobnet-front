@@ -253,15 +253,15 @@ const isPrivilegedRole = computed(() => {
   return (
     nativeRole.value === "ADMIN" ||
     nativeRole.value === "MODERATOR" ||
-    nativeRole.value === "ORGANIZACION" ||
-    nativeRole.value === "EMPRESA"
+    nativeRole.value === "MODERADOR" ||
+    nativeRole.value === "ORGANIZACION"
   );
 });
 const roleTitle = computed(() => {
   if (nativeRole.value === "ADMIN") return "Administrador";
-  if (nativeRole.value === "MODERATOR") return "Moderador";
-  if (nativeRole.value === "ORGANIZACION" || nativeRole.value === "EMPRESA")
-    return "Organización";
+  if (nativeRole.value === "MODERATOR" || nativeRole.value === "MODERADOR")
+    return "Moderador";
+  if (nativeRole.value === "ORGANIZACION") return "Organización";
   return "";
 });
 

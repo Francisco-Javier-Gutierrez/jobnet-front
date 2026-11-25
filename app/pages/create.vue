@@ -263,7 +263,7 @@ const userRole = computed<string>(() => {
   if (status.value !== "authenticated") return "guest";
   const user = session.value?.user as any;
   const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
-  if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "company";
+  if (tipo === "ORGANIZACION") return "company";
   if (tipo === "ADMIN") return "admin";
   if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
   return "candidate";
@@ -308,7 +308,7 @@ const mockPostPreview = computed(() => {
   const userType = (
     (session.value?.user as any)?.tipoUsuario || ""
   ).toUpperCase();
-  if (userType === "EMPRESA" || userType === "ORGANIZACION") {
+  if (userType === "ORGANIZACION") {
     role = "Organización";
   }
 
@@ -491,7 +491,7 @@ const publishPost = async () => {
   const userType = (
     (session.value?.user as any)?.tipoUsuario || ""
   ).toUpperCase();
-  if (userType === "EMPRESA" || userType === "ORGANIZACION") {
+  if (userType === "ORGANIZACION") {
     role = "Organización";
   } else {
     role = "Candidato";

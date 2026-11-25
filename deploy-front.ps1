@@ -34,7 +34,9 @@ if (Test-Path "$ROOT_DIR/.output") {
 # 2. Build Nuxt 4 SSR application for AWS Lambda
 Write-Host "`n[2/7] Building Nuxt SSR application (Nitro aws-lambda)..." -ForegroundColor Yellow
 Set-Location $ROOT_DIR
+node scripts/patch-pinia.cjs
 npm run build
+node scripts/patch-pinia.cjs
 
 if (-not (Test-Path "$ROOT_DIR/.output/server") -or -not (Test-Path "$ROOT_DIR/.output/public")) {
     Write-Error "Build failed: .output/server or .output/public directory not found!"
@@ -112,8 +114,8 @@ $ENV_VARS = "Variables={" +
     "COGNITO_USER_POOL_ID=us-east-1_trquL61F2," +
     "COGNITO_ISSUER=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_trquL61F2," +
     "COGNITO_DOMAIN=jobnet-auth-prod.auth.us-east-1.amazoncognito.com," +
-    "NUXT_PUBLIC_API_URL=https://olhoy8ebq7.execute-api.us-east-1.amazonaws.com," +
-    "NUXT_PUBLIC_WS_URL=wss://lzvcx59zaa.execute-api.us-east-1.amazonaws.com/prod," +
+    "NUXT_PUBLIC_API_URL=https://z79mmps5xk.execute-api.us-east-1.amazonaws.com," +
+    "NUXT_PUBLIC_WS_URL=wss://v9b53l2zr2.execute-api.us-east-1.amazonaws.com/prod," +
     "NUXT_PUBLIC_VAPID_KEY=BOIrktuQCHHiOWcKICA7YEwdKJf8WNYCmBS_PI338wnaB9VqXPQfCRwTN5NLYokujXBp5pdD83av6DACG2rAYok" +
 "}"
 
@@ -121,13 +123,22 @@ aws lambda update-function-configuration --profile $AWS_PROFILE_NAME --function-
 aws lambda wait function-updated --profile $AWS_PROFILE_NAME --function-name $LAMBDA_FUNCTION_NAME
 Write-Host "Lambda SSR environment configuration synchronized!" -ForegroundColor Green
 
-# 7. Sync S3 Static Assets (Protecting Google Verification Files)
+# 7. Sync S3 Static Assets (Protecting Google Verification Files & Brand PNG Logos)
 Write-Host "`n[7/7] Syncing static assets to S3 (s3://$BUCKET_NAME)..." -ForegroundColor Yellow
 # Sync hashed immutable assets with long-term cache
 aws s3 sync "$ROOT_DIR/.output/public/_nuxt" "s3://$BUCKET_NAME/_nuxt" --profile $AWS_PROFILE_NAME --delete --cache-control "public,max-age=31536000,immutable"
 
-# Sync other public static assets, preserving Google verification HTML files from accidental deletion
-aws s3 sync "$ROOT_DIR/.output/public" "s3://$BUCKET_NAME" --profile $AWS_PROFILE_NAME --delete --exclude "google*.html" --cache-control "public,max-age=3600"
+# Sync other public static assets, preserving Google verification HTML files and brand PNG logos from accidental deletion
+aws s3 sync "$ROOT_DIR/.output/public" "s3://$BUCKET_NAME" --profile $AWS_PROFILE_NAME --delete --exclude "google*.html" --exclude "*.png" --exclude "logo*.png" --exclude "logotipo*.png" --cache-control "public,max-age=3600"
+
+# Explicitly ensure brand logo PNG assets are uploaded and preserved with exact image/png MIME type
+$PNG_SOURCE_DIR = if (Test-Path "$ROOT_DIR/.output/public/logo.png") { "$ROOT_DIR/.output/public" } else { "$ROOT_DIR/public" }
+if (Test-Path "$PNG_SOURCE_DIR/logo.png") {
+    aws s3 cp "$PNG_SOURCE_DIR/logo.png" "s3://$BUCKET_NAME/logo.png" --profile $AWS_PROFILE_NAME --content-type "image/png" --cache-control "public,max-age=86400"
+}
+if (Test-Path "$PNG_SOURCE_DIR/logotipo.png") {
+    aws s3 cp "$PNG_SOURCE_DIR/logotipo.png" "s3://$BUCKET_NAME/logotipo.png" --profile $AWS_PROFILE_NAME --content-type "image/png" --cache-control "public,max-age=86400"
+}
 
 # Explicitly ensure sw.js has no-cache and standard JavaScript MIME type
 if (Test-Path "$ROOT_DIR/.output/public/sw.js") {

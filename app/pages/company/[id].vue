@@ -281,7 +281,7 @@
     <!-- Report Company Modal -->
     <ReportModal
       :is-open="showReportCompanyModal"
-      target-type="EMPRESA"
+      target-type="ORGANIZACION"
       :target-id="companyId"
       :target-title="company.name"
       @close="showReportCompanyModal = false"

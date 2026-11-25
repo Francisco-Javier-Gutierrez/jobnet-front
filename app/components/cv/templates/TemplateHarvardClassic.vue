@@ -1,9 +1,9 @@
 <template>
   <div
-    class="cv-letter-page cv-template-harvard text-black bg-white shadow-lg mx-auto p-10 flex flex-col justify-between font-serif"
+    class="cv-letter-page cv-template-harvard text-black bg-white mx-auto p-10 flex flex-col justify-between font-serif"
     :style="{
       width: '215.9mm',
-      minHeight: '279.4mm',
+      minHeight: '278.5mm',
       fontSize: fontSizePx,
     }"
   >
@@ -62,7 +62,7 @@
           Resumen Profesional
         </h2>
         <p
-          class="text-xs text-neutral-900 leading-relaxed text-justify whitespace-pre-line pt-0.5"
+          class="text-xs text-neutral-900 leading-relaxed whitespace-pre-line pt-0.5"
         >
           {{ cv.bio }}
         </p>
@@ -97,7 +97,7 @@
             </div>
             <p
               v-if="exp.descripcion || exp.description"
-              class="text-xs text-neutral-800 leading-relaxed whitespace-pre-line pt-0.5 text-justify"
+              class="text-xs text-neutral-800 leading-relaxed whitespace-pre-line pt-0.5"
             >
               {{ exp.descripcion || exp.description }}
             </p>
@@ -161,6 +161,7 @@
 
 <script setup lang="ts">
 import type { CvData, CvOptions } from "~/types/cv";
+import { getCvBaseFontSize } from "~/composables/useCvGenerator";
 
 const props = defineProps<{
   cv: CvData;
@@ -168,17 +169,12 @@ const props = defineProps<{
   primaryColor?: string;
 }>();
 
-const fontSizePx = computed(() => {
-  if (props.options.fontSize === "sm") return "11px";
-  if (props.options.fontSize === "lg") return "13px";
-  return "12px";
-});
+const fontSizePx = computed(() => getCvBaseFontSize(props.options.fontSize));
 </script>
 
 <style scoped>
 .cv-letter-page {
   box-sizing: border-box;
-  page-break-after: always;
   font-family: Georgia, Cambria, "Times New Roman", Times, serif;
 }
 </style>

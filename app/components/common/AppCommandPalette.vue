@@ -217,8 +217,7 @@ const userRole = computed<
   if (status.value !== "authenticated") return "guest";
   const user = session.value?.user as any;
   const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
-  if (tipo === "ORGANIZACION" || tipo === "ORGANIZATION" || tipo === "EMPRESA")
-    return "organization";
+  if (tipo === "ORGANIZACION") return "organization";
   if (tipo === "ADMIN") return "admin";
   if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
   return "candidate";
@@ -343,11 +342,11 @@ const staticItems = computed<CommandItem[]>(() => {
       },
       {
         id: "action-register-company",
-        title: "Registrar Organización o Empresa",
+        title: "Registrar Organización",
         subtitle: "Publicar ofertas laborales y captar talento",
         icon: "domain_add",
         group: "Acciones Rápidas",
-        badge: "Empresas",
+        badge: "Organizaciones",
         badgeVariant: "neutral",
         keywords: [
           "empresa",
@@ -524,7 +523,7 @@ const staticItems = computed<CommandItem[]>(() => {
       },
       {
         id: "action-applicants",
-        title: "Tablero ATS de Postulantes",
+        title: "Tablero ATS de Candidatos",
         subtitle: "Gestionar candidatos en el embudo de contratación",
         icon: "dashboard_customize",
         group: "Acciones Rápidas",
@@ -577,10 +576,15 @@ const staticItems = computed<CommandItem[]>(() => {
         subtitle: "Información corporativa, logotipo y cultura",
         icon: "business",
         group: "Navegación",
-        badge: "Empresa",
+        badge: "Organización",
         badgeVariant: "neutral",
-        keywords: ["perfil empresa", "organizacion", "logo", "datos fiscales"],
-        action: () => router.push("/company/profile"),
+        keywords: [
+          "perfil organizacion",
+          "organizacion",
+          "logo",
+          "datos fiscales",
+        ],
+        action: () => router.push("/company/edit"),
       },
       {
         id: "nav-messages",

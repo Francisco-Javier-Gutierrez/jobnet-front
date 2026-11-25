@@ -1,6 +1,9 @@
 <template>
   <div
-    class="lg:col-span-5 border-r border-outline-variant/60 flex flex-col h-full bg-surface-container-low/40"
+    :class="[
+      'lg:col-span-5 border-r border-outline-variant/60 flex flex-col h-full bg-surface-container-low/40 min-h-0',
+      selectedAppealId ? 'hidden lg:flex' : 'flex',
+    ]"
   >
     <!-- Search and Filter Header -->
     <div class="p-4 border-b border-outline-variant/60 space-y-3">
@@ -57,7 +60,7 @@
 
     <!-- Appeals Items List -->
     <div
-      class="flex-grow overflow-y-auto max-h-[550px] divide-y divide-outline-variant/30"
+      class="flex-1 min-h-0 overflow-y-auto divide-y divide-outline-variant/30"
     >
       <div
         v-if="isLoading"

@@ -39,7 +39,7 @@ export const useAppNavigation = () => {
     if (status.value !== "authenticated") return "guest";
     const user = data.value?.user;
     const tipo = (user?.tipoUsuario || "").toUpperCase();
-    if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
+    if (tipo === "ORGANIZACION") return "organization";
     if (tipo === "ADMIN") return "admin";
     if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
     return "candidate";
@@ -215,6 +215,12 @@ export const useAppNavigation = () => {
                 label: "Guardados",
                 protected: true,
               },
+              {
+                to: "/support",
+                icon: "report_problem",
+                label: "Reportar un problema",
+                protected: true,
+              },
             ],
           },
         ];
@@ -258,6 +264,12 @@ export const useAppNavigation = () => {
                 to: "/saved",
                 icon: "bookmark",
                 label: "Guardados",
+                protected: true,
+              },
+              {
+                to: "/support",
+                icon: "report_problem",
+                label: "Reportar un problema",
                 protected: true,
               },
               {
@@ -317,10 +329,16 @@ export const useAppNavigation = () => {
                 label: "Guardados",
                 protected: true,
               },
+              {
+                to: "/support",
+                icon: "report_problem",
+                label: "Reportar un problema",
+                protected: true,
+              },
             ],
           },
           {
-            title: "Empresa & Soporte",
+            title: "Organización & Soporte",
             items: [
               {
                 to: "/company/verification",
@@ -330,8 +348,8 @@ export const useAppNavigation = () => {
               },
               {
                 to: "/support",
-                icon: "gavel",
-                label: "Soporte y Apelaciones",
+                icon: "report_problem",
+                label: "Reportar un problema",
                 protected: true,
               },
             ],
@@ -379,9 +397,21 @@ export const useAppNavigation = () => {
             title: "Mi Actividad",
             items: [
               {
+                to: "/candidate/my-applications",
+                icon: "fact_check",
+                label: "Mis Postulaciones",
+                protected: true,
+              },
+              {
                 to: "/saved",
                 icon: "bookmark",
                 label: "Guardados",
+                protected: true,
+              },
+              {
+                to: "/support",
+                icon: "report_problem",
+                label: "Reportar un problema",
                 protected: true,
               },
             ],

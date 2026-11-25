@@ -147,6 +147,31 @@
             >
               {{ new Date(inc.fechaCreacion).toLocaleDateString() }}
             </span>
+
+            <!-- Concurrency Assignment Badge -->
+            <span
+              v-if="inc.assignedModeratorId === currentUserId"
+              class="text-[9px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5"
+            >
+              <span class="material-symbols-outlined text-[11px]">check</span>
+              Asignado a ti
+            </span>
+            <span
+              v-else-if="inc.assignedModeratorId"
+              class="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 flex items-center gap-0.5"
+              :title="
+                'Asignado a: ' + (inc.assignedModeratorName || 'Moderador')
+              "
+            >
+              <span class="material-symbols-outlined text-[11px]">lock</span>
+              En atención: {{ inc.assignedModeratorName || "Moderador" }}
+            </span>
+            <span
+              v-else
+              class="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+            >
+              Sin Asignar
+            </span>
           </div>
           <h3 class="text-sm font-bold text-on-background mb-1">
             {{
@@ -200,80 +225,113 @@
         <div
           class="flex flex-wrap items-center gap-2 flex-shrink-0 self-center"
         >
-          <!-- Dispute Messaging Audit Actions (Fase 1 y Fase 2) -->
-          <template
-            v-if="
-              inc.targetType === 'VACANTE' ||
-              inc.targetType === 'CHAT' ||
-              inc.jobId ||
-              isSeriousInfraction(inc.infraccion)
+          <!-- Concurrency lock: In progress by another moderator -->
+          <div
+            v-if="isLockedByOther(inc)"
+            class="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 font-medium"
+            :title="
+              'Incidencia asignada al moderador ' +
+              (inc.assignedModeratorName || 'otro moderador')
             "
           >
-            <button
-              v-if="
-                inc.auditState === 'AUDIT_ACTIVE' || inc.estatus === 'AUDITORIA'
-              "
-              type="button"
-              @click="inspectAuditChat(inc)"
-              class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
-              title="Inspeccionar historial íntegro de mensajes en solo lectura y dictaminar (Fase 2)"
-            >
-              <span class="material-symbols-outlined text-sm">visibility</span>
-              <span>Inspeccionar Auditoría</span>
-            </button>
-            <button
-              v-else-if="inc.auditState !== 'AUDIT_CONCLUDED'"
-              type="button"
-              @click="openAudit(inc)"
-              class="bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5"
-              title="Admitir controversia y notificar apertura de auditoría a ambas partes (Fase 1)"
-            >
-              <span class="material-symbols-outlined text-sm">policy</span>
-              <span>Auditar Mensajes</span>
-            </button>
-          </template>
-
-          <!-- For reports in EVALUACION (under appeal) -->
-          <template v-if="inc.estatus === 'EVALUACION'">
+            <span class="material-symbols-outlined text-sm">lock</span>
             <span
-              class="text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 px-2.5 py-1 rounded border border-amber-200 dark:border-amber-800 uppercase tracking-wide"
-              >En Apelación</span
+              >En atención por
+              {{ inc.assignedModeratorName || "otro moderador" }}</span
             >
-            <NuxtLink
-              to="/mod/appeals"
-              class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1"
-            >
-              <span class="material-symbols-outlined text-sm">forum</span>
-              Atender Apelación
-            </NuxtLink>
-          </template>
+          </div>
 
-          <!-- For raw reports PENDIENTE -->
-          <template v-else-if="inc.estatus !== 'AUDITORIA'">
-            <button
-              @click="resolve(inc.id, 'approve')"
-              class="bg-surface border border-outline-variant/60 hover:bg-surface-container text-on-surface font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-sm"
+          <template v-else>
+            <!-- Dispute Messaging Audit Actions (Fase 1 y Fase 2) -->
+            <template
+              v-if="
+                inc.targetType === 'VACANTE' ||
+                inc.targetType === 'CHAT' ||
+                inc.jobId ||
+                isSeriousInfraction(inc.infraccion)
+              "
             >
-              Ignorar
-            </button>
-            <button
-              v-if="inc.targetType !== 'POST'"
-              @click="resolve(inc.id, 'evaluate')"
-              class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1"
-            >
-              <span class="material-symbols-outlined text-sm"
-                >pause_circle</span
+              <button
+                v-if="
+                  inc.auditState === 'AUDIT_ACTIVE' ||
+                  inc.estatus === 'AUDITORIA'
+                "
+                type="button"
+                @click="inspectAuditChat(inc)"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
+                title="Inspeccionar historial íntegro de mensajes en solo lectura y dictaminar (Fase 2)"
               >
-              Pausar (Evaluar)
-            </button>
-            <button
-              v-else
-              @click="resolve(inc.id, 'reject')"
-              class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1"
+                <span class="material-symbols-outlined text-sm"
+                  >visibility</span
+                >
+                <span>Inspeccionar Auditoría</span>
+              </button>
+              <button
+                v-else-if="inc.auditState !== 'AUDIT_CONCLUDED'"
+                type="button"
+                @click="openAudit(inc)"
+                class="bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+                title="Admitir controversia y notificar apertura de auditoría a ambas partes (Fase 1)"
+              >
+                <span class="material-symbols-outlined text-sm">policy</span>
+                <span>Auditar Mensajes</span>
+              </button>
+            </template>
+
+            <!-- For reports in EVALUACION (under appeal) -->
+            <template
+              v-if="inc.estatus === 'EVALUACION' || inc.status === 'EVALUACION'"
             >
-              <span class="material-symbols-outlined text-sm">delete</span>
-              Eliminar
-            </button>
+              <span
+                class="text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 px-2.5 py-1 rounded border border-amber-200 dark:border-amber-800 uppercase tracking-wide"
+                >En Apelación</span
+              >
+              <NuxtLink
+                to="/mod/appeals"
+                class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-sm">forum</span>
+                Atender Apelación
+              </NuxtLink>
+            </template>
+
+            <!-- For raw reports PENDIENTE -->
+            <template v-else-if="inc.estatus !== 'AUDITORIA'">
+              <button
+                @click="resolve(inc.id, 'approve')"
+                class="bg-surface border border-outline-variant/60 hover:bg-surface-container text-on-surface font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-sm"
+              >
+                Ignorar
+              </button>
+              <button
+                v-if="inc.targetType !== 'POST'"
+                :disabled="processingId === inc.id"
+                @click="resolve(inc.id, 'evaluate')"
+                class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1 disabled:opacity-50"
+              >
+                <span
+                  v-if="processingId === inc.id"
+                  class="material-symbols-outlined text-sm animate-spin"
+                  >progress_activity</span
+                >
+                <span v-else class="material-symbols-outlined text-sm"
+                  >pause_circle</span
+                >
+                <span>{{
+                  inc.targetType === "VACANTE" || inc.jobId
+                    ? "Pausar Vacante"
+                    : "Pausar (Evaluar)"
+                }}</span>
+              </button>
+              <button
+                v-else
+                @click="resolve(inc.id, 'reject')"
+                class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-sm">delete</span>
+                Eliminar
+              </button>
+            </template>
           </template>
         </div>
       </div>
@@ -298,14 +356,29 @@
 import type { Incident } from "~/types";
 import DisputeAuditModal from "~/components/mod/DisputeAuditModal.vue";
 import { useDisputeAudit } from "~/composables/useDisputeAudit";
+import { apiFetch } from "~/composables/useApiClient";
+import { useAppFeedback } from "~/composables/useAppFeedback";
 
-const config = useRuntimeConfig();
 const { data: session } = useAuth();
+const { showError } = useAppFeedback();
 
 const userRole = computed(() => {
   const user = session.value?.user;
   return (user?.tipoUsuario || "").toUpperCase();
 });
+
+const currentUserId = computed(() => {
+  const u: any = session.value?.user;
+  return u?.id || u?.uuid || u?.sub || "";
+});
+
+const isLockedByOther = (inc: any) => {
+  return (
+    inc.assignedModeratorId &&
+    inc.assignedModeratorId !== currentUserId.value &&
+    userRole.value !== "ADMIN"
+  );
+};
 
 const incidents = ref<Incident[]>([]);
 const loading = ref(true);
@@ -354,44 +427,16 @@ const displayedIncidents = computed(() => {
   return list;
 });
 
-const getAuthHeaders = (): Record<string, string> => {
-  const token =
-    (session.value as any)?.idToken ||
-    (session.value as any)?.accessToken ||
-    (session.value as any)?.token ||
-    "";
-  const role =
-    session.value?.user?.tipoUsuario ||
-    session.value?.user?.role ||
-    (session.value as any)?.tipoUsuario ||
-    "MODERADOR";
-  const userId =
-    session.value?.user?.id || (session.value?.user as any)?.uuid || "";
+const processingId = ref<string | null>(null);
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    "x-user-id": userId,
-    "x-user-role": role,
-  };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-  return headers;
-};
-
-const fetchIncidents = async () => {
-  loading.value = true;
+const fetchIncidents = async (initial = false) => {
+  if (initial) loading.value = true;
   try {
-    const data = await $fetch<any>(
-      `${config.public.apiUrl}/moderator/incidents`,
-      {
-        headers: getAuthHeaders(),
-      },
-    );
+    const data = await apiFetch<any>("/moderator/incidents");
     const fetched =
       data?.value || data?.Items || (Array.isArray(data) ? data : []);
     incidents.value = fetched;
-  } catch (e) {
+  } catch (e: any) {
     console.error("Error loading incidents:", e);
     incidents.value = [];
   } finally {
@@ -399,8 +444,25 @@ const fetchIncidents = async () => {
   }
 };
 
+const handleIncidentSync = () => {
+  fetchIncidents(false);
+};
+
 onMounted(() => {
-  fetchIncidents();
+  fetchIncidents(true);
+  if (typeof window !== "undefined") {
+    window.addEventListener("incident-sync", handleIncidentSync);
+  }
+});
+
+onUnmounted(() => {
+  if (typeof window !== "undefined") {
+    window.removeEventListener("incident-sync", handleIncidentSync);
+  }
+});
+
+defineExpose({
+  fetchIncidents,
 });
 
 const resolve = async (id: string, action: string) => {
@@ -410,25 +472,43 @@ const resolve = async (id: string, action: string) => {
       : action === "evaluate"
         ? "evaluate"
         : "approve";
+  processingId.value = id;
   try {
-    await $fetch(`${config.public.apiUrl}/moderator/incidents/${id}/resolve`, {
+    await apiFetch(`/moderator/incidents/${id}/resolve`, {
       method: "POST",
-      headers: getAuthHeaders(),
       body: {
         action: mappedAction,
       },
     });
 
     if (action === "evaluate") {
-      const idx = incidents.value.findIndex((i) => i.id === id);
+      const idx = incidents.value.findIndex(
+        (i) =>
+          i.id === id ||
+          (i as any).incidentId === id ||
+          i.targetId === id ||
+          (i as any).jobId === id,
+      );
       if (idx !== -1) {
-        incidents.value[idx].status = "EVALUACION";
+        incidents.value[idx] = {
+          ...incidents.value[idx],
+          status: "EVALUACION",
+          estatus: "EVALUACION",
+        };
+        incidents.value = [...incidents.value];
       }
     } else {
-      incidents.value = incidents.value.filter((i) => i.id !== id);
+      incidents.value = incidents.value.filter(
+        (i) => i.id !== id && (i as any).incidentId !== id && i.targetId !== id,
+      );
     }
-  } catch (e) {
+    // Re-fetch in background to synchronize any server-side cascades immediately
+    await fetchIncidents(false);
+  } catch (e: any) {
     console.error("Error resolving incident:", e);
+    showError(e?.data?.error || e?.message || "Error al resolver incidencia.");
+  } finally {
+    processingId.value = null;
   }
 };
 </script>

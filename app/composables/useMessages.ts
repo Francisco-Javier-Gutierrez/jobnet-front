@@ -1,6 +1,7 @@
 import { useRoute, useRuntimeConfig, useAuth } from "#imports";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useS3Upload } from "~/composables/useS3Upload";
+import { getAuthHeaders } from "~/composables/useApiClient";
 import { WebSocketClient, type WebSocketStatus } from "~/utils/wsClient";
 import type { ChatConversation, ChatMessage } from "~/types";
 
@@ -52,11 +53,9 @@ export const useMessages = () => {
     const role = (userRole.value || "").toUpperCase();
     return (
       role === "ORGANIZACION" ||
-      role === "EMPRESA" ||
-      role === "COMPANY" ||
-      role === "ORGANIZATION" ||
       role === "ADMIN" ||
-      role === "MODERATOR"
+      role === "MODERATOR" ||
+      role === "MODERADOR"
     );
   });
 
@@ -219,14 +218,7 @@ export const useMessages = () => {
     isLoadingChats.value = true;
 
     try {
-      const token =
-        (session.value as any)?.idToken ||
-        (session.value as any)?.accessToken ||
-        "";
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
+      const headers = getAuthHeaders();
 
       const list: ChatConversation[] = [];
       const allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`, {

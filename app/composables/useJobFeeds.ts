@@ -190,11 +190,11 @@ export function useJobFeeds() {
     const author = session.value?.user?.name || "Usuario JobNet";
     let role = "Candidato";
     const userRole = (session.value?.user as any)?.tipoUsuario;
-    if (userRole === "EMPRESA") {
+    if (userRole === "ORGANIZACION") {
       role = "Organización";
     } else if (userRole === "ADMIN") {
       role = "Admin";
-    } else if (userRole === "MODERATOR") {
+    } else if (userRole === "MODERATOR" || userRole === "MODERADOR") {
       role = "Moderador";
     }
 
@@ -635,7 +635,7 @@ export function useJobFeeds() {
     if (status.value !== "authenticated") return false;
     if (node.user === session.value?.user?.name) return true;
     const role = (session.value?.user as any)?.tipoUsuario?.toUpperCase();
-    return role === "ADMIN" || role === "MODERATOR";
+    return role === "ADMIN" || role === "MODERATOR" || role === "MODERADOR";
   };
 
   const deleteComment = async (id: string) => {

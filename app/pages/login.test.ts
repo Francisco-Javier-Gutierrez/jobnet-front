@@ -42,7 +42,7 @@ describe("Autenticación de Candidatos e Inicio de Sesión con Google", () => {
         if (!res?.error) {
           if (userRole === "CANDIDATO") {
             routerPushMock("/");
-          } else if (userRole === "EMPRESA") {
+          } else if (userRole === "ORGANIZACION") {
             routerPushMock("/applicants");
           } else if (userRole === "ADMIN") {
             routerPushMock("/admin");
