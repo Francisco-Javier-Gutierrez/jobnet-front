@@ -386,7 +386,8 @@ export default NuxtAuthHandler({
             scopes.some(
               (s: string) => s.includes("moderator") || s.includes("mod"),
             ) ||
-            customRole === "MODERATOR"
+            customRole === "MODERATOR" ||
+            customRole === "MODERADOR"
           )
             cognitoRole = "MODERATOR";
           else if (

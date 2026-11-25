@@ -382,6 +382,7 @@
 
 <script setup lang="ts">
 import { useAuth, useRuntimeConfig, useRouter } from "#imports";
+import { getAuthHeaders } from "~/composables/useApiClient";
 
 // definePageMeta removed for mock
 
@@ -443,6 +444,7 @@ const fetchApplications = async () => {
 
     const apps = await $fetch<any[]>(
       `${config.public.apiUrl}/applications?candidateId=${candidateId}`,
+      { headers: getAuthHeaders() },
     ).catch(() => []);
 
     if (apps && apps.length > 0) {

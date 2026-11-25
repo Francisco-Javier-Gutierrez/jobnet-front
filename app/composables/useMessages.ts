@@ -3,6 +3,7 @@ import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useMockSession } from "~/composables/useMockSession";
 import { MOCK_CHATS, MOCK_MESSAGES_TECHSOLUTIONS } from "~/utils/mockData";
 import { useS3Upload } from "~/composables/useS3Upload";
+import { getAuthHeaders } from "~/composables/useApiClient";
 import { WebSocketClient, type WebSocketStatus } from "~/utils/wsClient";
 import type { ChatConversation, ChatMessage } from "~/types";
 
@@ -228,14 +229,7 @@ const { isMockEnabled } = useMockSession();
     }
 
     try {
-      const token =
-        (session.value as any)?.idToken ||
-        (session.value as any)?.accessToken ||
-        "";
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
+      const headers = getAuthHeaders();
 
       const list: ChatConversation[] = [];
       const allJobs = await $fetch<any[]>(`${config.public.apiUrl}/jobs`, {
