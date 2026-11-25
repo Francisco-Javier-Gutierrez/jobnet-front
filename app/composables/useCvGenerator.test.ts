@@ -1,12 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ref } from "vue";
-import { useCvGenerator, CV_COLOR_THEMES } from "./useCvGenerator";
+import {
+  useCvGenerator,
+  CV_COLOR_THEMES,
+  QUICK_STAR_VERBS,
+  getCvBaseFontSize,
+  hasActionVerb,
+  appendActionVerb,
+  waitForElementAssets,
+  resolveCvPrintTarget,
+  cleanupNativePrintRoot,
+  sanitizePdfCloneNode,
+  buildLetterPdfFromCanvas,
+  PRINT_ROOT_ID,
+} from "./useCvGenerator";
 
 // Setup global mocks for Nuxt auto-imports
 const mockShowSuccess = vi.fn();
 const mockShowError = vi.fn();
 const mockUploadFile = vi.fn();
 const mockFetch = vi.fn();
+const mockWindowPrint = vi.fn();
 
 vi.mock("~/stores/upload", () => ({
   useUploadStore: () => ({
@@ -21,28 +35,24 @@ vi.mock("~/composables/useAppFeedback", () => ({
   }),
 }));
 
-// Mock html2pdf.js
+// Mock modern-screenshot & jspdf (Option A Blob pipeline)
+const mockDomToCanvas = vi.fn();
 const mockSetProperties = vi.fn();
-const mockPdfInstance = {
-  setProperties: mockSetProperties,
-};
+const mockAddPage = vi.fn();
+const mockAddImage = vi.fn();
+const mockPdfOutput = vi.fn();
 
-const mockWorker: any = {
-  set: vi.fn().mockReturnThis(),
-  from: vi.fn().mockReturnThis(),
-  toPdf: vi.fn().mockReturnThis(),
-  get: vi.fn().mockReturnThis(),
-  then: vi.fn().mockImplementation((cb: any) => {
-    cb(mockPdfInstance);
-    return mockWorker;
-  }),
-  output: vi
-    .fn()
-    .mockResolvedValue(new Blob(["mock-pdf"], { type: "application/pdf" })),
-};
+let currentPdfInstance: any;
+const mockJsPdfCtor = vi.fn(function () {
+  return currentPdfInstance;
+});
 
-vi.mock("html2pdf.js", () => ({
-  default: () => mockWorker,
+vi.mock("modern-screenshot", () => ({
+  domToCanvas: (...args: any[]) => mockDomToCanvas(...args),
+}));
+
+vi.mock("jspdf", () => ({
+  jsPDF: mockJsPdfCtor,
 }));
 
 // Nuxt globals
@@ -55,9 +65,47 @@ vi.mock("html2pdf.js", () => ({
 describe("useCvGenerator & RF-123 Anonymous Mode", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockWorker.set.mockReturnThis();
-    mockWorker.from.mockReturnThis();
-    mockWorker.toPdf.mockReturnThis();
+    cleanupNativePrintRoot("JobNet Test");
+
+    currentPdfInstance = {
+      internal: {
+        pageSize: {
+          getWidth: () => 215.9,
+          getHeight: () => 279.4,
+        },
+      },
+      setProperties: mockSetProperties,
+      addPage: mockAddPage,
+      addImage: mockAddImage,
+      output: mockPdfOutput,
+    };
+
+    mockPdfOutput.mockReturnValue(
+      new Blob(["mock-pdf"], { type: "application/pdf" }),
+    );
+
+    const mockCapturedCanvas = document.createElement("canvas");
+    mockCapturedCanvas.width = 1632;
+    mockCapturedCanvas.height = 2108;
+    mockDomToCanvas.mockResolvedValue(mockCapturedCanvas);
+
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(
+      () =>
+        ({
+          fillStyle: "#ffffff",
+          fillRect: vi.fn(),
+          drawImage: vi.fn(),
+        }) as any,
+    );
+    vi.spyOn(HTMLCanvasElement.prototype, "toDataURL").mockReturnValue(
+      "data:image/jpeg;base64,/9j/mock",
+    );
+
+    Object.defineProperty(window, "print", {
+      configurable: true,
+      writable: true,
+      value: mockWindowPrint,
+    });
   });
 
   describe("CV_COLOR_THEMES", () => {
@@ -220,7 +268,7 @@ describe("useCvGenerator & RF-123 Anonymous Mode", () => {
     });
   });
 
-  describe("generatePdfBlob & metadata sanitization", () => {
+  describe("generatePdfBlob & metadata sanitization (Option A)", () => {
     const { generatePdfBlob } = useCvGenerator();
 
     it("should generate a blob and set sanitized PDF properties when metadata is provided", async () => {
@@ -232,6 +280,15 @@ describe("useCvGenerator & RF-123 Anonymous Mode", () => {
       });
 
       expect(blob).toBeInstanceOf(Blob);
+      expect(mockDomToCanvas).toHaveBeenCalledWith(
+        dummyElement,
+        expect.objectContaining({
+          width: 816,
+          height: 1054,
+          scale: 2,
+          backgroundColor: "#ffffff",
+        }),
+      );
       expect(mockSetProperties).toHaveBeenCalledWith(
         expect.objectContaining({
           title: "Curriculum Vitae Anónimo",
@@ -241,6 +298,7 @@ describe("useCvGenerator & RF-123 Anonymous Mode", () => {
         }),
       );
     });
+
     it("should throw error when called on server without window", async () => {
       const originalWindow = (globalThis as any).window;
       // @ts-ignore
@@ -256,13 +314,15 @@ describe("useCvGenerator & RF-123 Anonymous Mode", () => {
       const dummy = document.createElement("div");
       const blob = await generatePdfBlob(dummy);
       expect(blob).toBeInstanceOf(Blob);
+      expect(mockSetProperties).not.toHaveBeenCalled();
     });
 
-    it("should handle pdf instance without setProperties gracefully", async () => {
-      mockWorker.then.mockImplementationOnce((cb: any) => {
-        cb({}); // no setProperties
-        return mockWorker;
-      });
+    it("should handle pdf instance without setProperties or internal pageSize gracefully", async () => {
+      currentPdfInstance = {
+        addPage: mockAddPage,
+        addImage: mockAddImage,
+        output: mockPdfOutput,
+      };
       const dummy = document.createElement("div");
       const blob = await generatePdfBlob(dummy, "test.pdf", { title: "Test" });
       expect(blob).toBeInstanceOf(Blob);
@@ -285,34 +345,81 @@ describe("useCvGenerator & RF-123 Anonymous Mode", () => {
       );
     });
 
-    it("should handle null pdf instance gracefully", async () => {
-      mockWorker.then.mockImplementationOnce((cb: any) => {
-        cb(null);
-        return mockWorker;
-      });
-      const dummy = document.createElement("div");
-      const blob = await generatePdfBlob(dummy, "test.pdf", { title: "Test" });
+    it("should resolve .cv-letter-page child and use explicit unscaled dimensions when available", async () => {
+      const wrapper = document.createElement("div");
+      const page = document.createElement("div");
+      page.className = "cv-letter-page";
+      Object.defineProperty(page, "offsetWidth", { value: 820 });
+      Object.defineProperty(page, "scrollHeight", { value: 1120 });
+      wrapper.appendChild(page);
+
+      const blob = await generatePdfBlob(wrapper, "Exact.pdf");
       expect(blob).toBeInstanceOf(Blob);
-    });
-  });
-
-  describe("downloadPdf", () => {
-    const { downloadPdf } = useCvGenerator();
-
-    it("should work with default arguments", async () => {
-      const dummyElement = document.createElement("div");
-      await downloadPdf(dummyElement);
-      expect(mockShowSuccess).toHaveBeenCalledWith(
-        "CV Descargado",
-        expect.any(String),
-        expect.any(Number),
+      expect(mockDomToCanvas).toHaveBeenCalledWith(
+        page,
+        expect.objectContaining({ width: 820, height: 1120 }),
       );
     });
 
-    it("should download standard PDF with candidate name in filename", async () => {
+    it("should fall back to offsetHeight when scrollHeight is 0", async () => {
+      const page = document.createElement("div");
+      page.className = "cv-letter-page";
+      Object.defineProperty(page, "offsetWidth", { value: 816 });
+      Object.defineProperty(page, "scrollHeight", { value: 0 });
+      Object.defineProperty(page, "offsetHeight", { value: 1060 });
+
+      await generatePdfBlob(page, "FallbackHeight.pdf");
+      expect(mockDomToCanvas).toHaveBeenCalledWith(
+        page,
+        expect.objectContaining({ width: 816, height: 1060 }),
+      );
+    });
+  });
+
+  describe("downloadPdf (Option B Native Vector Print)", () => {
+    const { downloadPdf } = useCvGenerator();
+
+    it("should throw error when called on server without window", async () => {
+      const originalWindow = (globalThis as any).window;
+      // @ts-ignore
+      delete (globalThis as any).window;
+      const dummy = document.createElement("div");
+      await expect(downloadPdf(dummy)).rejects.toThrow(
+        "PDF generation is only supported in browser client.",
+      );
+      (globalThis as any).window = originalWindow;
+    });
+
+    it("should work with default arguments and clean up print root on afterprint", async () => {
+      document.title = "JobNet Profile";
+      const dummyElement = document.createElement("div");
+      dummyElement.className = "cv-letter-page";
+      dummyElement.style.margin = "12px";
+
+      await downloadPdf(dummyElement);
+
+      expect(mockWindowPrint).toHaveBeenCalledTimes(1);
+      expect(document.body.classList.contains("cv-printing")).toBe(true);
+      expect(document.getElementById(PRINT_ROOT_ID)).not.toBeNull();
+      expect(document.title).toBe("CV_Candidato_Carta");
+      expect(mockShowSuccess).toHaveBeenCalledWith(
+        "CV Descargado",
+        expect.stringContaining("tamaño Carta"),
+        expect.any(Number),
+      );
+
+      window.dispatchEvent(new Event("afterprint"));
+      expect(document.body.classList.contains("cv-printing")).toBe(false);
+      expect(document.getElementById(PRINT_ROOT_ID)).toBeNull();
+      expect(document.title).toBe("JobNet Profile");
+    });
+
+    it("should print standard PDF with candidate name in document title", async () => {
       const dummyElement = document.createElement("div");
       await downloadPdf(dummyElement, "María López", false);
 
+      expect(mockWindowPrint).toHaveBeenCalledTimes(1);
+      expect(document.title).toBe("CV_María_López_Carta");
       expect(mockShowSuccess).toHaveBeenCalledWith(
         "CV Descargado",
         expect.stringContaining("tamaño Carta"),
@@ -320,14 +427,33 @@ describe("useCvGenerator & RF-123 Anonymous Mode", () => {
       );
     });
 
-    it("should download anonymous PDF with sanitized filename and impartial feedback (RF-123)", async () => {
+    it("should print anonymous PDF with sanitized title and impartial feedback (RF-123)", async () => {
       const dummyElement = document.createElement("div");
       await downloadPdf(dummyElement, "María López", true);
 
+      expect(mockWindowPrint).toHaveBeenCalledTimes(1);
+      expect(document.title).toBe("CV_Anonimo_Carta");
       expect(mockShowSuccess).toHaveBeenCalledWith(
         "CV Anónimo Descargado",
         expect.stringContaining("Modo Anónimo"),
         expect.any(Number),
+      );
+    });
+
+    it("handles errors during print setup gracefully without leaving dangling afterprint listeners", async () => {
+      const removeSpy = vi.spyOn(window, "removeEventListener");
+      const badEl = {
+        querySelector: () => {
+          throw new Error("Print target failure");
+        },
+      } as unknown as HTMLElement;
+
+      await expect(downloadPdf(badEl, "Ana", false)).rejects.toThrow(
+        "Print target failure",
+      );
+      expect(removeSpy).toHaveBeenCalledWith(
+        "afterprint",
+        expect.any(Function),
       );
     });
   });
@@ -567,6 +693,153 @@ describe("useCvGenerator & RF-123 Anonymous Mode", () => {
         "Desarrollador Full Stack con 5 años de experiencia.",
       );
       expect(anonData.skills).toEqual(["Node.js", "Vue.js", "PostgreSQL"]);
+    });
+  });
+
+  describe("STAR Verbs Deduplication Helpers", () => {
+    it("exports accented Spanish STAR verbs including Automaticé", () => {
+      expect(QUICK_STAR_VERBS).toContain("Lideré");
+      expect(QUICK_STAR_VERBS).toContain("Automaticé");
+    });
+
+    it("detects existing action verbs accent- and case-insensitively without false substring matches", () => {
+      expect(hasActionVerb(undefined, "Lideré")).toBe(false);
+      expect(hasActionVerb("Texto", "")).toBe(false);
+      expect(hasActionVerb("• Lideré equipo de 5 devs", "Lideré")).toBe(true);
+      expect(hasActionVerb("• Automaticé pipelines CI/CD", "automatice")).toBe(
+        true,
+      );
+      expect(hasActionVerb("• Automatice pruebas E2E", "Automaticé")).toBe(
+        true,
+      );
+      expect(hasActionVerb("• Colaboré con QA", "Lideré")).toBe(false);
+    });
+
+    it("appends verb once and prevents duplicate insertion", () => {
+      const first = appendActionVerb("", "Lideré");
+      expect(first).toEqual({ text: "• Lideré ", inserted: true });
+
+      const second = appendActionVerb(first.text, "Lideré");
+      expect(second).toEqual({ text: "• Lideré ", inserted: false });
+
+      const third = appendActionVerb("• Diseñé API REST\n  ", "Automaticé");
+      expect(third).toEqual({
+        text: "• Diseñé API REST\n• Automaticé ",
+        inserted: true,
+      });
+
+      expect(appendActionVerb(undefined, "")).toEqual({
+        text: "",
+        inserted: false,
+      });
+    });
+  });
+
+  describe("getCvBaseFontSize", () => {
+    it("returns proportional base font sizes for standard and compact templates", () => {
+      expect(getCvBaseFontSize("sm")).toBe("10.5px");
+      expect(getCvBaseFontSize("base")).toBe("12px");
+      expect(getCvBaseFontSize("lg")).toBe("13.5px");
+      expect(getCvBaseFontSize()).toBe("12px");
+
+      expect(getCvBaseFontSize("sm", true)).toBe("9.5px");
+      expect(getCvBaseFontSize("base", true)).toBe("11px");
+      expect(getCvBaseFontSize("lg", true)).toBe("12.5px");
+      expect(getCvBaseFontSize(undefined, true)).toBe("11px");
+    });
+  });
+
+  describe("PDF 1:1 Fidelity Helpers", () => {
+    it("waits for document fonts and pending images before PDF capture", async () => {
+      const origFonts = Object.getOwnPropertyDescriptor(document, "fonts");
+      Object.defineProperty(document, "fonts", {
+        configurable: true,
+        value: { ready: Promise.resolve() },
+      });
+
+      const container = document.createElement("div");
+      const completeImg = document.createElement("img");
+      Object.defineProperty(completeImg, "complete", { value: true });
+
+      const loadingImg = document.createElement("img");
+      Object.defineProperty(loadingImg, "complete", { value: false });
+
+      const brokenImg = document.createElement("img");
+      Object.defineProperty(brokenImg, "complete", { value: false });
+
+      container.append(completeImg, loadingImg, brokenImg);
+
+      const pending = waitForElementAssets(container);
+      loadingImg.dispatchEvent(new Event("load"));
+      brokenImg.dispatchEvent(new Event("error"));
+      await expect(pending).resolves.toBeUndefined();
+
+      if (origFonts) {
+        Object.defineProperty(document, "fonts", origFonts);
+      } else {
+        delete (document as any).fonts;
+      }
+    });
+
+    it("resolves print target, normalizes cloned nodes, and cleans print host safely", () => {
+      const page = document.createElement("div");
+      page.className = "cv-letter-page";
+      expect(resolveCvPrintTarget(page)).toBe(page);
+
+      const wrapper = document.createElement("div");
+      wrapper.appendChild(page);
+      expect(resolveCvPrintTarget(wrapper)).toBe(page);
+
+      const plain = document.createElement("div");
+      expect(resolveCvPrintTarget(plain)).toBe(plain);
+
+      page.style.margin = "20px";
+      page.style.boxShadow = "0 4px 10px black";
+      page.style.transform = "scale(0.75)";
+      sanitizePdfCloneNode(page);
+      expect(page.style.margin).toBe("0px");
+      expect(page.style.boxShadow).toBe("none");
+      expect(page.style.transform).toBe("none");
+
+      // Safely ignores non-HTMLElement nodes
+      sanitizePdfCloneNode(document.createTextNode("text"));
+
+      const origDocument = globalThis.document;
+      // @ts-ignore
+      delete (globalThis as any).document;
+      expect(() => cleanupNativePrintRoot()).not.toThrow();
+      (globalThis as any).document = origDocument;
+    });
+
+    it("slices single, tolerance-adjusted, and multi-page Carta PDFs cleanly via buildLetterPdfFromCanvas", () => {
+      const smallOverflowCanvas = document.createElement("canvas");
+      smallOverflowCanvas.width = 1632;
+      // rawPxPageHeight = floor(279.4 * (1632 / 215.9)) = 2112; 2116 is within 6px tolerance -> fits 1 page
+      smallOverflowCanvas.height = 2116;
+
+      buildLetterPdfFromCanvas(mockJsPdfCtor as any, smallOverflowCanvas);
+      expect(mockAddPage).not.toHaveBeenCalled();
+      expect(mockAddImage).toHaveBeenCalledTimes(1);
+
+      vi.clearAllMocks();
+      const multiPageCanvas = document.createElement("canvas");
+      multiPageCanvas.width = 1632;
+      multiPageCanvas.height = 4200;
+
+      buildLetterPdfFromCanvas(mockJsPdfCtor as any, multiPageCanvas);
+      expect(mockAddPage).toHaveBeenCalledTimes(1);
+      expect(mockAddImage).toHaveBeenCalledTimes(2);
+
+      // Handles unavailable 2D context & zero width gracefully
+      vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValueOnce(
+        null,
+      );
+      const zeroWidthCanvas = { width: 0, height: 100 } as HTMLCanvasElement;
+      const fallbackBlob = buildLetterPdfFromCanvas(
+        mockJsPdfCtor as any,
+        zeroWidthCanvas,
+      );
+      expect(fallbackBlob).toBeInstanceOf(Blob);
     });
   });
 });
