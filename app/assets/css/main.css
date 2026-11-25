@@ -140,3 +140,128 @@ select:-webkit-autofill:active {
 .fill-1 {
   font-variation-settings: "FILL" 1;
 }
+
+/* ==============================================================================
+   CV Builder Letter Page Typography & HTML/PDF 1:1 Fidelity
+   ============================================================================== */
+.cv-letter-page {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-wrap: break-word;
+}
+
+.cv-letter-page *,
+.cv-letter-page *::before,
+.cv-letter-page *::after {
+  box-sizing: border-box;
+}
+
+/* Proportional em scale so Compacto / Estándar / Amplio affect all text sizes */
+.cv-letter-page .text-2xl {
+  font-size: 2em;
+  line-height: 1.3;
+}
+.cv-letter-page .text-xl {
+  font-size: 1.6667em;
+  line-height: 1.35;
+}
+.cv-letter-page .text-sm {
+  font-size: 1.1667em;
+  line-height: 1.4286;
+}
+.cv-letter-page .text-xs {
+  font-size: 1em;
+  line-height: 1.4;
+}
+.cv-letter-page .text-\[11px\] {
+  font-size: 0.9167em;
+}
+.cv-letter-page .text-\[10px\] {
+  font-size: 0.8333em;
+}
+.cv-letter-page .text-\[9px\] {
+  font-size: 0.75em;
+}
+.cv-letter-page .text-\[8px\] {
+  font-size: 0.6667em;
+}
+
+/* Preserve explicit leading-* classes at matching specificity */
+.cv-letter-page .leading-none {
+  line-height: 1;
+}
+.cv-letter-page .leading-tight {
+  line-height: 1.25;
+}
+.cv-letter-page .leading-snug {
+  line-height: 1.375;
+}
+.cv-letter-page .leading-normal {
+  line-height: 1.5;
+}
+.cv-letter-page .leading-relaxed {
+  line-height: 1.625;
+}
+
+/* Prevent orphaned headings and split images in multi-page PDF exports */
+.cv-letter-page h1,
+.cv-letter-page h2,
+.cv-letter-page h3 {
+  break-after: avoid;
+  page-break-after: avoid;
+}
+.cv-letter-page img {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Native 1:1 Vector Carta Print Host (Option B) */
+#cv-native-print-root {
+  display: none;
+}
+
+@page {
+  size: letter portrait;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 215.9mm !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  body.cv-printing > *:not(#cv-native-print-root) {
+    display: none !important;
+  }
+
+  #cv-native-print-root {
+    display: block !important;
+    position: static !important;
+    width: 215.9mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  #cv-native-print-root,
+  #cv-native-print-root * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #cv-native-print-root .cv-letter-page {
+    margin: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    width: 215.9mm !important;
+    min-height: 278.5mm !important;
+  }
+}

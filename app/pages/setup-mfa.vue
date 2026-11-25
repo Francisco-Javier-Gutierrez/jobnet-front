@@ -265,7 +265,7 @@ const userRole = computed<string>(() => {
   const tipo = (
     (sessionData.value?.user as any)?.tipoUsuario || ""
   ).toUpperCase();
-  if (tipo === "ORGANIZACION" || tipo === "EMPRESA") return "organization";
+  if (tipo === "ORGANIZACION") return "organization";
   return "candidate";
 });
 
@@ -401,16 +401,20 @@ const handleSetupVerify = async () => {
 
     // 2. Save mfaConfigured & mfaEnabled in user profile in DynamoDB
     if (status.value === "authenticated" && sessionData.value?.user?.id) {
-      await $fetch(
-        `${config.public.apiUrl}/profile/${sessionData.value.user.id}`,
-        {
-          method: "POST",
-          body: {
-            mfaConfigured: true,
-            mfaEnabled: true,
-          },
+      const token =
+        (sessionData.value as any)?.idToken ||
+        (sessionData.value as any)?.accessToken;
+      await apiFetch(`/profile/${sessionData.value.user.id}`, {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          "x-user-id": sessionData.value.user.id,
         },
-      );
+        body: {
+          mfaConfigured: true,
+          mfaEnabled: true,
+        },
+      });
     }
 
     successMessage.value =
@@ -420,6 +424,7 @@ const handleSetupVerify = async () => {
     }, 1500);
   } catch (error: any) {
     errorMessage.value =
+      error.data?.error ||
       error.data?.message ||
       error.message ||
       "Error al intentar activar MFA en Cognito";

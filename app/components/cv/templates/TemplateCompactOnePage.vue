@@ -1,9 +1,9 @@
 <template>
   <div
-    class="cv-letter-page cv-template-compact text-slate-900 bg-white shadow-lg mx-auto p-6 flex flex-col justify-between font-sans leading-tight"
+    class="cv-letter-page cv-template-compact text-slate-900 bg-white mx-auto p-6 flex flex-col justify-between font-sans leading-tight"
     :style="{
       width: '215.9mm',
-      minHeight: '279.4mm',
+      minHeight: '278.5mm',
       fontSize: fontSizePx,
     }"
   >
@@ -188,6 +188,7 @@
 
 <script setup lang="ts">
 import type { CvData, CvOptions } from "~/types/cv";
+import { getCvBaseFontSize } from "~/composables/useCvGenerator";
 
 const props = defineProps<{
   cv: CvData;
@@ -195,16 +196,13 @@ const props = defineProps<{
   primaryColor?: string;
 }>();
 
-const fontSizePx = computed(() => {
-  if (props.options.fontSize === "sm") return "10px";
-  if (props.options.fontSize === "lg") return "12px";
-  return "11px";
-});
+const fontSizePx = computed(() =>
+  getCvBaseFontSize(props.options.fontSize, true),
+);
 </script>
 
 <style scoped>
 .cv-letter-page {
   box-sizing: border-box;
-  page-break-after: always;
 }
 </style>

@@ -238,6 +238,19 @@
       @select-tab="companyTab = $event"
     />
 
+    <!-- Ficha de Datos Corporativos visible en primer plano (homogéneo con perfil de candidato cuando es propietario) -->
+    <section
+      v-if="isOwner"
+      class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] p-6 md:p-8 space-y-6 mb-6 border border-outline-variant/60"
+    >
+      <CompanyAboutSection
+        :company="company"
+        :web-links="webLinks"
+        @preview-doc="previewCompanyDoc"
+      />
+    </section>
+
+    <!-- Pestañas inferiores de actividad: Vacantes vigentes / Mis publicaciones / Guardados / Verificación -->
     <CompanyLists
       :company-tab="companyTab"
       :company="company"
@@ -245,6 +258,7 @@
       :web-links="webLinks"
       :company-posts="companyPosts"
       :company-bookmarked-posts="companyBookmarkedPosts"
+      :company-bookmarked-jobs="companyBookmarkedJobs"
       :loading-company-posts="loadingCompanyPosts"
       :current-user-id="currentUserId"
       @update:company-tab="companyTab = $event"
@@ -267,7 +281,7 @@
     <!-- Report Company Modal -->
     <ReportModal
       :is-open="showReportCompanyModal"
-      target-type="EMPRESA"
+      target-type="ORGANIZACION"
       :target-id="companyId"
       :target-title="company.name"
       @close="showReportCompanyModal = false"
@@ -290,6 +304,7 @@
 import { useCompanyProfile } from "~/composables/useCompanyProfile";
 import { useOrgActions } from "~/composables/useOrgActions";
 import SanctionModal from "~/components/admin/organizations/SanctionModal.vue";
+import CompanyAboutSection from "~/components/profiles/CompanyAboutSection.vue";
 
 const {
   companyId,
@@ -301,6 +316,7 @@ const {
   loadingCompanyPosts,
   companyPosts,
   companyBookmarkedPosts,
+  companyBookmarkedJobs,
   currentUserId,
   showReportCompanyModal,
   isPdfModalOpen,

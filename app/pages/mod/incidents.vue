@@ -52,7 +52,7 @@
     />
 
     <!-- Incidents Panel Component -->
-    <IncidentsPanel />
+    <IncidentsPanel ref="incidentsPanelRef" />
 
     <!-- Sanction Modal (Intervención y Pausa Preventiva en 3 Fases) -->
     <SanctionModal
@@ -87,6 +87,8 @@ const {
   refresh: refreshAnomalies,
 } = useModeratorAnomalies();
 
+const incidentsPanelRef = ref<any>(null);
+
 const {
   isSanctionModalOpen,
   selectedOrg,
@@ -97,7 +99,10 @@ const {
   applySanction,
   successMsg,
 } = useOrgActions(async () => {
-  await refreshAnomalies();
+  await Promise.all([
+    refreshAnomalies(),
+    incidentsPanelRef.value?.fetchIncidents?.(),
+  ]);
 });
 
 const handlePreventivePause = (org: {

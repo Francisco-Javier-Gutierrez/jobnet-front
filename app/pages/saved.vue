@@ -1,6 +1,6 @@
 <template>
   <main
-    class="w-full max-w-container-max mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16 space-y-6"
+    class="w-full max-w-4xl mx-auto md:px-gutter md:py-8 px-margin-mobile pb-16 space-y-6"
   >
     <!-- Header del Panel Personal de Favoritos -->
     <header
@@ -187,7 +187,7 @@
           >
         </div>
 
-        <div class="grid grid-cols-1 gap-4">
+        <div class="max-w-3xl mx-auto w-full space-y-4">
           <JobCard
             v-for="job in bookmarkedJobs"
             :key="job.id || job.uniqueId"
@@ -225,7 +225,7 @@
           >
         </div>
 
-        <div class="grid grid-cols-1 gap-4">
+        <div class="max-w-xl mx-auto w-full space-y-4">
           <PostCard
             v-for="post in bookmarkedPosts"
             :key="post.uniqueId"
@@ -303,29 +303,97 @@ watch(
   (val: any) => {
     if (val) {
       if (Array.isArray(val.posts) && val.posts.length > 0) {
-        bookmarkedPosts.value = val.posts;
+        bookmarkedPosts.value = val.posts.map((p: any) => ({
+          ...p,
+          isLiked:
+            p.isLiked !== undefined
+              ? Boolean(p.isLiked)
+              : Array.isArray(p.likesList) && currentUserId.value
+                ? p.likesList.includes(currentUserId.value)
+                : false,
+          likesCount:
+            typeof p.likesCount === "number"
+              ? p.likesCount
+              : typeof p.likes === "number"
+                ? p.likes
+                : Array.isArray(p.likesList)
+                  ? p.likesList.length
+                  : 0,
+        }));
       } else if (Array.isArray(val.data)) {
-        bookmarkedPosts.value = val.data.filter(
-          (i: any) =>
-            (i.PK && i.PK.startsWith("POST#")) ||
-            i.uniqueId ||
-            (i.content && !i.modalidad),
-        );
+        bookmarkedPosts.value = val.data
+          .filter(
+            (i: any) =>
+              (i.PK && i.PK.startsWith("POST#")) ||
+              i.uniqueId ||
+              (i.content && !i.modalidad),
+          )
+          .map((p: any) => ({
+            ...p,
+            isLiked:
+              p.isLiked !== undefined
+                ? Boolean(p.isLiked)
+                : Array.isArray(p.likesList) && currentUserId.value
+                  ? p.likesList.includes(currentUserId.value)
+                  : false,
+            likesCount:
+              typeof p.likesCount === "number"
+                ? p.likesCount
+                : typeof p.likes === "number"
+                  ? p.likes
+                  : Array.isArray(p.likesList)
+                    ? p.likesList.length
+                    : 0,
+          }));
       } else {
         bookmarkedPosts.value = [];
       }
 
       if (Array.isArray(val.jobs) && val.jobs.length > 0) {
-        bookmarkedJobs.value = val.jobs;
+        bookmarkedJobs.value = val.jobs.map((j: any) => ({
+          ...j,
+          isLiked:
+            j.isLiked !== undefined
+              ? Boolean(j.isLiked)
+              : Array.isArray(j.likesList) && currentUserId.value
+                ? j.likesList.includes(currentUserId.value)
+                : false,
+          likesCount:
+            typeof j.likesCount === "number"
+              ? j.likesCount
+              : typeof j.likes === "number"
+                ? j.likes
+                : Array.isArray(j.likesList)
+                  ? j.likesList.length
+                  : 0,
+        }));
       } else if (Array.isArray(val.data)) {
-        bookmarkedJobs.value = val.data.filter(
-          (i: any) =>
-            (i.PK && i.PK.startsWith("VACANCY#")) ||
-            i.empresaUuid !== undefined ||
-            i.modalidad !== undefined ||
-            i.salario !== undefined ||
-            i.title !== undefined,
-        );
+        bookmarkedJobs.value = val.data
+          .filter(
+            (i: any) =>
+              (i.PK && i.PK.startsWith("VACANCY#")) ||
+              i.empresaUuid !== undefined ||
+              i.modalidad !== undefined ||
+              i.salario !== undefined ||
+              i.title !== undefined,
+          )
+          .map((j: any) => ({
+            ...j,
+            isLiked:
+              j.isLiked !== undefined
+                ? Boolean(j.isLiked)
+                : Array.isArray(j.likesList) && currentUserId.value
+                  ? j.likesList.includes(currentUserId.value)
+                  : false,
+            likesCount:
+              typeof j.likesCount === "number"
+                ? j.likesCount
+                : typeof j.likes === "number"
+                  ? j.likes
+                  : Array.isArray(j.likesList)
+                    ? j.likesList.length
+                    : 0,
+          }));
       } else {
         bookmarkedJobs.value = [];
       }
@@ -364,37 +432,54 @@ const toggleJobBookmark = async (job: any) => {
   }
 };
 
-// Toggle Job Like
+// Toggle Job Like (Optimistic instant like increment/decrement)
 const toggleJobLike = async (job: any) => {
   if (!currentUserId.value) return;
+  const uid = currentUserId.value;
   if (!job.likesList) job.likesList = [];
 
-  const jId = job.id || job.uniqueId;
-  const idx = job.likesList.indexOf(currentUserId.value);
-  if (idx !== -1) {
-    job.likesList.splice(idx, 1);
-    if (typeof job.likesCount === "number") {
-      job.likesCount = Math.max(0, job.likesCount - 1);
-    }
-    job.isLiked = false;
-  } else {
-    job.likesList.push(currentUserId.value);
-    if (typeof job.likesCount === "number") {
-      job.likesCount = job.likesCount + 1;
-    } else {
-      job.likesCount = job.likesList.length;
-    }
-    job.isLiked = true;
-  }
-  job.likes = job.likesList.length;
+  const wasLiked = Boolean(
+    job.isLiked ||
+    (Array.isArray(job.likesList) && job.likesList.includes(uid)),
+  );
 
+  if (wasLiked) {
+    job.isLiked = false;
+    job.likesList = job.likesList.filter((id: string) => id !== uid);
+    job.likesCount = Math.max(
+      0,
+      (typeof job.likesCount === "number"
+        ? job.likesCount
+        : job.likesList.length + 1) - 1,
+    );
+  } else {
+    job.isLiked = true;
+    if (!job.likesList.includes(uid)) job.likesList.push(uid);
+    job.likesCount =
+      (typeof job.likesCount === "number"
+        ? job.likesCount
+        : job.likesList.length - 1) + 1;
+  }
+  job.likes = job.likesCount;
+
+  const jId = job.id || job.uniqueId;
   try {
     await $fetch(`/api/jobs/${jId}/like`, {
       method: "POST",
-      body: { userUuid: currentUserId.value },
+      body: { userUuid: uid, userId: uid },
     });
   } catch (e) {
     console.error("Error toggling job like:", e);
+    // Revert optimistic update on network error
+    job.isLiked = wasLiked;
+    if (wasLiked) {
+      if (!job.likesList.includes(uid)) job.likesList.push(uid);
+      job.likesCount = job.likesCount + 1;
+    } else {
+      job.likesList = job.likesList.filter((id: string) => id !== uid);
+      job.likesCount = Math.max(0, job.likesCount - 1);
+    }
+    job.likes = job.likesCount;
   }
 };
 
@@ -418,36 +503,54 @@ const togglePostBookmark = async (post: any) => {
   }
 };
 
-// Toggle Post Like
+// Toggle Post Like (Optimistic instant like increment/decrement)
 const togglePostLike = async (post: any) => {
   if (!currentUserId.value) return;
+  const uid = currentUserId.value;
   if (!post.likesList) post.likesList = [];
 
-  const idx = post.likesList.indexOf(currentUserId.value);
-  if (idx !== -1) {
-    post.likesList.splice(idx, 1);
-    if (typeof post.likesCount === "number") {
-      post.likesCount = Math.max(0, post.likesCount - 1);
-    }
-    post.isLiked = false;
-  } else {
-    post.likesList.push(currentUserId.value);
-    if (typeof post.likesCount === "number") {
-      post.likesCount = post.likesCount + 1;
-    } else {
-      post.likesCount = post.likesList.length;
-    }
-    post.isLiked = true;
-  }
-  post.likes = post.likesList.length;
+  const wasLiked = Boolean(
+    post.isLiked ||
+    (Array.isArray(post.likesList) && post.likesList.includes(uid)),
+  );
 
+  if (wasLiked) {
+    post.isLiked = false;
+    post.likesList = post.likesList.filter((id: string) => id !== uid);
+    post.likesCount = Math.max(
+      0,
+      (typeof post.likesCount === "number"
+        ? post.likesCount
+        : post.likesList.length + 1) - 1,
+    );
+  } else {
+    post.isLiked = true;
+    if (!post.likesList.includes(uid)) post.likesList.push(uid);
+    post.likesCount =
+      (typeof post.likesCount === "number"
+        ? post.likesCount
+        : post.likesList.length - 1) + 1;
+  }
+  post.likes = post.likesCount;
+
+  const pId = post.uniqueId || post.id;
   try {
-    await $fetch(`/api/posts/${post.uniqueId || post.id}/like`, {
+    await $fetch(`/api/posts/${pId}/like`, {
       method: "POST",
-      body: { userUuid: currentUserId.value },
+      body: { userUuid: uid, userId: uid },
     });
   } catch (e) {
     console.error("Error toggling post like:", e);
+    // Revert optimistic update on network error
+    post.isLiked = wasLiked;
+    if (wasLiked) {
+      if (!post.likesList.includes(uid)) post.likesList.push(uid);
+      post.likesCount = post.likesCount + 1;
+    } else {
+      post.likesList = post.likesList.filter((id: string) => id !== uid);
+      post.likesCount = Math.max(0, post.likesCount - 1);
+    }
+    post.likes = post.likesCount;
   }
 };
 </script>

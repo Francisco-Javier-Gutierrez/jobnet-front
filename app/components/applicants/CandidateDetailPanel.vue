@@ -46,6 +46,20 @@
             </div>
 
             <div class="flex items-center gap-2 flex-wrap">
+              <nuxt-link
+                v-if="
+                  ['EN_CONTACTO', 'SELECCIONADO', 'CONTRATADO'].includes(
+                    selectedCandidate.status,
+                  )
+                "
+                :to="`/messages?jobId=${selectedCandidate.jobId}&candidateId=${selectedCandidate.id}`"
+                class="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold flex items-center gap-1 transition shadow-sm"
+                title="Abrir chat en pantalla completa"
+              >
+                <span class="material-symbols-outlined text-sm">forum</span>
+                Chat
+              </nuxt-link>
+
               <button
                 v-if="
                   ['PENDIENTE', 'EN_CONTACTO', 'SELECCIONADO'].includes(
@@ -165,6 +179,29 @@
               )
             "
           >
+            <div
+              class="flex items-center justify-between pb-2 mb-2 border-b border-outline-variant/40 flex-shrink-0"
+            >
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-sky-500 text-base"
+                  >forum</span
+                >
+                <span
+                  class="text-xs font-bold text-on-background dark:text-slate-200"
+                  >Chat con {{ selectedCandidate.name }}</span
+                >
+              </div>
+              <nuxt-link
+                :to="`/messages?jobId=${selectedCandidate.jobId}&candidateId=${selectedCandidate.id}`"
+                class="text-[11px] font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 flex items-center gap-1 transition hover:underline"
+              >
+                <span>Abrir en Mensajería</span>
+                <span class="material-symbols-outlined text-xs"
+                  >open_in_new</span
+                >
+              </nuxt-link>
+            </div>
+
             <ChatDetail
               v-if="activeChat"
               v-model:newMessage="newMessage"
@@ -182,6 +219,16 @@
               @set-message-container="messageContainer = $event"
               @set-file-input="fileInput = $event"
             />
+            <div
+              v-else
+              class="flex-grow flex flex-col items-center justify-center p-6 text-center text-on-surface-variant dark:text-slate-400"
+            >
+              <span
+                class="material-symbols-outlined text-2xl text-sky-500 animate-spin mb-2"
+                >sync</span
+              >
+              <p class="text-xs font-medium">Cargando conversación...</p>
+            </div>
           </template>
           <template v-else>
             <div

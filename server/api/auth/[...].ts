@@ -386,7 +386,8 @@ export default NuxtAuthHandler({
             scopes.some(
               (s: string) => s.includes("moderator") || s.includes("mod"),
             ) ||
-            customRole === "MODERATOR"
+            customRole === "MODERATOR" ||
+            customRole === "MODERADOR"
           )
             cognitoRole = "MODERATOR";
           else if (
@@ -757,44 +758,47 @@ export default NuxtAuthHandler({
               .toUpperCase();
 
             if (
-              !isGoogleFederated &&
-              (groups.some(
+              groups.some(
                 (g: string) =>
                   g.toUpperCase() === "ADMIN" ||
                   g.toUpperCase().includes("ADMIN"),
               ) ||
-                scopes.some((s: string) => s.includes("admin")) ||
-                customRole === "ADMIN")
+              scopes.some((s: string) => s.includes("admin")) ||
+              customRole === "ADMIN" ||
+              token.nativeRole === "ADMIN"
             ) {
               token.tipoUsuario = "ADMIN";
             } else if (
-              !isGoogleFederated &&
-              (groups.some(
+              groups.some(
                 (g: string) =>
                   g.toUpperCase() === "MODERATOR" ||
+                  g.toUpperCase() === "MODERADOR" ||
                   g.toUpperCase().includes("MOD"),
               ) ||
-                scopes.some(
-                  (s: string) => s.includes("moderator") || s.includes("mod"),
-                ) ||
-                customRole === "MODERATOR")
+              scopes.some(
+                (s: string) => s.includes("moderator") || s.includes("mod"),
+              ) ||
+              customRole === "MODERATOR" ||
+              customRole === "MODERADOR" ||
+              token.nativeRole === "MODERATOR" ||
+              token.nativeRole === "MODERADOR"
             ) {
               token.tipoUsuario = "MODERATOR";
             } else if (
-              !isGoogleFederated &&
-              (groups.some(
+              groups.some(
                 (g: string) =>
                   g.toUpperCase() === "ORGANIZACION" ||
                   g.toUpperCase() === "EMPRESA" ||
                   g.toUpperCase() === "COMPANY",
               ) ||
-                scopes.some(
-                  (s: string) =>
-                    s.includes("organization") || s.includes("empresa"),
-                ) ||
-                customRole === "ORGANIZACION" ||
-                customRole === "EMPRESA" ||
-                customRole === "COMPANY")
+              scopes.some(
+                (s: string) =>
+                  s.includes("organization") || s.includes("empresa"),
+              ) ||
+              customRole === "ORGANIZACION" ||
+              customRole === "EMPRESA" ||
+              customRole === "COMPANY" ||
+              token.nativeRole === "ORGANIZACION"
             ) {
               token.tipoUsuario = "ORGANIZACION";
             } else if (

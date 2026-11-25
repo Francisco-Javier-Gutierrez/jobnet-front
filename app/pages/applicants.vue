@@ -76,6 +76,7 @@
     </div>
 
     <CandidateModals />
+    <ApplicantsAiComparisonModal />
 
     <!-- Standardized ATS Applicant Document Viewer -->
     <AppDocumentViewer
@@ -83,12 +84,13 @@
       :url="selectedPdfUrl"
       :title="`CV de ${selectedPdfCandidateName}`"
       :candidate-id="selectedPdfCandidateId"
+      :vacancy-title="selectedJobTitle"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useSeoMeta } from "#imports";
+import { useSeoMeta, computed } from "#imports";
 
 import { useApplicants } from "~/composables/useApplicants";
 import { useApplicantActions } from "~/composables/useApplicantActions";
@@ -110,8 +112,15 @@ const {
   selectedPdfUrl,
   selectedPdfCandidateName,
   selectedPdfCandidateId,
+  selectedJobId,
+  myJobs,
 } = applicants;
 const { successMsg } = actions;
+
+const selectedJobTitle = computed(() => {
+  const currentJob = myJobs.value.find((j) => j.id === selectedJobId.value);
+  return currentJob?.title || "Vacante seleccionada";
+});
 
 // Expose to template
 onMounted(async () => {

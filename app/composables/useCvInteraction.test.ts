@@ -110,4 +110,62 @@ describe("useCvInteraction", () => {
     const result = await notifyCvInteraction("cand-789");
     expect(result).toEqual({ success: false });
   });
+
+  it("should forward authorization headers if session has idToken", async () => {
+    mockSession.value = {
+      user: {
+        id: "recruiter-123",
+        role: "ORGANIZACION",
+        name: "Admin Org",
+        companyName: "Org Corp",
+      },
+      idToken: "test-auth-token-xyz",
+    };
+    mockFetch.mockResolvedValue({ success: true, sentPush: true });
+    const { notifyCvInteraction } = useCvInteraction();
+
+    const result = await notifyCvInteraction("cand-999");
+    expect(result.success).toBe(true);
+    expect(mockFetch).toHaveBeenCalledWith(
+      "https://api.jobnet.test/profile/cand-999/cv-interaction",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer test-auth-token-xyz",
+          "x-user-id": "recruiter-123",
+          "x-user-role": "ORGANIZACION",
+        }),
+      }),
+    );
+  });
+
+  it("should return false and not notify if the current user is a CANDIDATO", async () => {
+    mockSession.value = {
+      user: {
+        id: "cand-1",
+        role: "CANDIDATO",
+        tipoUsuario: "CANDIDATO",
+        name: "Juan Candidato",
+      },
+    };
+    const { notifyCvInteraction } = useCvInteraction();
+
+    const result = await notifyCvInteraction("cand-2");
+    expect(result.success).toBe(false);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("should return false and not notify if a user views their own CV", async () => {
+    mockSession.value = {
+      user: {
+        id: "same-user-id",
+        role: "ORGANIZACION",
+        name: "Owner",
+      },
+    };
+    const { notifyCvInteraction } = useCvInteraction();
+
+    const result = await notifyCvInteraction("same-user-id");
+    expect(result.success).toBe(false);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
 });

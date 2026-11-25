@@ -593,7 +593,7 @@ const canDeleteComment = (node: any) => {
   if (status.value !== "authenticated") return false;
   if (node.user === session.value?.user?.name) return true;
   const role = (session.value?.user as any)?.tipoUsuario?.toUpperCase();
-  return role === "ADMIN" || role === "MODERATOR";
+  return role === "ADMIN" || role === "MODERATOR" || role === "MODERADOR";
 };
 
 // Delete comment (prunes entirely if alone/reply, or placeholder if it has children)

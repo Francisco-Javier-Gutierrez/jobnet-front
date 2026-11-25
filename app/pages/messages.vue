@@ -44,7 +44,7 @@
 
     <!-- Main Chat/ATS Workspace Grid -->
     <div
-      class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl flex-grow overflow-hidden min-h-[550px] shadow-sm animate-fadeIn"
+      class="h-[calc(100dvh-11rem)] sm:h-[calc(100vh-10rem)] min-h-[520px] flex flex-col lg:grid lg:grid-cols-12 bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl flex-grow overflow-hidden shadow-sm animate-fadeIn"
     >
       <ChatList
         v-model:searchQuery="searchQuery"
@@ -69,6 +69,7 @@
         :closePreviewModal="closePreviewModal"
         :downloadAttachment="downloadAttachment"
         :formatTime="formatTime"
+        @back-to-list="activeChat = null"
         @handle-send="handleSend"
         @handle-file-upload="handleFileUpload"
         @cancel-staged-file="cancelStagedFile"

@@ -1,3 +1,5 @@
+import { getAuthHeaders } from "./useApiClient";
+
 export interface CvInteractionOptions {
   action?: "VIEW" | "DOWNLOAD" | "OPEN";
   recruiterName?: string;
@@ -16,11 +18,32 @@ export function useCvInteraction() {
   const notifyCvInteraction = async (
     candidateId: string,
     options: CvInteractionOptions = {},
-  ): Promise<{ success: boolean; sentPush?: boolean }> => {
+  ): Promise<{ success: boolean; sentPush?: boolean; notifId?: string }> => {
     if (!candidateId) return { success: false };
 
-    const action = options.action || "VIEW";
     const recruiterUser = (session.value?.user as any) || {};
+    const rawRole = (
+      recruiterUser.tipoUsuario ||
+      recruiterUser.role ||
+      (session.value as any)?.tipoUsuario ||
+      ""
+    ).toUpperCase();
+
+    // Solo notificar si la interacción la realiza una ORGANIZACIÓN/EMPRESA
+    // Nunca notificar si es un CANDIDATO o si el usuario interactúa con su propio CV
+    const isCandidate = rawRole === "CANDIDATO";
+    const currentUserId =
+      recruiterUser.id || recruiterUser.uuid || recruiterUser.sub;
+    if (
+      isCandidate ||
+      (currentUserId &&
+        String(currentUserId).toLowerCase() ===
+          String(candidateId).toLowerCase())
+    ) {
+      return { success: false };
+    }
+
+    const action = options.action || "VIEW";
     const recruiterName =
       options.recruiterName || recruiterUser.name || recruiterUser.nombre || "";
     const companyName =
@@ -29,7 +52,7 @@ export function useCvInteraction() {
       recruiterUser.nombreComercial ||
       recruiterUser.empresa ||
       "Organización Reclutadora";
-    const vacancyTitle = options.vacancyTitle || "Vacante seleccionada";
+    const vacancyTitle = options.vacancyTitle || "";
 
     const payload = {
       action,
@@ -39,20 +62,24 @@ export function useCvInteraction() {
       timestamp: new Date().toISOString(),
     };
 
+    const authHeaders = getAuthHeaders();
+
     try {
-      // 1. Invocar endpoint local Nitro
+      // 1. Invocar endpoint local Nitro con cabeceras de autorización
       await $fetch(`/api/candidates/${candidateId}/cv-interaction`, {
         method: "POST",
         body: payload,
+        headers: authHeaders,
       }).catch(() => null);
 
-      // 2. Invocar backend en AWS Lambda / DynamoDB
+      // 2. Invocar backend en AWS Lambda / DynamoDB con cabeceras de autorización
       if (config.public?.apiUrl) {
         await $fetch(
           `${config.public.apiUrl}/profile/${candidateId}/cv-interaction`,
           {
             method: "POST",
             body: payload,
+            headers: authHeaders,
           },
         ).catch(() => null);
       }

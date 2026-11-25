@@ -267,6 +267,8 @@
 </template>
 
 <script setup lang="ts">
+import { apiFetch } from "~/composables/useApiClient";
+
 useSeoMeta({
   title: "Aprobación de Catálogo (Habilidades y Sectores) - JobNet",
   description:
@@ -274,6 +276,7 @@ useSeoMeta({
 });
 
 const config = useRuntimeConfig();
+const { showSuccess, showInfo, showError } = useAppFeedback();
 const allSuggestions = ref<any[]>([]);
 const activeCategory = ref<"ALL" | "Habilidad" | "Sector">("ALL");
 const loading = ref(true);
@@ -301,9 +304,7 @@ const filteredSuggestions = computed(() => {
 const fetchSuggestions = async () => {
   loading.value = true;
   try {
-    const data = await $fetch<any[]>(
-      `${config.public.apiUrl}/moderator/skills/suggestions`,
-    );
+    const data = await apiFetch<any[]>("/moderator/skills/suggestions");
     allSuggestions.value = data || [];
   } catch (e) {
     console.error("Error loading catalog suggestions:", e);
@@ -323,12 +324,15 @@ const approveItem = async (sug: any) => {
   if (sug.hasDuplicate && sug.existingName) {
     existingItemName.value = sug.existingName;
     showWarningModal.value = true;
+    showInfo(
+      `Elemento similar detectado: "${sug.existingName}". Selecciona una acción.`,
+    );
     return;
   }
 
   try {
-    const res = await $fetch<any>(
-      `${config.public.apiUrl}/moderator/skills/suggestions/${sug.id}/resolve`,
+    const res = await apiFetch<any>(
+      `/moderator/skills/suggestions/${sug.id}/resolve`,
       {
         method: "POST",
         body: {
@@ -340,13 +344,20 @@ const approveItem = async (sug: any) => {
     if (res.duplicate) {
       existingItemName.value = res.existingName;
       showWarningModal.value = true;
+      showInfo(
+        `Posible duplicado detectado: "${res.existingName}". ¿Deseas unificar o agregar de todas formas?`,
+      );
     } else {
       allSuggestions.value = allSuggestions.value.filter(
         (s) => s.id !== sug.id,
       );
+      showSuccess(`"${sug.name}" aprobado y añadido al catálogo oficial.`);
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error("Error approving catalog suggestion:", e);
+    showError(
+      e?.data?.error || "Error al procesar la aprobación de la sugerencia.",
+    );
   }
 };
 
@@ -355,23 +366,26 @@ const handleResolveChoice = async (
 ) => {
   if (!selectedSuggestion.value) return;
 
+  const sugName = selectedSuggestion.value.name;
+  const existName = existingItemName.value;
+
   const payload: any = {
     approve: true,
   };
 
   if (mode === "KEEP_EXISTING") {
-    payload.unifyWith = existingItemName.value;
+    payload.unifyWith = existName;
     payload.unifyMode = "KEEP_EXISTING";
   } else if (mode === "REPLACE_EXISTING") {
-    payload.unifyWith = existingItemName.value;
+    payload.unifyWith = existName;
     payload.unifyMode = "REPLACE_EXISTING";
   } else if (mode === "ADD_ANYWAY") {
     payload.addAnyway = true;
   }
 
   try {
-    await $fetch(
-      `${config.public.apiUrl}/moderator/skills/suggestions/${selectedSuggestion.value.id}/resolve`,
+    await apiFetch(
+      `/moderator/skills/suggestions/${selectedSuggestion.value.id}/resolve`,
       {
         method: "POST",
         body: payload,
@@ -380,27 +394,40 @@ const handleResolveChoice = async (
     allSuggestions.value = allSuggestions.value.filter(
       (s) => s.id !== selectedSuggestion.value.id,
     );
+
+    if (mode === "KEEP_EXISTING") {
+      showSuccess(
+        `Se conservó "${existName}" en el catálogo y se descartó la sugerencia.`,
+      );
+    } else if (mode === "REPLACE_EXISTING") {
+      showSuccess(
+        `Se renombró "${existName}" a "${sugName}" en el catálogo oficial.`,
+      );
+    } else if (mode === "ADD_ANYWAY") {
+      showSuccess(`"${sugName}" se añadió como nuevo elemento independiente.`);
+    }
+
     showWarningModal.value = false;
     selectedSuggestion.value = null;
-  } catch (e) {
+  } catch (e: any) {
     console.error("Error resolving catalog item choice:", e);
+    showError(e?.data?.error || "Error al resolver la unificación.");
   }
 };
 
 const rejectItem = async (id: string) => {
   try {
-    await $fetch(
-      `${config.public.apiUrl}/moderator/skills/suggestions/${id}/resolve`,
-      {
-        method: "POST",
-        body: {
-          approve: false,
-        },
+    await apiFetch(`/moderator/skills/suggestions/${id}/resolve`, {
+      method: "POST",
+      body: {
+        approve: false,
       },
-    );
+    });
     allSuggestions.value = allSuggestions.value.filter((s) => s.id !== id);
-  } catch (e) {
+    showInfo("Sugerencia rechazada y retirada de la cola.");
+  } catch (e: any) {
     console.error("Error rejecting suggestion:", e);
+    showError(e?.data?.error || "Error al rechazar la sugerencia.");
   }
 };
 </script>

@@ -1418,8 +1418,8 @@ const filterDevice = ref("ALL");
 const roleFilterOptions = [
   { value: "ALL", label: "Todos los roles" },
   { value: "CANDIDATO", label: "Candidatos" },
-  { value: "EMPRESA", label: "Empresas" },
-  { value: "MODERATOR", label: "Moderadores" },
+  { value: "ORGANIZACION", label: "Organizaciones" },
+  { value: "MODERADOR", label: "Moderadores" },
   { value: "ADMIN", label: "Administradores" },
   { value: "PENDIENTE", label: "Pendientes de Rol" },
 ];
@@ -1613,11 +1613,9 @@ const getRoleBadgeClass = (role?: string) => {
     case "MODERATOR":
     case "MODERADOR":
       return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20";
-    case "EMPRESA":
     case "ORGANIZACION":
       return "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20";
     case "CANDIDATO":
-    case "POSTULANTE":
       return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20";
     default:
       return "bg-slate-500/10 text-slate-600 dark:text-slate-300 border border-slate-500/20";
@@ -1631,11 +1629,9 @@ const getAvatarBg = (role?: string) => {
     case "MODERATOR":
     case "MODERADOR":
       return "bg-amber-600";
-    case "EMPRESA":
     case "ORGANIZACION":
       return "bg-purple-600";
     case "CANDIDATO":
-    case "POSTULANTE":
       return "bg-blue-600";
     default:
       return "bg-slate-600";
