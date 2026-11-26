@@ -439,6 +439,63 @@ const fetchIncidents = async (initial = false) => {
     loading.value = false;
     return;
   }
+  try {
+    const data = await apiFetch<any>("/moderator/incidents");
+    const fetched =
+      data?.value || data?.Items || (Array.isArray(data) ? data : []);
+    incidents.value = fetched;
+  } catch (e: any) {
+    console.error("Error loading incidents:", e);
+    incidents.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+const handleIncidentSync = () => {
+  fetchIncidents(false);
+};
+
+onMounted(() => {
+  fetchIncidents(true);
+  if (typeof window !== "undefined") {
+    window.addEventListener("incident-sync", handleIncidentSync);
+  }
+});
+
+onUnmounted(() => {
+  if (typeof window !== "undefined") {
+    window.removeEventListener("incident-sync", handleIncidentSync);
+  }
+});
+
+defineExpose({
+  fetchIncidents,
+});
+
+const resolve = async (id: string, action: string) => {
+  const mappedAction =
+    action === "reject"
+      ? "block"
+      : action === "evaluate"
+        ? "evaluate"
+        : "approve";
+  processingId.value = id;
+  try {
+    await apiFetch(`/moderator/incidents/${id}/resolve`, {
+      method: "POST",
+      body: {
+        action: mappedAction,
+      },
+    });
+
+    if (action === "evaluate") {
+      const idx = incidents.value.findIndex(
+        (i) =>
+          i.id === id ||
+          (i as any).incidentId === id ||
+          i.targetId === id ||
+          (i as any).jobId === id,
       );
       if (idx !== -1) {
         incidents.value[idx] = {
