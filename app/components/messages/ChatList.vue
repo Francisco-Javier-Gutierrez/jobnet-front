@@ -25,16 +25,12 @@
     <div
       class="flex-grow overflow-y-auto max-h-[550px] divide-y divide-outline-variant/30"
     >
-      <div
+      <AppSkeletonLoader
         v-if="isLoadingChats"
-        class="p-8 text-center text-xs text-on-surface-variant dark:text-slate-300/80"
-      >
-        <span
-          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
-          aria-hidden="true"
-        ></span>
-        Cargando tus conversaciones...
-      </div>
+        type="chat-list"
+        :count="5"
+        label="Cargando conversaciones..."
+      />
       <div
         v-else-if="filteredChats.length === 0"
         class="p-8 text-center text-xs text-on-surface-variant dark:text-slate-300"

@@ -11,13 +11,16 @@
             Mantente al tanto de tus ofertas, comentarios y comunidad.
           </p>
         </div>
-        <button
+        <AppActionButton
           v-if="notifications.length > 0 && !loading"
+          type="button"
+          :loading="isMarkingAll"
+          label="Marcar todas como leídas"
+          loading-text="Marcando..."
+          spinner-size="xs"
           @click="markAllAsRead"
-          class="text-xs text-primary font-bold hover:underline flex-shrink-0"
-        >
-          Marcar todas como leídas
-        </button>
+          class="text-xs text-primary font-bold hover:underline flex-shrink-0 cursor-pointer"
+        />
       </div>
 
       <!-- Web Push Notification Banner -->
@@ -90,11 +93,17 @@
 
             <button
               v-else-if="isPushSubscribed"
+              type="button"
               @click="unsubscribePush(userId)"
               :disabled="loadingPush"
-              class="text-[11px] font-semibold text-on-surface-variant hover:text-rose-600 dark:hover:text-rose-400 transition"
+              class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-on-surface-variant hover:text-rose-600 dark:hover:text-rose-400 transition disabled:opacity-50"
             >
-              Desactivar
+              <span
+                v-if="loadingPush"
+                class="w-3 h-3 border-2 border-current/25 border-t-current rounded-full animate-spin"
+                aria-hidden="true"
+              ></span>
+              <span>{{ loadingPush ? "Desactivando..." : "Desactivar" }}</span>
             </button>
           </div>
         </div>
@@ -214,14 +223,17 @@
             {{ notif.message }}
           </p>
           <div class="mt-2.5 flex items-center gap-3">
-            <button
+            <AppActionButton
               v-if="notif.type === 'SUSPENSION_NOTICE'"
+              type="button"
+              :loading="isAppealActionPending(notif.id)"
+              icon="forum"
+              label="Apelar Decisión"
+              loading-text="Abriendo..."
+              spinner-size="xs"
               @click="joinAppealAction(notif)"
-              class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5"
-            >
-              <span class="material-symbols-outlined text-sm">forum</span>
-              Apelar Decisión
-            </button>
+              class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+            />
             <NuxtLink
               v-if="
                 notif.type === 'AUDIT_CHANNEL_SUPERVISED' ||
@@ -259,6 +271,7 @@
 
 <script setup lang="ts">
 import { apiFetch } from "~/composables/useApiClient";
+import { useActionLoading } from "~/composables/useActionLoading";
 
 useSeoMeta({
   title: "Notificaciones - JobNet",
@@ -293,6 +306,9 @@ interface NotificationItem {
 }
 
 const loading = ref(true);
+const isMarkingAll = ref(false);
+const { isPending: isAppealActionPending, runWithLoading: runAppealAction } =
+  useActionLoading();
 const notifications = ref<NotificationItem[]>([]);
 const filterState = ref<"all" | "unread" | "read">("all");
 
@@ -459,18 +475,22 @@ const markAsRead = async (id: string) => {
 };
 
 const markAllAsRead = async () => {
+  if (isMarkingAll.value) return;
+  isMarkingAll.value = true;
   notifications.value.forEach((n) => {
     n.read = true;
   });
 
-  if (userId.value) {
-    try {
+  try {
+    if (userId.value) {
       await apiFetch(`/profile/${userId.value}/notifications/read-all`, {
         method: "POST",
       });
-    } catch (e) {
-      console.error("Error marking all notifications as read:", e);
     }
+  } catch (e) {
+    console.error("Error marking all notifications as read:", e);
+  } finally {
+    isMarkingAll.value = false;
   }
 };
 
@@ -482,19 +502,21 @@ const joinAppealAction = async (notif: NotificationItem) => {
   const companyId = notif.companyId || userId.value;
   if (!companyId) return;
 
-  selectedCompanyId.value = companyId;
-  selectedReason.value = notif.reason || notif.message || "";
+  await runAppealAction(notif.id, async () => {
+    selectedCompanyId.value = companyId;
+    selectedReason.value = notif.reason || notif.message || "";
 
-  try {
-    await $fetch(
-      `${config.public.apiUrl}/moderator/organizations/${companyId}/join-appeal`,
-      { method: "POST" },
-    ).catch(() => {});
-  } catch (e: any) {
-    console.error("Error joining appeal:", e);
-  }
+    try {
+      await $fetch(
+        `${config.public.apiUrl}/moderator/organizations/${companyId}/join-appeal`,
+        { method: "POST" },
+      ).catch(() => {});
+    } catch (e: any) {
+      console.error("Error joining appeal:", e);
+    }
 
-  isAppealModalOpen.value = true;
+    isAppealModalOpen.value = true;
+  });
 };
 
 onMounted(() => {

@@ -13,9 +13,16 @@
       </NuxtLink>
     </div>
 
+    <!-- Skeleton State -->
+    <AppSkeletonLoader
+      v-if="loading"
+      type="detail"
+      label="Cargando publicación..."
+    />
+
     <!-- Post Card Details -->
     <PostCard
-      v-if="post"
+      v-else-if="post"
       :post="post"
       :current-user-id="currentUserId"
       :is-bookmarked="isBookmarked"
@@ -49,13 +56,15 @@
           class="w-full bg-surface border border-outline-variant/60 focus:border-primary rounded-xl p-4 text-xs text-on-background outline-none transition placeholder-on-surface-variant/50 resize-none font-sans"
         ></textarea>
         <div class="flex justify-end">
-          <button
+          <AppActionButton
             type="submit"
+            :loading="isSubmittingComment"
             :disabled="!newCommentText.trim()"
-            class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm"
-          >
-            Comentar
-          </button>
+            icon="send"
+            loading-text="Enviando..."
+            label="Comentar"
+            class="bg-primary hover:bg-primary-container text-white disabled:bg-primary/40 font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm"
+          />
         </div>
       </form>
 
@@ -96,14 +105,18 @@
                 >
               </div>
             </div>
-            <button
+            <AppActionButton
               v-if="canDeleteComment(node)"
+              type="button"
               @click="deleteComment(node.id)"
-              class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg transition opacity-0 group-hover:opacity-100"
+              :loading="isDeletingComment(node.id)"
+              icon="delete"
+              spinner-size="xs"
+              icon-class="text-sm"
+              class="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 focus:opacity-100"
+              :class="{ 'opacity-100': isDeletingComment(node.id) }"
               title="Eliminar comentario"
-            >
-              <span class="material-symbols-outlined text-sm">delete</span>
-            </button>
+            />
           </div>
 
           <p
@@ -135,13 +148,15 @@
               placeholder="Escribe una respuesta..."
               class="flex-grow bg-surface border border-outline-variant/60 focus:border-primary rounded-xl px-4 py-2 text-xs text-on-background outline-none transition"
             />
-            <button
+            <AppActionButton
               type="submit"
+              :loading="isSubmittingReply"
               :disabled="!replyText.trim()"
-              class="bg-secondary text-white font-bold text-xs px-4 py-2 rounded-xl hover:bg-[#005236] transition shadow-sm"
-            >
-              Responder
-            </button>
+              loading-text="Enviando..."
+              label="Responder"
+              spinner-size="xs"
+              class="bg-secondary text-white font-bold text-xs px-4 py-2 rounded-xl hover:bg-[#005236] shadow-sm"
+            />
           </form>
 
           <!-- Nested Replies (Level 2) -->
@@ -171,14 +186,18 @@
                     >
                   </div>
                 </div>
-                <button
+                <AppActionButton
                   v-if="canDeleteComment(reply)"
+                  type="button"
                   @click="deleteComment(reply.id)"
-                  class="text-rose-600 hover:bg-rose-50 p-1 rounded-md transition opacity-0 group-hover:opacity-100"
+                  :loading="isDeletingComment(reply.id)"
+                  icon="delete"
+                  spinner-size="xs"
+                  icon-class="text-xs"
+                  class="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 p-1 rounded-md opacity-0 group-hover:opacity-100 focus:opacity-100"
+                  :class="{ 'opacity-100': isDeletingComment(reply.id) }"
                   title="Eliminar respuesta"
-                >
-                  <span class="material-symbols-outlined text-xs">delete</span>
-                </button>
+                />
               </div>
               <p
                 class="text-xs text-on-surface-variant dark:text-slate-300 leading-relaxed"
@@ -255,6 +274,7 @@ const { data: session, status } = useAuth();
 
 const postId = route.params.id as string;
 const post = ref<any>(null);
+const loading = ref(true);
 const showPdf = ref(false);
 const showAuthModal = ref(false);
 
@@ -263,9 +283,13 @@ const replyingToId = ref<string | null>(null);
 const replyText = ref("");
 const isSubmittingComment = ref(false);
 const isSubmittingReply = ref(false);
+const { isPending: isDeletePending, runWithLoading: runDeleteWithLoading } =
+  useActionLoading();
+const isDeletingComment = (id: string) => isDeletePending(`post-comment-${id}`);
 
 // Load post details from localStorage
 const loadPost = async () => {
+  loading.value = true;
   try {
     const config = useRuntimeConfig();
     const baseUrl = config.public.apiUrl || "";
@@ -275,6 +299,8 @@ const loadPost = async () => {
   } catch (error) {
     console.error("Error loading post:", error);
     post.value = null;
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -514,76 +540,79 @@ const canDeleteComment = (node: any) => {
 const deleteComment = async (id: string) => {
   if (!post.value?.comments) return;
 
-  try {
-    const res = await $fetch<any>(
-      `/api/posts/${post.value.uniqueId}/comment/${encodeURIComponent(id)}`,
-      {
-        method: "DELETE",
-      },
-    );
+  await runDeleteWithLoading(`post-comment-${id}`, async () => {
+    if (!post.value?.comments) return;
+    try {
+      const res = await $fetch<any>(
+        `/api/posts/${post.value.uniqueId}/comment/${encodeURIComponent(id)}`,
+        {
+          method: "DELETE",
+        },
+      );
 
-    const targetIndex = post.value.comments.findIndex(
-      (c: any) => String(c.id) === String(id),
-    );
+      const targetIndex = post.value.comments.findIndex(
+        (c: any) => String(c.id) === String(id),
+      );
 
-    let nextComments = [...post.value.comments];
+      let nextComments = [...post.value.comments];
 
-    if (targetIndex !== -1) {
-      const target = nextComments[targetIndex];
-      const isLevel2 = !!target.parentId;
+      if (targetIndex !== -1) {
+        const target = nextComments[targetIndex];
+        const isLevel2 = !!target.parentId;
 
-      if (res?.action === "SOFT_DELETED_PARENT" || res?.isDeleted) {
-        nextComments[targetIndex] = {
-          ...target,
-          text: "Comentario no disponible",
-          user: "Eliminado",
-          isDeleted: true,
-        };
-      } else if (isLevel2) {
-        nextComments.splice(targetIndex, 1);
-        const parentId = target.parentId;
-        const parentIndex = nextComments.findIndex(
-          (c: any) => String(c.id) === String(parentId),
-        );
-        if (parentIndex !== -1 && nextComments[parentIndex].isDeleted) {
-          const parentHasOtherChildren = nextComments.some(
-            (c: any) =>
-              String(c.parentId) === String(parentId) && c.id !== target.id,
-          );
-          if (!parentHasOtherChildren) {
-            nextComments.splice(parentIndex, 1);
-          }
-        }
-      } else {
-        const hasChildren = nextComments.some(
-          (c: any) => String(c.parentId) === String(id),
-        );
-        if (hasChildren) {
+        if (res?.action === "SOFT_DELETED_PARENT" || res?.isDeleted) {
           nextComments[targetIndex] = {
             ...target,
             text: "Comentario no disponible",
             user: "Eliminado",
             isDeleted: true,
           };
-        } else {
+        } else if (isLevel2) {
           nextComments.splice(targetIndex, 1);
+          const parentId = target.parentId;
+          const parentIndex = nextComments.findIndex(
+            (c: any) => String(c.id) === String(parentId),
+          );
+          if (parentIndex !== -1 && nextComments[parentIndex].isDeleted) {
+            const parentHasOtherChildren = nextComments.some(
+              (c: any) =>
+                String(c.parentId) === String(parentId) && c.id !== target.id,
+            );
+            if (!parentHasOtherChildren) {
+              nextComments.splice(parentIndex, 1);
+            }
+          }
+        } else {
+          const hasChildren = nextComments.some(
+            (c: any) => String(c.parentId) === String(id),
+          );
+          if (hasChildren) {
+            nextComments[targetIndex] = {
+              ...target,
+              text: "Comentario no disponible",
+              user: "Eliminado",
+              isDeleted: true,
+            };
+          } else {
+            nextComments.splice(targetIndex, 1);
+          }
         }
+      } else {
+        nextComments = nextComments.filter(
+          (c: any) => String(c.id) !== String(id),
+        );
       }
-    } else {
-      nextComments = nextComments.filter(
-        (c: any) => String(c.id) !== String(id),
-      );
-    }
 
-    // Re-assign object reference to trigger Vue 3 reactivity immediately
-    post.value = {
-      ...post.value,
-      comments: nextComments,
-    };
-  } catch (e) {
-    console.error("Error deleting comment:", e);
-    showError("Error", "Error al eliminar el comentario del servidor.");
-  }
+      // Re-assign object reference to trigger Vue 3 reactivity immediately
+      post.value = {
+        ...post.value,
+        comments: nextComments,
+      };
+    } catch (e) {
+      console.error("Error deleting comment:", e);
+      showError("Error", "Error al eliminar el comentario del servidor.");
+    }
+  });
 };
 
 onMounted(async () => {

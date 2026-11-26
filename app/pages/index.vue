@@ -38,6 +38,7 @@
       :replying-to-id="replyingToId"
       :reply-text="replyText"
       :is-submitting-reply="isSubmittingReply"
+      :is-deleting-comment="isDeletingComment"
       @close="closeBottomSheet"
       @touchstart="onTouchStart"
       @touchmove="onTouchMove"
@@ -132,5 +133,6 @@ const {
   submitReply,
   canDeleteComment,
   deleteComment,
+  isDeletingComment,
 } = useJobFeeds();
 </script>

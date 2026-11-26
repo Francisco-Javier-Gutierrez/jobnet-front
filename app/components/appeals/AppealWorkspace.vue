@@ -47,49 +47,49 @@
         <!-- Dictamen Action Buttons ALWAYS visible for Moderator -->
         <div class="flex items-center gap-2">
           <template v-if="activeAppeal.type === 'VACANTE'">
-            <button
+            <AppActionButton
               @click="$emit('resolve-vacancy', 'approve')"
-              :disabled="isProcessingAction"
-              class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
+              :loading="isProcessingAction"
+              icon="check_circle"
+              icon-class="text-[16px]"
+              spinner-size="xs"
+              label="Aprobar Vacante"
+              class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-sm"
               title="Aprobar y reactivar la vacante en la plataforma"
-            >
-              <span class="material-symbols-outlined text-[16px]"
-                >check_circle</span
-              >
-              Aprobar Vacante
-            </button>
-            <button
+            />
+            <AppActionButton
               @click="$emit('resolve-vacancy', 'block')"
-              :disabled="isProcessingAction"
-              class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
+              :loading="isProcessingAction"
+              icon="block"
+              icon-class="text-[16px]"
+              spinner-size="xs"
+              label="Sancionar"
+              class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-sm"
               title="Mantener sanción y cerrar vacante definitivamente"
-            >
-              <span class="material-symbols-outlined text-[16px]">block</span>
-              Sancionar
-            </button>
+            />
           </template>
 
           <template v-else>
-            <button
+            <AppActionButton
               @click="$emit('resolve-org', 'approve')"
-              :disabled="isProcessingAction"
-              class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
+              :loading="isProcessingAction"
+              icon="check_circle"
+              icon-class="text-[16px]"
+              spinner-size="xs"
+              label="Aprobar Apelación"
+              class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-sm"
               title="Aprobar apelación y reactivar cuenta de la organización"
-            >
-              <span class="material-symbols-outlined text-[16px]"
-                >check_circle</span
-              >
-              Aprobar Apelación
-            </button>
-            <button
+            />
+            <AppActionButton
               @click="$emit('resolve-org', 'confirm')"
-              :disabled="isProcessingAction"
-              class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-sm disabled:opacity-40"
+              :loading="isProcessingAction"
+              icon="cancel"
+              icon-class="text-[16px]"
+              spinner-size="xs"
+              label="Confirmar Suspensión"
+              class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-sm"
               title="Confirmar suspensión permanente de la organización"
-            >
-              <span class="material-symbols-outlined text-[16px]">cancel</span>
-              Confirmar Suspensión
-            </button>
+            />
           </template>
         </div>
       </div>
@@ -116,8 +116,15 @@
         ref="chatContainerRef"
         class="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
       >
+        <AppSkeletonLoader
+          v-if="isLoadingMessages"
+          type="chat-thread"
+          :count="4"
+          label="Cargando historial de apelación..."
+        />
+
         <div
-          v-if="activeAppeal.messages.length === 0"
+          v-else-if="activeAppeal.messages.length === 0"
           class="text-center text-xs text-slate-400 my-8"
         >
           No hay mensajes previos en este canal. Escribe para iniciar el diálogo
@@ -245,14 +252,15 @@
           placeholder="Escribe una respuesta para la organización en apelación..."
           class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-indigo-600 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs text-on-background dark:text-slate-100 outline-none transition"
         />
-        <button
+        <AppActionButton
           @click="handleSendMessage"
+          :loading="Boolean(isSending) || isUploading"
           :disabled="!newMessageText.trim() && !pendingAttachment"
-          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
+          icon="send"
+          icon-class="text-lg"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white active:scale-95 flex-shrink-0 shadow-sm"
           title="Enviar mensaje"
-        >
-          <span class="material-symbols-outlined text-lg">send</span>
-        </button>
+        />
       </div>
     </template>
 
@@ -289,6 +297,8 @@ import type { Appeal, AppealMessage, AppealAttachment } from "~/types";
 const props = defineProps<{
   activeAppeal: Appeal | null;
   isProcessingAction: boolean;
+  isLoadingMessages?: boolean;
+  isSending?: boolean;
   orgMessageCount: number;
   isModeratorSender: (msg: AppealMessage) => boolean;
 }>();

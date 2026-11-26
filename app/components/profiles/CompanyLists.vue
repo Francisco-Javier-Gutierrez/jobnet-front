@@ -181,12 +181,13 @@
       aria-labelledby="tab-posts"
       class="space-y-4 animate-fade-in"
     >
-      <div
+      <AppSkeletonLoader
         v-if="loadingCompanyPosts"
-        class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 animate-pulse"
-      >
-        Cargando publicaciones...
-      </div>
+        type="card"
+        :count="2"
+        :columns="1"
+        label="Cargando publicaciones..."
+      />
       <div
         v-else-if="companyPosts.length === 0"
         class="py-12 text-center text-xs text-on-surface-variant dark:text-slate-300 italic bg-surface-container-low/30 rounded-xl border border-outline-variant/30 space-y-2"
@@ -288,12 +289,13 @@
         </button>
       </div>
 
-      <div
+      <AppSkeletonLoader
         v-if="loadingCompanyPosts"
-        class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 animate-pulse"
-      >
-        Cargando publicaciones guardadas...
-      </div>
+        type="card"
+        :count="2"
+        :columns="1"
+        label="Cargando publicaciones guardadas..."
+      />
       <div
         v-else-if="displayedBookmarksCount === 0"
         class="py-12 text-center text-xs text-on-surface-variant dark:text-slate-300 italic bg-surface-container-low/30 rounded-xl border border-outline-variant/30 space-y-2"

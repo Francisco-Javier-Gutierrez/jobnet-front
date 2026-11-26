@@ -31,7 +31,15 @@
       </span>
     </div>
 
-    <template v-if="hasData">
+    <div v-if="loading" class="mt-4">
+      <AppSkeletonLoader
+        type="chart"
+        :count="4"
+        label="Cargando volumen mensual de organizaciones..."
+      />
+    </div>
+
+    <template v-else-if="hasData">
       <!-- Chart Body (SVG Columns) -->
       <div class="mt-6 flex-1 flex flex-col justify-end">
         <!-- Top Max Value Indicator -->
@@ -144,6 +152,7 @@ import type { MonthlyOrgItem } from "~/composables/useAdminAnalytics";
 
 const props = defineProps<{
   monthlyData: MonthlyOrgItem[];
+  loading?: boolean;
 }>();
 
 const series = computed(() => props.monthlyData || []);

@@ -111,16 +111,12 @@
         <div
           class="flex-grow overflow-y-auto divide-y divide-outline-variant/30"
         >
-          <div
+          <AppSkeletonLoader
             v-if="isLoadingTickets"
-            class="p-8 text-center text-on-surface-variant text-xs"
-          >
-            <span
-              class="material-symbols-outlined animate-spin text-2xl text-primary mb-2"
-              >progress_activity</span
-            >
-            <p>Cargando reportes...</p>
-          </div>
+            type="chat-list"
+            :count="5"
+            label="Cargando reportes de soporte..."
+          />
 
           <div
             v-else-if="filteredTickets.length === 0"
@@ -363,6 +359,13 @@
               </span>
             </div>
 
+            <AppSkeletonLoader
+              v-if="isLoadingMessages"
+              type="chat-thread"
+              :count="4"
+              label="Cargando mensajes del reporte..."
+            />
+
             <!-- Thread Messages -->
             <div
               v-for="msg in messages"
@@ -587,6 +590,7 @@
     <!-- Report Problem Modal -->
     <ReportProblemModal
       v-model="showCreateModal"
+      :submitting="isCreatingTicket"
       @ticketCreated="onTicketCreated"
     />
   </div>
@@ -616,6 +620,8 @@ const {
   activeTicket,
   messages,
   isLoadingTickets,
+  isLoadingMessages,
+  isCreatingTicket,
   isSending,
   userId,
   wsConnected,
@@ -721,8 +727,8 @@ const handleSelectTicket = async (ticket: SupportTicket) => {
 };
 
 const onTicketCreated = async (payload: CreateTicketDTO) => {
-  showCreateModal.value = false;
   const newTicket = await createTicket(payload);
+  showCreateModal.value = false;
   if (newTicket) {
     await selectTicket(newTicket);
     scrollToBottom();

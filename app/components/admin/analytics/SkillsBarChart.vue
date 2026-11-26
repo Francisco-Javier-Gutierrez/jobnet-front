@@ -29,9 +29,18 @@
       </span>
     </div>
 
+    <!-- Skeleton State -->
+    <div v-if="loading" class="mt-4">
+      <AppSkeletonLoader
+        type="chart"
+        :count="5"
+        label="Cargando demanda de habilidades..."
+      />
+    </div>
+
     <!-- Empty State -->
     <div
-      v-if="skills.length === 0"
+      v-else-if="skills.length === 0"
       class="mt-6 flex-1 flex flex-col items-center justify-center py-12 text-center"
     >
       <span
@@ -117,6 +126,7 @@ import type { SkillItem } from "~/composables/useAdminAnalytics";
 defineProps<{
   skills: SkillItem[];
   region: string;
+  loading?: boolean;
 }>();
 
 const getRankBadgeClass = (index: number) => {

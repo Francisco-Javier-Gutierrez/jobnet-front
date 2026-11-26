@@ -298,15 +298,17 @@
                 >
               </NuxtLink>
 
-              <button
+              <AppActionButton
+                type="button"
+                :loading="isSigningOut"
+                icon="logout"
+                icon-class="text-[18px]"
+                label="Cerrar sesión"
+                loading-text="Cerrando sesión..."
+                spinner-size="xs"
                 @click="onSignOutClick"
-                class="w-full flex items-center justify-center gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/60 transition cursor-pointer"
-              >
-                <span class="material-symbols-outlined text-[18px]"
-                  >logout</span
-                >
-                <span>Cerrar sesión</span>
-              </button>
+                class="w-full gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/60 cursor-pointer"
+              />
             </div>
 
             <!-- Guest Login & Register Buttons -->
@@ -365,6 +367,7 @@ const {
   isActive,
   handleNavClick,
   onSignOut,
+  isSigningOut,
 } = useAppNavigation();
 
 const isMobileMenuOpen = ref(false);
@@ -384,8 +387,11 @@ const closeMenu = () => {
 };
 
 const onSignOutClick = async () => {
-  closeMenu();
-  await onSignOut();
+  try {
+    await onSignOut();
+  } finally {
+    closeMenu();
+  }
 };
 
 // Close mobile menu automatically on route change

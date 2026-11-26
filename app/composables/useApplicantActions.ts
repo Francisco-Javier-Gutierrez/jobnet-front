@@ -1,6 +1,7 @@
 import { useRuntimeConfig } from "#imports";
 import type { ApplicantCandidate } from "~/types";
 import { apiClient } from "./useApiClient";
+import { useActionLoading } from "~/composables/useActionLoading";
 
 const successMsg = ref("");
 const pendingCandidateItem = ref<ApplicantCandidate | null>(null);
@@ -10,6 +11,9 @@ const interviewDetails = ref("");
 
 const isRejectModalOpen = ref(false);
 const rejectionReason = ref("");
+
+const { isPending, runWithLoading } = useActionLoading();
+const isSubmittingModal = ref(false);
 
 export const useApplicantActions = () => {
   const config = useRuntimeConfig();
@@ -48,12 +52,15 @@ export const useApplicantActions = () => {
     }
   };
 
+  const isCandidateUpdating = (candidateId?: string | number | null) =>
+    Boolean(candidateId && isPending(`stage-${candidateId}`));
+
   const submitStatusUpdate = async (
     candidate: any,
     backendStatus: string,
     details?: string,
   ) => {
-    try {
+    await runCandidateUpdateOrFallback(candidate, async () => {
       if (!candidate.id.startsWith("cand-demo")) {
         await apiClient.put(
           `/applications/${candidate.jobId}/${candidate.id}/status`,
@@ -66,9 +73,20 @@ export const useApplicantActions = () => {
       candidate.status = backendStatus;
       successMsg.value = `Estado de candidato ${candidate.name} actualizado con éxito a ${getStatusLabel(backendStatus)}.`;
       setTimeout(() => (successMsg.value = ""), 4500);
-    } catch (e) {
-      console.error("Error updating candidate application status:", e);
-    }
+    });
+  };
+
+  const runCandidateUpdateOrFallback = async (
+    candidate: any,
+    task: () => Promise<void>,
+  ) => {
+    await runWithLoading(`stage-${candidate.id}`, async () => {
+      try {
+        await task();
+      } catch (e) {
+        console.error("Error updating candidate application status:", e);
+      }
+    });
   };
 
   const advanceCandidateStage = (candidate: any) => {
@@ -84,14 +102,19 @@ export const useApplicantActions = () => {
   };
 
   const submitInterviewTransition = async () => {
-    if (!pendingCandidateItem.value) return;
-    await submitStatusUpdate(
-      pendingCandidateItem.value,
-      "EN_CONTACTO",
-      interviewDetails.value,
-    );
-    isInterviewModalOpen.value = false;
-    pendingCandidateItem.value = null;
+    if (!pendingCandidateItem.value || isSubmittingModal.value) return;
+    isSubmittingModal.value = true;
+    try {
+      await submitStatusUpdate(
+        pendingCandidateItem.value,
+        "EN_CONTACTO",
+        interviewDetails.value,
+      );
+      isInterviewModalOpen.value = false;
+      pendingCandidateItem.value = null;
+    } finally {
+      isSubmittingModal.value = false;
+    }
   };
 
   const triggerReject = (candidate: any) => {
@@ -101,8 +124,9 @@ export const useApplicantActions = () => {
   };
 
   const submitRejection = async () => {
-    if (!pendingCandidateItem.value) return;
+    if (!pendingCandidateItem.value || isSubmittingModal.value) return;
     const candidate = pendingCandidateItem.value;
+    isSubmittingModal.value = true;
     try {
       if (!candidate.id.startsWith("cand-demo")) {
         await apiClient.put(
@@ -119,6 +143,7 @@ export const useApplicantActions = () => {
     } catch (e) {
       console.error("Error rejecting candidate application:", e);
     } finally {
+      isSubmittingModal.value = false;
       isRejectModalOpen.value = false;
       pendingCandidateItem.value = null;
     }
@@ -131,6 +156,8 @@ export const useApplicantActions = () => {
     interviewDetails,
     isRejectModalOpen,
     rejectionReason,
+    isSubmittingModal,
+    isCandidateUpdating,
     getStatusLabel,
     getStatusBadgeClass,
     advanceCandidateStage,

@@ -39,12 +39,14 @@
             </span>
             <span
               v-if="loading"
-              class="inline-flex items-center gap-1 text-[11px] text-on-surface-variant animate-pulse"
+              class="inline-flex items-center gap-1.5 text-[11px] text-on-surface-variant px-2.5 py-0.5 rounded-full skeleton-shimmer border border-outline-variant/40"
+              role="status"
+              aria-busy="true"
             >
               <span
                 class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"
               ></span>
-              Sincronizando...
+              Sincronizando versión...
             </span>
           </div>
         </header>

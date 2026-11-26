@@ -228,27 +228,36 @@
             >
               Editar
             </NuxtLink>
-            <button
+            <AppActionButton
               v-if="job.estado !== 'EVALUACION' && job.estado !== 'PAUSADA'"
               @click="togglePause(job.id, 'PAUSADA')"
-              class="bg-surface border border-outline-variant hover:border-amber-500 text-on-surface-variant dark:text-slate-300 hover:text-amber-500 font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
-            >
-              Pausar
-            </button>
-            <button
+              :loading="isJobActionPending(job.id, 'pause')"
+              :disabled="isJobBusy(job.id)"
+              spinner-size="xs"
+              loading-text="Pausando..."
+              label="Pausar"
+              class="bg-surface border border-outline-variant hover:border-amber-500 text-on-surface-variant dark:text-slate-300 hover:text-amber-500 font-semibold text-xs px-3.5 py-2.5 rounded-lg active:scale-95 duration-100"
+            />
+            <AppActionButton
               v-if="job.estado === 'PAUSADA'"
               @click="togglePause(job.id, 'Activa')"
-              class="bg-surface border border-emerald-200 hover:border-emerald-500 text-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
-            >
-              Reanudar
-            </button>
-            <button
+              :loading="isJobActionPending(job.id, 'resume')"
+              :disabled="isJobBusy(job.id)"
+              spinner-size="xs"
+              loading-text="Reanudando..."
+              label="Reanudar"
+              class="bg-surface border border-emerald-200 hover:border-emerald-500 text-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 font-semibold text-xs px-3.5 py-2.5 rounded-lg active:scale-95 duration-100"
+            />
+            <AppActionButton
               v-if="job.estado !== 'EVALUACION'"
               @click="deleteJob(job.id)"
-              class="bg-surface border border-rose-200 hover:border-rose-500 text-rose-500 hover:bg-rose-50 hover:text-rose-600 font-semibold text-xs px-3.5 py-2.5 rounded-lg transition active:scale-95 duration-100"
-            >
-              Eliminar
-            </button>
+              :loading="isJobActionPending(job.id, 'delete')"
+              :disabled="isJobBusy(job.id)"
+              spinner-size="xs"
+              loading-text="Eliminando..."
+              label="Eliminar"
+              class="bg-surface border border-rose-200 hover:border-rose-500 text-rose-500 hover:bg-rose-50 hover:text-rose-600 font-semibold text-xs px-3.5 py-2.5 rounded-lg active:scale-95 duration-100"
+            />
           </div>
         </div>
       </div>
@@ -369,6 +378,15 @@ const getAuthHeaders = () => {
   return headers;
 };
 
+const { isPending: isJobPending, runWithLoading: runJobWithLoading } =
+  useActionLoading();
+const isJobActionPending = (id: string, action: string) =>
+  isJobPending(`vacancy-${action}-${id}`);
+const isJobBusy = (id: string) =>
+  isJobActionPending(id, "pause") ||
+  isJobActionPending(id, "resume") ||
+  isJobActionPending(id, "delete");
+
 const deleteJob = async (id: string) => {
   if (
     !confirm(
@@ -377,31 +395,36 @@ const deleteJob = async (id: string) => {
   ) {
     return;
   }
-  try {
-    await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
-    // Remove from local list
-    vacancies.value = vacancies.value.filter((j) => j.id !== id);
-  } catch (e) {
-    console.error("Error deleting job:", e);
-    alert("Hubo un error al eliminar la vacante.");
-  }
+  await runJobWithLoading(`vacancy-delete-${id}`, async () => {
+    try {
+      await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      // Remove from local list
+      vacancies.value = vacancies.value.filter((j) => j.id !== id);
+    } catch (e) {
+      console.error("Error deleting job:", e);
+      alert("Hubo un error al eliminar la vacante.");
+    }
+  });
 };
 
 const togglePause = async (id: string, nuevoEstado: string) => {
-  try {
-    await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
-      method: "PUT",
-      headers: getAuthHeaders(),
-      body: { estado: nuevoEstado, empresaUuid: companyId.value },
-    });
-    const job = vacancies.value.find((j) => j.id === id);
-    if (job) job.estado = nuevoEstado;
-  } catch (e) {
-    console.error("Error toggling pause:", e);
-    alert("Error al actualizar estado de la vacante.");
-  }
+  const actionKey = nuevoEstado === "PAUSADA" ? "pause" : "resume";
+  await runJobWithLoading(`vacancy-${actionKey}-${id}`, async () => {
+    try {
+      await $fetch(`${config.public.apiUrl}/jobs/${id}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: { estado: nuevoEstado, empresaUuid: companyId.value },
+      });
+      const job = vacancies.value.find((j) => j.id === id);
+      if (job) job.estado = nuevoEstado;
+    } catch (e) {
+      console.error("Error toggling pause:", e);
+      alert("Error al actualizar estado de la vacante.");
+    }
+  });
 };
 </script>

@@ -1,6 +1,7 @@
 import { useRoute, useRuntimeConfig, useAuth } from "#imports";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useS3Upload } from "~/composables/useS3Upload";
+import { useActionLoading } from "~/composables/useActionLoading";
 import { getAuthHeaders } from "~/composables/useApiClient";
 import { WebSocketClient, type WebSocketStatus } from "~/utils/wsClient";
 import type { ChatConversation, ChatMessage } from "~/types";
@@ -67,6 +68,12 @@ export const useMessages = () => {
 
   const isLoadingChats = ref(true);
   const isLoadingMessages = ref(false);
+  const {
+    isPending: isDownloadPending,
+    runWithLoading: runDownloadWithLoading,
+  } = useActionLoading();
+  const isDownloadingAttachment = (url?: string | null) =>
+    Boolean(url && isDownloadPending(`download-${url}`));
 
   const messageContainer = ref<HTMLElement | null>(null);
 
@@ -555,18 +562,20 @@ export const useMessages = () => {
     url: string,
     filename: string = "archivo",
   ) => {
-    try {
-      const secureUrl = await getSecureViewUrl(url);
-      const link = document.createElement("a");
-      link.href = secureUrl || url;
-      link.download = filename;
-      link.target = "_blank";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (e) {
-      window.open(url, "_blank");
-    }
+    await runDownloadWithLoading(`download-${url}`, async () => {
+      try {
+        const secureUrl = await getSecureViewUrl(url);
+        const link = document.createElement("a");
+        link.href = secureUrl || url;
+        link.download = filename;
+        link.target = "_blank";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (e) {
+        window.open(url, "_blank");
+      }
+    });
   };
 
   // Handle message sending (combining text and staged attachment)
@@ -744,6 +753,7 @@ export const useMessages = () => {
     openPdfViewer,
     closePreviewModal,
     downloadAttachment,
+    isDownloadingAttachment,
     formatTime,
   };
 };

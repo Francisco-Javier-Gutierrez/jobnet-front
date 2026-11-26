@@ -164,15 +164,15 @@
             Reconfigurar Dispositivo MFA
           </button>
 
-          <button
+          <AppActionButton
             type="button"
             @click="disableMfa"
-            :disabled="disabling"
-            class="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold text-xs rounded-xl transition disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
-          >
-            <span class="material-symbols-outlined text-sm">no_encryption</span>
-            {{ disabling ? "Desactivando..." : "Desactivar MFA" }}
-          </button>
+            :loading="disabling"
+            icon="no_encryption"
+            loading-text="Desactivando..."
+            label="Desactivar MFA"
+            class="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold text-xs rounded-xl active:scale-95"
+          />
         </div>
       </div>
 

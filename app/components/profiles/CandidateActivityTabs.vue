@@ -36,12 +36,13 @@
 
     <!-- Tab Content 1: Mis Publicaciones -->
     <div v-if="activeTab === 'posts'" class="space-y-4">
-      <div
+      <AppSkeletonLoader
         v-if="loadingPosts"
-        class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 animate-pulse"
-      >
-        Cargando publicaciones...
-      </div>
+        type="card"
+        :count="2"
+        :columns="1"
+        label="Cargando publicaciones..."
+      />
       <div
         v-else-if="userPosts.length === 0"
         class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 italic"
@@ -134,12 +135,13 @@
         </button>
       </div>
 
-      <div
+      <AppSkeletonLoader
         v-if="loadingPosts"
-        class="py-8 text-center text-xs text-on-surface-variant dark:text-slate-300 animate-pulse"
-      >
-        Cargando tus favoritos...
-      </div>
+        type="card"
+        :count="2"
+        :columns="1"
+        label="Cargando tus favoritos..."
+      />
 
       <div
         v-else-if="displayedBookmarksCount === 0"

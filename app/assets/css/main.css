@@ -265,3 +265,60 @@ select:-webkit-autofill:active {
     min-height: 278.5mm !important;
   }
 }
+
+/* ==============================================================================
+   Skeleton Shimmer & Reveal Transitions (M3 Design System)
+   ============================================================================== */
+@keyframes jobnetShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes jobnetFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-container) 25%,
+    var(--color-surface-container-high) 50%,
+    var(--color-surface-container) 75%
+  );
+  background-size: 200% 100%;
+  animation: jobnetShimmer 1.6s ease-in-out infinite;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 41, 59, 0.85) 25%,
+    rgba(51, 65, 85, 0.9) 50%,
+    rgba(30, 41, 59, 0.85) 75%
+  );
+  background-size: 200% 100%;
+}
+
+.animate-fade-in {
+  animation: jobnetFadeIn 220ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+  }
+  .animate-fade-in {
+    animation: none;
+  }
+}

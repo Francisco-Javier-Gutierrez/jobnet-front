@@ -174,22 +174,20 @@
               </td>
               <td class="px-6 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
-                  <button
+                  <AppActionButton
                     @click="$emit('toggleVerification', org)"
+                    :loading="Boolean(isTogglingVerification?.(org.id))"
                     :disabled="
                       getOrgStatusKey(org) !== 'ACTIVO' &&
                       !org.organizacionVerificada
                     "
+                    icon="verified"
+                    icon-class="text-[18px]"
                     :class="[
-                      'p-2 rounded-xl transition active:scale-95 duration-100 flex items-center justify-center border',
+                      'p-2 rounded-xl active:scale-95 duration-100 border',
                       org.organizacionVerificada
                         ? 'bg-secondary/15 border-secondary/30 text-secondary hover:bg-secondary hover:text-white'
                         : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:border-indigo-600 dark:hover:text-white',
-                      {
-                        'opacity-40 cursor-not-allowed':
-                          getOrgStatusKey(org) !== 'ACTIVO' &&
-                          !org.organizacionVerificada,
-                      },
                     ]"
                     :title="
                       getOrgStatusKey(org) !== 'ACTIVO' &&
@@ -199,11 +197,7 @@
                           ? 'Quitar Verificación de Confianza'
                           : 'Asignar Insignia de Confianza'
                     "
-                  >
-                    <span class="material-symbols-outlined text-[18px]"
-                      >verified</span
-                    >
-                  </button>
+                  />
                   <button
                     @click="$emit('openSanctionModal', org)"
                     class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:border-rose-600 dark:hover:text-white p-2 rounded-xl transition active:scale-95 duration-100 flex items-center justify-center"
@@ -249,6 +243,7 @@ const props = defineProps<{
   currentPage: number;
   totalPages: number;
   getOrgStatusKey: (org: AdminOrganization | CompanyProfile) => string;
+  isTogglingVerification?: (orgId?: string) => boolean;
 }>();
 
 const emit = defineEmits<{

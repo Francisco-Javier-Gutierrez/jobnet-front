@@ -14,6 +14,8 @@ export const useAppeals = () => {
   const appeals = ref<Appeal[]>([]);
   const selectedAppealId = ref<string | null>(null);
   const isLoading = ref(true);
+  const isLoadingMessages = ref(false);
+  const isSending = ref(false);
   const isProcessingAction = ref(false);
 
   const socket = ref<WebSocket | null>(null);
@@ -209,6 +211,7 @@ export const useAppeals = () => {
   const selectAppeal = async (appeal: any) => {
     selectedAppealId.value = appeal.id;
     const compId = appeal.id;
+    isLoadingMessages.value = true;
 
     try {
       const msgs = await apiFetch<any[]>(
@@ -231,6 +234,8 @@ export const useAppeals = () => {
       }));
     } catch (e) {
       console.error("Error loading appeal messages:", e);
+    } finally {
+      isLoadingMessages.value = false;
     }
 
     scrollToBottom();
@@ -370,51 +375,63 @@ export const useAppeals = () => {
   ) => {
     const text = newMessageText.trim();
     const attachment = pendingAttachment;
-    if ((!text && !attachment) || !activeAppeal.value) return;
+    if ((!text && !attachment) || !activeAppeal.value || isSending.value)
+      return;
 
     const appealId = activeAppeal.value.id;
     const companyId = activeAppeal.value.companyId;
     if (!appealId) return;
 
-    const now = new Date().toISOString();
-    const timeStr = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    const messageId = crypto.randomUUID();
+    isSending.value = true;
+    try {
+      const now = new Date().toISOString();
+      const timeStr = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const messageId = crypto.randomUUID();
 
-    activeAppeal.value.messages.push({
-      id: `m-mod-${Date.now()}`,
-      messageId,
-      senderId: userId.value,
-      sender: "MODERATOR",
-      text,
-      attachmentUrl: attachment?.url || null,
-      attachmentType: attachment?.type || null,
-      attachmentName: attachment?.name || null,
-      createdAt: now,
-      time: timeStr,
-    });
+      activeAppeal.value.messages.push({
+        id: `m-mod-${Date.now()}`,
+        messageId,
+        senderId: userId.value,
+        sender: "MODERATOR",
+        text,
+        attachmentUrl: attachment?.url || null,
+        attachmentType: attachment?.type || null,
+        attachmentName: attachment?.name || null,
+        createdAt: now,
+        time: timeStr,
+      });
 
-    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-      try {
-        socket.value.send(
-          JSON.stringify({
-            action: "sendMessage",
-            appealId: appealId,
-            appealCompanyId: companyId,
+      if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+        try {
+          socket.value.send(
+            JSON.stringify({
+              action: "sendMessage",
+              appealId: appealId,
+              appealCompanyId: companyId,
+              messageId,
+              text: text || "",
+              attachmentUrl: attachment?.url || null,
+              attachmentType: attachment?.type || null,
+              attachmentName: attachment?.name || null,
+            }),
+          );
+        } catch (wsErr) {
+          console.warn(
+            "WebSocket send exception, executing HTTP fallback:",
+            wsErr,
+          );
+          await sendHttpFallback(
+            appealId,
+            companyId,
+            text,
+            attachment,
             messageId,
-            text: text || "",
-            attachmentUrl: attachment?.url || null,
-            attachmentType: attachment?.type || null,
-            attachmentName: attachment?.name || null,
-          }),
-        );
-      } catch (wsErr) {
-        console.warn(
-          "WebSocket send exception, executing HTTP fallback:",
-          wsErr,
-        );
+          );
+        }
+      } else {
         await sendHttpFallback(
           appealId,
           companyId,
@@ -423,11 +440,11 @@ export const useAppeals = () => {
           messageId,
         );
       }
-    } else {
-      await sendHttpFallback(appealId, companyId, text, attachment, messageId);
-    }
 
-    scrollToBottom();
+      scrollToBottom();
+    } finally {
+      isSending.value = false;
+    }
   };
 
   const closeWebSocket = () => {
@@ -442,6 +459,8 @@ export const useAppeals = () => {
     appeals,
     selectedAppealId,
     isLoading,
+    isLoadingMessages,
+    isSending,
     isProcessingAction,
     wsConnected,
     filteredAppeals,

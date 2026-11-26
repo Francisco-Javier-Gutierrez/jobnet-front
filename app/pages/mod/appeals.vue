@@ -55,6 +55,8 @@
       <AppealWorkspace
         :active-appeal="activeAppeal"
         :is-processing-action="isProcessingAction"
+        :is-loading-messages="isLoadingMessages"
+        :is-sending="isSending"
         :org-message-count="orgMessageCount"
         :is-moderator-sender="isModeratorSender"
         @back-to-list="selectedAppealId = null"
@@ -82,6 +84,8 @@ const {
   appeals,
   selectedAppealId,
   isLoading,
+  isLoadingMessages,
+  isSending,
   isProcessingAction,
   wsConnected,
   filteredAppeals,

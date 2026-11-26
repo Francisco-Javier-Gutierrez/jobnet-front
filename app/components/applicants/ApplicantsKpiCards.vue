@@ -1,6 +1,13 @@
 <template>
   <!-- Dashboard Quick Stats KPIs -->
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+  <AppSkeletonLoader
+    v-if="isLoading"
+    type="stats"
+    :count="4"
+    class="mb-6"
+    label="Cargando resumen de postulantes..."
+  />
+  <div v-else class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
     <div
       class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 rounded-2xl p-4 shadow-sm flex items-center gap-3"
     >
@@ -81,5 +88,5 @@
 
 <script setup lang="ts">
 import { useApplicants } from "~/composables/useApplicants";
-const { candidates, countByStatus } = useApplicants();
+const { candidates, countByStatus, isLoading } = useApplicants();
 </script>

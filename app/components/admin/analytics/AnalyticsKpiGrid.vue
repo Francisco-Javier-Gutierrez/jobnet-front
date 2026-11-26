@@ -1,5 +1,11 @@
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <AppSkeletonLoader
+    v-if="loading"
+    type="stats"
+    :count="4"
+    label="Cargando indicadores ejecutivos..."
+  />
+  <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <!-- KPI 1: Vacantes Activas en la Región -->
     <div
       class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow transition"
@@ -142,5 +148,6 @@ import type { AnalyticsKpis } from "~/composables/useAdminAnalytics";
 
 defineProps<{
   kpis: AnalyticsKpis;
+  loading?: boolean;
 }>();
 </script>

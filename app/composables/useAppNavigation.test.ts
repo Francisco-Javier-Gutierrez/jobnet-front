@@ -27,10 +27,12 @@ vi.mock("vue-router", () => ({
   useRouter: () => mockRouter,
 }));
 
+const mockSignOut = vi.fn();
+
 vi.stubGlobal("useAuth", () => ({
   status: mockAuthStatus,
   data: mockAuthData,
-  signOut: vi.fn(),
+  signOut: mockSignOut,
 }));
 
 vi.mock("~/composables/useProtectedAction", () => ({
@@ -50,6 +52,8 @@ vi.mock("~/composables/useProfileState", () => ({
 describe("useAppNavigation", () => {
   beforeEach(() => {
     mockRoute.path = "/";
+    mockSignOut.mockReset();
+    mockSignOut.mockResolvedValue(undefined);
   });
 
   describe("isActive route matching", () => {
@@ -162,6 +166,42 @@ describe("useAppNavigation", () => {
       };
       const { primaryAction } = useAppNavigation();
       expect(primaryAction.value?.label).toBe("Crear Publicación");
+    });
+  });
+
+  describe("onSignOut loading guard", () => {
+    it("sets isSigningOut while signOut is pending and prevents duplicate calls", async () => {
+      let resolveSignOut!: () => void;
+      mockSignOut.mockImplementation(
+        () =>
+          new Promise<void>((resolve) => {
+            resolveSignOut = resolve;
+          }),
+      );
+
+      const { isSigningOut, onSignOut } = useAppNavigation();
+      expect(isSigningOut.value).toBe(false);
+
+      const firstPromise = onSignOut();
+      expect(isSigningOut.value).toBe(true);
+      expect(mockSignOut).toHaveBeenCalledTimes(1);
+      expect(mockSignOut).toHaveBeenCalledWith({ callbackUrl: "/login" });
+
+      // Concurrent trigger while still signing out must be ignored
+      await onSignOut();
+      expect(mockSignOut).toHaveBeenCalledTimes(1);
+
+      resolveSignOut();
+      await firstPromise;
+      expect(isSigningOut.value).toBe(false);
+    });
+
+    it("resets isSigningOut even if signOut rejects", async () => {
+      mockSignOut.mockRejectedValueOnce(new Error("Network error"));
+      const { isSigningOut, onSignOut } = useAppNavigation();
+
+      await expect(onSignOut()).rejects.toThrow("Network error");
+      expect(isSigningOut.value).toBe(false);
     });
   });
 });

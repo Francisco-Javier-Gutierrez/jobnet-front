@@ -120,13 +120,19 @@
         <p class="text-sm text-on-surface-variant dark:text-slate-300">
           ¿No recibiste el código?
           <button
+            type="button"
             @click="handleResend"
             :disabled="resendLoading"
             :aria-busy="resendLoading"
             aria-label="Reenviar el código de verificación por correo"
-            class="font-semibold text-primary hover:underline transition ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1 font-semibold text-primary hover:underline transition ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ resendLoading ? "Reenviando..." : "Reenviar" }}
+            <span
+              v-if="resendLoading"
+              class="w-3 h-3 border-2 border-current/25 border-t-current rounded-full animate-spin"
+              aria-hidden="true"
+            ></span>
+            <span>{{ resendLoading ? "Reenviando..." : "Reenviar" }}</span>
           </button>
         </p>
       </div>

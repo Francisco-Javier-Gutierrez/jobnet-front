@@ -2,171 +2,189 @@
   <main
     class="flex-grow pt-4 pb-36 px-4 md:px-8 flex flex-col gap-6 max-w-4xl mx-auto w-full bg-background dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200"
   >
-    <!-- Header Section (RF-33: Logo + Nombre Comercial preview) -->
-    <div
-      class="flex items-center gap-4 mt-4 p-4 bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 rounded-2xl shadow-sm"
-    >
-      <div
-        class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-outline-variant/80 shadow-md flex items-center justify-center relative group flex-shrink-0 p-1.5"
-      >
-        <img
-          alt="Logotipo Corporativo"
-          class="w-full h-full object-contain rounded-xl"
-          :src="
-            fotoPerfil ||
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuBv7ieXvxtMvK4Bf5kvEuqFTPF59k2wFj0FOiA-v1xXN5VHCH9_ZcdYzKj6xGbyBIeLHVW5FuXPuhZ8ghouEp8A22nMpZV0iW6Zvg_YQ0avpohEqle9p-AR9bgPXdnJadM20BCP6_nuDkNCMnR9ywHb5fxRNfK1sAIL6bXl7qjeDQaRa5J--hkEcazv-m8Brqe_BbKSdIGlVhXvuRzLzSM3HSd57GyjW2Ueeh0XvBP7u4bT3o0EWgnO0Q'
-          "
-        />
-      </div>
-
-      <div class="min-w-0 flex-grow">
-        <h1
-          class="text-xl font-bold text-on-background dark:text-slate-100 truncate"
-        >
-          {{ nombreComercial || "Mi Organización" }}
-        </h1>
-        <p
-          class="text-xs text-on-surface-variant dark:text-slate-300 flex items-center gap-1"
-        >
-          <span class="material-symbols-outlined text-sm text-primary"
-            >domain</span
-          >
-          Configuración e Identidad Corporativa (Organización)
-        </p>
-      </div>
-
-      <NuxtLink
-        :to="`/company/${companyId}`"
-        class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold rounded-xl transition flex items-center gap-1 active:scale-95"
-      >
-        <span class="material-symbols-outlined text-sm">visibility</span>
-        Ver Perfil Público
-      </NuxtLink>
-    </div>
-
-    <!-- Segmented Navigation Tabs -->
-    <div
-      class="w-full border-b border-outline-variant/60 overflow-x-auto overflow-y-hidden touch-pan-x hide-scrollbar"
-    >
-      <nav class="flex flex-nowrap gap-4 w-max pb-1 px-1">
-        <button
-          v-for="tab in tabItems"
-          :key="tab.id"
-          @click="activeTab = tab.id"
-          :class="[
-            activeTab === tab.id
-              ? 'text-primary border-b-2 border-primary font-bold'
-              : 'text-on-surface-variant dark:text-slate-300 hover:text-primary',
-          ]"
-          class="pb-2.5 px-2 text-xs font-medium transition-colors flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap"
-        >
-          <span class="material-symbols-outlined text-base">{{
-            tab.icon
-          }}</span>
-          {{ tab.label }}
-        </button>
-      </nav>
-    </div>
-
-    <!-- Draft Restore Notification Banner -->
-    <div
-      v-if="hasDraft"
-      class="bg-primary/10 border border-primary/20 text-on-surface text-xs p-3 rounded-xl flex items-center justify-between"
-    >
-      <span class="flex items-center gap-1.5 font-medium">
-        <span class="material-symbols-outlined text-base text-primary"
-          >info</span
-        >
-        Se ha restaurado un borrador con cambios sin guardar de la organización.
-      </span>
-      <button
-        type="button"
-        @click="discardDraft"
-        class="text-rose-500 hover:text-rose-600 font-bold transition"
-      >
-        Descartar
-      </button>
-    </div>
-
-    <!-- Tab 1: Identidad Visual -->
-    <section v-show="activeTab === 'identidad'" class="flex flex-col gap-6">
-      <CompanyIdentityTab
-        v-model:fotoPerfil="fotoPerfil"
-        v-model:nombreComercial="nombreComercial"
-        v-model:sector="sector"
-        v-model:latitude="latitude"
-        v-model:longitude="longitude"
-        v-model:locationName="locationName"
-        :companyId="companyId"
-      />
-    </section>
-
-    <!-- Tab 2: Perfil Corporativo -->
-    <section v-show="activeTab === 'perfil'" class="flex flex-col gap-6">
-      <CompanyProfileTab
-        v-model:descripcion="descripcion"
-        v-model:mision="mision"
-        v-model:vision="vision"
-        v-model:beneficios="beneficios"
-      />
-    </section>
-
-    <!-- Tab 3: Documentos Corporativos -->
-    <section v-show="activeTab === 'documentos'" class="flex flex-col gap-6">
-      <CompanyDocumentsTab
-        v-model:documentosCorporativos="documentosCorporativos"
-        :companyId="companyId"
-        @previewDoc="previewDoc"
-      />
-    </section>
-
-    <!-- Tab 4: Marca y Redes -->
-    <section v-show="activeTab === 'marca'" class="flex flex-col gap-6">
-      <CompanyBrandTab v-model:website="website" v-model:linkedin="linkedin" />
-    </section>
-
-    <!-- Tab 5: Verificación Fiscal -->
-    <section v-show="activeTab === 'verificacion'" class="flex flex-col gap-6">
-      <CompanyVerificationTab
-        v-model:taxId="taxId"
-        v-model:documentoVerificacion="documentoVerificacion"
-        :estatusVerificacion="estatusVerificacion"
-        :is-verified="organizacionVerificada"
-        :companyId="companyId"
-        :submittingVerification="submittingVerification"
-        @verify="handleVerificationRequest"
-      />
-    </section>
-
-    <!-- Tab 6: Seguridad y MFA -->
-    <section v-show="activeTab === 'seguridad'" class="flex flex-col gap-6">
-      <MfaSettingsCard
-        :user-id="companyId || ''"
-        :initial-mfa-state="mfaEnabled"
-        @mfa-updated="(state) => (mfaEnabled = state)"
-      />
-
-      <SettingsPasswordCard />
-    </section>
-
-    <!-- Standardized Corporate Document Viewer -->
-    <AppDocumentViewer
-      v-model="isPdfModalOpen"
-      :url="activePreviewUrl"
-      :title="activePreviewName"
+    <!-- Loading Skeleton State -->
+    <AppSkeletonLoader
+      v-if="loading"
+      type="form"
+      :count="2"
+      class="mt-4"
+      label="Cargando configuración de la organización..."
     />
 
-    <!-- Save Action Button -->
-    <button
-      @click="handleSave"
-      :disabled="saving"
-      class="bg-primary hover:bg-primary-container disabled:opacity-50 text-white font-semibold text-sm h-12 rounded-xl transition shadow-md shadow-primary/20 flex items-center justify-center gap-2 active:scale-95 duration-100 mt-4"
-    >
-      <span class="material-symbols-outlined text-lg">{{
-        saving ? "sync" : "save"
-      }}</span>
-      {{ saving ? "Guardando..." : "Guardar Perfil de la Organización" }}
-    </button>
+    <template v-else>
+      <!-- Header Section (RF-33: Logo + Nombre Comercial preview) -->
+      <div
+        class="flex items-center gap-4 mt-4 p-4 bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 rounded-2xl shadow-sm"
+      >
+        <div
+          class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-outline-variant/80 shadow-md flex items-center justify-center relative group flex-shrink-0 p-1.5"
+        >
+          <img
+            alt="Logotipo Corporativo"
+            class="w-full h-full object-contain rounded-xl"
+            :src="
+              fotoPerfil ||
+              'https://lh3.googleusercontent.com/aida-public/AB6AXuBv7ieXvxtMvK4Bf5kvEuqFTPF59k2wFj0FOiA-v1xXN5VHCH9_ZcdYzKj6xGbyBIeLHVW5FuXPuhZ8ghouEp8A22nMpZV0iW6Zvg_YQ0avpohEqle9p-AR9bgPXdnJadM20BCP6_nuDkNCMnR9ywHb5fxRNfK1sAIL6bXl7qjeDQaRa5J--hkEcazv-m8Brqe_BbKSdIGlVhXvuRzLzSM3HSd57GyjW2Ueeh0XvBP7u4bT3o0EWgnO0Q'
+            "
+          />
+        </div>
+
+        <div class="min-w-0 flex-grow">
+          <h1
+            class="text-xl font-bold text-on-background dark:text-slate-100 truncate"
+          >
+            {{ nombreComercial || "Mi Organización" }}
+          </h1>
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-300 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm text-primary"
+              >domain</span
+            >
+            Configuración e Identidad Corporativa (Organización)
+          </p>
+        </div>
+
+        <NuxtLink
+          :to="`/company/${companyId}`"
+          class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold rounded-xl transition flex items-center gap-1 active:scale-95"
+        >
+          <span class="material-symbols-outlined text-sm">visibility</span>
+          Ver Perfil Público
+        </NuxtLink>
+      </div>
+
+      <!-- Segmented Navigation Tabs -->
+      <div
+        class="w-full border-b border-outline-variant/60 overflow-x-auto overflow-y-hidden touch-pan-x hide-scrollbar"
+      >
+        <nav class="flex flex-nowrap gap-4 w-max pb-1 px-1">
+          <button
+            v-for="tab in tabItems"
+            :key="tab.id"
+            @click="activeTab = tab.id"
+            :class="[
+              activeTab === tab.id
+                ? 'text-primary border-b-2 border-primary font-bold'
+                : 'text-on-surface-variant dark:text-slate-300 hover:text-primary',
+            ]"
+            class="pb-2.5 px-2 text-xs font-medium transition-colors flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap"
+          >
+            <span class="material-symbols-outlined text-base">{{
+              tab.icon
+            }}</span>
+            {{ tab.label }}
+          </button>
+        </nav>
+      </div>
+
+      <!-- Draft Restore Notification Banner -->
+      <div
+        v-if="hasDraft"
+        class="bg-primary/10 border border-primary/20 text-on-surface text-xs p-3 rounded-xl flex items-center justify-between"
+      >
+        <span class="flex items-center gap-1.5 font-medium">
+          <span class="material-symbols-outlined text-base text-primary"
+            >info</span
+          >
+          Se ha restaurado un borrador con cambios sin guardar de la
+          organización.
+        </span>
+        <button
+          type="button"
+          @click="discardDraft"
+          class="text-rose-500 hover:text-rose-600 font-bold transition"
+        >
+          Descartar
+        </button>
+      </div>
+
+      <!-- Tab 1: Identidad Visual -->
+      <section v-show="activeTab === 'identidad'" class="flex flex-col gap-6">
+        <CompanyIdentityTab
+          v-model:fotoPerfil="fotoPerfil"
+          v-model:nombreComercial="nombreComercial"
+          v-model:sector="sector"
+          v-model:latitude="latitude"
+          v-model:longitude="longitude"
+          v-model:locationName="locationName"
+          :companyId="companyId"
+        />
+      </section>
+
+      <!-- Tab 2: Perfil Corporativo -->
+      <section v-show="activeTab === 'perfil'" class="flex flex-col gap-6">
+        <CompanyProfileTab
+          v-model:descripcion="descripcion"
+          v-model:mision="mision"
+          v-model:vision="vision"
+          v-model:beneficios="beneficios"
+        />
+      </section>
+
+      <!-- Tab 3: Documentos Corporativos -->
+      <section v-show="activeTab === 'documentos'" class="flex flex-col gap-6">
+        <CompanyDocumentsTab
+          v-model:documentosCorporativos="documentosCorporativos"
+          :companyId="companyId"
+          @previewDoc="previewDoc"
+        />
+      </section>
+
+      <!-- Tab 4: Marca y Redes -->
+      <section v-show="activeTab === 'marca'" class="flex flex-col gap-6">
+        <CompanyBrandTab
+          v-model:website="website"
+          v-model:linkedin="linkedin"
+        />
+      </section>
+
+      <!-- Tab 5: Verificación Fiscal -->
+      <section
+        v-show="activeTab === 'verificacion'"
+        class="flex flex-col gap-6"
+      >
+        <CompanyVerificationTab
+          v-model:taxId="taxId"
+          v-model:documentoVerificacion="documentoVerificacion"
+          :estatusVerificacion="estatusVerificacion"
+          :is-verified="organizacionVerificada"
+          :companyId="companyId"
+          :submittingVerification="submittingVerification"
+          @verify="handleVerificationRequest"
+        />
+      </section>
+
+      <!-- Tab 6: Seguridad y MFA -->
+      <section v-show="activeTab === 'seguridad'" class="flex flex-col gap-6">
+        <MfaSettingsCard
+          :user-id="companyId || ''"
+          :initial-mfa-state="mfaEnabled"
+          @mfa-updated="(state) => (mfaEnabled = state)"
+        />
+
+        <SettingsPasswordCard />
+      </section>
+
+      <!-- Standardized Corporate Document Viewer -->
+      <AppDocumentViewer
+        v-model="isPdfModalOpen"
+        :url="activePreviewUrl"
+        :title="activePreviewName"
+      />
+
+      <!-- Save Action Button -->
+      <AppActionButton
+        type="button"
+        @click="handleSave"
+        :loading="saving"
+        icon="save"
+        spinner-size="md"
+        loading-text="Guardando..."
+        label="Guardar Perfil de la Organización"
+        class="bg-primary hover:bg-primary-container text-white font-semibold text-sm h-12 rounded-xl shadow-md shadow-primary/20 active:scale-95 duration-100 mt-4"
+      />
+    </template>
   </main>
 </template>
 

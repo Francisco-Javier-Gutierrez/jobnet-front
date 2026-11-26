@@ -24,7 +24,8 @@
       <div class="flex items-center gap-3">
         <button
           @click="fetchApplicants"
-          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline-variant/60 hover:bg-surface text-xs font-bold transition shadow-sm active:scale-95"
+          :disabled="isLoading"
+          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline-variant/60 hover:bg-surface text-xs font-bold transition shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           title="Actualizar postulantes"
         >
           <span

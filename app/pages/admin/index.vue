@@ -165,7 +165,14 @@
         </NuxtLink>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <AppSkeletonLoader
+        v-if="loadingAnalytics"
+        type="stats"
+        :count="4"
+        label="Cargando indicadores ejecutivos..."
+      />
+
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- KPI 1: Vacantes Activas -->
         <div
           class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl p-5 shadow-xs"
@@ -545,7 +552,14 @@
           </NuxtLink>
         </div>
 
-        <div class="space-y-3">
+        <AppSkeletonLoader
+          v-if="loadingOrgs"
+          type="list"
+          :count="4"
+          label="Cargando organizaciones recientes..."
+        />
+
+        <div v-else class="space-y-3">
           <p
             v-if="recentOrgs.length === 0"
             class="py-6 text-center text-xs text-slate-500 dark:text-slate-400"
@@ -621,7 +635,14 @@
           </span>
         </div>
 
-        <div class="space-y-4">
+        <AppSkeletonLoader
+          v-if="loadingAnalytics"
+          type="chart"
+          :count="3"
+          label="Cargando distribución laboral..."
+        />
+
+        <div v-else class="space-y-4">
           <!-- Remoto -->
           <div>
             <div class="flex justify-between text-xs mb-1">
@@ -735,6 +756,7 @@
       v-model:suspension-reason-input="suspensionReasonInput"
       v-model:grace-days-input="graceDaysInput"
       :get-org-status-key="getOrgStatusKey"
+      :is-submitting="isApplyingSanction"
       @apply-sanction="handleApplySanction"
     />
   </div>
@@ -761,6 +783,7 @@ const isRefreshing = ref(false);
 
 const {
   analyticsData,
+  loading: loadingAnalytics,
   activeAnomalies,
   hasActiveAnomalies,
   dismissAnomaly,
@@ -768,7 +791,12 @@ const {
   refresh: refreshAnalytics,
 } = useAdminAnalytics();
 
-const { orgs, getOrgStatusKey, refresh: refreshOrgs } = useAdminOrganizations();
+const {
+  orgs,
+  loading: loadingOrgs,
+  getOrgStatusKey,
+  refresh: refreshOrgs,
+} = useAdminOrganizations();
 
 const {
   successMsg,
@@ -777,6 +805,7 @@ const {
   suspensionReasonInput,
   graceDaysInput,
   sanctionSteps,
+  isApplyingSanction,
   openSanctionModal,
   applySanction,
 } = useOrgActions(async () => {

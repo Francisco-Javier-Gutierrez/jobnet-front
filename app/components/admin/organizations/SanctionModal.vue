@@ -153,13 +153,15 @@
                 />
               </div>
             </div>
-            <button
+            <AppActionButton
               @click="$emit('applySanction', 'INITIATE')"
-              class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-4 py-3 rounded-xl transition shadow active:scale-95 duration-100 flex items-center justify-center gap-2"
-            >
-              <span class="material-symbols-outlined text-[18px]">warning</span>
-              Notificar infracción e iniciar periodo de gracia
-            </button>
+              :loading="Boolean(isSubmitting)"
+              icon="warning"
+              icon-class="text-[18px]"
+              loading-text="Procesando..."
+              label="Notificar infracción e iniciar periodo de gracia"
+              class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-4 py-3 rounded-xl shadow active:scale-95 duration-100 gap-2"
+            />
           </div>
 
           <div
@@ -170,22 +172,24 @@
               Emitir dictamen de apelación
             </h4>
             <div class="flex flex-col sm:flex-row gap-3">
-              <button
+              <AppActionButton
                 @click="$emit('applySanction', 'CANCEL')"
-                class="flex-grow bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-3 rounded-xl transition shadow active:scale-95 duration-100 flex items-center justify-center gap-2"
-              >
-                <span class="material-symbols-outlined text-[18px]"
-                  >task_alt</span
-                >
-                Aceptar Apelación (Revocar Suspensión)
-              </button>
-              <button
+                :loading="Boolean(isSubmitting)"
+                icon="task_alt"
+                icon-class="text-[18px]"
+                loading-text="Procesando..."
+                label="Aceptar Apelación (Revocar Suspensión)"
+                class="flex-grow bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-3 rounded-xl shadow active:scale-95 duration-100 gap-2"
+              />
+              <AppActionButton
                 @click="$emit('applySanction', 'CONFIRM')"
-                class="flex-grow bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-3 rounded-xl transition shadow active:scale-95 duration-100 flex items-center justify-center gap-2"
-              >
-                <span class="material-symbols-outlined text-[18px]">block</span>
-                Rechazar Apelación y Suspender Definitivamente
-              </button>
+                :loading="Boolean(isSubmitting)"
+                icon="block"
+                icon-class="text-[18px]"
+                loading-text="Procesando..."
+                label="Rechazar Apelación y Suspender Definitivamente"
+                class="flex-grow bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-3 rounded-xl shadow active:scale-95 duration-100 gap-2"
+              />
             </div>
           </div>
 
@@ -200,15 +204,15 @@
               Si la organización ha corregido las infracciones señaladas, el
               administrador puede reactivar su cuenta y desbloquear el acceso.
             </p>
-            <button
+            <AppActionButton
               @click="$emit('applySanction', 'CANCEL')"
-              class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-3 rounded-xl transition shadow active:scale-95 duration-100 flex items-center justify-center gap-2"
-            >
-              <span class="material-symbols-outlined text-[18px]"
-                >restart_alt</span
-              >
-              Reactivar Cuenta y Desbloquear Acceso
-            </button>
+              :loading="Boolean(isSubmitting)"
+              icon="restart_alt"
+              icon-class="text-[18px]"
+              loading-text="Procesando..."
+              label="Reactivar Cuenta y Desbloquear Acceso"
+              class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-3 rounded-xl shadow active:scale-95 duration-100 gap-2"
+            />
           </div>
         </div>
       </div>
@@ -246,6 +250,7 @@ const props = defineProps<{
   suspensionReasonInput: string;
   graceDaysInput: number;
   getOrgStatusKey: (org: AdminOrganization | CompanyProfile) => string;
+  isSubmitting?: boolean;
 }>();
 
 const emit = defineEmits<{

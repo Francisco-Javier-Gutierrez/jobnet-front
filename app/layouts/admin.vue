@@ -59,13 +59,17 @@
           >
           Perfil
         </NuxtLink>
-        <button
+        <AppActionButton
+          type="button"
+          :loading="isSigningOut"
+          icon="logout"
+          icon-class="text-[20px]"
+          label="Cerrar Sesión"
+          loading-text="Cerrando..."
+          spinner-size="xs"
           @click="handleSignOut"
-          class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
-        >
-          <span class="material-symbols-outlined text-[20px]">logout</span>
-          Cerrar Sesión
-        </button>
+          class="w-full !justify-start gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
+        />
       </div>
     </aside>
 
@@ -89,10 +93,20 @@
         </div>
         <div class="flex items-center justify-end gap-3 flex-1">
           <button
+            type="button"
+            :disabled="isSigningOut"
             @click="handleSignOut"
-            class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300"
+            class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 disabled:opacity-50 inline-flex items-center justify-center"
+            aria-label="Cerrar sesión"
           >
-            <span class="material-symbols-outlined text-[24px]">logout</span>
+            <span
+              v-if="isSigningOut"
+              class="w-5 h-5 border-2 border-current/25 border-t-current rounded-full animate-spin"
+              aria-hidden="true"
+            ></span>
+            <span v-else class="material-symbols-outlined text-[24px]"
+              >logout</span
+            >
           </button>
           <NuxtLink
             to="/profile"
@@ -184,13 +198,17 @@
             >
             Perfil
           </NuxtLink>
-          <button
+          <AppActionButton
+            type="button"
+            :loading="isSigningOut"
+            icon="logout"
+            icon-class="text-[20px]"
+            label="Cerrar Sesión"
+            loading-text="Cerrando..."
+            spinner-size="xs"
             @click="handleSignOut"
-            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition"
-          >
-            <span class="material-symbols-outlined text-[20px]">logout</span>
-            Cerrar Sesión
-          </button>
+            class="w-full !justify-start gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer"
+          />
         </div>
       </div>
     </Transition>
@@ -202,6 +220,7 @@ const route = useRoute();
 const router = useRouter();
 const { status, data, signOut } = useAuth();
 const isMobileMenuOpen = ref(false);
+const isSigningOut = ref(false);
 
 const navItems = [
   { to: "/", icon: "home", label: "Inicio" },
@@ -250,6 +269,12 @@ watch(status, () => checkRole(), { immediate: true });
 watch(data, () => checkRole(), { immediate: true });
 
 const handleSignOut = async () => {
-  await signOut({ callbackUrl: "/login" });
+  if (isSigningOut.value) return;
+  isSigningOut.value = true;
+  try {
+    await signOut({ callbackUrl: "/login" });
+  } finally {
+    isSigningOut.value = false;
+  }
 };
 </script>

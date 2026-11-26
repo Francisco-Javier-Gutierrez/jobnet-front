@@ -101,7 +101,28 @@
     </div>
 
     <!-- Quick Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <div
+      v-if="loadingSubscribers"
+      class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8"
+      role="status"
+      aria-busy="true"
+      aria-label="Cargando métricas de suscriptores..."
+    >
+      <div
+        v-for="i in 3"
+        :key="i"
+        class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 animate-pulse"
+      >
+        <div class="w-12 h-12 rounded-2xl skeleton-shimmer flex-shrink-0"></div>
+        <div class="space-y-2 flex-grow">
+          <div class="h-3 w-28 skeleton-shimmer rounded"></div>
+          <div class="h-6 w-12 skeleton-shimmer rounded-md"></div>
+          <div class="h-2.5 w-24 skeleton-shimmer rounded"></div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
       <div
         class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-5 shadow-sm flex items-center gap-4"
       >
@@ -329,15 +350,12 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="loadingSubscribers" class="py-16 text-center">
-        <span
-          class="material-symbols-outlined text-4xl text-primary animate-spin"
-          >progress_activity</span
-        >
-        <p class="text-xs text-on-surface-variant dark:text-slate-400 mt-2">
-          Consultando suscriptores en AWS DynamoDB...
-        </p>
-      </div>
+      <AppSkeletonLoader
+        v-if="loadingSubscribers"
+        type="list"
+        :count="5"
+        label="Consultando suscriptores en AWS DynamoDB..."
+      />
 
       <!-- Empty State -->
       <div
@@ -1015,7 +1033,14 @@
     <!-- TAB 3: TERMS & CONDITIONS UPDATE & BROADCAST -->
     <div v-if="activeTab === 'terms'" class="space-y-8">
       <!-- Current Version Status Card -->
+      <AppSkeletonLoader
+        v-if="loadingTerms"
+        type="list"
+        :count="1"
+        label="Cargando versión vigente de Términos..."
+      />
       <div
+        v-else
         class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
       >
         <div class="flex items-start gap-4">
@@ -1316,17 +1341,25 @@
               Historial de Versiones en DynamoDB (CONFIG#TERMS)
             </h3>
           </div>
-          <button
+          <AppActionButton
             @click="fetchTermsHistory"
-            class="text-xs text-primary font-bold hover:underline flex items-center gap-1 cursor-pointer"
-          >
-            <span class="material-symbols-outlined text-sm">refresh</span>
-            <span>Refrescar Historial</span>
-          </button>
+            :loading="loadingTerms"
+            icon="refresh"
+            loading-text="Actualizando..."
+            label="Refrescar Historial"
+            class="text-xs text-primary font-bold hover:underline cursor-pointer"
+          />
         </div>
 
+        <AppSkeletonLoader
+          v-if="loadingTerms"
+          type="table"
+          :count="3"
+          label="Cargando historial de versiones..."
+        />
+
         <div
-          v-if="termsHistory.length === 0"
+          v-else-if="termsHistory.length === 0"
           class="py-8 text-center text-xs text-on-surface-variant"
         >
           No hay registros históricos previos guardados.

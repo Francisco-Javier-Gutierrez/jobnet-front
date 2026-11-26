@@ -65,14 +65,17 @@
               Chat
             </nuxt-link>
 
-            <button
+            <AppActionButton
               v-if="
                 !['RECHAZADO', 'CONTRATADO'].includes(selectedCandidate.status)
               "
               @click="advanceCandidateStage(selectedCandidate)"
-              class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold flex items-center gap-1"
+              :loading="isCandidateUpdating(selectedCandidate.id)"
+              icon="trending_up"
+              spinner-size="xs"
+              loading-text="Actualizando..."
+              class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold"
             >
-              <span class="material-symbols-outlined text-sm">trending_up</span>
               {{
                 selectedCandidate.status === "PENDIENTE"
                   ? "Contactar"
@@ -80,17 +83,17 @@
                     ? "Seleccionar"
                     : "Contratar"
               }}
-            </button>
+            </AppActionButton>
 
-            <button
+            <AppActionButton
               v-if="
                 !['RECHAZADO', 'CONTRATADO'].includes(selectedCandidate.status)
               "
               @click="triggerReject(selectedCandidate)"
-              class="px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-600 text-xs font-bold flex items-center gap-1"
-            >
-              <span class="material-symbols-outlined text-sm">close</span>
-            </button>
+              :disabled="isCandidateUpdating(selectedCandidate.id)"
+              icon="close"
+              class="px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-600 text-xs font-bold"
+            />
           </div>
         </div>
 
@@ -197,14 +200,16 @@
       >
         Cancelar
       </button>
-      <button
+      <AppActionButton
         type="button"
         @click="submitInterviewTransition"
+        :loading="isSubmittingModal"
         :disabled="!interviewDetails.trim()"
-        class="px-4 py-2 bg-primary hover:bg-primary-container text-white disabled:opacity-50 rounded-xl text-xs font-bold shadow-sm transition cursor-pointer"
-      >
-        Confirmar y Contactar
-      </button>
+        loading-text="Enviando..."
+        label="Confirmar y Contactar"
+        spinner-size="xs"
+        class="px-4 py-2 bg-primary hover:bg-primary-container text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+      />
     </template>
   </AppModal>
 
@@ -279,14 +284,16 @@
       >
         Cancelar
       </button>
-      <button
+      <AppActionButton
         type="button"
         @click="submitRejection"
+        :loading="isSubmittingModal"
         :disabled="!rejectionReason.trim()"
-        class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white disabled:opacity-50 rounded-xl text-xs font-bold shadow-sm transition cursor-pointer"
-      >
-        Confirmar Descarte
-      </button>
+        loading-text="Descartando..."
+        label="Confirmar Descarte"
+        spinner-size="xs"
+        class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+      />
     </template>
   </AppModal>
 </template>
@@ -307,6 +314,8 @@ const {
   interviewDetails,
   isRejectModalOpen,
   rejectionReason,
+  isSubmittingModal,
+  isCandidateUpdating,
   getStatusBadgeClass,
   getStatusLabel,
   advanceCandidateStage,
