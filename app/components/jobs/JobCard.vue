@@ -131,83 +131,27 @@
       </p>
     </div>
 
-    <!-- BOTTOM ACTIONS BAR (Similar to PostCard: Like, Dislike, Share, Bookmark, and Detail/Comment Action) -->
-    <div
-      class="px-4 py-2 flex items-center gap-1 border-t border-outline-variant/30 prevent-job-nav select-none"
-    >
-      <!-- LIKE BUTTON -->
-      <button
-        @click="handleLikeClick"
-        class="flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-        :class="
-          isLiked
-            ? 'text-rose-600 font-bold'
-            : 'text-on-surface-variant dark:text-slate-300 hover:text-rose-600'
-        "
-        title="Me gusta esta vacante"
-      >
-        <span
-          class="material-symbols-outlined text-[20px]"
-          :class="{ 'font-fill-1 text-rose-600': isLiked }"
-        >
-          {{ isLiked ? "favorite" : "favorite_border" }}
-        </span>
-        <span class="text-xs font-semibold">{{ likesCount }}</span>
-      </button>
-
-      <!-- COMMENT / DETAIL ACTION (Navigates to vacancy detail where comments exist) -->
-      <button
-        @click.stop="forceNavigate"
-        class="flex items-center gap-1.5 text-on-surface-variant dark:text-slate-300 hover:text-primary transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-        title="Ver comentarios y detalles en la vacante"
-      >
-        <span class="material-symbols-outlined text-[20px]"
-          >chat_bubble_outline</span
-        >
-        <span class="text-xs font-semibold select-none">{{
-          commentsCount
-        }}</span>
-      </button>
-
-      <!-- SHARE BUTTON -->
-      <button
-        @click.stop="handleShareClick"
-        class="flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-        :class="
-          isSharedLocally
-            ? 'text-secondary font-bold'
-            : 'text-on-surface-variant dark:text-slate-300 hover:text-secondary'
-        "
-        title="Compartir enlace de vacante"
-      >
-        <span
-          class="material-symbols-outlined text-[20px]"
-          :class="{ 'font-fill-1 text-secondary': isSharedLocally }"
-          >share</span
-        >
-        <span class="text-xs font-semibold">{{ sharesCount }}</span>
-      </button>
-
-      <!-- BOOKMARK / SAVE BUTTON -->
-      <button
-        @click="handleBookmarkClick"
-        class="ml-auto flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-        :class="
-          effectiveIsBookmarked
-            ? 'text-amber-500 font-bold'
-            : 'text-on-surface-variant dark:text-slate-300 hover:text-amber-500'
-        "
-        title="Guardar vacante"
-      >
-        <span
-          class="material-symbols-outlined text-[20px]"
-          :class="{ 'font-fill-1 text-amber-500': effectiveIsBookmarked }"
-        >
-          {{ effectiveIsBookmarked ? "bookmark" : "bookmark_border" }}
-        </span>
-        <span class="text-xs font-semibold">{{ bookmarksCount }}</span>
-      </button>
-    </div>
+    <!-- BOTTOM ACTIONS BAR -->
+    <AppInteractionBar
+      :item-id="job.id || job.uniqueId"
+      storage-prefix="shared-jobs"
+      :current-user-id="currentUserId"
+      :is-liked="isLiked"
+      :is-bookmarked="effectiveIsBookmarked"
+      :likes-count="likesCount"
+      :comments-count="commentsCount"
+      :shares-count="sharesCount"
+      :bookmarks-count="bookmarksCount"
+      container-class="prevent-job-nav"
+      like-title="Me gusta esta vacante"
+      comment-title="Ver comentarios y detalles en la vacante"
+      share-title="Compartir enlace de vacante"
+      bookmark-title="Guardar vacante"
+      @like="emit('like', props.job)"
+      @comment="forceNavigate"
+      @share="emit('share', props.job)"
+      @bookmark="emit('bookmark', props.job)"
+    />
 
     <!-- Report Modal for Vacancy -->
     <ReportModal
@@ -248,25 +192,17 @@ const emit = defineEmits<{
 const showMenu = ref(false);
 const showReportModal = ref(false);
 
-const { status, data: session } = useAuth();
+const { status } = useAuth();
 const { openProtectedModal } = useProtectedAction();
 const router = useRouter();
-
-const isSharedLocally = ref(false);
-
-onMounted(() => {
-  if (process.client) {
-    const currentUserId =
-      props.currentUserId || session.value?.user?.id || "anonymous";
-    const shared = JSON.parse(
-      localStorage.getItem(`shared-jobs-${currentUserId}`) || "[]",
-    );
-    const jobId = props.job.id || props.job.uniqueId;
-    if (jobId) {
-      isSharedLocally.value = shared.includes(jobId);
-    }
-  }
-});
+const {
+  getUserIdentifiers,
+  isItemLiked: checkItemLiked,
+  isItemBookmarked: checkItemBookmarked,
+  getItemLikesCount,
+  getItemBookmarksCount,
+  getItemCommentsCount,
+} = useContentInteractions();
 
 const companyName = computed(() => {
   return (
@@ -309,113 +245,30 @@ const salaryDisplay = computed(() => {
 });
 
 // Likes count & state
-const likesList = computed<string[]>(() => {
-  if (Array.isArray(props.job?.likesList)) return props.job.likesList;
-  if (Array.isArray((props.job as any)?.likedBy))
-    return (props.job as any).likedBy;
-  return [];
-});
-
 const isLiked = computed(() => {
   if (props.isLiked !== undefined) return props.isLiked;
-
-  const authUser = session.value?.user as any;
-  const loggedEmail = authUser?.email?.toLowerCase();
-  const loggedId = authUser?.id ? String(authUser.id).toLowerCase() : "";
-  const passedUserId = props.currentUserId
-    ? String(props.currentUserId).toLowerCase()
-    : "";
-
-  const likes =
-    props.job?.likesList ||
-    (props.job as any)?.likedBy ||
-    (props.job as any)?.likes_list ||
-    [];
-
-  if (Array.isArray(likes) && likes.length > 0) {
-    const found = likes.some((item: unknown) => {
-      const s = String(item).toLowerCase();
-      return (
-        (passedUserId && s === passedUserId) ||
-        (loggedEmail && s === loggedEmail) ||
-        (loggedId && s === loggedId)
-      );
-    });
-    if (found) return true;
-  }
-
-  return Boolean((props.job as any)?.isLiked || (props.job as any)?.liked);
+  return checkItemLiked(props.job, getUserIdentifiers(props.currentUserId));
 });
 
-const likesCount = computed(() => {
-  if (typeof props.job?.likesCount === "number") return props.job.likesCount;
-  if (typeof props.job?.likes === "number") return props.job.likes;
-  if (Array.isArray(props.job?.likesList)) return props.job.likesList.length;
-  return likesList.value.length;
-});
+const likesCount = computed(() => getItemLikesCount(props.job));
 
 // Bookmarks state
-const bookmarksList = computed<string[]>(() => {
-  if (Array.isArray(props.job?.bookmarksList)) return props.job.bookmarksList;
-  if (Array.isArray(props.job?.savedBy)) return props.job.savedBy;
-  return [];
-});
-
 const effectiveIsBookmarked = computed(() => {
   if (props.isBookmarked !== undefined) return props.isBookmarked;
-
-  const authUser = session.value?.user as any;
-  const loggedEmail = authUser?.email?.toLowerCase();
-  const loggedId = authUser?.id ? String(authUser.id).toLowerCase() : "";
-  const passedUserId = props.currentUserId
-    ? String(props.currentUserId).toLowerCase()
-    : "";
-
-  const bookmarks =
-    props.job?.bookmarksList ||
-    (props.job as any)?.savedBy ||
-    (props.job as any)?.bookmarks ||
-    [];
-
-  if (Array.isArray(bookmarks)) {
-    const found = bookmarks.some((item: unknown) => {
-      const s = String(item).toLowerCase();
-      return (
-        (passedUserId && s === passedUserId) ||
-        (loggedEmail && s === loggedEmail) ||
-        (loggedId && s === loggedId)
-      );
-    });
-    if (found) return true;
-  }
-
-  return Boolean(
-    (props.job as any)?.isBookmarked || (props.job as any)?.bookmarked,
+  return checkItemBookmarked(
+    props.job,
+    getUserIdentifiers(props.currentUserId),
   );
 });
 
 // Comments count
-const commentsCount = computed(() => {
-  if (typeof props.job?.commentsCount === "number")
-    return props.job.commentsCount;
-  if (Array.isArray(props.job?.comments)) return props.job.comments.length;
-  return 0;
-});
+const commentsCount = computed(() => getItemCommentsCount(props.job));
 
 const sharesCount = computed(() => {
   return props.job?.sharesCount || 0;
 });
 
-const bookmarksCount = computed(() => {
-  const bList =
-    props.job?.bookmarksList ||
-    (props.job as any)?.savedBy ||
-    (props.job as any)?.bookmarks;
-  if (Array.isArray(bList) && bList.length > 0) return bList.length;
-  if (typeof props.job?.bookmarksCount === "number")
-    return props.job.bookmarksCount;
-  return Array.isArray(bList) ? bList.length : bookmarksList.value.length;
-});
+const bookmarksCount = computed(() => getItemBookmarksCount(props.job));
 
 // Click handlers
 const handleClick = (e: MouseEvent) => {
@@ -455,46 +308,5 @@ const openReportModal = () => {
     return;
   }
   showReportModal.value = true;
-};
-
-const handleLikeClick = (e: Event) => {
-  e.stopPropagation();
-  if (status.value !== "authenticated") {
-    openProtectedModal();
-    return;
-  }
-  emit("like", props.job);
-};
-
-const handleShareClick = (e: Event) => {
-  e.stopPropagation();
-
-  if (process.client) {
-    const currentUserId =
-      props.currentUserId || session.value?.user?.id || "anonymous";
-    const shared = JSON.parse(
-      localStorage.getItem(`shared-jobs-${currentUserId}`) || "[]",
-    );
-    const id = props.job.id || props.job.uniqueId;
-    if (id && !shared.includes(id)) {
-      shared.push(id);
-      localStorage.setItem(
-        `shared-jobs-${currentUserId}`,
-        JSON.stringify(shared),
-      );
-    }
-    isSharedLocally.value = true;
-  }
-
-  emit("share", props.job);
-};
-
-const handleBookmarkClick = (e: Event) => {
-  e.stopPropagation();
-  if (status.value !== "authenticated") {
-    openProtectedModal();
-    return;
-  }
-  emit("bookmark", props.job);
 };
 </script>

@@ -2,6 +2,7 @@ import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useAuth } from "#imports";
 import { useShare } from "#imports";
+import { MOCK_POSTS } from "~/utils/mockData";
 
 import type { Post, Job } from "~/types";
 
@@ -104,6 +105,11 @@ export function useJobFeeds() {
   // Load Posts from API
   const loadPosts = async () => {
     try {
+      const { isMockEnabled } = useMockSession();
+      if (isMockEnabled.value) {
+        postsList.value = JSON.parse(JSON.stringify(MOCK_POSTS));
+        return;
+      }
       const config = useRuntimeConfig();
       const baseUrl = config.public.apiUrl || "";
       const targetUrl = baseUrl ? `${baseUrl}/posts` : "/api/posts";
@@ -225,77 +231,17 @@ export function useJobFeeds() {
     }
   };
 
+  const {
+    toggleLike: toggleSharedLike,
+    toggleBookmark: toggleSharedBookmark,
+  } = useContentInteractions();
+
   const toggleLike = async (item: any) => {
     if (status.value !== "authenticated") {
       showAuthModal.value = true;
       return;
     }
-
-    if (!item.likesList) {
-      item.likesList = [];
-    }
-
-    const originalLikesList = [...item.likesList];
-    const originalLikesCount =
-      item.likesCount ?? item.likes ?? item.likesList.length;
-    const originalIsLiked = item.isLiked;
-
-    const idx = item.likesList.indexOf(currentUserId.value);
-    const wasLiked = idx !== -1;
-    if (wasLiked) {
-      item.likesList.splice(idx, 1);
-      if (typeof item.likesCount === "number") {
-        item.likesCount = Math.max(0, item.likesCount - 1);
-      } else {
-        item.likesCount = item.likesList.length;
-      }
-      item.isLiked = false;
-    } else {
-      item.likesList.push(currentUserId.value);
-      if (typeof item.likesCount === "number") {
-        item.likesCount = item.likesCount + 1;
-      } else {
-        item.likesCount = item.likesList.length;
-      }
-      item.isLiked = true;
-    }
-    item.likes = item.likesList.length;
-
-    try {
-      const isJob =
-        item.isVacancy || item.tipo === "VACANTE" || item.type === "VACANCY";
-      const endpoint = isJob
-        ? `/api/jobs/${item.id || item.uniqueId}/like`
-        : `/api/posts/${item.uniqueId || item.id}/like`;
-
-      const res = await $fetch<any>(endpoint, {
-        method: "POST",
-        body: { userUuid: currentUserId.value },
-      });
-
-      const idxNow = item.likesList.indexOf(currentUserId.value);
-      if (res?.liked) {
-        if (idxNow === -1) {
-          item.likesList.push(currentUserId.value);
-        }
-        item.isLiked = true;
-      } else if (res?.liked === false) {
-        if (idxNow !== -1) {
-          item.likesList.splice(idxNow, 1);
-        }
-        item.isLiked = false;
-      }
-      item.likes = item.likesList.length;
-      if (typeof res?.likesCount === "number") {
-        item.likesCount = res.likesCount;
-      }
-    } catch (e) {
-      console.error("Error toggling like:", e);
-      item.likesList = originalLikesList;
-      item.likes = originalLikesCount;
-      item.likesCount = originalLikesCount;
-      item.isLiked = originalIsLiked;
-    }
+    await toggleSharedLike(item, undefined, { userId: currentUserId.value });
   };
 
   const toggleBookmark = async (item: any) => {
@@ -303,68 +249,9 @@ export function useJobFeeds() {
       showAuthModal.value = true;
       return;
     }
-    if (!item.bookmarksList) {
-      item.bookmarksList = [];
-    }
-
-    const originalBookmarksList = [...item.bookmarksList];
-    const originalBookmarksCount =
-      item.bookmarksCount ?? item.bookmarksList.length;
-    const originalIsBookmarked = item.isBookmarked;
-
-    const idx = item.bookmarksList.indexOf(currentUserId.value);
-    const wasBookmarked = idx !== -1;
-    if (wasBookmarked) {
-      item.bookmarksList.splice(idx, 1);
-      if (typeof item.bookmarksCount === "number") {
-        item.bookmarksCount = Math.max(0, item.bookmarksCount - 1);
-      } else {
-        item.bookmarksCount = item.bookmarksList.length;
-      }
-      item.isBookmarked = false;
-    } else {
-      item.bookmarksList.push(currentUserId.value);
-      if (typeof item.bookmarksCount === "number") {
-        item.bookmarksCount = item.bookmarksCount + 1;
-      } else {
-        item.bookmarksCount = item.bookmarksList.length;
-      }
-      item.isBookmarked = true;
-    }
-
-    try {
-      const isJob =
-        item.isVacancy || item.tipo === "VACANTE" || item.type === "VACANCY";
-      const endpoint = isJob
-        ? `/api/jobs/${item.id || item.uniqueId}/bookmark`
-        : `/api/posts/${item.uniqueId || item.id}/bookmark`;
-
-      const res = await $fetch<any>(endpoint, {
-        method: "POST",
-        body: { userUuid: currentUserId.value },
-      });
-
-      const idxNow = item.bookmarksList.indexOf(currentUserId.value);
-      if (res?.bookmarked) {
-        if (idxNow === -1) {
-          item.bookmarksList.push(currentUserId.value);
-        }
-        item.isBookmarked = true;
-      } else if (res?.bookmarked === false) {
-        if (idxNow !== -1) {
-          item.bookmarksList.splice(idxNow, 1);
-        }
-        item.isBookmarked = false;
-      }
-      if (typeof res?.bookmarksCount === "number") {
-        item.bookmarksCount = res.bookmarksCount;
-      }
-    } catch (e) {
-      console.error("Error toggling bookmark:", e);
-      item.bookmarksList = originalBookmarksList;
-      item.bookmarksCount = originalBookmarksCount;
-      item.isBookmarked = originalIsBookmarked;
-    }
+    await toggleSharedBookmark(item, undefined, {
+      userId: currentUserId.value,
+    });
   };
 
   // Bottom Sheet state

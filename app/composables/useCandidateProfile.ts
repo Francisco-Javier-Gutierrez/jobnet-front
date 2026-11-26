@@ -370,6 +370,11 @@ export function useCandidateProfile(candidateIdParam?: string) {
     return Boolean(post.isBookmarked || post.bookmarked);
   };
 
+  const {
+    toggleLike: toggleSharedLike,
+    toggleBookmark: toggleSharedBookmark,
+  } = useContentInteractions();
+
   const toggleLike = async (itemOrId: any) => {
     const post =
       typeof itemOrId === "string"
@@ -382,58 +387,7 @@ export function useCandidateProfile(candidateIdParam?: string) {
         : itemOrId;
 
     if (!post) return;
-    const authUser = authData.value?.user as any;
-    const currentUserId = authUser?.id || authUser?.email;
-    if (!currentUserId) return;
-
-    if (!post.likesList) post.likesList = [];
-
-    const userEmail = authUser?.email?.toLowerCase();
-    const userId = authUser?.id;
-
-    const originalLikes = [...post.likesList];
-    const existingIdx = post.likesList.findIndex((item: any) => {
-      const s = String(item).toLowerCase();
-      return (
-        s === String(currentUserId).toLowerCase() ||
-        (userEmail && s === userEmail) ||
-        (userId && s === String(userId).toLowerCase())
-      );
-    });
-
-    if (existingIdx !== -1) {
-      post.likesList.splice(existingIdx, 1);
-      if (typeof post.likesCount === "number") {
-        post.likesCount = Math.max(0, post.likesCount - 1);
-      } else {
-        post.likesCount = post.likesList.length;
-      }
-      post.isLiked = false;
-    } else {
-      post.likesList.push(currentUserId);
-      if (typeof post.likesCount === "number") {
-        post.likesCount = post.likesCount + 1;
-      } else {
-        post.likesCount = post.likesList.length;
-      }
-      post.isLiked = true;
-    }
-    post.likes = post.likesList.length;
-
-    try {
-      const postId = post.uniqueId || post.id;
-      const res = await $fetch<any>(`/api/posts/${postId}/like`, {
-        method: "POST",
-        body: { userId: currentUserId, userUuid: currentUserId },
-      });
-
-      if (res?.likesList) {
-        post.likesList = res.likesList;
-      }
-    } catch (e) {
-      console.error("Error toggling like:", e);
-      post.likesList = originalLikes;
-    }
+    await toggleSharedLike(post, "post");
   };
 
   const toggleBookmark = async (itemOrId: any) => {
@@ -448,151 +402,34 @@ export function useCandidateProfile(candidateIdParam?: string) {
         : itemOrId;
 
     if (!post) return;
-    const authUser = authData.value?.user as any;
-    const currentUserId = authUser?.id || authUser?.email;
-    if (!currentUserId) return;
-
-    if (!post.bookmarksList) post.bookmarksList = [];
-
-    const userEmail = authUser?.email?.toLowerCase();
-    const userId = authUser?.id;
-
-    const originalBookmarks = [...post.bookmarksList];
-    const existingIdx = post.bookmarksList.findIndex((item: any) => {
-      const s = String(item).toLowerCase();
-      return (
-        s === String(currentUserId).toLowerCase() ||
-        (userEmail && s === userEmail) ||
-        (userId && s === String(userId).toLowerCase())
-      );
-    });
-
-    if (existingIdx !== -1) {
-      post.bookmarksList.splice(existingIdx, 1);
-      if (typeof post.bookmarksCount === "number") {
-        post.bookmarksCount = Math.max(0, post.bookmarksCount - 1);
-      } else {
-        post.bookmarksCount = post.bookmarksList.length;
-      }
-      post.isBookmarked = false;
-    } else {
-      post.bookmarksList.push(currentUserId);
-      if (typeof post.bookmarksCount === "number") {
-        post.bookmarksCount = post.bookmarksCount + 1;
-      } else {
-        post.bookmarksCount = post.bookmarksList.length;
-      }
-      post.isBookmarked = true;
-    }
-
-    try {
-      const postId = post.uniqueId || post.id;
-      const res = await $fetch<any>(`/api/posts/${postId}/bookmark`, {
-        method: "POST",
-        body: { userId: currentUserId, userUuid: currentUserId },
-      });
-
-      if (res?.bookmarksList) {
-        post.bookmarksList = res.bookmarksList;
-      } else if (res?.bookmarked !== undefined) {
-        const idxNow = post.bookmarksList.findIndex((item: any) => {
-          const s = String(item).toLowerCase();
-          return (
-            s === String(currentUserId).toLowerCase() ||
-            (userEmail && s === userEmail) ||
-            (userId && s === String(userId).toLowerCase())
-          );
-        });
-        if (res.bookmarked && idxNow === -1) {
-          post.bookmarksList.push(currentUserId);
-        } else if (!res.bookmarked && idxNow !== -1) {
-          post.bookmarksList.splice(idxNow, 1);
-        }
-      }
-    } catch (e) {
-      console.error("Error toggling bookmark:", e);
-      post.bookmarksList = originalBookmarks;
-    }
+    await toggleSharedBookmark(post, "post");
   };
 
   const toggleJobBookmark = async (job: any) => {
     const authUser = authData.value?.user as any;
-    const currentUserId = authUser?.id || candidateId;
-    if (!currentUserId) return;
-    if (!job.bookmarksList) job.bookmarksList = [];
-
+    const uid = authUser?.id || candidateId;
+    if (!uid) return;
     const jId = job.id || job.uniqueId;
-    const idx = job.bookmarksList.indexOf(currentUserId);
-    if (idx !== -1) {
-      job.bookmarksList.splice(idx, 1);
-      if (typeof job.bookmarksCount === "number") {
-        job.bookmarksCount = Math.max(0, job.bookmarksCount - 1);
-      } else {
-        job.bookmarksCount = job.bookmarksList.length;
+
+    await toggleSharedBookmark(job, "job", { userId: uid });
+
+    if (job.isBookmarked) {
+      if (!allBookmarkedJobs.value.some((j) => (j.id || j.uniqueId) === jId)) {
+        allBookmarkedJobs.value.unshift(job);
       }
-      job.isBookmarked = false;
+    } else {
       const bIdx = allBookmarkedJobs.value.findIndex(
         (j) => (j.id || j.uniqueId) === jId,
       );
       if (bIdx !== -1) allBookmarkedJobs.value.splice(bIdx, 1);
-    } else {
-      job.bookmarksList.push(currentUserId);
-      if (typeof job.bookmarksCount === "number") {
-        job.bookmarksCount = job.bookmarksCount + 1;
-      } else {
-        job.bookmarksCount = job.bookmarksList.length;
-      }
-      job.isBookmarked = true;
-      if (!allBookmarkedJobs.value.some((j) => (j.id || j.uniqueId) === jId)) {
-        allBookmarkedJobs.value.unshift(job);
-      }
-    }
-
-    try {
-      await $fetch(`/api/jobs/${jId}/bookmark`, {
-        method: "POST",
-        body: { userUuid: currentUserId },
-      });
-    } catch (e) {
-      console.error("Error toggling job bookmark:", e);
     }
   };
 
   const toggleJobLike = async (job: any) => {
     const authUser = authData.value?.user as any;
-    const currentUserId = authUser?.id || candidateId;
-    if (!currentUserId) return;
-    if (!job.likesList) job.likesList = [];
-
-    const jId = job.id || job.uniqueId;
-    const idx = job.likesList.indexOf(currentUserId);
-    if (idx !== -1) {
-      job.likesList.splice(idx, 1);
-      if (typeof job.likesCount === "number") {
-        job.likesCount = Math.max(0, job.likesCount - 1);
-      } else {
-        job.likesCount = job.likesList.length;
-      }
-      job.isLiked = false;
-    } else {
-      job.likesList.push(currentUserId);
-      if (typeof job.likesCount === "number") {
-        job.likesCount = job.likesCount + 1;
-      } else {
-        job.likesCount = job.likesList.length;
-      }
-      job.isLiked = true;
-    }
-    job.likes = job.likesList.length;
-
-    try {
-      await $fetch(`/api/jobs/${jId}/like`, {
-        method: "POST",
-        body: { userUuid: currentUserId },
-      });
-    } catch (e) {
-      console.error("Error toggling job like:", e);
-    }
+    const uid = authUser?.id || candidateId;
+    if (!uid) return;
+    await toggleSharedLike(job, "job", { userId: uid });
   };
 
   return {

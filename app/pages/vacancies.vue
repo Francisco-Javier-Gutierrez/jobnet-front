@@ -737,52 +737,16 @@ const filteredJobs = computed(() => {
   return results;
 });
 
+const { toggleLike: toggleSharedLike, toggleBookmark: toggleSharedBookmark } =
+  useContentInteractions();
+
 // Reactive Job Action Handlers for JobCard
 const toggleJobLike = async (job: any) => {
-  const currentUserId = (session.value?.user as any)?.id;
-  if (!currentUserId) return;
-  if (!job.likesList) job.likesList = [];
-  if (!job.dislikesList) job.dislikesList = [];
-
-  const idx = job.likesList.indexOf(currentUserId);
-  if (idx !== -1) {
-    job.likesList.splice(idx, 1);
-  } else {
-    job.likesList.push(currentUserId);
-    const dislikeIdx = job.dislikesList.indexOf(currentUserId);
-    if (dislikeIdx !== -1) job.dislikesList.splice(dislikeIdx, 1);
-  }
-
-  try {
-    await $fetch(`/api/jobs/${job.id}/like`, {
-      method: "POST",
-      body: { userUuid: currentUserId },
-    });
-  } catch (e) {
-    // Local optimistic state preserved
-  }
+  await toggleSharedLike(job, "job");
 };
 
 const toggleJobBookmark = async (job: any) => {
-  const currentUserId = (session.value?.user as any)?.id;
-  if (!currentUserId) return;
-  if (!job.bookmarksList) job.bookmarksList = [];
-
-  const idx = job.bookmarksList.indexOf(currentUserId);
-  if (idx !== -1) {
-    job.bookmarksList.splice(idx, 1);
-  } else {
-    job.bookmarksList.push(currentUserId);
-  }
-
-  try {
-    await $fetch(`/api/jobs/${job.id}/bookmark`, {
-      method: "POST",
-      body: { userUuid: currentUserId },
-    });
-  } catch (e) {
-    // Local optimistic state preserved
-  }
+  await toggleSharedBookmark(job, "job");
 };
 
 const handleShareJob = async (job: any) => {
