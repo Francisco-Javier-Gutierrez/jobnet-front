@@ -24,11 +24,7 @@ export function resolveItemId(item: any, kind: ContentKind): string {
  * Infers whether an arbitrary feed item is a job/vacancy or a community post.
  */
 export function inferContentKind(item: any): ContentKind {
-  if (
-    item?.isVacancy ||
-    item?.tipo === "VACANTE" ||
-    item?.type === "VACANCY"
-  ) {
+  if (item?.isVacancy || item?.tipo === "VACANTE" || item?.type === "VACANCY") {
     return "job";
   }
   return "post";
@@ -111,10 +107,7 @@ export function getItemLikesCount(item: any): number {
 export function getItemBookmarksCount(item: any): number {
   if (!item) return 0;
   const list =
-    item.bookmarksList ||
-    item.bookmarkedBy ||
-    item.savedBy ||
-    item.bookmarks;
+    item.bookmarksList || item.bookmarkedBy || item.savedBy || item.bookmarks;
   if (Array.isArray(list) && list.length > 0) return list.length;
   if (typeof item.bookmarksCount === "number") return item.bookmarksCount;
   return Array.isArray(list) ? list.length : 0;
@@ -146,11 +139,7 @@ export function useContentInteractions() {
     passedUserId?: string,
     extra?: string[],
   ): string[] => {
-    return collectUserIdentifiers(
-      session.value?.user,
-      passedUserId,
-      extra,
-    );
+    return collectUserIdentifiers(session.value?.user, passedUserId, extra);
   };
 
   const toggleLike = async (
@@ -288,7 +277,8 @@ export function useContentInteractions() {
       const idx = t.bookmarksList.findIndex((entry: unknown) =>
         identifiers.includes(String(entry).toLowerCase()),
       );
-      const wasBookmarked = idx !== -1 || Boolean(t.isBookmarked || t.bookmarked);
+      const wasBookmarked =
+        idx !== -1 || Boolean(t.isBookmarked || t.bookmarked);
       const currentCount = getItemBookmarksCount(t);
 
       if (wasBookmarked) {

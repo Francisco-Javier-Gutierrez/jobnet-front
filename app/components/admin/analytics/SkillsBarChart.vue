@@ -12,7 +12,7 @@
             >code_blocks</span
           >
           <h2 class="text-base font-bold text-on-surface dark:text-slate-100">
-            Top 10 Habilidades Técnicas Más Demandadas
+            Habilidades Técnicas Más Demandadas
           </h2>
         </div>
         <p class="text-xs text-on-surface-variant dark:text-slate-400 mt-0.5">
@@ -29,8 +29,22 @@
       </span>
     </div>
 
+    <!-- Empty State -->
+    <div
+      v-if="skills.length === 0"
+      class="mt-6 flex-1 flex flex-col items-center justify-center py-12 text-center"
+    >
+      <span
+        class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-700"
+        >code_off</span
+      >
+      <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+        Aún no hay habilidades registradas en vacantes activas de esta región.
+      </p>
+    </div>
+
     <!-- Chart List -->
-    <div class="mt-5 space-y-3.5">
+    <div v-else class="mt-5 space-y-3.5">
       <div
         v-for="(skill, index) in skills"
         :key="skill.name"
@@ -88,10 +102,11 @@
     <div
       class="mt-6 pt-3 border-t border-outline-variant/30 dark:border-slate-800 flex items-center justify-between text-xs text-on-surface-variant dark:text-slate-400"
     >
-      <span>Actualizado en tiempo real según publicaciones activas</span>
-      <span class="font-semibold text-primary"
-        >Total: 10 tecnologías líderes</span
-      >
+      <span>Calculado con publicaciones activas de la región</span>
+      <span class="font-semibold text-primary">
+        Total: {{ skills.length }}
+        {{ skills.length === 1 ? "tecnología" : "tecnologías" }}
+      </span>
     </div>
   </div>
 </template>

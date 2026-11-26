@@ -370,10 +370,8 @@ export function useCandidateProfile(candidateIdParam?: string) {
     return Boolean(post.isBookmarked || post.bookmarked);
   };
 
-  const {
-    toggleLike: toggleSharedLike,
-    toggleBookmark: toggleSharedBookmark,
-  } = useContentInteractions();
+  const { toggleLike: toggleSharedLike, toggleBookmark: toggleSharedBookmark } =
+    useContentInteractions();
 
   const toggleLike = async (itemOrId: any) => {
     const post =

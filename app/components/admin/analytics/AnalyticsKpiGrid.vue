@@ -55,7 +55,12 @@
           {{ kpis.totalOrganizations }}
         </span>
         <span
-          class="text-xs font-semibold text-purple-600 dark:text-purple-400"
+          class="text-xs font-semibold"
+          :class="
+            kpis.monthlyGrowthRate === 'N/D'
+              ? 'text-slate-400 dark:text-slate-500'
+              : 'text-purple-600 dark:text-purple-400'
+          "
         >
           {{ kpis.monthlyGrowthRate }}
         </span>
@@ -63,7 +68,7 @@
       <p
         class="text-[11px] text-on-surface-variant/80 dark:text-slate-500 mt-1"
       >
-        {{ kpis.verifiedOrganizations }} empresas verificadas oficialmente
+        {{ kpis.verifiedOrganizations }} con verificación aprobada
       </p>
     </div>
 
@@ -94,7 +99,7 @@
       <p
         class="text-[11px] text-on-surface-variant/80 dark:text-slate-500 mt-1"
       >
-        {{ kpis.totalApplications }} postulaciones procesadas
+        {{ kpis.totalApplications }} postulaciones en vacantes activas
       </p>
     </div>
 

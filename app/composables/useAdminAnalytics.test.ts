@@ -36,21 +36,46 @@ describe("useAdminAnalytics Composable (Panel de Analítica Avanzada [V2])", () 
     expect(sortedTop10[9].name).toBe("SQL");
   });
 
-  it("should calculate average applications per job correctly", () => {
-    const totalApplications = 340;
-    const totalJobs = 40;
+  it("should calculate modality rates from real applications", () => {
+    const vacancies = [
+      { modalidad: "Remoto", applications: 12 },
+      { modalidad: "Remoto", applications: 8 },
+      { modalidad: "Híbrido", applications: 6 },
+      { modalidad: "Presencial", applications: 4 },
+    ];
+
+    const totalApplications = vacancies.reduce(
+      (sum, vacancy) => sum + vacancy.applications,
+      0,
+    );
+    const totalJobs = vacancies.length;
     const average = Number((totalApplications / totalJobs).toFixed(1));
 
-    expect(average).toBe(8.5);
+    expect(average).toBe(7.5);
 
-    const byModality = {
-      Remoto: Number((average * 1.48).toFixed(1)),
-      Híbrido: Number((average * 0.88).toFixed(1)),
-      Presencial: Number((average * 0.62).toFixed(1)),
-    };
+    const totals = {
+      Remoto: { jobs: 0, applications: 0 },
+      Híbrido: { jobs: 0, applications: 0 },
+      Presencial: { jobs: 0, applications: 0 },
+    } as Record<string, { jobs: number; applications: number }>;
 
-    expect(byModality.Remoto).toBeGreaterThan(byModality.Híbrido);
-    expect(byModality.Híbrido).toBeGreaterThan(byModality.Presencial);
+    vacancies.forEach((vacancy) => {
+      totals[vacancy.modalidad].jobs += 1;
+      totals[vacancy.modalidad].applications += vacancy.applications;
+    });
+
+    const byModality = Object.fromEntries(
+      Object.entries(totals).map(([modality, value]) => [
+        modality,
+        value.jobs > 0 ? value.applications / value.jobs : 0,
+      ]),
+    );
+
+    expect(byModality).toEqual({
+      Remoto: 10,
+      Híbrido: 6,
+      Presencial: 4,
+    });
   });
 
   it("should format CSV export correctly with all 3 core metrics", () => {

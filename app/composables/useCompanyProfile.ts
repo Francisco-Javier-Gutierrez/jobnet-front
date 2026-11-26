@@ -2,7 +2,6 @@ import { useRoute, useRouter } from "#app";
 import { useRuntimeConfig, useLazyAsyncData } from "#imports";
 import { useAuth } from "#imports";
 import { useShare } from "~/composables/useShare";
-import { MOCK_VACANCIES, MOCK_POSTS, MOCK_COMPANIES } from "~/utils/mockData";
 import type { Post, Job, CompanyProfile } from "~/types";
 
 export type CompanyProfileTab =
@@ -120,35 +119,21 @@ export const useCompanyProfile = () => {
     data: profileData,
     pending: profilePending,
     refresh: refreshProfile,
-  } = useLazyAsyncData(`company-profile-${companyId}`, async () => {
-    const { isMockEnabled } = useMockSession();
-    if (isMockEnabled.value) {
-      return (
-        MOCK_COMPANIES.find((c) => c.id === companyId || c.companyId === companyId) ||
-        MOCK_COMPANIES[0]
-      );
-    }
-    return $fetch(`${config.public.apiUrl}/profile/${companyId}`)
+  } = useLazyAsyncData(`company-profile-${companyId}`, () =>
+    $fetch(`${config.public.apiUrl}/profile/${companyId}`)
       .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => null);
-  });
+      .catch(() => null),
+  );
 
   const {
     data: vacanciesData,
     pending: vacanciesPending,
     refresh: refreshVacancies,
-  } = useLazyAsyncData(`company-vacancies-${companyId}`, async () => {
-    const { isMockEnabled } = useMockSession();
-    if (isMockEnabled.value) {
-      const matched = MOCK_VACANCIES.filter(
-        (v: any) => v.companyId === companyId || v.empresaUuid === companyId,
-      );
-      return { data: matched.length > 0 ? matched : MOCK_VACANCIES.slice(0, 2) };
-    }
-    return $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
+  } = useLazyAsyncData(`company-vacancies-${companyId}`, () =>
+    $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
       .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => ({ data: [] }));
-  });
+      .catch(() => ({ data: [] })),
+  );
 
   const { data: postsData, pending: postsPending } = useLazyAsyncData(
     `company-posts-${companyId}`,
@@ -452,10 +437,8 @@ export const useCompanyProfile = () => {
     isPdfModalOpen.value = true;
   };
 
-  const {
-    toggleLike: toggleSharedLike,
-    toggleBookmark: toggleSharedBookmark,
-  } = useContentInteractions();
+  const { toggleLike: toggleSharedLike, toggleBookmark: toggleSharedBookmark } =
+    useContentInteractions();
 
   const toggleLike = async (itemOrId: any) => {
     if (!currentUserId.value) return;

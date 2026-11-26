@@ -308,10 +308,8 @@ const likesCount = computed(() => {
     : post.value?.likes || 0;
 });
 
-const {
-  toggleLike: toggleSharedLike,
-  toggleBookmark: toggleSharedBookmark,
-} = useContentInteractions();
+const { toggleLike: toggleSharedLike, toggleBookmark: toggleSharedBookmark } =
+  useContentInteractions();
 
 const toggleLike = async () => {
   if (status.value !== "authenticated") {
