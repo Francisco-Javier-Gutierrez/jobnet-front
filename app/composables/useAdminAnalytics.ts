@@ -1,5 +1,6 @@
 import { ref, computed } from "vue";
-import { useFetch, useAuth } from "#imports";
+import { useFetch } from "#imports";
+import { getAuthHeaders } from "~/composables/useApiClient";
 
 export interface SkillItem {
   name: string;
@@ -66,18 +67,44 @@ export interface AdminAnalyticsData {
   applicationRate: ApplicationRateData;
   anomalies?: AnomalyAlert[];
   kpis: AnalyticsKpis;
+  warnings?: string[];
 }
+
+const emptyAnalytics = (selectedRegion: string): AdminAnalyticsData => ({
+  regions: ["Todas las Regiones"],
+  selectedRegion,
+  topSkills: [],
+  monthlyOrganizations: [],
+  applicationRate: {
+    averagePerJob: 0,
+    totalApplications: 0,
+    totalJobs: 0,
+    byModality: {
+      Remoto: 0,
+      Híbrido: 0,
+      Presencial: 0,
+    },
+    distribution: [],
+  },
+  anomalies: [],
+  kpis: {
+    totalVacancies: 0,
+    totalOrganizations: 0,
+    verifiedOrganizations: 0,
+    totalApplications: 0,
+    averageApplicationsPerJob: 0,
+    topSkillName: "Sin datos",
+    topSkillCount: 0,
+    monthlyGrowthRate: "N/D",
+    activeAnomaliesCount: 0,
+  },
+  warnings: [],
+});
 
 export function useAdminAnalytics() {
   const selectedRegion = ref("Todas las Regiones");
   const selectedPeriod = ref<"year" | "quarter" | "month">("year");
   const dismissedAnomalyIds = ref<string[]>([]);
-
-  const { data: sessionData } = useAuth();
-
-  const userRole = computed(() => {
-    return ((sessionData.value?.user as any)?.tipoUsuario || "").toUpperCase();
-  });
 
   const queryParams = computed(() => ({
     region:
@@ -94,10 +121,9 @@ export function useAdminAnalytics() {
     refresh,
   } = useFetch<any>("/api/admin/analytics", {
     query: queryParams,
-    headers: computed(() => ({
-      "x-user-role": userRole.value || "ADMIN",
-    })),
+    headers: computed(() => getAuthHeaders()),
     lazy: false,
+    server: false,
   });
 
   const loading = computed(() => status.value === "pending");
@@ -105,112 +131,13 @@ export function useAdminAnalytics() {
 
   const analyticsData = computed<AdminAnalyticsData>(() => {
     if (apiResponse.value?.data) {
-      return apiResponse.value.data;
+      return {
+        ...apiResponse.value.data,
+        warnings: apiResponse.value.warnings || [],
+      };
     }
 
-    // Default fallback baseline
-    return {
-      regions: [
-        "Todas las Regiones",
-        "Toluca",
-        "Metepec",
-        "Naucalpan",
-        "Estado de México",
-        "Ciudad de México",
-        "Querétaro",
-        "Remoto Nacional",
-      ],
-      selectedRegion: selectedRegion.value,
-      topSkills: [
-        {
-          name: "Vue.js / Nuxt 3",
-          count: 34,
-          percentage: 89,
-          category: "Frontend",
-        },
-        { name: "TypeScript", count: 31, percentage: 81, category: "Lenguaje" },
-        { name: "Tailwind CSS", count: 28, percentage: 73, category: "UI/UX" },
-        {
-          name: "AWS (Cloud / Lambda / DynamoDB)",
-          count: 26,
-          percentage: 68,
-          category: "Cloud",
-        },
-        {
-          name: "Node.js / Express",
-          count: 23,
-          percentage: 60,
-          category: "Backend",
-        },
-        {
-          name: "Docker / Contenedores",
-          count: 19,
-          percentage: 50,
-          category: "DevOps",
-        },
-        {
-          name: "Python / Data Science",
-          count: 16,
-          percentage: 42,
-          category: "Data / AI",
-        },
-        { name: "Git & CI/CD", count: 15, percentage: 39, category: "DevOps" },
-        {
-          name: "Figma & UI Design",
-          count: 13,
-          percentage: 34,
-          category: "Diseño",
-        },
-        {
-          name: "SQL & Bases de Datos",
-          count: 11,
-          percentage: 28,
-          category: "Database",
-        },
-      ],
-      monthlyOrganizations: [
-        { month: "Nov 2025", count: 3, label: "Nov 2025" },
-        { month: "Dic 2025", count: 4, label: "Dic 2025" },
-        { month: "Ene 2026", count: 6, label: "Ene 2026" },
-        { month: "Feb 2026", count: 8, label: "Feb 2026" },
-        { month: "Mar 2026", count: 11, label: "Mar 2026" },
-        { month: "Abr 2026", count: 14, label: "Abr 2026" },
-        { month: "May 2026", count: 17, label: "May 2026" },
-        { month: "Jun 2026", count: 21, label: "Jun 2026" },
-        { month: "Jul 2026", count: 25, label: "Jul 2026" },
-        { month: "Ago 2026", count: 29, label: "Ago 2026" },
-        { month: "Sep 2026", count: 33, label: "Sep 2026" },
-        { month: "Oct 2026", count: 38, label: "Oct 2026" },
-      ],
-      applicationRate: {
-        averagePerJob: 8.5,
-        totalApplications: 348,
-        totalJobs: 41,
-        byModality: {
-          Remoto: 12.8,
-          Híbrido: 7.4,
-          Presencial: 5.2,
-        },
-        distribution: [
-          { range: "1 a 4 postulaciones", count: 12, percentage: 31.6 },
-          { range: "5 a 9 postulaciones", count: 17, percentage: 44.7 },
-          { range: "10 a 19 postulaciones", count: 7, percentage: 18.4 },
-          { range: "20+ postulaciones", count: 2, percentage: 5.3 },
-        ],
-      },
-      anomalies: [],
-      kpis: {
-        totalVacancies: 41,
-        totalOrganizations: 38,
-        verifiedOrganizations: 29,
-        totalApplications: 348,
-        averageApplicationsPerJob: 8.5,
-        topSkillName: "Vue.js / Nuxt 3",
-        topSkillCount: 34,
-        monthlyGrowthRate: "+15.2%",
-        activeAnomaliesCount: 0,
-      },
-    };
+    return emptyAnalytics(selectedRegion.value);
   });
 
   const activeAnomalies = computed<AnomalyAlert[]>(() => {

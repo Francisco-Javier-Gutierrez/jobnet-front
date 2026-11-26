@@ -24,6 +24,30 @@
       </button>
     </div>
 
+    <!-- Data Quality Warning -->
+    <div
+      v-if="error || (analyticsData.warnings?.length || 0) > 0"
+      class="mb-4 p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-500/40 rounded-xl text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2 shadow-sm"
+      role="alert"
+    >
+      <span
+        class="material-symbols-outlined text-[18px] text-amber-600 dark:text-amber-400"
+        >warning</span
+      >
+      <div>
+        <p class="font-bold">
+          {{
+            error
+              ? "No se pudieron cargar las métricas"
+              : "Algunas métricas están incompletas"
+          }}
+        </p>
+        <p class="mt-0.5">
+          {{ error || analyticsData.warnings?.join(" ") }}
+        </p>
+      </div>
+    </div>
+
     <!-- Title & Navigation to Main Dashboard -->
     <div
       class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
@@ -45,7 +69,7 @@
         </h1>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
           Demanda de habilidades técnicas, distribución regional y tasas de
-          postulación en el Estado de México.
+          postulación según la región seleccionada.
         </p>
       </div>
 
@@ -113,6 +137,7 @@ const {
   analyticsData,
   regionsList,
   loading,
+  error,
   refresh,
   exportCsv,
 } = useAdminAnalytics();

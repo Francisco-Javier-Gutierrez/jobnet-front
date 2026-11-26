@@ -1,12 +1,20 @@
+import { createError } from "h3";
+
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const region = (query.region as string) || "ALL";
 
   const config = useRuntimeConfig();
   const authHeader = getHeader(event, "authorization");
-  const userRoleHeader = getHeader(event, "x-user-role") || "ADMIN";
+  const userRoleHeader = getHeader(event, "x-user-role");
 
-  // Try fetching from backend API
+  // In production only forward the role alongside a bearer token. Local dev
+  // keeps the header fallback so the dashboard can run without Cognito.
+  const forwardUserRole =
+    userRoleHeader && (authHeader || process.env.NODE_ENV !== "production")
+      ? userRoleHeader
+      : undefined;
+
   try {
     const backendData = await $fetch<any>(
       `${config.public.apiUrl}/admin/analytics`,
@@ -15,7 +23,7 @@ export default defineEventHandler(async (event) => {
         params: { region },
         headers: {
           ...(authHeader ? { Authorization: authHeader } : {}),
-          "x-user-role": userRoleHeader,
+          ...(forwardUserRole ? { "x-user-role": forwardUserRole } : {}),
         },
       },
     );
@@ -23,45 +31,20 @@ export default defineEventHandler(async (event) => {
     if (backendData?.success && backendData?.data) {
       return backendData;
     }
+
+    throw new Error("El backend devolvió una respuesta inválida.");
   } catch (err: any) {
     console.warn(
       "Failed to fetch admin analytics from backend API:",
       err?.message,
     );
-  }
 
-  // Real empty analytics fallback
-  return {
-    success: true,
-    timestamp: new Date().toISOString(),
-    data: {
-      regions: ["Todas las Regiones"],
-      selectedRegion: region,
-      topSkills: [],
-      monthlyOrganizations: [],
-      applicationRate: {
-        averagePerJob: 0,
-        totalApplications: 0,
-        totalJobs: 0,
-        byModality: {
-          Remoto: 0,
-          Híbrido: 0,
-          Presencial: 0,
-        },
-        distribution: [],
+    throw createError({
+      statusCode: 502,
+      statusMessage: "No se pudieron consultar las métricas del backend.",
+      data: {
+        detail: err?.data?.error || err?.message || String(err),
       },
-      anomalies: [],
-      kpis: {
-        totalVacancies: 0,
-        totalOrganizations: 0,
-        verifiedOrganizations: 0,
-        totalApplications: 0,
-        averageApplicationsPerJob: 0,
-        topSkillName: "N/A",
-        topSkillCount: 0,
-        monthlyGrowthRate: "0%",
-        activeAnomaliesCount: 0,
-      },
-    },
-  };
+    });
+  }
 });

@@ -2,7 +2,6 @@ import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useAuth } from "#imports";
 import { useShare } from "#imports";
-import { MOCK_POSTS } from "~/utils/mockData";
 
 import type { Post, Job } from "~/types";
 
@@ -105,11 +104,6 @@ export function useJobFeeds() {
   // Load Posts from API
   const loadPosts = async () => {
     try {
-      const { isMockEnabled } = useMockSession();
-      if (isMockEnabled.value) {
-        postsList.value = JSON.parse(JSON.stringify(MOCK_POSTS));
-        return;
-      }
       const config = useRuntimeConfig();
       const baseUrl = config.public.apiUrl || "";
       const targetUrl = baseUrl ? `${baseUrl}/posts` : "/api/posts";
@@ -231,10 +225,8 @@ export function useJobFeeds() {
     }
   };
 
-  const {
-    toggleLike: toggleSharedLike,
-    toggleBookmark: toggleSharedBookmark,
-  } = useContentInteractions();
+  const { toggleLike: toggleSharedLike, toggleBookmark: toggleSharedBookmark } =
+    useContentInteractions();
 
   const toggleLike = async (item: any) => {
     if (status.value !== "authenticated") {

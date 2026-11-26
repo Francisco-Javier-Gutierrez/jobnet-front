@@ -29,6 +29,13 @@
       </span>
     </div>
 
+    <div
+      v-if="rateData.totalJobs === 0"
+      class="mt-4 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 dark:text-slate-400"
+    >
+      Aún no hay vacantes activas para calcular la tasa de postulaciones.
+    </div>
+
     <!-- Main Metric Display & Modality Breakdown -->
     <div class="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
       <!-- Big Gauge / Rate Indicator (cols 5) -->

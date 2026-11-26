@@ -287,12 +287,6 @@ const {
 } = useLazyAsyncData(
   "user-personal-favorites",
   async () => {
-    if (isMockEnabled.value) {
-      return {
-        posts: JSON.parse(JSON.stringify(MOCK_POSTS.slice(0, 1))),
-        jobs: JSON.parse(JSON.stringify(MOCK_VACANCIES.slice(0, 2))),
-      };
-    }
     if (!currentUserId.value) return { data: [], posts: [], jobs: [] };
     return $fetch<any>(
       `/api/profile/${encodeURIComponent(currentUserId.value)}/bookmarks?userId=${encodeURIComponent(currentUserId.value)}`,

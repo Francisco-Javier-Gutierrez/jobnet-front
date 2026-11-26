@@ -25,6 +25,30 @@
       </button>
     </div>
 
+    <!-- Data Quality Warning -->
+    <div
+      v-if="error || (analyticsData.warnings?.length || 0) > 0"
+      class="mb-6 p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-500/40 rounded-xl text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2 shadow-sm"
+      role="alert"
+    >
+      <span
+        class="material-symbols-outlined text-[18px] text-amber-600 dark:text-amber-400"
+        >warning</span
+      >
+      <div>
+        <p class="font-bold">
+          {{
+            error
+              ? "No se pudieron cargar las métricas"
+              : "Algunas métricas están incompletas"
+          }}
+        </p>
+        <p class="mt-0.5">
+          {{ error || analyticsData.warnings?.join(" ") }}
+        </p>
+      </div>
+    </div>
+
     <!-- Header / Executive Overview -->
     <div
       class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -49,27 +73,20 @@
           Monitoreo y Métricas
         </h1>
         <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Estado en tiempo real de la infraestructura, métricas operativas y
-          resumen general de JobNet.
+          Métricas operativas y resumen general de JobNet, calculados desde la
+          base de datos.
         </p>
       </div>
 
       <!-- Action Buttons & Health Pill -->
       <div class="flex flex-wrap items-center gap-3">
-        <!-- Live System Health Badge -->
+        <!-- Data Source Badge -->
         <div
-          class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900/60 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-400 shadow-xs"
-          title="Todos los microservicios y funciones Lambda responden con normalidad"
+          class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 shadow-xs"
+          title="Las métricas se calculan directamente desde DynamoDB"
         >
-          <span class="relative flex h-2.5 w-2.5">
-            <span
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
-            ></span>
-            <span
-              class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"
-            ></span>
-          </span>
-          <span>Sistemas Operativos 100%</span>
+          <span class="material-symbols-outlined text-base">database</span>
+          <span>Datos desde DynamoDB</span>
         </div>
 
         <!-- Refresh Button -->
@@ -114,7 +131,8 @@
           </span>
           <span class="font-medium">
             <strong>Monitoreo de Seguridad Óptimo:</strong> Sin concurrencia
-            anómala, bots o reportes masivos detectados en la última hora.
+            anómala, bots o reportes masivos detectados en los patrones
+            monitoreados.
           </span>
         </div>
         <NuxtLink
@@ -155,7 +173,7 @@
           <div class="flex items-center justify-between">
             <span
               class="text-xs font-semibold text-slate-500 dark:text-slate-400"
-              >Vacantes Publicadas</span
+              >Vacantes Activas</span
             >
             <div
               class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center"
@@ -175,7 +193,7 @@
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-            En todas las regiones del Estado de México
+            En las regiones registradas en la plataforma
           </p>
         </div>
 
@@ -207,8 +225,8 @@
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-            {{ analyticsData.kpis.verifiedOrganizations }} verificadas
-            fiscalmente
+            {{ analyticsData.kpis.verifiedOrganizations }} con verificación
+            aprobada
           </p>
         </div>
 
@@ -240,210 +258,50 @@
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-            Tasa promedio de conversión laboral
+            Postulaciones recibidas en vacantes activas
           </p>
         </div>
 
-        <!-- KPI 4: Uptime & Disponibilidad -->
+        <!-- KPI 4: Anomalías Detectadas -->
         <div
           class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-2xl p-5 shadow-xs"
         >
           <div class="flex items-center justify-between">
             <span
               class="text-xs font-semibold text-slate-500 dark:text-slate-400"
-              >Uptime Infraestructura</span
+              >Anomalías Detectadas</span
             >
             <div
-              class="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center"
+              class="w-9 h-9 rounded-xl flex items-center justify-center"
+              :class="
+                hasActiveAnomalies
+                  ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                  : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+              "
             >
-              <span class="material-symbols-outlined text-[20px]"
-                >cloud_done</span
-              >
+              <span class="material-symbols-outlined text-[20px]">{{
+                hasActiveAnomalies ? "gpp_maybe" : "verified_user"
+              }}</span>
             </div>
           </div>
           <div class="mt-3 flex items-baseline gap-2">
             <span class="text-2xl font-black text-slate-900 dark:text-white">
-              99.98%
+              {{ activeAnomalies.length }}
             </span>
-            <span class="text-xs font-semibold text-sky-600 dark:text-sky-400">
-              AWS us-east-1
+            <span
+              class="text-xs font-semibold"
+              :class="
+                hasActiveAnomalies
+                  ? 'text-rose-600 dark:text-rose-400'
+                  : 'text-emerald-600 dark:text-emerald-400'
+              "
+            >
+              {{ hasActiveAnomalies ? "Requieren revisión" : "Sin alertas" }}
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-            5 servicios de nube sin interrupciones
+            Concurrencia anómala detectada
           </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 2: System Health & Infrastructure Monitoring -->
-    <div class="mb-8">
-      <div class="flex items-center justify-between mb-4">
-        <h2
-          class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2"
-        >
-          <span
-            class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400"
-            >health_and_safety</span
-          >
-          Monitoreo de Infraestructura y Servicios AWS en Vivo
-        </h2>
-        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">
-          Latencia p95 promedio: 48 ms
-        </span>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Service 1: AWS Lambda SSR -->
-        <div
-          class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-amber-500"
-                >terminal</span
-              >
-              <span class="text-xs font-bold text-slate-900 dark:text-white"
-                >Nuxt SSR (Lambda)</span
-              >
-            </div>
-            <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Operativo
-            </span>
-          </div>
-          <div
-            class="text-[11px] text-slate-500 dark:text-slate-400 space-y-1 mt-2"
-          >
-            <div class="flex justify-between">
-              <span>Tiempo de respuesta:</span>
-              <span class="font-semibold text-slate-700 dark:text-slate-200"
-                >~115 ms</span
-              >
-            </div>
-            <div class="flex justify-between">
-              <span>Tasa de error:</span>
-              <span class="font-semibold text-emerald-600 dark:text-emerald-400"
-                >0.00%</span
-              >
-            </div>
-          </div>
-        </div>
-
-        <!-- Service 2: API Gateway -->
-        <div
-          class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-indigo-500"
-                >lan</span
-              >
-              <span class="text-xs font-bold text-slate-900 dark:text-white"
-                >API Gateway REST</span
-              >
-            </div>
-            <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Operativo
-            </span>
-          </div>
-          <div
-            class="text-[11px] text-slate-500 dark:text-slate-400 space-y-1 mt-2"
-          >
-            <div class="flex justify-between">
-              <span>Latencia HTTP:</span>
-              <span class="font-semibold text-slate-700 dark:text-slate-200"
-                >~42 ms</span
-              >
-            </div>
-            <div class="flex justify-between">
-              <span>Rutas autorizadas:</span>
-              <span class="font-semibold text-slate-700 dark:text-slate-200"
-                >JWT & Cognito</span
-              >
-            </div>
-          </div>
-        </div>
-
-        <!-- Service 3: Amazon Cognito -->
-        <div
-          class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-rose-500"
-                >lock</span
-              >
-              <span class="text-xs font-bold text-slate-900 dark:text-white"
-                >Cognito Auth Pool</span
-              >
-            </div>
-            <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Saludable
-            </span>
-          </div>
-          <div
-            class="text-[11px] text-slate-500 dark:text-slate-400 space-y-1 mt-2"
-          >
-            <div class="flex justify-between">
-              <span>Protocolo:</span>
-              <span class="font-semibold text-slate-700 dark:text-slate-200"
-                >OAuth 2.0 / NextAuth</span
-              >
-            </div>
-            <div class="flex justify-between">
-              <span>Tokens revocados:</span>
-              <span class="font-semibold text-slate-700 dark:text-slate-200"
-                >0</span
-              >
-            </div>
-          </div>
-        </div>
-
-        <!-- Service 4: DynamoDB & S3 -->
-        <div
-          class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-blue-500"
-                >database</span
-              >
-              <span class="text-xs font-bold text-slate-900 dark:text-white"
-                >DynamoDB & S3</span
-              >
-            </div>
-            <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Sincronizado
-            </span>
-          </div>
-          <div
-            class="text-[11px] text-slate-500 dark:text-slate-400 space-y-1 mt-2"
-          >
-            <div class="flex justify-between">
-              <span>Cifrado en reposo:</span>
-              <span class="font-semibold text-slate-700 dark:text-slate-200"
-                >AWS KMS</span
-              >
-            </div>
-            <div class="flex justify-between">
-              <span>Edge CloudFront:</span>
-              <span class="font-semibold text-emerald-600 dark:text-emerald-400"
-                >Caché Activo</span
-              >
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -479,8 +337,8 @@
               Analítica Avanzada
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Top 10 habilidades técnicas más demandadas, distribución
-              geográfica y tasas de postulación regional.
+              Habilidades técnicas más demandadas, distribución geográfica y
+              tasas de postulación regional.
             </p>
           </div>
           <div
@@ -688,6 +546,12 @@
         </div>
 
         <div class="space-y-3">
+          <p
+            v-if="recentOrgs.length === 0"
+            class="py-6 text-center text-xs text-slate-500 dark:text-slate-400"
+          >
+            No hay organizaciones registradas todavía.
+          </p>
           <div
             v-for="org in recentOrgs"
             :key="org.id"
@@ -778,8 +642,12 @@
               class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"
             >
               <div
-                class="h-full bg-indigo-500 rounded-full"
-                style="width: 58%"
+                class="h-full bg-indigo-500 rounded-full transition-all duration-300"
+                :style="{
+                  width: modalityWidth(
+                    analyticsData.applicationRate.byModality.Remoto,
+                  ),
+                }"
               ></div>
             </div>
           </div>
@@ -804,8 +672,12 @@
               class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"
             >
               <div
-                class="h-full bg-purple-500 rounded-full"
-                style="width: 32%"
+                class="h-full bg-purple-500 rounded-full transition-all duration-300"
+                :style="{
+                  width: modalityWidth(
+                    analyticsData.applicationRate.byModality.Híbrido,
+                  ),
+                }"
               ></div>
             </div>
           </div>
@@ -830,8 +702,12 @@
               class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"
             >
               <div
-                class="h-full bg-emerald-500 rounded-full"
-                style="width: 20%"
+                class="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                :style="{
+                  width: modalityWidth(
+                    analyticsData.applicationRate.byModality.Presencial,
+                  ),
+                }"
               ></div>
             </div>
           </div>
@@ -839,7 +715,7 @@
           <div
             class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
           >
-            <span>Demanda concentrada en Estado de México y CDMX</span>
+            <span>Tasas calculadas con postulaciones de vacantes activas</span>
             <NuxtLink
               to="/admin/analytics"
               class="font-semibold text-primary hover:underline"
@@ -878,7 +754,7 @@ definePageMeta({
 useSeoMeta({
   title: "Monitoreo y Métricas - JobNet Admin",
   description:
-    "Panel principal de control, monitoreo de infraestructura en tiempo real y métricas del sistema.",
+    "Panel principal de control y métricas calculadas directamente desde la base de datos de JobNet.",
 });
 
 const isRefreshing = ref(false);
@@ -888,6 +764,7 @@ const {
   activeAnomalies,
   hasActiveAnomalies,
   dismissAnomaly,
+  error,
   refresh: refreshAnalytics,
 } = useAdminAnalytics();
 
@@ -908,8 +785,36 @@ const {
 });
 
 const recentOrgs = computed(() => {
-  return orgs.value.slice(0, 5);
+  const getTimestamp = (org: any): number => {
+    const raw =
+      org.fechaCreacion ||
+      org.createdAt ||
+      org.fechaActualizacion ||
+      org.updatedAt ||
+      0;
+    const time = new Date(raw).getTime();
+    return Number.isNaN(time) ? 0 : time;
+  };
+
+  return [...orgs.value]
+    .sort((a, b) => getTimestamp(b) - getTimestamp(a))
+    .slice(0, 5);
 });
+
+const modalityMax = computed(() => {
+  const byModality = analyticsData.value.applicationRate.byModality;
+  return Math.max(
+    byModality.Remoto,
+    byModality.Híbrido,
+    byModality.Presencial,
+    0,
+  );
+});
+
+const modalityWidth = (value: number): string => {
+  if (!modalityMax.value || value <= 0) return "0%";
+  return `${Math.max((value / modalityMax.value) * 100, 4)}%`;
+};
 
 const handleManualRefresh = async () => {
   isRefreshing.value = true;

@@ -130,7 +130,9 @@ const { openProtectedModal } = useProtectedAction();
 const isSharedLocally = ref(false);
 
 const effectiveUserId = computed(() => {
-  return props.currentUserId || (authSession.value?.user as any)?.id || "anonymous";
+  return (
+    props.currentUserId || (authSession.value?.user as any)?.id || "anonymous"
+  );
 });
 
 onMounted(() => {
@@ -138,7 +140,8 @@ onMounted(() => {
     const key = `${props.storagePrefix}-${effectiveUserId.value}`;
     try {
       const shared = JSON.parse(localStorage.getItem(key) || "[]");
-      isSharedLocally.value = Array.isArray(shared) && shared.includes(props.itemId);
+      isSharedLocally.value =
+        Array.isArray(shared) && shared.includes(props.itemId);
     } catch {
       isSharedLocally.value = false;
     }

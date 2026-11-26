@@ -45,7 +45,7 @@
         <span class="material-symbols-outlined text-[16px] animate-spin"
           >autorenew</span
         >
-        <span>Monitoreo Activo en Tiempo Real</span>
+        <span>Detección automática de patrones</span>
       </div>
     </div>
 
@@ -94,7 +94,7 @@
             </span>
 
             <span class="text-[11px] text-slate-600 dark:text-slate-300">
-              Detectado hace unos momentos
+              {{ formatDetectedAt(item.detectedAt) }}
             </span>
           </div>
 
@@ -181,6 +181,25 @@ const handleSanction = (item: AnomalyAlert) => {
 
 const handleDismiss = (id: string) => {
   emit("dismiss", id);
+};
+
+const formatDetectedAt = (value: string): string => {
+  const timestamp = new Date(value).getTime();
+  if (Number.isNaN(timestamp)) return "Fecha de detección no disponible";
+
+  const elapsedMinutes = Math.max(
+    0,
+    Math.round((Date.now() - timestamp) / 60000),
+  );
+
+  if (elapsedMinutes < 1) return "Detectado hace menos de un minuto";
+  if (elapsedMinutes < 60) return `Detectado hace ${elapsedMinutes} min`;
+
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) return `Detectado hace ${elapsedHours} h`;
+
+  const elapsedDays = Math.floor(elapsedHours / 24);
+  return `Detectado hace ${elapsedDays} d`;
 };
 </script>
 
