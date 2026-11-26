@@ -217,8 +217,7 @@ const userRole = computed<
   if (status.value !== "authenticated") return "guest";
   const user = session.value?.user as any;
   const tipo = (user?.tipoUsuario || user?.role || "").toUpperCase();
-  if (tipo === "ORGANIZACION")
-    return "organization";
+  if (tipo === "ORGANIZACION") return "organization";
   if (tipo === "ADMIN") return "admin";
   if (tipo === "MODERATOR" || tipo === "MODERADOR") return "moderator";
   return "candidate";
@@ -579,7 +578,12 @@ const staticItems = computed<CommandItem[]>(() => {
         group: "Navegación",
         badge: "Organización",
         badgeVariant: "neutral",
-        keywords: ["perfil organizacion", "organizacion", "logo", "datos fiscales"],
+        keywords: [
+          "perfil organizacion",
+          "organizacion",
+          "logo",
+          "datos fiscales",
+        ],
         action: () => router.push("/company/edit"),
       },
       {

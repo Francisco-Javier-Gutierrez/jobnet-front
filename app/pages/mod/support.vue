@@ -8,12 +8,19 @@
       class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
     >
       <div>
-        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-on-background dark:text-slate-100 mb-1 flex items-center gap-2.5">
-          <span class="material-symbols-outlined text-amber-500 text-3xl">headset_mic</span>
+        <h1
+          class="text-2xl sm:text-3xl font-bold tracking-tight text-on-background dark:text-slate-100 mb-1 flex items-center gap-2.5"
+        >
+          <span class="material-symbols-outlined text-amber-500 text-3xl"
+            >headset_mic</span
+          >
           Mesa de Ayuda y Soporte a Usuarios
         </h1>
-        <p class="text-on-surface-variant dark:text-slate-300 text-xs sm:text-sm">
-          Atiende reportes de fallos técnicos, problemas de cuenta y dudas generales enviados por candidatos y organizaciones.
+        <p
+          class="text-on-surface-variant dark:text-slate-300 text-xs sm:text-sm"
+        >
+          Atiende reportes de fallos técnicos, problemas de cuenta y dudas
+          generales enviados por candidatos y organizaciones.
         </p>
       </div>
 
@@ -47,12 +54,17 @@
         aria-label="Cola de tickets de soporte"
       >
         <!-- Search and Filter Bar -->
-        <div class="p-4 border-b border-outline-variant/60 bg-surface-container-low/20 space-y-3">
+        <div
+          class="p-4 border-b border-outline-variant/60 bg-surface-container-low/20 space-y-3"
+        >
           <div class="relative">
             <span
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
-              <span class="material-symbols-outlined text-on-surface-variant dark:text-slate-400 text-lg">search</span>
+              <span
+                class="material-symbols-outlined text-on-surface-variant dark:text-slate-400 text-lg"
+                >search</span
+              >
             </span>
             <input
               v-model="searchQuery"
@@ -63,7 +75,9 @@
           </div>
 
           <!-- Status Filters -->
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] font-bold">
+          <div
+            class="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] font-bold"
+          >
             <button
               v-for="filter in filterOptions"
               :key="filter.value"
@@ -79,7 +93,9 @@
             </button>
           </div>
 
-          <div class="flex justify-between items-center text-[11px] font-bold text-on-surface-variant dark:text-slate-300">
+          <div
+            class="flex justify-between items-center text-[11px] font-bold text-on-surface-variant dark:text-slate-300"
+          >
             <span>TICKETS EN COLA</span>
             <div class="flex items-center gap-2">
               <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full">
@@ -92,23 +108,45 @@
                 title="Actualizar cola"
                 class="hover:text-primary transition flex items-center p-0.5 rounded text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-low"
               >
-                <span class="material-symbols-outlined text-[15px]" :class="{ 'animate-spin': isLoadingTickets }">refresh</span>
+                <span
+                  class="material-symbols-outlined text-[15px]"
+                  :class="{ 'animate-spin': isLoadingTickets }"
+                  >refresh</span
+                >
               </button>
             </div>
           </div>
         </div>
 
         <!-- Tickets List -->
-        <div class="flex-grow overflow-y-auto divide-y divide-outline-variant/30">
-          <div v-if="isLoadingTickets" class="p-8 text-center text-on-surface-variant text-xs">
-            <span class="material-symbols-outlined animate-spin text-2xl text-primary mb-2">progress_activity</span>
+        <div
+          class="flex-grow overflow-y-auto divide-y divide-outline-variant/30"
+        >
+          <div
+            v-if="isLoadingTickets"
+            class="p-8 text-center text-on-surface-variant text-xs"
+          >
+            <span
+              class="material-symbols-outlined animate-spin text-2xl text-primary mb-2"
+              >progress_activity</span
+            >
             <p>Cargando tickets...</p>
           </div>
 
-          <div v-else-if="filteredTickets.length === 0" class="p-8 text-center text-on-surface-variant text-xs">
-            <span class="material-symbols-outlined text-3xl text-outline-variant mb-2">inbox</span>
-            <p class="font-bold text-on-background dark:text-slate-200">No hay tickets en esta vista</p>
-            <p class="text-[11px] mt-0.5">Los reportes enviados por usuarios aparecerán aquí.</p>
+          <div
+            v-else-if="filteredTickets.length === 0"
+            class="p-8 text-center text-on-surface-variant text-xs"
+          >
+            <span
+              class="material-symbols-outlined text-3xl text-outline-variant mb-2"
+              >inbox</span
+            >
+            <p class="font-bold text-on-background dark:text-slate-200">
+              No hay tickets en esta vista
+            </p>
+            <p class="text-[11px] mt-0.5">
+              Los reportes enviados por usuarios aparecerán aquí.
+            </p>
           </div>
 
           <button
@@ -117,14 +155,18 @@
             @click="handleSelectTicket(ticket)"
             class="w-full text-left p-4 hover:bg-surface-container-low/40 dark:hover:bg-slate-800/40 transition duration-150 flex gap-3.5 relative"
             :class="
-              (activeTicket?.id || activeTicket?.ticketId) === (ticket.id || ticket.ticketId)
+              (activeTicket?.id || activeTicket?.ticketId) ===
+              (ticket.id || ticket.ticketId)
                 ? 'bg-primary/5 dark:bg-primary/10'
                 : ''
             "
           >
             <!-- Highlight bar -->
             <div
-              v-if="(activeTicket?.id || activeTicket?.ticketId) === (ticket.id || ticket.ticketId)"
+              v-if="
+                (activeTicket?.id || activeTicket?.ticketId) ===
+                (ticket.id || ticket.ticketId)
+              "
               class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-md"
             ></div>
 
@@ -135,17 +177,27 @@
               {{ (ticket.userName || "U").charAt(0).toUpperCase() }}
               <span
                 class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-surface dark:border-slate-900"
-                :class="ticket.status === 'RESUELTO' ? 'bg-emerald-500' : ticket.assignedModeratorId ? 'bg-indigo-500' : 'bg-amber-500'"
+                :class="
+                  ticket.status === 'RESUELTO'
+                    ? 'bg-emerald-500'
+                    : ticket.assignedModeratorId
+                      ? 'bg-indigo-500'
+                      : 'bg-amber-500'
+                "
               ></span>
             </div>
 
             <!-- Ticket Info -->
             <div class="flex-grow min-w-0">
               <div class="flex justify-between items-start mb-0.5">
-                <h3 class="text-xs font-bold text-on-background dark:text-slate-100 truncate">
+                <h3
+                  class="text-xs font-bold text-on-background dark:text-slate-100 truncate"
+                >
                   {{ ticket.userName }}
                 </h3>
-                <span class="text-[9px] text-on-surface-variant dark:text-slate-400 font-medium ml-1 flex-shrink-0">
+                <span
+                  class="text-[9px] text-on-surface-variant dark:text-slate-400 font-medium ml-1 flex-shrink-0"
+                >
                   {{ formatDate(ticket.updatedAt || ticket.createdAt) }}
                 </span>
               </div>
@@ -176,7 +228,9 @@
                   v-if="ticket.assignedModeratorId === userId"
                   class="text-[8px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5"
                 >
-                  <span class="material-symbols-outlined text-[10px]">check</span>
+                  <span class="material-symbols-outlined text-[10px]"
+                    >check</span
+                  >
                   Asignado a ti
                 </span>
                 <span
@@ -194,7 +248,9 @@
                 </span>
               </div>
 
-              <p class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate">
+              <p
+                class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate"
+              >
                 {{ ticket.lastMessage || ticket.subject }}
               </p>
             </div>
@@ -220,7 +276,9 @@
                 class="lg:hidden p-1.5 -ml-1 text-on-surface-variant hover:text-primary rounded-lg flex items-center justify-center flex-shrink-0"
                 title="Volver a la cola"
               >
-                <span class="material-symbols-outlined text-xl">arrow_back</span>
+                <span class="material-symbols-outlined text-xl"
+                  >arrow_back</span
+                >
               </button>
 
               <div
@@ -230,7 +288,9 @@
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                  <h2 class="text-xs font-bold text-on-background dark:text-slate-100 truncate">
+                  <h2
+                    class="text-xs font-bold text-on-background dark:text-slate-100 truncate"
+                  >
                     {{ activeTicket.userName }}
                   </h2>
                   <span
@@ -243,14 +303,22 @@
                   >
                     {{ activeTicket.userRole }}
                   </span>
-                  <span class="text-[10px] text-on-surface-variant dark:text-slate-400 hidden sm:inline truncate">
+                  <span
+                    class="text-[10px] text-on-surface-variant dark:text-slate-400 hidden sm:inline truncate"
+                  >
                     {{ activeTicket.userEmail }}
                   </span>
                 </div>
-                <p class="text-[10px] text-on-surface-variant dark:text-slate-400 flex items-center gap-1.5 truncate">
-                  <span class="truncate">Asunto: <strong>{{ activeTicket.subject }}</strong></span>
+                <p
+                  class="text-[10px] text-on-surface-variant dark:text-slate-400 flex items-center gap-1.5 truncate"
+                >
+                  <span class="truncate"
+                    >Asunto: <strong>{{ activeTicket.subject }}</strong></span
+                  >
                   <span>•</span>
-                  <span class="flex-shrink-0">{{ formatCategory(activeTicket.category) }}</span>
+                  <span class="flex-shrink-0">{{
+                    formatCategory(activeTicket.category)
+                  }}</span>
                 </p>
               </div>
             </div>
@@ -259,12 +327,17 @@
             <div class="flex items-center gap-2">
               <!-- If unassigned: Claim Button -->
               <button
-                v-if="!activeTicket.assignedModeratorId && activeTicket.status !== 'RESUELTO'"
+                v-if="
+                  !activeTicket.assignedModeratorId &&
+                  activeTicket.status !== 'RESUELTO'
+                "
                 @click="handleClaim('CLAIM')"
                 :disabled="isProcessingAction"
                 class="px-3 py-1.5 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
               >
-                <span class="material-symbols-outlined text-[16px]">touch_app</span>
+                <span class="material-symbols-outlined text-[16px]"
+                  >touch_app</span
+                >
                 Tomar Caso
               </button>
 
@@ -282,12 +355,17 @@
 
               <!-- Resolve Button -->
               <button
-                v-if="activeTicket.status !== 'RESUELTO' && (isAssignedToMe || !activeTicket.assignedModeratorId)"
+                v-if="
+                  activeTicket.status !== 'RESUELTO' &&
+                  (isAssignedToMe || !activeTicket.assignedModeratorId)
+                "
                 @click="showResolvePrompt = true"
                 :disabled="isProcessingAction"
                 class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
               >
-                <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                <span class="material-symbols-outlined text-[16px]"
+                  >check_circle</span
+                >
                 Resolver Ticket
               </button>
 
@@ -296,7 +374,9 @@
                 v-if="activeTicket.status === 'RESUELTO'"
                 class="px-3 py-1 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-xl border border-emerald-500/20 flex items-center gap-1"
               >
-                <span class="material-symbols-outlined text-[16px]">done_all</span>
+                <span class="material-symbols-outlined text-[16px]"
+                  >done_all</span
+                >
                 Caso Resuelto
               </span>
             </div>
@@ -308,24 +388,36 @@
             class="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2.5 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between"
           >
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-amber-600 text-lg">lock</span>
+              <span class="material-symbols-outlined text-amber-600 text-lg"
+                >lock</span
+              >
               <span>
-                <strong>Caso bloqueado:</strong> Este ticket está siendo atendido en exclusiva por
-                <strong>{{ activeTicket.assignedModeratorName }}</strong>.
+                <strong>Caso bloqueado:</strong> Este ticket está siendo
+                atendido en exclusiva por
+                <strong>{{ activeTicket.assignedModeratorName }}</strong
+                >.
               </span>
             </div>
-            <span class="text-[10px] uppercase font-bold tracking-wider text-amber-700 dark:text-amber-400">
+            <span
+              class="text-[10px] uppercase font-bold tracking-wider text-amber-700 dark:text-amber-400"
+            >
               Solo lectura
             </span>
           </div>
 
           <div
-            v-else-if="!activeTicket.assignedModeratorId && activeTicket.status !== 'RESUELTO'"
+            v-else-if="
+              !activeTicket.assignedModeratorId &&
+              activeTicket.status !== 'RESUELTO'
+            "
             class="bg-sky-500/10 border-b border-sky-500/20 px-4 py-2 text-xs text-sky-800 dark:text-sky-300 flex items-center gap-2"
           >
-            <span class="material-symbols-outlined text-sky-600 text-base">info</span>
+            <span class="material-symbols-outlined text-sky-600 text-base"
+              >info</span
+            >
             <span>
-              Ticket sin asignar. Al enviar una respuesta o pulsar <strong>"Tomar Caso"</strong>, se te auto-asignará en exclusiva.
+              Ticket sin asignar. Al enviar una respuesta o pulsar
+              <strong>"Tomar Caso"</strong>, se te auto-asignará en exclusiva.
             </span>
           </div>
 
@@ -338,11 +430,17 @@
             <div
               class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 rounded-xl p-4 max-w-xl mx-auto shadow-sm"
             >
-              <div class="flex items-center gap-2 mb-1.5 text-primary font-bold text-xs">
-                <span class="material-symbols-outlined text-base">contact_support</span>
+              <div
+                class="flex items-center gap-2 mb-1.5 text-primary font-bold text-xs"
+              >
+                <span class="material-symbols-outlined text-base"
+                  >contact_support</span
+                >
                 <span>Contexto y Reporte Inicial</span>
               </div>
-              <p class="text-xs text-on-background dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
+              <p
+                class="text-xs text-on-background dark:text-slate-200 leading-relaxed whitespace-pre-wrap"
+              >
                 {{ activeTicket.description }}
               </p>
 
@@ -356,7 +454,9 @@
                   :key="i"
                   class="flex items-center gap-1.5 bg-surface dark:bg-slate-800 px-2.5 py-1.5 rounded-lg border border-outline-variant/40 text-xs"
                 >
-                  <span class="material-symbols-outlined text-sm text-primary">attachment</span>
+                  <span class="material-symbols-outlined text-sm text-primary"
+                    >attachment</span
+                  >
                   <a
                     :href="att.url"
                     target="_blank"
@@ -371,13 +471,21 @@
 
             <!-- Resolution Notes if any -->
             <div
-              v-if="activeTicket.status === 'RESUELTO' && activeTicket.resolutionNotes"
+              v-if="
+                activeTicket.status === 'RESUELTO' &&
+                activeTicket.resolutionNotes
+              "
               class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3.5 max-w-xl mx-auto text-emerald-800 dark:text-emerald-300 text-xs flex items-start gap-2.5"
             >
-              <span class="material-symbols-outlined text-emerald-600 text-xl flex-shrink-0">verified</span>
+              <span
+                class="material-symbols-outlined text-emerald-600 text-xl flex-shrink-0"
+                >verified</span
+              >
               <div>
                 <p class="font-bold">Dictamen / Nota de Cierre:</p>
-                <p class="mt-0.5 text-[11px]">{{ activeTicket.resolutionNotes }}</p>
+                <p class="mt-0.5 text-[11px]">
+                  {{ activeTicket.resolutionNotes }}
+                </p>
               </div>
             </div>
 
@@ -396,12 +504,22 @@
               class="flex flex-col"
               :class="isModeratorMessage(msg) ? 'items-end' : 'items-start'"
             >
-              <div class="flex items-center gap-1.5 mb-1 px-1 text-[10px] text-on-surface-variant dark:text-slate-400 font-medium">
-                <span v-if="isModeratorMessage(msg)" class="font-bold text-primary flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">verified_user</span>
+              <div
+                class="flex items-center gap-1.5 mb-1 px-1 text-[10px] text-on-surface-variant dark:text-slate-400 font-medium"
+              >
+                <span
+                  v-if="isModeratorMessage(msg)"
+                  class="font-bold text-primary flex items-center gap-1"
+                >
+                  <span class="material-symbols-outlined text-[12px]"
+                    >verified_user</span
+                  >
                   {{ msg.senderName || "Moderador" }}
                 </span>
-                <span v-else class="font-bold text-on-background dark:text-slate-200">
+                <span
+                  v-else
+                  class="font-bold text-on-background dark:text-slate-200"
+                >
                   {{ activeTicket.userName }}
                 </span>
                 <span>•</span>
@@ -419,17 +537,21 @@
                 <p class="leading-relaxed">{{ msg.message || msg.text }}</p>
 
                 <!-- Attachments in message -->
-                <div v-if="msg.attachments && msg.attachments.length > 0" class="mt-2 space-y-1.5">
-                  <div
-                    v-for="(att, idx) in msg.attachments"
-                    :key="idx"
-                  >
+                <div
+                  v-if="msg.attachments && msg.attachments.length > 0"
+                  class="mt-2 space-y-1.5"
+                >
+                  <div v-for="(att, idx) in msg.attachments" :key="idx">
                     <!-- Image Preview -->
                     <div
                       v-if="isImgAttachment(att)"
                       class="rounded-xl overflow-hidden border border-outline-variant/40 max-w-[220px]"
                     >
-                      <a :href="att.url" target="_blank" rel="noopener noreferrer">
+                      <a
+                        :href="att.url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <img
                           :src="att.url"
                           :alt="att.name || 'Imagen adjunta'"
@@ -441,9 +563,15 @@
                     <div
                       v-else
                       class="flex items-center gap-1.5 p-1.5 rounded-lg text-xs"
-                      :class="isModeratorMessage(msg) ? 'bg-white/10' : 'bg-surface-container-low dark:bg-slate-800'"
+                      :class="
+                        isModeratorMessage(msg)
+                          ? 'bg-white/10'
+                          : 'bg-surface-container-low dark:bg-slate-800'
+                      "
                     >
-                      <span class="material-symbols-outlined text-sm">description</span>
+                      <span class="material-symbols-outlined text-sm"
+                        >description</span
+                      >
                       <a
                         :href="att.url"
                         target="_blank"
@@ -483,14 +611,21 @@
                   v-else
                   class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 flex items-center justify-center flex-shrink-0"
                 >
-                  <span class="material-symbols-outlined text-lg">description</span>
+                  <span class="material-symbols-outlined text-lg"
+                    >description</span
+                  >
                 </div>
                 <div class="truncate">
-                  <p class="text-xs font-semibold text-on-surface dark:text-slate-100 truncate">
+                  <p
+                    class="text-xs font-semibold text-on-surface dark:text-slate-100 truncate"
+                  >
                     {{ stagedAttachment.name }}
                   </p>
-                  <p class="text-[10px] text-on-surface-variant dark:text-slate-400">
-                    {{ stagedAttachment.sizeFormatted }} • Adjunto preparado para enviar
+                  <p
+                    class="text-[10px] text-on-surface-variant dark:text-slate-400"
+                  >
+                    {{ stagedAttachment.sizeFormatted }} • Adjunto preparado
+                    para enviar
                   </p>
                 </div>
               </div>
@@ -507,9 +642,17 @@
             <!-- Input Row -->
             <div class="p-2.5 sm:p-4 flex items-center gap-2 sm:gap-3">
               <template v-if="isAssignedToOther">
-                <div class="flex-grow bg-amber-500/10 border border-amber-500/30 rounded-xl px-3 py-2 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-2 min-w-0">
-                  <span class="material-symbols-outlined text-base flex-shrink-0">lock</span>
-                  <span class="truncate">En atención por {{ activeTicket.assignedModeratorName }}.</span>
+                <div
+                  class="flex-grow bg-amber-500/10 border border-amber-500/30 rounded-xl px-3 py-2 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-2 min-w-0"
+                >
+                  <span
+                    class="material-symbols-outlined text-base flex-shrink-0"
+                    >lock</span
+                  >
+                  <span class="truncate"
+                    >En atención por
+                    {{ activeTicket.assignedModeratorName }}.</span
+                  >
                 </div>
                 <button
                   disabled
@@ -537,24 +680,44 @@
                   class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-surface-container-low dark:bg-slate-800 border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0 cursor-pointer"
                   title="Adjuntar documento PDF o imagen (máx 5MB)"
                 >
-                  <span v-if="isUploading" class="material-symbols-outlined text-base animate-spin">progress_activity</span>
-                  <span v-else class="material-symbols-outlined text-lg">attach_file</span>
+                  <span
+                    v-if="isUploading"
+                    class="material-symbols-outlined text-base animate-spin"
+                    >progress_activity</span
+                  >
+                  <span v-else class="material-symbols-outlined text-lg"
+                    >attach_file</span
+                  >
                 </button>
 
                 <input
                   v-model="newMessageText"
                   @keydown.enter.prevent="handleSendMessage"
                   type="text"
-                  :placeholder="isAssignedToMe ? 'Escribe tu respuesta...' : 'Escribe tu respuesta (se te auto-asignará)...'"
+                  :placeholder="
+                    isAssignedToMe
+                      ? 'Escribe tu respuesta...'
+                      : 'Escribe tu respuesta (se te auto-asignará)...'
+                  "
                   class="flex-grow bg-surface-container-low dark:bg-slate-800/60 border border-outline-variant/60 rounded-xl px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs text-on-background dark:text-slate-100 focus:outline-none focus:border-primary"
                 />
                 <button
                   @click="handleSendMessage"
-                  :disabled="(!newMessageText.trim() && !stagedAttachment) || isSending || isUploading"
+                  :disabled="
+                    (!newMessageText.trim() && !stagedAttachment) ||
+                    isSending ||
+                    isUploading
+                  "
                   class="bg-primary hover:bg-primary-container text-white disabled:opacity-50 font-bold px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition active:scale-95 shadow-sm flex-shrink-0 cursor-pointer"
                 >
-                  <span v-if="isSending || isUploading" class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
-                  <span v-else class="material-symbols-outlined text-[16px]">send</span>
+                  <span
+                    v-if="isSending || isUploading"
+                    class="material-symbols-outlined text-[16px] animate-spin"
+                    >progress_activity</span
+                  >
+                  <span v-else class="material-symbols-outlined text-[16px]"
+                    >send</span
+                  >
                   <span class="hidden sm:inline">Responder</span>
                 </button>
               </template>
@@ -567,14 +730,21 @@
           v-else
           class="flex-grow flex flex-col items-center justify-center p-8 text-center bg-surface-container-low/10 h-full"
         >
-          <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 text-primary">
+          <div
+            class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 text-primary"
+          >
             <span class="material-symbols-outlined text-4xl">forum</span>
           </div>
-          <h3 class="text-lg font-bold text-on-background dark:text-slate-100 mb-2">
+          <h3
+            class="text-lg font-bold text-on-background dark:text-slate-100 mb-2"
+          >
             Selecciona un ticket de soporte
           </h3>
-          <p class="text-on-surface-variant dark:text-slate-400 text-xs max-w-sm">
-            Elige un reporte de la cola lateral para revisar su historial, auto-asignarte el caso y responder en tiempo real.
+          <p
+            class="text-on-surface-variant dark:text-slate-400 text-xs max-w-sm"
+          >
+            Elige un reporte de la cola lateral para revisar su historial,
+            auto-asignarte el caso y responder en tiempo real.
           </p>
         </div>
       </div>
@@ -590,7 +760,8 @@
     >
       <div class="p-5 space-y-4 text-xs">
         <p class="text-on-surface-variant dark:text-slate-300">
-          Indica los detalles o recomendaciones de resolución que se registrarán en el cierre del caso:
+          Indica los detalles o recomendaciones de resolución que se registrarán
+          en el cierre del caso:
         </p>
         <textarea
           v-model="resolutionNotesText"
@@ -599,7 +770,9 @@
           class="w-full px-3.5 py-2.5 rounded-xl border border-outline-variant/60 bg-surface dark:bg-slate-800 text-on-background dark:text-slate-100 text-xs focus:outline-none focus:border-primary"
         ></textarea>
 
-        <div class="flex justify-end gap-3 pt-3 border-t border-outline-variant/40">
+        <div
+          class="flex justify-end gap-3 pt-3 border-t border-outline-variant/40"
+        >
           <button
             type="button"
             @click="showResolvePrompt = false"
@@ -613,7 +786,11 @@
             :disabled="isProcessingAction"
             class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
           >
-            <span v-if="isProcessingAction" class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+            <span
+              v-if="isProcessingAction"
+              class="material-symbols-outlined text-sm animate-spin"
+              >progress_activity</span
+            >
             Confirmar y Cerrar
           </button>
         </div>
@@ -628,11 +805,16 @@ import { useSupportTickets } from "~/composables/useSupportTickets";
 import { useS3Upload } from "~/composables/useS3Upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import AppModal from "~/components/common/AppModal.vue";
-import type { SupportTicket, SupportTicketMessage, TicketAttachment } from "~/types/support";
+import type {
+  SupportTicket,
+  SupportTicketMessage,
+  TicketAttachment,
+} from "~/types/support";
 
 useSeoMeta({
   title: "Mesa de Soporte - Moderación JobNet",
-  description: "Gestión y resolución concurrente de tickets de soporte para moderadores",
+  description:
+    "Gestión y resolución concurrente de tickets de soporte para moderadores",
 });
 
 const {
@@ -748,7 +930,7 @@ const filteredTickets = computed(() => {
       t.userName.toLowerCase().includes(q) ||
       t.subject.toLowerCase().includes(q) ||
       t.userEmail.toLowerCase().includes(q) ||
-      t.description.toLowerCase().includes(q)
+      t.description.toLowerCase().includes(q),
   );
 });
 
@@ -759,7 +941,11 @@ const ticketAttachments = computed(() => {
 });
 
 const isModeratorMessage = (msg: SupportTicketMessage) => {
-  return msg.senderRole === "MODERADOR" || msg.senderRole === "ADMIN" || msg.senderRole === "MODERATOR";
+  return (
+    msg.senderRole === "MODERADOR" ||
+    msg.senderRole === "ADMIN" ||
+    msg.senderRole === "MODERATOR"
+  );
 };
 
 const handleSelectTicket = async (ticket: SupportTicket) => {
@@ -886,7 +1072,10 @@ const formatTime = (dateStr?: string) => {
   if (!dateStr) return "";
   try {
     const d = new Date(dateStr);
-    return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   } catch {
     return "";
   }
@@ -903,7 +1092,8 @@ const manualRefresh = async () => {
 };
 
 const pollQueueAndMessages = async () => {
-  if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+  if (typeof document !== "undefined" && document.visibilityState !== "visible")
+    return;
   if (isSending.value || isProcessingAction.value || isPolling.value) return;
 
   isPolling.value = true;
@@ -911,7 +1101,9 @@ const pollQueueAndMessages = async () => {
     await fetchAllTickets(undefined, true);
     if (activeTicket.value) {
       const id = activeTicket.value.id || activeTicket.value.ticketId;
-      const currentInList = tickets.value.find((t) => (t.id || t.ticketId) === id);
+      const currentInList = tickets.value.find(
+        (t) => (t.id || t.ticketId) === id,
+      );
       if (currentInList) {
         activeTicket.value = { ...activeTicket.value, ...currentInList };
       }
@@ -929,7 +1121,7 @@ watch(
   () => {
     scrollToBottom();
   },
-  { deep: true }
+  { deep: true },
 );
 
 onMounted(async () => {

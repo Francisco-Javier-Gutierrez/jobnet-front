@@ -460,10 +460,9 @@ const markAsRead = async (id: string) => {
 
   if (userId.value) {
     try {
-      await apiFetch(
-        `/profile/${userId.value}/notifications/${id}/read`,
-        { method: "POST" },
-      );
+      await apiFetch(`/profile/${userId.value}/notifications/${id}/read`, {
+        method: "POST",
+      });
     } catch (e) {
       console.error("Error marking notification as read:", e);
     }
@@ -477,10 +476,9 @@ const markAllAsRead = async () => {
 
   if (userId.value) {
     try {
-      await apiFetch(
-        `/profile/${userId.value}/notifications/read-all`,
-        { method: "POST" },
-      );
+      await apiFetch(`/profile/${userId.value}/notifications/read-all`, {
+        method: "POST",
+      });
     } catch (e) {
       console.error("Error marking all notifications as read:", e);
     }

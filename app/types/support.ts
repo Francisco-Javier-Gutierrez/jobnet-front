@@ -1,8 +1,5 @@
 export type TicketCategory =
-  | "FALLO_TECNICO"
-  | "DUDA_GENERAL"
-  | "PROBLEMA_CUENTA"
-  | "OTRO";
+  "FALLO_TECNICO" | "DUDA_GENERAL" | "PROBLEMA_CUENTA" | "OTRO";
 
 export type TicketStatus = "ABIERTO" | "EN_PROCESO" | "RESUELTO";
 

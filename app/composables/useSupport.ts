@@ -23,9 +23,7 @@ export function useSupport() {
     return (user?.tipoUsuario || "").toUpperCase();
   });
 
-  const isOrganization = computed(
-    () => userRole.value === "ORGANIZACION",
-  );
+  const isOrganization = computed(() => userRole.value === "ORGANIZACION");
 
   const isModeratorRole = computed(
     () =>
@@ -81,10 +79,9 @@ export function useSupport() {
 
     try {
       if (isOrganization.value) {
-        await apiFetch(
-          `/moderator/organizations/${userId.value}/join-appeal`,
-          { method: "POST" },
-        ).catch(() => {});
+        await apiFetch(`/moderator/organizations/${userId.value}/join-appeal`, {
+          method: "POST",
+        }).catch(() => {});
 
         const statusRes = await apiFetch<any>(
           `/moderator/organizations/${userId.value}/suspension-status`,
@@ -104,9 +101,9 @@ export function useSupport() {
           },
         ];
       } else {
-        const data = await apiFetch<any[]>(
-          "/moderator/appeals",
-        ).catch(() => []);
+        const data = await apiFetch<any[]>("/moderator/appeals").catch(
+          () => [],
+        );
 
         chats.value = (data || []).map((item) => ({
           id: item.id || item.companyId,
@@ -186,13 +183,10 @@ export function useSupport() {
 
     try {
       if (action === "approve") {
-        await apiFetch(
-          `/moderator/organizations/${compId}/cancel-suspension`,
-          {
-            method: "POST",
-            body: { notes: "Apelación aprobada tras revisión en tiempo real" },
-          },
-        );
+        await apiFetch(`/moderator/organizations/${compId}/cancel-suspension`, {
+          method: "POST",
+          body: { notes: "Apelación aprobada tras revisión en tiempo real" },
+        });
         showSuccess(
           "Éxito",
           "Apelación aprobada con éxito. La organización ha sido reactivada.",

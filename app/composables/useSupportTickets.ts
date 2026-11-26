@@ -37,7 +37,12 @@ export function useSupportTickets() {
 
   const userName = computed(() => {
     const s = session.value as any;
-    return s?.user?.name || s?.user?.nombre || s?.user?.email?.split("@")[0] || "Usuario";
+    return (
+      s?.user?.name ||
+      s?.user?.nombre ||
+      s?.user?.email?.split("@")[0] ||
+      "Usuario"
+    );
   });
 
   const userRole = computed(() => {
@@ -51,12 +56,14 @@ export function useSupportTickets() {
   });
 
   const isAssignedToMe = computed(() => {
-    if (!activeTicket.value || !activeTicket.value.assignedModeratorId) return false;
+    if (!activeTicket.value || !activeTicket.value.assignedModeratorId)
+      return false;
     return activeTicket.value.assignedModeratorId === userId.value;
   });
 
   const isAssignedToOther = computed(() => {
-    if (!activeTicket.value || !activeTicket.value.assignedModeratorId) return false;
+    if (!activeTicket.value || !activeTicket.value.assignedModeratorId)
+      return false;
     return activeTicket.value.assignedModeratorId !== userId.value;
   });
 
@@ -99,7 +106,9 @@ export function useSupportTickets() {
       return list;
     } catch (err: any) {
       console.error("Error al obtener cola de tickets:", err);
-      showError(err?.data?.error || "Error al cargar la cola de moderación de tickets.");
+      showError(
+        err?.data?.error || "Error al cargar la cola de moderación de tickets.",
+      );
       return [];
     } finally {
       if (!silent) isLoadingTickets.value = false;
@@ -123,7 +132,9 @@ export function useSupportTickets() {
       if (res?.ticket) {
         // Sync active ticket with latest metadata (assignment, status)
         activeTicket.value = res.ticket;
-        const idx = tickets.value.findIndex((t) => (t.id || t.ticketId) === ticketId);
+        const idx = tickets.value.findIndex(
+          (t) => (t.id || t.ticketId) === ticketId,
+        );
         if (idx !== -1) {
           tickets.value[idx] = { ...tickets.value[idx], ...res.ticket };
         }
@@ -131,7 +142,9 @@ export function useSupportTickets() {
       return messages.value;
     } catch (err: any) {
       console.error("Error al cargar mensajes del ticket:", err);
-      showError(err?.data?.error || "No se pudieron cargar los mensajes del ticket.");
+      showError(
+        err?.data?.error || "No se pudieron cargar los mensajes del ticket.",
+      );
       return [];
     } finally {
       if (!silent) isLoadingMessages.value = false;
@@ -150,23 +163,30 @@ export function useSupportTickets() {
   /**
    * Create a new support ticket / problem report
    */
-  const createTicket = async (payload: CreateTicketDTO): Promise<SupportTicket | null> => {
+  const createTicket = async (
+    payload: CreateTicketDTO,
+  ): Promise<SupportTicket | null> => {
     isCreatingTicket.value = true;
     try {
-      const res = await apiFetch<{ ticket: SupportTicket }>("/support/tickets", {
-        method: "POST",
-        body: {
-          ...payload,
-          userName: userName.value,
+      const res = await apiFetch<{ ticket: SupportTicket }>(
+        "/support/tickets",
+        {
+          method: "POST",
+          body: {
+            ...payload,
+            userName: userName.value,
+          },
         },
-      });
+      );
 
       if (res?.ticket) {
         tickets.value.unshift(res.ticket);
         activeTicket.value = res.ticket;
         const ticketId = res.ticket.id || res.ticket.ticketId;
         await fetchTicketMessages(ticketId, true);
-        showSuccess("Reporte de problema enviado. Un moderador atenderá tu caso pronto.");
+        showSuccess(
+          "Reporte de problema enviado. Un moderador atenderá tu caso pronto.",
+        );
         return res.ticket;
       }
       return null;
@@ -187,7 +207,8 @@ export function useSupportTickets() {
     text: string,
     attachments?: TicketAttachment[],
   ): Promise<boolean> => {
-    if (!text.trim() && (!attachments || attachments.length === 0)) return false;
+    if (!text.trim() && (!attachments || attachments.length === 0))
+      return false;
 
     // Concurrency check for moderators
     if (isModerator.value && isAssignedToOther.value) {
@@ -226,9 +247,22 @@ export function useSupportTickets() {
 
         const isDuplicate = messages.value.some(
           (m) =>
-            (m.messageId && normalizedMsg.messageId && m.messageId === normalizedMsg.messageId) ||
-            (m.createdAt && normalizedMsg.createdAt && m.createdAt === normalizedMsg.createdAt && m.senderId === normalizedMsg.senderId) ||
-            (m.senderId && normalizedMsg.senderId && m.senderId === normalizedMsg.senderId && (m.message || m.text) === (normalizedMsg.message || normalizedMsg.text) && Math.abs(new Date(m.createdAt || 0).getTime() - new Date(normalizedMsg.createdAt || 0).getTime()) < 3000)
+            (m.messageId &&
+              normalizedMsg.messageId &&
+              m.messageId === normalizedMsg.messageId) ||
+            (m.createdAt &&
+              normalizedMsg.createdAt &&
+              m.createdAt === normalizedMsg.createdAt &&
+              m.senderId === normalizedMsg.senderId) ||
+            (m.senderId &&
+              normalizedMsg.senderId &&
+              m.senderId === normalizedMsg.senderId &&
+              (m.message || m.text) ===
+                (normalizedMsg.message || normalizedMsg.text) &&
+              Math.abs(
+                new Date(m.createdAt || 0).getTime() -
+                  new Date(normalizedMsg.createdAt || 0).getTime(),
+              ) < 3000),
         );
         if (!isDuplicate) {
           messages.value = [...messages.value, normalizedMsg];
@@ -237,16 +271,20 @@ export function useSupportTickets() {
         // Update activeTicket auto-assignment if newly assigned
         if (activeTicket.value) {
           activeTicket.value.lastMessage = text.trim();
-          activeTicket.value.lastMessageAt = normalizedMsg.createdAt || new Date().toISOString();
+          activeTicket.value.lastMessageAt =
+            normalizedMsg.createdAt || new Date().toISOString();
           if (res.assignedModeratorId) {
             activeTicket.value.assignedModeratorId = res.assignedModeratorId;
-            activeTicket.value.assignedModeratorName = res.assignedModeratorName;
+            activeTicket.value.assignedModeratorName =
+              res.assignedModeratorName;
             activeTicket.value.status = "EN_PROCESO";
           }
         }
 
         // Update in list
-        const idx = tickets.value.findIndex((t) => (t.id || t.ticketId) === ticketId);
+        const idx = tickets.value.findIndex(
+          (t) => (t.id || t.ticketId) === ticketId,
+        );
         if (idx !== -1 && activeTicket.value) {
           tickets.value[idx] = { ...tickets.value[idx], ...activeTicket.value };
         }
@@ -264,7 +302,10 @@ export function useSupportTickets() {
   /**
    * Claim or release a ticket (moderator exclusive)
    */
-  const claimTicket = async (ticketId: string, action: "CLAIM" | "RELEASE"): Promise<boolean> => {
+  const claimTicket = async (
+    ticketId: string,
+    action: "CLAIM" | "RELEASE",
+  ): Promise<boolean> => {
     isProcessingAction.value = true;
     try {
       const res = await apiFetch<{
@@ -277,13 +318,19 @@ export function useSupportTickets() {
         body: { action, moderatorName: userName.value },
       });
 
-      if (activeTicket.value && (activeTicket.value.id === ticketId || activeTicket.value.ticketId === ticketId)) {
+      if (
+        activeTicket.value &&
+        (activeTicket.value.id === ticketId ||
+          activeTicket.value.ticketId === ticketId)
+      ) {
         activeTicket.value.assignedModeratorId = res.assignedModeratorId;
         activeTicket.value.assignedModeratorName = res.assignedModeratorName;
         activeTicket.value.status = res.status as any;
       }
 
-      const idx = tickets.value.findIndex((t) => (t.id || t.ticketId) === ticketId);
+      const idx = tickets.value.findIndex(
+        (t) => (t.id || t.ticketId) === ticketId,
+      );
       if (idx !== -1 && activeTicket.value) {
         tickets.value[idx] = { ...tickets.value[idx], ...activeTicket.value };
       }
@@ -296,7 +343,9 @@ export function useSupportTickets() {
       return true;
     } catch (err: any) {
       console.error("Error al gestionar asignación del ticket:", err);
-      showError(err?.data?.error || "Error al modificar la asignación del ticket.");
+      showError(
+        err?.data?.error || "Error al modificar la asignación del ticket.",
+      );
       return false;
     } finally {
       isProcessingAction.value = false;
@@ -306,7 +355,10 @@ export function useSupportTickets() {
   /**
    * Resolve and close a ticket
    */
-  const resolveTicket = async (ticketId: string, resolutionNotes?: string): Promise<boolean> => {
+  const resolveTicket = async (
+    ticketId: string,
+    resolutionNotes?: string,
+  ): Promise<boolean> => {
     isProcessingAction.value = true;
     try {
       const notes = resolutionNotes || "Caso resuelto satisfactoriamente.";
@@ -320,7 +372,11 @@ export function useSupportTickets() {
         body: { resolutionNotes: notes, notes },
       });
 
-      if (activeTicket.value && (activeTicket.value.id === ticketId || activeTicket.value.ticketId === ticketId)) {
+      if (
+        activeTicket.value &&
+        (activeTicket.value.id === ticketId ||
+          activeTicket.value.ticketId === ticketId)
+      ) {
         activeTicket.value.status = "RESUELTO";
         activeTicket.value.resolutionNotes = res.resolutionNotes || notes;
         activeTicket.value.lastMessage = `[Caso Resuelto]: ${notes}`;
@@ -331,13 +387,21 @@ export function useSupportTickets() {
           ...messages.value,
           {
             ...res.resolutionMessage,
-            text: res.resolutionMessage.text || res.resolutionMessage.message || `[Caso Resuelto]: ${notes}`,
-            message: res.resolutionMessage.message || res.resolutionMessage.text || `[Caso Resuelto]: ${notes}`,
+            text:
+              res.resolutionMessage.text ||
+              res.resolutionMessage.message ||
+              `[Caso Resuelto]: ${notes}`,
+            message:
+              res.resolutionMessage.message ||
+              res.resolutionMessage.text ||
+              `[Caso Resuelto]: ${notes}`,
           },
         ];
       }
 
-      const idx = tickets.value.findIndex((t) => (t.id || t.ticketId) === ticketId);
+      const idx = tickets.value.findIndex(
+        (t) => (t.id || t.ticketId) === ticketId,
+      );
       if (idx !== -1 && activeTicket.value) {
         tickets.value[idx] = { ...tickets.value[idx], ...activeTicket.value };
       }
@@ -362,7 +426,10 @@ export function useSupportTickets() {
     const action = payload.action || payload.type;
 
     // 1. New Message received in a Ticket thread
-    if (action === "receiveSupportMessage" || action === "SUPPORT_TICKET_MESSAGE") {
+    if (
+      action === "receiveSupportMessage" ||
+      action === "SUPPORT_TICKET_MESSAGE"
+    ) {
       const ticketId = payload.ticketId || payload.message?.ticketId;
       const rawMsg = payload.message;
       if (!ticketId || !rawMsg) return;
@@ -374,13 +441,27 @@ export function useSupportTickets() {
       };
 
       // If this ticket is currently active, push message if not duplicate
-      const currentActiveId = activeTicket.value?.id || activeTicket.value?.ticketId;
+      const currentActiveId =
+        activeTicket.value?.id || activeTicket.value?.ticketId;
       if (currentActiveId === ticketId) {
         const isDuplicate = messages.value.some(
           (m) =>
-            (m.messageId && incomingMsg.messageId && m.messageId === incomingMsg.messageId) ||
-            (m.createdAt && incomingMsg.createdAt && m.createdAt === incomingMsg.createdAt && m.senderId === incomingMsg.senderId) ||
-            (m.senderId && incomingMsg.senderId && m.senderId === incomingMsg.senderId && (m.message || m.text) === (incomingMsg.message || incomingMsg.text) && Math.abs(new Date(m.createdAt || 0).getTime() - new Date(incomingMsg.createdAt || 0).getTime()) < 3000)
+            (m.messageId &&
+              incomingMsg.messageId &&
+              m.messageId === incomingMsg.messageId) ||
+            (m.createdAt &&
+              incomingMsg.createdAt &&
+              m.createdAt === incomingMsg.createdAt &&
+              m.senderId === incomingMsg.senderId) ||
+            (m.senderId &&
+              incomingMsg.senderId &&
+              m.senderId === incomingMsg.senderId &&
+              (m.message || m.text) ===
+                (incomingMsg.message || incomingMsg.text) &&
+              Math.abs(
+                new Date(m.createdAt || 0).getTime() -
+                  new Date(incomingMsg.createdAt || 0).getTime(),
+              ) < 3000),
         );
         if (!isDuplicate) {
           messages.value = [...messages.value, incomingMsg];
@@ -388,10 +469,12 @@ export function useSupportTickets() {
 
         // Update activeTicket metadata in real time
         activeTicket.value.lastMessage = incomingMsg.text || "Archivo adjunto";
-        activeTicket.value.lastMessageAt = incomingMsg.createdAt || new Date().toISOString();
+        activeTicket.value.lastMessageAt =
+          incomingMsg.createdAt || new Date().toISOString();
         if (payload.assignedModeratorId) {
           activeTicket.value.assignedModeratorId = payload.assignedModeratorId;
-          activeTicket.value.assignedModeratorName = payload.assignedModeratorName;
+          activeTicket.value.assignedModeratorName =
+            payload.assignedModeratorName;
         }
         if (payload.status) {
           activeTicket.value.status = payload.status;
@@ -399,14 +482,20 @@ export function useSupportTickets() {
       }
 
       // Update metadata in the tickets list and move to top
-      const idx = tickets.value.findIndex((t) => (t.id || t.ticketId) === ticketId);
+      const idx = tickets.value.findIndex(
+        (t) => (t.id || t.ticketId) === ticketId,
+      );
       if (idx !== -1) {
         const updatedTicket = {
           ...tickets.value[idx],
           lastMessage: incomingMsg.text || "Archivo adjunto",
           lastMessageAt: incomingMsg.createdAt || new Date().toISOString(),
-          assignedModeratorId: payload.assignedModeratorId || tickets.value[idx].assignedModeratorId,
-          assignedModeratorName: payload.assignedModeratorName || tickets.value[idx].assignedModeratorName,
+          assignedModeratorId:
+            payload.assignedModeratorId ||
+            tickets.value[idx].assignedModeratorId,
+          assignedModeratorName:
+            payload.assignedModeratorName ||
+            tickets.value[idx].assignedModeratorName,
           status: payload.status || tickets.value[idx].status,
         };
         tickets.value = [
@@ -420,7 +509,10 @@ export function useSupportTickets() {
     }
 
     // 2. New Ticket Created
-    if (action === "receiveSupportTicketCreated" || action === "SUPPORT_TICKET_CREATED") {
+    if (
+      action === "receiveSupportTicketCreated" ||
+      action === "SUPPORT_TICKET_CREATED"
+    ) {
       const newTicket = payload.ticket;
       if (!newTicket) return;
       const tId = newTicket.id || newTicket.ticketId;
@@ -431,18 +523,25 @@ export function useSupportTickets() {
     }
 
     // 3. Ticket Claimed or Released
-    if (action === "receiveSupportTicketClaimed" || action === "SUPPORT_TICKET_CLAIMED") {
+    if (
+      action === "receiveSupportTicketClaimed" ||
+      action === "SUPPORT_TICKET_CLAIMED"
+    ) {
       const ticketId = payload.ticketId;
       if (!ticketId) return;
 
-      const currentActiveId = activeTicket.value?.id || activeTicket.value?.ticketId;
+      const currentActiveId =
+        activeTicket.value?.id || activeTicket.value?.ticketId;
       if (currentActiveId === ticketId && activeTicket.value) {
         activeTicket.value.assignedModeratorId = payload.assignedModeratorId;
-        activeTicket.value.assignedModeratorName = payload.assignedModeratorName;
+        activeTicket.value.assignedModeratorName =
+          payload.assignedModeratorName;
         activeTicket.value.status = payload.status;
       }
 
-      const idx = tickets.value.findIndex((t) => (t.id || t.ticketId) === ticketId);
+      const idx = tickets.value.findIndex(
+        (t) => (t.id || t.ticketId) === ticketId,
+      );
       if (idx !== -1) {
         tickets.value = tickets.value.map((t) =>
           (t.id || t.ticketId) === ticketId
@@ -452,34 +551,48 @@ export function useSupportTickets() {
                 assignedModeratorName: payload.assignedModeratorName,
                 status: payload.status,
               }
-            : t
+            : t,
         );
       }
     }
 
     // 4. Ticket Resolved
-    if (action === "receiveSupportTicketResolved" || action === "SUPPORT_TICKET_RESOLVED") {
+    if (
+      action === "receiveSupportTicketResolved" ||
+      action === "SUPPORT_TICKET_RESOLVED"
+    ) {
       const ticketId = payload.ticketId;
       if (!ticketId) return;
 
-      const currentActiveId = activeTicket.value?.id || activeTicket.value?.ticketId;
+      const currentActiveId =
+        activeTicket.value?.id || activeTicket.value?.ticketId;
       if (currentActiveId === ticketId && activeTicket.value) {
         activeTicket.value.status = "RESUELTO";
         activeTicket.value.resolutionNotes = payload.resolutionNotes;
         if (payload.resolutionMessage) {
           const resMsg = {
             ...payload.resolutionMessage,
-            text: payload.resolutionMessage.text || payload.resolutionMessage.message || `[Caso Resuelto]: ${payload.resolutionNotes}`,
-            message: payload.resolutionMessage.message || payload.resolutionMessage.text || `[Caso Resuelto]: ${payload.resolutionNotes}`,
+            text:
+              payload.resolutionMessage.text ||
+              payload.resolutionMessage.message ||
+              `[Caso Resuelto]: ${payload.resolutionNotes}`,
+            message:
+              payload.resolutionMessage.message ||
+              payload.resolutionMessage.text ||
+              `[Caso Resuelto]: ${payload.resolutionNotes}`,
           };
-          const isDup = messages.value.some((m) => m.messageId === resMsg.messageId);
+          const isDup = messages.value.some(
+            (m) => m.messageId === resMsg.messageId,
+          );
           if (!isDup) {
             messages.value = [...messages.value, resMsg];
           }
         }
       }
 
-      const idx = tickets.value.findIndex((t) => (t.id || t.ticketId) === ticketId);
+      const idx = tickets.value.findIndex(
+        (t) => (t.id || t.ticketId) === ticketId,
+      );
       if (idx !== -1) {
         tickets.value = tickets.value.map((t) =>
           (t.id || t.ticketId) === ticketId
@@ -489,7 +602,7 @@ export function useSupportTickets() {
                 resolutionNotes: payload.resolutionNotes,
                 lastMessage: `[Caso Resuelto]: ${payload.resolutionNotes || "Problema atendido."}`,
               }
-            : t
+            : t,
         );
       }
     }

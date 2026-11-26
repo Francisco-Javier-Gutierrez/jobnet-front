@@ -4,6 +4,223 @@ import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { apiFetch } from "~/composables/useApiClient";
 
+export const QUICK_STAR_VERBS = [
+  "Lideré",
+  "Coordiné",
+  "Diseñé",
+  "Desarrollé",
+  "Optimicé",
+  "Implementé",
+  "Gestioné",
+  "Automaticé",
+] as const;
+
+/**
+ * Returns the responsive base root font-size (px) for CV Letter pages so
+ * proportional `em` child classes scale smoothly across Compacto/Estándar/Amplio.
+ */
+export function getCvBaseFontSize(
+  fontSize?: CvOptions["fontSize"],
+  compact = false,
+): string {
+  if (compact) {
+    if (fontSize === "sm") return "9.5px";
+    if (fontSize === "lg") return "12.5px";
+    return "11px";
+  }
+  if (fontSize === "sm") return "10.5px";
+  if (fontSize === "lg") return "13.5px";
+  return "12px";
+}
+
+function normalizeVerbToken(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+/**
+ * Accent- and case-insensitive check whether a STAR action verb already exists
+ * in an experience description.
+ */
+export function hasActionVerb(
+  description: string | undefined,
+  verb: string,
+): boolean {
+  const normalizedVerb = normalizeVerbToken(verb).trim();
+  if (!description || !normalizedVerb) return false;
+  const normalizedDesc = normalizeVerbToken(description);
+  const escaped = normalizedVerb.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^a-z0-9])${escaped}(?=$|[^a-z0-9])`).test(
+    normalizedDesc,
+  );
+}
+
+/**
+ * Appends a STAR action verb bullet only if it is not already present.
+ */
+export function appendActionVerb(
+  description: string | undefined,
+  verb: string,
+): { text: string; inserted: boolean } {
+  const trimmedVerb = verb.trim();
+  if (!trimmedVerb || hasActionVerb(description, trimmedVerb)) {
+    return { text: description || "", inserted: false };
+  }
+  const clean = (description || "").trimEnd();
+  return {
+    text: clean ? `${clean}\n• ${trimmedVerb} ` : `• ${trimmedVerb} `,
+    inserted: true,
+  };
+}
+
+/**
+ * Waits for web fonts and embedded images inside the target element to finish
+ * loading before rasterizing to PDF so line wrapping matches the HTML preview.
+ */
+export async function waitForElementAssets(root: HTMLElement): Promise<void> {
+  const tasks: Promise<unknown>[] = [];
+
+  if (typeof document !== "undefined" && document.fonts?.ready) {
+    tasks.push(document.fonts.ready);
+  }
+
+  const images = Array.from(root.querySelectorAll?.("img") ?? []);
+  for (const img of images) {
+    if (!img.complete) {
+      tasks.push(
+        new Promise<void>((resolve) => {
+          const done = () => resolve();
+          img.addEventListener("load", done, { once: true });
+          img.addEventListener("error", done, { once: true });
+        }),
+      );
+    }
+  }
+
+  if (tasks.length > 0) {
+    await Promise.all(tasks);
+  }
+}
+
+export const PRINT_ROOT_ID = "cv-native-print-root";
+const LETTER_WIDTH_MM = 215.9;
+const LETTER_HEIGHT_MM = 279.4;
+const TRANSPARENT_PIXEL_PLACEHOLDER =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+/**
+ * Resolves the actual `.cv-letter-page` root inside a wrapper element.
+ */
+export function resolveCvPrintTarget(element: HTMLElement): HTMLElement {
+  return element.matches && element.matches(".cv-letter-page")
+    ? element
+    : (element.querySelector &&
+        (element.querySelector(".cv-letter-page") as HTMLElement)) ||
+        element;
+}
+
+/**
+ * Removes any mounted native print container and restores page state.
+ */
+export function cleanupNativePrintRoot(previousTitle?: string): void {
+  if (typeof document === "undefined") return;
+  document.body?.classList?.remove("cv-printing");
+  const existing = document.getElementById(PRINT_ROOT_ID);
+  if (existing?.parentNode) {
+    existing.parentNode.removeChild(existing);
+  }
+  if (typeof previousTitle === "string") {
+    document.title = previousTitle;
+  }
+}
+
+/**
+ * Normalizes cloned DOM attributes before capture or print so zoom transforms
+ * and modal shadows never alter layout inside the Carta output.
+ */
+export function sanitizePdfCloneNode(cloned: Node): void {
+  if (cloned instanceof HTMLElement) {
+    cloned.style.margin = "0";
+    cloned.style.boxShadow = "none";
+    cloned.style.transform = "none";
+  }
+}
+
+/**
+ * Slices a rasterized high-DPI canvas cleanly onto US Letter jsPDF pages.
+ */
+export function buildLetterPdfFromCanvas(
+  jsPDFCtor: new (options?: any) => any,
+  canvas: HTMLCanvasElement,
+  pdfMeta?: { title?: string; author?: string; subject?: string },
+): Blob {
+  const pdf = new jsPDFCtor({
+    unit: "mm",
+    format: "letter", // 215.9mm x 279.4mm (8.5in x 11in)
+    orientation: "portrait",
+    compress: true,
+  });
+
+  if (pdfMeta && pdf && typeof pdf.setProperties === "function") {
+    pdf.setProperties({
+      title: pdfMeta.title || "Curriculum Vitae",
+      author: pdfMeta.author || "JobNet Platform",
+      subject: pdfMeta.subject || "CV Profesional",
+      creator: "JobNet Dynamic CV Builder",
+    });
+  }
+
+  const pageWidth = pdf.internal?.pageSize?.getWidth?.() || LETTER_WIDTH_MM;
+  const pageHeight = pdf.internal?.pageSize?.getHeight?.() || LETTER_HEIGHT_MM;
+  const safeCanvasWidth = Math.max(1, canvas.width || 1);
+  const pxPerMm = safeCanvasWidth / pageWidth;
+  const rawPxPageHeight = Math.max(1, Math.floor(pageHeight * pxPerMm));
+  // Absorb tiny subpixel CSS rounding slivers (< 6px at 2x) onto page 1
+  const pxPageHeight =
+    canvas.height > rawPxPageHeight && canvas.height - rawPxPageHeight <= 6
+      ? canvas.height
+      : rawPxPageHeight;
+  const totalPages = Math.max(1, Math.ceil(canvas.height / pxPageHeight));
+
+  for (let page = 0; page < totalPages; page++) {
+    if (page > 0) pdf.addPage();
+
+    const sliceTop = page * pxPageHeight;
+    const sliceHeight = Math.max(
+      1,
+      Math.min(pxPageHeight, canvas.height - sliceTop),
+    );
+    const pageCanvas = document.createElement("canvas");
+    pageCanvas.width = safeCanvasWidth;
+    pageCanvas.height = sliceHeight;
+
+    const ctx = pageCanvas.getContext("2d");
+    if (ctx) {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+      ctx.drawImage(
+        canvas,
+        0,
+        sliceTop,
+        safeCanvasWidth,
+        sliceHeight,
+        0,
+        0,
+        safeCanvasWidth,
+        sliceHeight,
+      );
+    }
+
+    const sliceHeightMm = (sliceHeight * pageWidth) / safeCanvasWidth;
+    const imgData = pageCanvas.toDataURL("image/jpeg", 0.98);
+    pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, sliceHeightMm);
+  }
+
+  return pdf.output("blob");
+}
+
 export const CV_COLOR_THEMES: CvColorTheme[] = [
   {
     id: "indigo-jobnet",
@@ -240,11 +457,12 @@ export function useCvGenerator() {
   }
 
   /**
-   * Generates a PDF Blob from an HTML element using standard Carta (Letter) dimensions
+   * Generates a PDF Blob from an HTML element using SVG foreignObject capture
+   * (modern-screenshot) + US Letter jsPDF pagination (Option A).
    */
   async function generatePdfBlob(
     element: HTMLElement,
-    filename: string = "Curriculum_Vitae.pdf",
+    _filename: string = "Curriculum_Vitae.pdf",
     pdfMeta?: { title?: string; author?: string; subject?: string },
   ): Promise<Blob> {
     if (typeof window === "undefined" || (import.meta as any).server) {
@@ -254,116 +472,114 @@ export function useCvGenerator() {
     isGenerating.value = true;
     statusMessage.value = "Generando PDF en formato Carta...";
 
-    const origScrollX = typeof window !== "undefined" ? window.scrollX : 0;
-    const origScrollY = typeof window !== "undefined" ? window.scrollY : 0;
-    if (
-      typeof window !== "undefined" &&
-      (window.scrollX !== 0 || window.scrollY !== 0)
-    ) {
-      window.scrollTo(0, 0);
-    }
-
     try {
-      // Dynamic import to avoid SSR errors
-      const html2pdfModule = await import("html2pdf.js");
-      const html2pdf = html2pdfModule.default || html2pdfModule;
+      const [{ domToCanvas }, { jsPDF }] = await Promise.all([
+        import("modern-screenshot"),
+        import("jspdf"),
+      ]);
 
-      const opt = {
-        margin: [0, 0, 0, 0],
-        filename,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          letterRendering: true,
-          logging: false,
-          scrollY: 0,
-          scrollX: 0,
+      const printTarget = resolveCvPrintTarget(element);
+      await waitForElementAssets(printTarget);
+
+      const width =
+        printTarget.offsetWidth && printTarget.offsetWidth > 0
+          ? Math.round(printTarget.offsetWidth)
+          : 816;
+      const height =
+        printTarget.scrollHeight && printTarget.scrollHeight > 0
+          ? Math.round(printTarget.scrollHeight)
+          : printTarget.offsetHeight && printTarget.offsetHeight > 0
+            ? Math.round(printTarget.offsetHeight)
+            : 1054;
+
+      const canvas = await domToCanvas(printTarget, {
+        width,
+        height,
+        scale: 2,
+        backgroundColor: "#ffffff",
+        font: { preferredFormat: "woff2" },
+        fetch: {
+          requestInit: { mode: "cors" },
+          placeholderImage: TRANSPARENT_PIXEL_PLACEHOLDER,
         },
-        jsPDF: {
-          unit: "mm",
-          format: "letter", // 215.9mm x 279.4mm (8.5in x 11in)
-          orientation: "portrait",
+        style: {
+          margin: "0",
+          boxShadow: "none",
+          transform: "none",
         },
-        pagebreak: { mode: ["css", "legacy"] },
-      };
+        onCloneNode: sanitizePdfCloneNode,
+      });
 
-      const printTarget =
-        element.matches && element.matches(".cv-letter-page")
-          ? element
-          : (element.querySelector &&
-              (element.querySelector(".cv-letter-page") as HTMLElement)) ||
-            element;
-
-      let worker = html2pdf().set(opt).from(printTarget).toPdf();
-
-      if (pdfMeta) {
-        worker = worker.get("pdf").then((pdf: any) => {
-          if (pdf && typeof pdf.setProperties === "function") {
-            pdf.setProperties({
-              title: pdfMeta.title || "Curriculum Vitae",
-              author: pdfMeta.author || "JobNet Platform",
-              subject: pdfMeta.subject || "CV Profesional",
-              creator: "JobNet Dynamic CV Builder",
-            });
-          }
-        });
-      }
-
-      const pdfBlob: Blob = await worker.output("blob");
-
-      return pdfBlob;
+      return buildLetterPdfFromCanvas(jsPDF, canvas, pdfMeta);
     } finally {
-      if (
-        typeof window !== "undefined" &&
-        (origScrollX !== 0 || origScrollY !== 0)
-      ) {
-        window.scrollTo(origScrollX, origScrollY);
-      }
       isGenerating.value = false;
       statusMessage.value = "";
     }
   }
 
   /**
-   * Direct download of PDF in client
+   * Direct vector Carta print / "Save as PDF" via native browser engine (Option B)
    */
   async function downloadPdf(
     element: HTMLElement,
     candidateName: string = "Candidato",
     isAnonymous: boolean = false,
   ): Promise<void> {
+    if (typeof window === "undefined" || (import.meta as any).server) {
+      throw new Error("PDF generation is only supported in browser client.");
+    }
+
     const cleanName = isAnonymous
       ? "Anonimo"
       : candidateName.replace(/\s+/g, "_");
-    const filename = `CV_${cleanName}_Carta.pdf`;
-    const blob = await generatePdfBlob(element, filename, {
-      title: isAnonymous ? "CV Anónimo - JobNet" : `CV ${candidateName}`,
-      author: isAnonymous ? "JobNet Impartial Recruitment" : candidateName,
-      subject: isAnonymous ? "Postulación Imparcial" : "Perfil Profesional",
-    });
+    const filename = `CV_${cleanName}_Carta`;
 
-    const blobUrl = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = blobUrl;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    setTimeout(() => {
-      if (link.parentNode) {
-        link.parentNode.removeChild(link);
-      } else {
-        link.remove();
+    isGenerating.value = true;
+    statusMessage.value = "Preparando vista de impresión Carta...";
+
+    const previousTitle = document.title;
+    let printRootAttached = false;
+
+    const handleAfterPrint = () => {
+      cleanupNativePrintRoot(previousTitle);
+      window.removeEventListener("afterprint", handleAfterPrint);
+    };
+
+    try {
+      const printTarget = resolveCvPrintTarget(element);
+      await waitForElementAssets(printTarget);
+
+      cleanupNativePrintRoot();
+
+      const printRoot = document.createElement("div");
+      printRoot.id = PRINT_ROOT_ID;
+      printRoot.setAttribute("aria-hidden", "true");
+
+      const clonedPage = printTarget.cloneNode(true) as HTMLElement;
+      sanitizePdfCloneNode(clonedPage);
+      printRoot.appendChild(clonedPage);
+
+      document.body.appendChild(printRoot);
+      document.body.classList.add("cv-printing");
+      document.title = filename;
+      printRootAttached = true;
+
+      window.addEventListener("afterprint", handleAfterPrint, { once: true });
+      window.print();
+    } finally {
+      isGenerating.value = false;
+      statusMessage.value = "";
+      if (!printRootAttached) {
+        window.removeEventListener("afterprint", handleAfterPrint);
       }
-      URL.revokeObjectURL(blobUrl);
-    }, 150);
+    }
 
     showSuccess(
       isAnonymous ? "CV Anónimo Descargado" : "CV Descargado",
       isAnonymous
-        ? "Tu CV en Modo Anónimo se ha descargado exitosamente para postulaciones imparciales."
-        : "Tu CV en tamaño Carta se ha descargado exitosamente.",
-      3500,
+        ? "Tu CV en Modo Anónimo está listo para guardar como PDF vectorial (tamaño Carta)."
+        : "Selecciona «Guardar como PDF» en la ventana de impresión para exportarlo 1:1 en tamaño Carta.",
+      4000,
     );
   }
 

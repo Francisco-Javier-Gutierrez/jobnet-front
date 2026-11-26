@@ -159,10 +159,12 @@
             <span
               v-else-if="inc.assignedModeratorId"
               class="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 flex items-center gap-0.5"
-              :title="'Asignado a: ' + (inc.assignedModeratorName || 'Moderador')"
+              :title="
+                'Asignado a: ' + (inc.assignedModeratorName || 'Moderador')
+              "
             >
               <span class="material-symbols-outlined text-[11px]">lock</span>
-              En atención: {{ inc.assignedModeratorName || 'Moderador' }}
+              En atención: {{ inc.assignedModeratorName || "Moderador" }}
             </span>
             <span
               v-else
@@ -227,10 +229,16 @@
           <div
             v-if="isLockedByOther(inc)"
             class="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 font-medium"
-            :title="'Incidencia asignada al moderador ' + (inc.assignedModeratorName || 'otro moderador')"
+            :title="
+              'Incidencia asignada al moderador ' +
+              (inc.assignedModeratorName || 'otro moderador')
+            "
           >
             <span class="material-symbols-outlined text-sm">lock</span>
-            <span>En atención por {{ inc.assignedModeratorName || 'otro moderador' }}</span>
+            <span
+              >En atención por
+              {{ inc.assignedModeratorName || "otro moderador" }}</span
+            >
           </div>
 
           <template v-else>
@@ -245,14 +253,17 @@
             >
               <button
                 v-if="
-                  inc.auditState === 'AUDIT_ACTIVE' || inc.estatus === 'AUDITORIA'
+                  inc.auditState === 'AUDIT_ACTIVE' ||
+                  inc.estatus === 'AUDITORIA'
                 "
                 type="button"
                 @click="inspectAuditChat(inc)"
                 class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
                 title="Inspeccionar historial íntegro de mensajes en solo lectura y dictaminar (Fase 2)"
               >
-                <span class="material-symbols-outlined text-sm">visibility</span>
+                <span class="material-symbols-outlined text-sm"
+                  >visibility</span
+                >
                 <span>Inspeccionar Auditoría</span>
               </button>
               <button
@@ -269,10 +280,7 @@
 
             <!-- For reports in EVALUACION (under appeal) -->
             <template
-              v-if="
-                inc.estatus === 'EVALUACION' ||
-                inc.status === 'EVALUACION'
-              "
+              v-if="inc.estatus === 'EVALUACION' || inc.status === 'EVALUACION'"
             >
               <span
                 class="text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 px-2.5 py-1 rounded border border-amber-200 dark:border-amber-800 uppercase tracking-wide"
@@ -301,9 +309,19 @@
                 @click="resolve(inc.id, 'evaluate')"
                 class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1 disabled:opacity-50"
               >
-                <span v-if="processingId === inc.id" class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-                <span v-else class="material-symbols-outlined text-sm">pause_circle</span>
-                <span>{{ inc.targetType === 'VACANTE' || inc.jobId ? 'Pausar Vacante' : 'Pausar (Evaluar)' }}</span>
+                <span
+                  v-if="processingId === inc.id"
+                  class="material-symbols-outlined text-sm animate-spin"
+                  >progress_activity</span
+                >
+                <span v-else class="material-symbols-outlined text-sm"
+                  >pause_circle</span
+                >
+                <span>{{
+                  inc.targetType === "VACANTE" || inc.jobId
+                    ? "Pausar Vacante"
+                    : "Pausar (Evaluar)"
+                }}</span>
               </button>
               <button
                 v-else
@@ -421,59 +439,6 @@ const fetchIncidents = async (initial = false) => {
     loading.value = false;
     return;
   }
-  try {
-    const data = await apiFetch<any>("/moderator/incidents");
-    const fetched =
-      data?.value || data?.Items || (Array.isArray(data) ? data : []);
-    incidents.value = fetched;
-  } catch (e: any) {
-    console.error("Error loading incidents:", e);
-    incidents.value = [];
-  } finally {
-    loading.value = false;
-  }
-};
-
-const handleIncidentSync = () => {
-  fetchIncidents(false);
-};
-
-onMounted(() => {
-  fetchIncidents(true);
-  if (typeof window !== "undefined") {
-    window.addEventListener("incident-sync", handleIncidentSync);
-  }
-});
-
-onUnmounted(() => {
-  if (typeof window !== "undefined") {
-    window.removeEventListener("incident-sync", handleIncidentSync);
-  }
-});
-
-defineExpose({
-  fetchIncidents,
-});
-
-const resolve = async (id: string, action: string) => {
-  const mappedAction =
-    action === "reject"
-      ? "block"
-      : action === "evaluate"
-        ? "evaluate"
-        : "approve";
-  processingId.value = id;
-  try {
-    await apiFetch(`/moderator/incidents/${id}/resolve`, {
-      method: "POST",
-      body: {
-        action: mappedAction,
-      },
-    });
-
-    if (action === "evaluate") {
-      const idx = incidents.value.findIndex(
-        (i) => i.id === id || (i as any).incidentId === id || i.targetId === id || (i as any).jobId === id,
       );
       if (idx !== -1) {
         incidents.value[idx] = {

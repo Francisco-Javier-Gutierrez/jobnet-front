@@ -53,7 +53,8 @@ describe("useSupportTickets Composable", () => {
 
   describe("Concurrency & Exclusive Auto-Assignment", () => {
     it("should detect when ticket is unassigned", () => {
-      const { activeTicket, isAssignedToMe, isAssignedToOther } = useSupportTickets();
+      const { activeTicket, isAssignedToMe, isAssignedToOther } =
+        useSupportTickets();
       activeTicket.value = {
         id: "t-1",
         ticketId: "t-1",
@@ -76,7 +77,8 @@ describe("useSupportTickets Composable", () => {
     });
 
     it("should detect when ticket is assigned to current moderator", () => {
-      const { activeTicket, isAssignedToMe, isAssignedToOther } = useSupportTickets();
+      const { activeTicket, isAssignedToMe, isAssignedToOther } =
+        useSupportTickets();
       activeTicket.value = {
         id: "t-2",
         ticketId: "t-2",
@@ -99,8 +101,12 @@ describe("useSupportTickets Composable", () => {
     });
 
     it("should detect when ticket is assigned to another moderator (collision guard)", () => {
-      const { activeTicket, isAssignedToMe, isAssignedToOther, assignedModeratorName } =
-        useSupportTickets();
+      const {
+        activeTicket,
+        isAssignedToMe,
+        isAssignedToOther,
+        assignedModeratorName,
+      } = useSupportTickets();
       activeTicket.value = {
         id: "t-3",
         ticketId: "t-3",
@@ -209,7 +215,10 @@ describe("useSupportTickets Composable", () => {
         status: "EN_PROCESO",
       } as any;
 
-      const success = await resolveTicket("t-10", "Solucionado tras orientar al usuario.");
+      const success = await resolveTicket(
+        "t-10",
+        "Solucionado tras orientar al usuario.",
+      );
       expect(success).toBe(true);
       expect(apiFetch).toHaveBeenCalledWith("/support/tickets/t-10/resolve", {
         method: "POST",
@@ -219,7 +228,9 @@ describe("useSupportTickets Composable", () => {
         },
       });
       expect(activeTicket.value?.status).toBe("RESUELTO");
-      expect(activeTicket.value?.resolutionNotes).toBe("Solucionado tras orientar al usuario.");
+      expect(activeTicket.value?.resolutionNotes).toBe(
+        "Solucionado tras orientar al usuario.",
+      );
     });
 
     it("should send a message with both text and message in payload and append to messages", async () => {
@@ -262,7 +273,8 @@ describe("useSupportTickets Composable", () => {
 
   describe("Real-time WebSocket Handling", () => {
     it("should process incoming SUPPORT_TICKET_MESSAGE and append to activeTicket without duplicates", () => {
-      const { handleWsMessage, messages, activeTicket, tickets } = useSupportTickets();
+      const { handleWsMessage, messages, activeTicket, tickets } =
+        useSupportTickets();
       activeTicket.value = {
         id: "ticket-ws-1",
         ticketId: "ticket-ws-1",
@@ -343,7 +355,8 @@ describe("useSupportTickets Composable", () => {
     });
 
     it("should update status and append resolution message when SUPPORT_TICKET_RESOLVED arrives", () => {
-      const { handleWsMessage, activeTicket, messages, tickets } = useSupportTickets();
+      const { handleWsMessage, activeTicket, messages, tickets } =
+        useSupportTickets();
       activeTicket.value = {
         id: "ticket-res-1",
         ticketId: "ticket-res-1",
@@ -368,7 +381,9 @@ describe("useSupportTickets Composable", () => {
       expect(activeTicket.value.status).toBe("RESUELTO");
       expect(activeTicket.value.resolutionNotes).toBe("Contraseña reseteada.");
       expect(messages.value).toHaveLength(1);
-      expect(messages.value[0].text).toBe("[Caso Resuelto]: Contraseña reseteada.");
+      expect(messages.value[0].text).toBe(
+        "[Caso Resuelto]: Contraseña reseteada.",
+      );
     });
   });
 });

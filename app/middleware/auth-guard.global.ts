@@ -125,10 +125,7 @@ isMockEnabled.value && mockUser
   ];
 
   if (orgRoutes.some((r) => path === r || path.startsWith(`${r}/`))) {
-    if (
-      effectiveStatus !== "authenticated" ||
-      userRole !== "ORGANIZACION"
-    ) {
+    if (effectiveStatus !== "authenticated" || userRole !== "ORGANIZACION") {
       throw createError({
         statusCode: 404,
         statusMessage: "Página no encontrada",
@@ -158,11 +155,11 @@ isMockEnabled.value && mockUser
   }
 
   // 5b. Candidate My Applications (/candidate/my-applications) -> Allowed ONLY for CANDIDATO
-  if (path === "/candidate/my-applications" || path.startsWith("/candidate/my-applications/")) {
-    if (
-      effectiveStatus !== "authenticated" ||
-      userRole !== "CANDIDATO"
-    ) {
+  if (
+    path === "/candidate/my-applications" ||
+    path.startsWith("/candidate/my-applications/")
+  ) {
+    if (effectiveStatus !== "authenticated" || userRole !== "CANDIDATO") {
       throw createError({
         statusCode: 404,
         statusMessage: "Página no encontrada",

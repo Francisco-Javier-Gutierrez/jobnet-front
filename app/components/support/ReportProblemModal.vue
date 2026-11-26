@@ -9,7 +9,9 @@
   >
     <form @submit.prevent="handleSubmit" class="space-y-4 p-5 sm:p-6 text-xs">
       <div>
-        <label class="block font-bold text-on-background dark:text-slate-200 mb-1.5">
+        <label
+          class="block font-bold text-on-background dark:text-slate-200 mb-1.5"
+        >
           Categoría del problema <span class="text-rose-500">*</span>
         </label>
         <select
@@ -17,15 +19,23 @@
           class="w-full px-3.5 py-2.5 rounded-xl border border-outline-variant/60 bg-surface dark:bg-slate-800 text-on-background dark:text-slate-100 text-xs focus:outline-none focus:border-primary transition"
           required
         >
-          <option value="FALLO_TECNICO">Fallo técnico / Error en la plataforma</option>
-          <option value="DUDA_GENERAL">Duda general sobre el funcionamiento</option>
-          <option value="PROBLEMA_CUENTA">Problema con mi cuenta o sesión</option>
+          <option value="FALLO_TECNICO">
+            Fallo técnico / Error en la plataforma
+          </option>
+          <option value="DUDA_GENERAL">
+            Duda general sobre el funcionamiento
+          </option>
+          <option value="PROBLEMA_CUENTA">
+            Problema con mi cuenta o sesión
+          </option>
           <option value="OTRO">Otro inconveniente</option>
         </select>
       </div>
 
       <div>
-        <label class="block font-bold text-on-background dark:text-slate-200 mb-1.5">
+        <label
+          class="block font-bold text-on-background dark:text-slate-200 mb-1.5"
+        >
           Asunto o título breve <span class="text-rose-500">*</span>
         </label>
         <input
@@ -39,7 +49,9 @@
       </div>
 
       <div>
-        <label class="block font-bold text-on-background dark:text-slate-200 mb-1.5">
+        <label
+          class="block font-bold text-on-background dark:text-slate-200 mb-1.5"
+        >
           Descripción detallada <span class="text-rose-500">*</span>
         </label>
         <textarea
@@ -54,7 +66,9 @@
 
       <!-- Optional attachment/screenshot -->
       <div>
-        <label class="block font-bold text-on-background dark:text-slate-200 mb-1.5">
+        <label
+          class="block font-bold text-on-background dark:text-slate-200 mb-1.5"
+        >
           Captura de pantalla o archivo adjunto (opcional)
         </label>
         <div class="flex items-center gap-3">
@@ -74,16 +88,25 @@
             <span class="material-symbols-outlined text-sm">attach_file</span>
             {{ isUploadingFile ? "Subiendo..." : "Adjuntar captura o archivo" }}
           </button>
-          <div v-if="attachedFile" class="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-lg text-xs font-medium">
+          <div
+            v-if="attachedFile"
+            class="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-lg text-xs font-medium"
+          >
             <span class="truncate max-w-[180px]">{{ attachedFile.name }}</span>
-            <button type="button" @click="removeAttachment" class="hover:text-rose-500">
+            <button
+              type="button"
+              @click="removeAttachment"
+              class="hover:text-rose-500"
+            >
               <span class="material-symbols-outlined text-sm">close</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div class="flex justify-end gap-3 pt-3 border-t border-outline-variant/40">
+      <div
+        class="flex justify-end gap-3 pt-3 border-t border-outline-variant/40"
+      >
         <button
           type="button"
           @click="$emit('update:modelValue', false)"
@@ -96,7 +119,11 @@
           :disabled="isSubmitting || !isFormValid"
           class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
         >
-          <span v-if="isSubmitting" class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+          <span
+            v-if="isSubmitting"
+            class="material-symbols-outlined text-sm animate-spin"
+            >progress_activity</span
+          >
           <span class="material-symbols-outlined text-sm">send</span>
           {{ isSubmitting ? "Enviando reporte..." : "Enviar a moderación" }}
         </button>
@@ -109,7 +136,11 @@
 import { ref, reactive, computed } from "vue";
 import AppModal from "~/components/common/AppModal.vue";
 import { useS3Upload } from "~/composables/useS3Upload";
-import type { TicketCategory, TicketAttachment, CreateTicketDTO } from "~/types/support";
+import type {
+  TicketCategory,
+  TicketAttachment,
+  CreateTicketDTO,
+} from "~/types/support";
 
 const props = defineProps<{
   modelValue: boolean;

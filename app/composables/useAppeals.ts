@@ -71,9 +71,7 @@ export const useAppeals = () => {
   const fetchAppeals = async () => {
     isLoading.value = true;
     try {
-      const data = await apiFetch<any[]>(
-        "/moderator/appeals",
-      ).catch(() => []);
+      const data = await apiFetch<any[]>("/moderator/appeals").catch(() => []);
 
       const list = Array.isArray(data) ? data : [];
       appeals.value = list.map((item) => ({
@@ -245,13 +243,10 @@ export const useAppeals = () => {
 
     try {
       if (actionType === "cancel") {
-        await apiFetch(
-          `/moderator/organizations/${compId}/cancel-suspension`,
-          {
-            method: "POST",
-            body: { notes: "Apelación aprobada tras revisión en tiempo real" },
-          },
-        );
+        await apiFetch(`/moderator/organizations/${compId}/cancel-suspension`, {
+          method: "POST",
+          body: { notes: "Apelación aprobada tras revisión en tiempo real" },
+        });
         showSuccess(
           "Éxito",
           "Apelación aprobada con éxito. La organización ha sido reactivada.",
@@ -295,13 +290,10 @@ export const useAppeals = () => {
     isProcessingAction.value = true;
 
     try {
-      await apiFetch(
-        `/moderator/incidents/${activeAppeal.value.id}/resolve`,
-        {
-          method: "POST",
-          body: { action },
-        },
-      ).catch(() => {});
+      await apiFetch(`/moderator/incidents/${activeAppeal.value.id}/resolve`, {
+        method: "POST",
+        body: { action },
+      }).catch(() => {});
 
       showInfo(
         "Notificación",

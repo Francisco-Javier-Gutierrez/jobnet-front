@@ -309,10 +309,9 @@ const fetchAppealMessages = async () => {
   const compId = props.targetId || props.companyId;
 
   try {
-    await apiFetch(
-      `/moderator/organizations/${compId}/join-appeal`,
-      { method: "POST" },
-    ).catch(() => {});
+    await apiFetch(`/moderator/organizations/${compId}/join-appeal`, {
+      method: "POST",
+    }).catch(() => {});
 
     const data = await apiFetch<any[]>(
       `/moderator/appeals/${compId}/messages`,

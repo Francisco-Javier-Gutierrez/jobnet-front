@@ -11,14 +11,16 @@
         <h1
           class="text-2xl sm:text-3xl font-bold text-on-background dark:text-slate-100 mb-1 flex items-center gap-2.5"
         >
-          <span
-            class="material-symbols-outlined text-amber-500 text-3xl"
+          <span class="material-symbols-outlined text-amber-500 text-3xl"
             >support_agent</span
           >
           Centro de Soporte y Ayuda
         </h1>
-        <p class="text-on-surface-variant dark:text-slate-300 text-xs sm:text-sm">
-          Reporta fallos técnicos, dudas o problemas de cuenta para recibir asistencia de Moderación JobNet.
+        <p
+          class="text-on-surface-variant dark:text-slate-300 text-xs sm:text-sm"
+        >
+          Reporta fallos técnicos, dudas o problemas de cuenta para recibir
+          asistencia de Moderación JobNet.
         </p>
       </div>
 
@@ -28,9 +30,7 @@
           <span
             :class="[
               'w-2.5 h-2.5 rounded-full',
-              wsConnected
-                ? 'bg-emerald-500'
-                : 'bg-amber-500 animate-pulse',
+              wsConnected ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse',
             ]"
           ></span>
           <span
@@ -44,7 +44,9 @@
           @click="showCreateModal = true"
           class="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition flex items-center gap-2 shadow-sm active:scale-95 flex-shrink-0 cursor-pointer"
         >
-          <span class="material-symbols-outlined text-base">report_problem</span>
+          <span class="material-symbols-outlined text-base"
+            >report_problem</span
+          >
           Reportar un problema
         </button>
       </div>
@@ -60,7 +62,9 @@
         :class="{ 'hidden lg:flex': activeTicket }"
       >
         <!-- Search and Filter Bar -->
-        <div class="p-4 border-b border-outline-variant/60 bg-surface-container-low/20 space-y-3">
+        <div
+          class="p-4 border-b border-outline-variant/60 bg-surface-container-low/20 space-y-3"
+        >
           <div class="relative">
             <span
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -78,7 +82,9 @@
             />
           </div>
 
-          <div class="flex items-center justify-between text-[11px] font-bold text-on-surface-variant dark:text-slate-300">
+          <div
+            class="flex items-center justify-between text-[11px] font-bold text-on-surface-variant dark:text-slate-300"
+          >
             <span>MIS REPORTES</span>
             <div class="flex items-center gap-2">
               <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full">
@@ -91,16 +97,28 @@
                 title="Actualizar reportes"
                 class="hover:text-primary transition flex items-center p-0.5 rounded text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-low"
               >
-                <span class="material-symbols-outlined text-[15px]" :class="{ 'animate-spin': isLoadingTickets }">refresh</span>
+                <span
+                  class="material-symbols-outlined text-[15px]"
+                  :class="{ 'animate-spin': isLoadingTickets }"
+                  >refresh</span
+                >
               </button>
             </div>
           </div>
         </div>
 
         <!-- Tickets List View -->
-        <div class="flex-grow overflow-y-auto divide-y divide-outline-variant/30">
-          <div v-if="isLoadingTickets" class="p-8 text-center text-on-surface-variant text-xs">
-            <span class="material-symbols-outlined animate-spin text-2xl text-primary mb-2">progress_activity</span>
+        <div
+          class="flex-grow overflow-y-auto divide-y divide-outline-variant/30"
+        >
+          <div
+            v-if="isLoadingTickets"
+            class="p-8 text-center text-on-surface-variant text-xs"
+          >
+            <span
+              class="material-symbols-outlined animate-spin text-2xl text-primary mb-2"
+              >progress_activity</span
+            >
             <p>Cargando reportes...</p>
           </div>
 
@@ -108,12 +126,19 @@
             v-else-if="filteredTickets.length === 0"
             class="p-8 text-center flex flex-col items-center justify-center text-on-surface-variant text-xs space-y-3"
           >
-            <div class="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
+            <div
+              class="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500"
+            >
               <span class="material-symbols-outlined text-2xl">inbox</span>
             </div>
             <div>
-              <p class="font-bold text-on-background dark:text-slate-200">No hay tickets registrados</p>
-              <p class="text-[11px] mt-0.5">Si tienes dudas o un fallo, crea un reporte con el botón superior.</p>
+              <p class="font-bold text-on-background dark:text-slate-200">
+                No hay tickets registrados
+              </p>
+              <p class="text-[11px] mt-0.5">
+                Si tienes dudas o un fallo, crea un reporte con el botón
+                superior.
+              </p>
             </div>
             <button
               @click="showCreateModal = true"
@@ -129,14 +154,18 @@
             @click="handleSelectTicket(ticket)"
             class="w-full text-left p-4 hover:bg-surface-container-low/40 dark:hover:bg-slate-800/40 transition duration-150 flex gap-3 relative"
             :class="
-              (activeTicket?.id || activeTicket?.ticketId) === (ticket.id || ticket.ticketId)
+              (activeTicket?.id || activeTicket?.ticketId) ===
+              (ticket.id || ticket.ticketId)
                 ? 'bg-primary/5 dark:bg-primary/10'
                 : ''
             "
           >
             <!-- Highlight bar -->
             <div
-              v-if="(activeTicket?.id || activeTicket?.ticketId) === (ticket.id || ticket.ticketId)"
+              v-if="
+                (activeTicket?.id || activeTicket?.ticketId) ===
+                (ticket.id || ticket.ticketId)
+              "
               class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-md"
             ></div>
 
@@ -153,10 +182,14 @@
             <!-- Content -->
             <div class="flex-grow min-w-0">
               <div class="flex justify-between items-start mb-0.5">
-                <h3 class="text-xs font-bold text-on-background dark:text-slate-100 truncate">
+                <h3
+                  class="text-xs font-bold text-on-background dark:text-slate-100 truncate"
+                >
                   {{ ticket.subject }}
                 </h3>
-                <span class="text-[10px] text-on-surface-variant dark:text-slate-400 font-medium whitespace-nowrap ml-2">
+                <span
+                  class="text-[10px] text-on-surface-variant dark:text-slate-400 font-medium whitespace-nowrap ml-2"
+                >
                   {{ formatDate(ticket.updatedAt || ticket.createdAt) }}
                 </span>
               </div>
@@ -176,7 +209,9 @@
                 </span>
               </div>
 
-              <p class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate">
+              <p
+                class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate"
+              >
                 {{ ticket.lastMessage || ticket.description }}
               </p>
             </div>
@@ -201,11 +236,15 @@
                 class="lg:hidden p-1.5 -ml-1 text-on-surface-variant hover:text-primary rounded-lg flex items-center justify-center flex-shrink-0"
                 title="Volver a la lista de reportes"
               >
-                <span class="material-symbols-outlined text-xl">arrow_back</span>
+                <span class="material-symbols-outlined text-xl"
+                  >arrow_back</span
+                >
               </button>
               <div class="min-w-0">
                 <div class="flex items-center gap-2">
-                  <h2 class="text-xs sm:text-sm font-bold text-on-background dark:text-slate-100 truncate">
+                  <h2
+                    class="text-xs sm:text-sm font-bold text-on-background dark:text-slate-100 truncate"
+                  >
                     {{ activeTicket.subject }}
                   </h2>
                   <span
@@ -215,11 +254,21 @@
                     {{ formatStatus(activeTicket.status) }}
                   </span>
                 </div>
-                <p class="text-[10px] sm:text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5 flex items-center gap-2 truncate">
-                  <span>Categoría: {{ formatCategory(activeTicket.category) }}</span>
+                <p
+                  class="text-[10px] sm:text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5 flex items-center gap-2 truncate"
+                >
+                  <span
+                    >Categoría:
+                    {{ formatCategory(activeTicket.category) }}</span
+                  >
                   <span>•</span>
-                  <span v-if="activeTicket.assignedModeratorName" class="text-primary font-semibold flex items-center gap-1 truncate">
-                    <span class="material-symbols-outlined text-[13px]">verified_user</span>
+                  <span
+                    v-if="activeTicket.assignedModeratorName"
+                    class="text-primary font-semibold flex items-center gap-1 truncate"
+                  >
+                    <span class="material-symbols-outlined text-[13px]"
+                      >verified_user</span
+                    >
                     {{ activeTicket.assignedModeratorName }}
                   </span>
                   <span v-else class="text-amber-500 font-medium">
@@ -229,7 +278,9 @@
               </div>
             </div>
 
-            <span class="text-[10px] text-on-surface-variant dark:text-slate-400 font-mono hidden sm:inline flex-shrink-0">
+            <span
+              class="text-[10px] text-on-surface-variant dark:text-slate-400 font-mono hidden sm:inline flex-shrink-0"
+            >
               #{{ (activeTicket.id || activeTicket.ticketId).substring(0, 15) }}
             </span>
           </div>
@@ -243,11 +294,15 @@
             <div
               class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 rounded-xl p-4 max-w-xl mx-auto shadow-sm"
             >
-              <div class="flex items-center gap-2 mb-2 text-primary font-bold text-xs">
+              <div
+                class="flex items-center gap-2 mb-2 text-primary font-bold text-xs"
+              >
                 <span class="material-symbols-outlined text-base">info</span>
                 <span>Descripción original del problema</span>
               </div>
-              <p class="text-xs text-on-background dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
+              <p
+                class="text-xs text-on-background dark:text-slate-200 leading-relaxed whitespace-pre-wrap"
+              >
                 {{ activeTicket.description }}
               </p>
 
@@ -261,7 +316,9 @@
                   :key="i"
                   class="flex items-center gap-1.5 bg-surface dark:bg-slate-800 px-2.5 py-1.5 rounded-lg border border-outline-variant/40 text-xs"
                 >
-                  <span class="material-symbols-outlined text-sm text-primary">attachment</span>
+                  <span class="material-symbols-outlined text-sm text-primary"
+                    >attachment</span
+                  >
                   <a
                     :href="att.url"
                     target="_blank"
@@ -279,11 +336,20 @@
               v-if="activeTicket.status === 'RESUELTO'"
               class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3.5 max-w-xl mx-auto text-emerald-800 dark:text-emerald-300 text-xs flex items-start gap-2.5"
             >
-              <span class="material-symbols-outlined text-emerald-600 text-xl flex-shrink-0">check_circle</span>
+              <span
+                class="material-symbols-outlined text-emerald-600 text-xl flex-shrink-0"
+                >check_circle</span
+              >
               <div>
-                <p class="font-bold">Este caso ha sido marcado como RESUELTO por moderación.</p>
-                <p v-if="activeTicket.resolutionNotes" class="mt-0.5 text-[11px]">
-                  <strong>Resolución:</strong> {{ activeTicket.resolutionNotes }}
+                <p class="font-bold">
+                  Este caso ha sido marcado como RESUELTO por moderación.
+                </p>
+                <p
+                  v-if="activeTicket.resolutionNotes"
+                  class="mt-0.5 text-[11px]"
+                >
+                  <strong>Resolución:</strong>
+                  {{ activeTicket.resolutionNotes }}
                 </p>
               </div>
             </div>
@@ -304,9 +370,16 @@
               class="flex flex-col"
               :class="isMyMessage(msg) ? 'items-end' : 'items-start'"
             >
-              <div class="flex items-center gap-1.5 mb-1 px-1 text-[10px] text-on-surface-variant dark:text-slate-400 font-medium">
-                <span v-if="!isMyMessage(msg)" class="font-bold text-primary flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">verified_user</span>
+              <div
+                class="flex items-center gap-1.5 mb-1 px-1 text-[10px] text-on-surface-variant dark:text-slate-400 font-medium"
+              >
+                <span
+                  v-if="!isMyMessage(msg)"
+                  class="font-bold text-primary flex items-center gap-1"
+                >
+                  <span class="material-symbols-outlined text-[12px]"
+                    >verified_user</span
+                  >
                   {{ msg.senderName || "Moderador JobNet" }}
                 </span>
                 <span v-else class="font-bold">Tú</span>
@@ -325,17 +398,21 @@
                 <p class="leading-relaxed">{{ msg.message || msg.text }}</p>
 
                 <!-- Attachments in message -->
-                <div v-if="msg.attachments && msg.attachments.length > 0" class="mt-2 space-y-1.5">
-                  <div
-                    v-for="(att, idx) in msg.attachments"
-                    :key="idx"
-                  >
+                <div
+                  v-if="msg.attachments && msg.attachments.length > 0"
+                  class="mt-2 space-y-1.5"
+                >
+                  <div v-for="(att, idx) in msg.attachments" :key="idx">
                     <!-- Image Preview -->
                     <div
                       v-if="isImgAttachment(att)"
                       class="rounded-xl overflow-hidden border border-outline-variant/40 max-w-[220px]"
                     >
-                      <a :href="att.url" target="_blank" rel="noopener noreferrer">
+                      <a
+                        :href="att.url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <img
                           :src="att.url"
                           :alt="att.name || 'Imagen adjunta'"
@@ -347,9 +424,15 @@
                     <div
                       v-else
                       class="flex items-center gap-1.5 p-1.5 rounded-lg text-xs"
-                      :class="isMyMessage(msg) ? 'bg-white/10' : 'bg-surface-container-low dark:bg-slate-800'"
+                      :class="
+                        isMyMessage(msg)
+                          ? 'bg-white/10'
+                          : 'bg-surface-container-low dark:bg-slate-800'
+                      "
                     >
-                      <span class="material-symbols-outlined text-sm">description</span>
+                      <span class="material-symbols-outlined text-sm"
+                        >description</span
+                      >
                       <a
                         :href="att.url"
                         target="_blank"
@@ -389,14 +472,21 @@
                   v-else
                   class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 flex items-center justify-center flex-shrink-0"
                 >
-                  <span class="material-symbols-outlined text-lg">description</span>
+                  <span class="material-symbols-outlined text-lg"
+                    >description</span
+                  >
                 </div>
                 <div class="truncate">
-                  <p class="text-xs font-semibold text-on-surface dark:text-slate-100 truncate">
+                  <p
+                    class="text-xs font-semibold text-on-surface dark:text-slate-100 truncate"
+                  >
                     {{ stagedAttachment.name }}
                   </p>
-                  <p class="text-[10px] text-on-surface-variant dark:text-slate-400">
-                    {{ stagedAttachment.sizeFormatted }} • Adjunto preparado para enviar
+                  <p
+                    class="text-[10px] text-on-surface-variant dark:text-slate-400"
+                  >
+                    {{ stagedAttachment.sizeFormatted }} • Adjunto preparado
+                    para enviar
                   </p>
                 </div>
               </div>
@@ -429,8 +519,14 @@
                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-surface-container-low dark:bg-slate-800 border border-outline-variant/60 hover:border-primary text-on-surface-variant dark:text-slate-300 flex items-center justify-center transition disabled:opacity-50 flex-shrink-0 cursor-pointer"
                 title="Adjuntar documento PDF o imagen (máx 5MB)"
               >
-                <span v-if="isUploading" class="material-symbols-outlined text-base animate-spin">progress_activity</span>
-                <span v-else class="material-symbols-outlined text-lg">attach_file</span>
+                <span
+                  v-if="isUploading"
+                  class="material-symbols-outlined text-base animate-spin"
+                  >progress_activity</span
+                >
+                <span v-else class="material-symbols-outlined text-lg"
+                  >attach_file</span
+                >
               </button>
 
               <input
@@ -442,11 +538,21 @@
               />
               <button
                 @click="handleSendMessage"
-                :disabled="(!newMessageText.trim() && !stagedAttachment) || isSending || isUploading"
+                :disabled="
+                  (!newMessageText.trim() && !stagedAttachment) ||
+                  isSending ||
+                  isUploading
+                "
                 class="bg-primary hover:bg-primary-container text-white disabled:opacity-50 font-bold px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition active:scale-95 shadow-sm flex-shrink-0 cursor-pointer"
               >
-                <span v-if="isSending || isUploading" class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
-                <span v-else class="material-symbols-outlined text-[16px]">send</span>
+                <span
+                  v-if="isSending || isUploading"
+                  class="material-symbols-outlined text-[16px] animate-spin"
+                  >progress_activity</span
+                >
+                <span v-else class="material-symbols-outlined text-[16px]"
+                  >send</span
+                >
                 <span class="hidden sm:inline">Responder</span>
               </button>
             </div>
@@ -458,14 +564,21 @@
           v-else
           class="flex-grow flex flex-col items-center justify-center p-8 text-center bg-surface-container-low/10 h-full"
         >
-          <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary">
+          <div
+            class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary"
+          >
             <span class="material-symbols-outlined text-3xl">chat</span>
           </div>
-          <h3 class="text-base font-bold text-on-background dark:text-slate-100 mb-1">
+          <h3
+            class="text-base font-bold text-on-background dark:text-slate-100 mb-1"
+          >
             Selecciona un reporte de soporte
           </h3>
-          <p class="text-on-surface-variant dark:text-slate-400 text-xs max-w-sm">
-            Elige un ticket de la lista para ver la conversación con el moderador o inicia un nuevo reporte.
+          <p
+            class="text-on-surface-variant dark:text-slate-400 text-xs max-w-sm"
+          >
+            Elige un ticket de la lista para ver la conversación con el
+            moderador o inicia un nuevo reporte.
           </p>
         </div>
       </div>
@@ -485,11 +598,17 @@ import { useSupportTickets } from "~/composables/useSupportTickets";
 import { useS3Upload } from "~/composables/useS3Upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import ReportProblemModal from "~/components/support/ReportProblemModal.vue";
-import type { SupportTicket, SupportTicketMessage, CreateTicketDTO, TicketAttachment } from "~/types/support";
+import type {
+  SupportTicket,
+  SupportTicketMessage,
+  CreateTicketDTO,
+  TicketAttachment,
+} from "~/types/support";
 
 useSeoMeta({
   title: "Centro de Soporte - JobNet",
-  description: "Atención directa de dudas, fallos técnicos y problemas con Moderación JobNet",
+  description:
+    "Atención directa de dudas, fallos técnicos y problemas con Moderación JobNet",
 });
 
 const {
@@ -582,7 +701,7 @@ const filteredTickets = computed(() => {
     (t) =>
       t.subject.toLowerCase().includes(q) ||
       t.description.toLowerCase().includes(q) ||
-      (t.lastMessage && t.lastMessage.toLowerCase().includes(q))
+      (t.lastMessage && t.lastMessage.toLowerCase().includes(q)),
   );
 });
 
@@ -761,7 +880,10 @@ const formatTime = (dateStr?: string) => {
   if (!dateStr) return "";
   try {
     const d = new Date(dateStr);
-    return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   } catch {
     return "";
   }
@@ -779,7 +901,7 @@ watch(
   () => {
     scrollToBottom();
   },
-  { deep: true }
+  { deep: true },
 );
 
 onMounted(async () => {
@@ -793,7 +915,11 @@ onMounted(async () => {
 
   // Gentle backup sync every 30 seconds only if active ticket is open and page is visible
   pollInterval = setInterval(async () => {
-    if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+    if (
+      typeof document !== "undefined" &&
+      document.visibilityState !== "visible"
+    )
+      return;
     if (activeTicket.value && !isSending.value) {
       await selectTicket(activeTicket.value, true);
     }

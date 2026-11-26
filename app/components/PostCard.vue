@@ -371,10 +371,7 @@ const displayRole = computed(() => {
     .trim();
   const upperRole = rawRole.toUpperCase();
 
-  if (
-    upperRole === "ORGANIZACION" ||
-    props.post?.isCompany
-  ) {
+  if (upperRole === "ORGANIZACION" || props.post?.isCompany) {
     return "Organización";
   }
 

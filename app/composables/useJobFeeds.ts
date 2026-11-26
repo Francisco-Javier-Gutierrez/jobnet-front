@@ -635,9 +635,7 @@ export function useJobFeeds() {
     if (status.value !== "authenticated") return false;
     if (node.user === session.value?.user?.name) return true;
     const role = (session.value?.user as any)?.tipoUsuario?.toUpperCase();
-    return (
-      role === "ADMIN" || role === "MODERATOR" || role === "MODERADOR"
-    );
+    return role === "ADMIN" || role === "MODERATOR" || role === "MODERADOR";
   };
 
   const deleteComment = async (id: string) => {

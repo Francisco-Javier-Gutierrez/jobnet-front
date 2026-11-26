@@ -31,8 +31,14 @@ describe("useApplicantAiRanking Composable", () => {
   });
 
   it("should initialize with default states", () => {
-    const { isAiModalOpen, isEvaluating, currentJobId, rankingResult, errorMessage, isCooldownActive } =
-      useApplicantAiRanking();
+    const {
+      isAiModalOpen,
+      isEvaluating,
+      currentJobId,
+      rankingResult,
+      errorMessage,
+      isCooldownActive,
+    } = useApplicantAiRanking();
 
     expect(isAiModalOpen.value).toBe(false);
     expect(isEvaluating.value).toBe(false);
@@ -42,7 +48,8 @@ describe("useApplicantAiRanking Composable", () => {
   });
 
   it("should detect cooldown active when userCooldown record is present in DynamoDB", () => {
-    const { userCooldown, isCooldownActive, cooldownRemainingText } = useApplicantAiRanking();
+    const { userCooldown, isCooldownActive, cooldownRemainingText } =
+      useApplicantAiRanking();
 
     userCooldown.value = {
       isBlocked: true,
@@ -56,7 +63,8 @@ describe("useApplicantAiRanking Composable", () => {
   });
 
   it("should not be on cooldown when userCooldown isBlocked is false", () => {
-    const { userCooldown, isCooldownActive, cooldownRemainingText } = useApplicantAiRanking();
+    const { userCooldown, isCooldownActive, cooldownRemainingText } =
+      useApplicantAiRanking();
 
     userCooldown.value = {
       isBlocked: false,
@@ -97,8 +105,13 @@ describe("useApplicantAiRanking Composable", () => {
 
     mockApiFetch.mockResolvedValueOnce(mockCachedRanking);
 
-    const { openRankingModal, isAiModalOpen, currentJobId, rankingResult, isCooldownActive } =
-      useApplicantAiRanking();
+    const {
+      openRankingModal,
+      isAiModalOpen,
+      currentJobId,
+      rankingResult,
+      isCooldownActive,
+    } = useApplicantAiRanking();
 
     await openRankingModal("job-100");
 
@@ -136,7 +149,8 @@ describe("useApplicantAiRanking Composable", () => {
   });
 
   it("should block generateRanking and showInfo if isCooldownActive is true", async () => {
-    const { userCooldown, generateRanking, currentJobId } = useApplicantAiRanking();
+    const { userCooldown, generateRanking, currentJobId } =
+      useApplicantAiRanking();
     currentJobId.value = "job-cooldown";
     userCooldown.value = {
       isBlocked: true,
@@ -178,8 +192,13 @@ describe("useApplicantAiRanking Composable", () => {
 
     mockApiFetch.mockResolvedValueOnce(mockGeneratedRanking);
 
-    const { generateRanking, isEvaluating, rankingResult, currentJobId, isCooldownActive } =
-      useApplicantAiRanking();
+    const {
+      generateRanking,
+      isEvaluating,
+      rankingResult,
+      currentJobId,
+      isCooldownActive,
+    } = useApplicantAiRanking();
     currentJobId.value = "job-200";
     rankingResult.value = null;
 
@@ -208,8 +227,13 @@ describe("useApplicantAiRanking Composable", () => {
       },
     });
 
-    const { generateRanking, isEvaluating, errorMessage, currentJobId, isCooldownActive } =
-      useApplicantAiRanking();
+    const {
+      generateRanking,
+      isEvaluating,
+      errorMessage,
+      currentJobId,
+      isCooldownActive,
+    } = useApplicantAiRanking();
     currentJobId.value = "job-429";
 
     await generateRanking();

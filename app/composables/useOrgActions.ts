@@ -89,29 +89,23 @@ export function useOrgActions(refreshData: () => Promise<void>) {
         );
         successMsg.value = `Fase 1 completada: Notificación enviada a ${orgName}. Cuenta en revisión (${graceDaysInput.value || 4} días de gracia).`;
       } else if (actionType === "CANCEL") {
-        await apiFetch(
-          `/moderator/organizations/${orgId}/cancel-suspension`,
-          {
-            method: "POST",
-            body: {
-              notes:
-                "Apelación evaluada favorablemente. Suspensión revocada por el Administrador.",
-            },
+        await apiFetch(`/moderator/organizations/${orgId}/cancel-suspension`, {
+          method: "POST",
+          body: {
+            notes:
+              "Apelación evaluada favorablemente. Suspensión revocada por el Administrador.",
           },
-        );
+        });
         successMsg.value = `Apelación aprobada. Cuenta de ${orgName} restablecida.`;
       } else if (actionType === "CONFIRM") {
-        await apiFetch(
-          `/moderator/organizations/${orgId}/confirm-suspension`,
-          {
-            method: "POST",
-            body: {
-              reason:
-                reason ||
-                "Dictamen desfavorable tras proceso de evaluación/apelación",
-            },
+        await apiFetch(`/moderator/organizations/${orgId}/confirm-suspension`, {
+          method: "POST",
+          body: {
+            reason:
+              reason ||
+              "Dictamen desfavorable tras proceso de evaluación/apelación",
           },
-        );
+        });
         successMsg.value = `Dictamen desfavorable emitido. Cuenta de ${orgName} suspendida.`;
       }
 

@@ -21,10 +21,14 @@
             <span class="material-symbols-outlined text-xl">work</span>
           </div>
           <div class="min-w-0">
-            <p class="text-xs font-semibold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">
+            <p
+              class="text-xs font-semibold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider"
+            >
               Vacante analizada
             </p>
-            <h4 class="text-sm sm:text-base font-bold text-on-background dark:text-slate-100 truncate">
+            <h4
+              class="text-sm sm:text-base font-bold text-on-background dark:text-slate-100 truncate"
+            >
               {{ currentVacancyTitle }}
             </h4>
           </div>
@@ -36,7 +40,9 @@
             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20"
             title="Límite de uso responsable: 1 evaluación con IA cada 24 horas por vacante"
           >
-            <span class="material-symbols-outlined text-sm text-indigo-500">schedule</span>
+            <span class="material-symbols-outlined text-sm text-indigo-500"
+              >schedule</span
+            >
             <span>Disponible en {{ cooldownRemainingText }}</span>
           </div>
 
@@ -50,23 +56,33 @@
                 ? 'bg-slate-400 dark:bg-slate-700 opacity-60 cursor-not-allowed shadow-none'
                 : 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20',
             ]"
-            :title="isCooldownActive ? `Próxima evaluación en ${cooldownRemainingText}` : 'Evaluar candidatos con IA'"
+            :title="
+              isCooldownActive
+                ? `Próxima evaluación en ${cooldownRemainingText}`
+                : 'Evaluar candidatos con IA'
+            "
           >
             <span
               class="material-symbols-outlined text-sm"
               :class="{ 'animate-spin': isEvaluating }"
             >
-              {{ isEvaluating ? 'refresh' : (isCooldownActive ? 'timer' : 'auto_awesome') }}
+              {{
+                isEvaluating
+                  ? "refresh"
+                  : isCooldownActive
+                    ? "timer"
+                    : "auto_awesome"
+              }}
             </span>
             <span>
               {{
                 isEvaluating
-                  ? 'Evaluando...'
+                  ? "Evaluando..."
                   : isCooldownActive
-                    ? 'Cooldown Activo'
+                    ? "Cooldown Activo"
                     : rankingResult
-                      ? 'Re-evaluar con IA'
-                      : 'Evaluar con IA'
+                      ? "Re-evaluar con IA"
+                      : "Evaluar con IA"
               }}
             </span>
           </button>
@@ -101,17 +117,25 @@
             class="absolute inset-0 rounded-full border-4 border-indigo-200 dark:border-indigo-900/40 border-t-indigo-600 animate-spin"
           ></div>
           <div class="absolute inset-0 flex items-center justify-center">
-            <span class="material-symbols-outlined text-2xl text-indigo-600 dark:text-indigo-400">
+            <span
+              class="material-symbols-outlined text-2xl text-indigo-600 dark:text-indigo-400"
+            >
               psychology
             </span>
           </div>
         </div>
         <div class="space-y-1">
-          <h4 class="text-base font-bold text-on-background dark:text-slate-100">
+          <h4
+            class="text-base font-bold text-on-background dark:text-slate-100"
+          >
             La Inteligencia Artificial está analizando los candidatos...
           </h4>
-          <p class="text-xs text-on-surface-variant dark:text-slate-400 max-w-md">
-            Comparando competencias técnicas, perfil profesional y adecuación con los requisitos de la vacante para determinar el porcentaje de afinidad.
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-400 max-w-md"
+          >
+            Comparando competencias técnicas, perfil profesional y adecuación
+            con los requisitos de la vacante para determinar el porcentaje de
+            afinidad.
           </p>
         </div>
       </div>
@@ -127,11 +151,17 @@
           <span class="material-symbols-outlined text-3xl">psychology</span>
         </div>
         <div class="space-y-1">
-          <h4 class="text-base font-bold text-on-background dark:text-slate-100">
+          <h4
+            class="text-base font-bold text-on-background dark:text-slate-100"
+          >
             Comparativa bajo demanda con IA
           </h4>
-          <p class="text-xs text-on-surface-variant dark:text-slate-400 max-w-md mx-auto">
-            Haz clic en el botón para que la IA analice y ordene a los postulantes de esta vacante, indicando fortalezas, brechas y el motivo de compatibilidad.
+          <p
+            class="text-xs text-on-surface-variant dark:text-slate-400 max-w-md mx-auto"
+          >
+            Haz clic en el botón para que la IA analice y ordene a los
+            postulantes de esta vacante, indicando fortalezas, brechas y el
+            motivo de compatibilidad.
           </p>
         </div>
         <button
@@ -158,11 +188,16 @@
               <span class="material-symbols-outlined text-base">summarize</span>
               Resumen Ejecutivo de la IA
             </span>
-            <span class="text-[11px] font-semibold text-on-surface-variant dark:text-slate-400">
-              {{ rankingResult.totalEvaluated }} candidatos evaluados · {{ formatDate(rankingResult.evaluatedAt) }}
+            <span
+              class="text-[11px] font-semibold text-on-surface-variant dark:text-slate-400"
+            >
+              {{ rankingResult.totalEvaluated }} candidatos evaluados ·
+              {{ formatDate(rankingResult.evaluatedAt) }}
             </span>
           </div>
-          <p class="text-xs sm:text-sm text-on-background dark:text-slate-200 leading-relaxed">
+          <p
+            class="text-xs sm:text-sm text-on-background dark:text-slate-200 leading-relaxed"
+          >
             {{ rankingResult.summary }}
           </p>
         </div>
@@ -217,14 +252,18 @@
                         class="w-9 h-9 rounded-xl font-black text-xs flex items-center justify-center flex-shrink-0 shadow-sm"
                         :class="getAvatarClass(index)"
                       >
-                        {{ (item.name || 'C').substring(0, 2).toUpperCase() }}
+                        {{ (item.name || "C").substring(0, 2).toUpperCase() }}
                       </div>
                       <div class="min-w-0">
-                        <div class="font-bold text-on-background dark:text-slate-100 truncate">
+                        <div
+                          class="font-bold text-on-background dark:text-slate-100 truncate"
+                        >
                           {{ item.name }}
                         </div>
-                        <div class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate">
-                          {{ item.titularProfesional || 'Sin titular' }}
+                        <div
+                          class="text-[11px] text-on-surface-variant dark:text-slate-400 truncate"
+                        >
+                          {{ item.titularProfesional || "Sin titular" }}
                         </div>
                       </div>
                     </div>
@@ -240,11 +279,15 @@
                         >
                           {{ item.tierLabel || item.tier }}
                         </span>
-                        <span class="font-black text-xs text-on-background dark:text-slate-100">
+                        <span
+                          class="font-black text-xs text-on-background dark:text-slate-100"
+                        >
                           {{ item.matchPercentage }}%
                         </span>
                       </div>
-                      <div class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div
+                        class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden"
+                      >
                         <div
                           class="h-full rounded-full transition-all duration-500"
                           :class="getProgressBarClass(item.tier)"
@@ -258,24 +301,34 @@
                   <td class="py-4 px-4">
                     <div class="space-y-2">
                       <!-- Strengths -->
-                      <div v-if="item.strengths && item.strengths.length > 0" class="flex flex-wrap gap-1">
+                      <div
+                        v-if="item.strengths && item.strengths.length > 0"
+                        class="flex flex-wrap gap-1"
+                      >
                         <span
                           v-for="(st, sIdx) in item.strengths"
                           :key="`st-${sIdx}`"
                           class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
                         >
-                          <span class="material-symbols-outlined text-[10px]">check</span>
+                          <span class="material-symbols-outlined text-[10px]"
+                            >check</span
+                          >
                           {{ st }}
                         </span>
                       </div>
                       <!-- Gaps -->
-                      <div v-if="item.gaps && item.gaps.length > 0" class="flex flex-wrap gap-1">
+                      <div
+                        v-if="item.gaps && item.gaps.length > 0"
+                        class="flex flex-wrap gap-1"
+                      >
                         <span
                           v-for="(gap, gIdx) in item.gaps"
                           :key="`gap-${gIdx}`"
                           class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"
                         >
-                          <span class="material-symbols-outlined text-[10px]">remove</span>
+                          <span class="material-symbols-outlined text-[10px]"
+                            >remove</span
+                          >
                           {{ gap }}
                         </span>
                       </div>
@@ -283,7 +336,9 @@
                   </td>
 
                   <!-- Technical Justification -->
-                  <td class="py-4 px-4 text-on-surface-variant dark:text-slate-300 leading-relaxed text-[11px]">
+                  <td
+                    class="py-4 px-4 text-on-surface-variant dark:text-slate-300 leading-relaxed text-[11px]"
+                  >
                     {{ item.justification }}
                   </td>
 
@@ -296,7 +351,9 @@
                         class="p-1.5 rounded-lg bg-surface border border-outline-variant/60 hover:bg-primary/10 hover:text-primary text-on-surface-variant transition cursor-pointer"
                         title="Ver y gestionar en ATS"
                       >
-                        <span class="material-symbols-outlined text-base">visibility</span>
+                        <span class="material-symbols-outlined text-base"
+                          >visibility</span
+                        >
                       </button>
                       <button
                         type="button"
@@ -304,7 +361,9 @@
                         class="p-1.5 rounded-lg bg-surface border border-outline-variant/60 hover:bg-indigo-500/10 hover:text-indigo-600 text-on-surface-variant transition cursor-pointer"
                         title="Ver Currículum Vitae"
                       >
-                        <span class="material-symbols-outlined text-base">description</span>
+                        <span class="material-symbols-outlined text-base"
+                          >description</span
+                        >
                       </button>
                     </div>
                   </td>
@@ -318,9 +377,13 @@
 
     <!-- Modal Footer -->
     <template #footer>
-      <div class="w-full flex items-center justify-between text-xs text-on-surface-variant dark:text-slate-400">
+      <div
+        class="w-full flex items-center justify-between text-xs text-on-surface-variant dark:text-slate-400"
+      >
         <span class="flex items-center gap-1.5 text-[11px]">
-          <span class="material-symbols-outlined text-xs text-indigo-500">lock</span>
+          <span class="material-symbols-outlined text-xs text-indigo-500"
+            >lock</span
+          >
           Procesado confidencialmente con IA
         </span>
         <button
@@ -388,9 +451,12 @@ const getRankBadgeClass = (index: number) => {
 };
 
 const getAvatarClass = (index: number) => {
-  if (index === 0) return "bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950";
-  if (index === 1) return "bg-gradient-to-tr from-slate-400 to-slate-200 text-slate-900";
-  if (index === 2) return "bg-gradient-to-tr from-amber-700 to-amber-600 text-white";
+  if (index === 0)
+    return "bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950";
+  if (index === 1)
+    return "bg-gradient-to-tr from-slate-400 to-slate-200 text-slate-900";
+  if (index === 2)
+    return "bg-gradient-to-tr from-amber-700 to-amber-600 text-white";
   return "bg-primary/10 text-primary";
 };
 

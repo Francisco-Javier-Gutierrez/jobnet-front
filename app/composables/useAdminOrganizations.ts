@@ -37,11 +37,7 @@ export function useAdminOrganizations() {
         : [];
 
     return list
-      .filter(
-        (p: any) =>
-          p.tipoUsuario === "ORGANIZACION" ||
-          !p.tipoUsuario,
-      )
+      .filter((p: any) => p.tipoUsuario === "ORGANIZACION" || !p.tipoUsuario)
       .map((p: any) => {
         const companyId =
           p.id || p.companyId || (p.PK ? p.PK.replace("USER#", "") : "");

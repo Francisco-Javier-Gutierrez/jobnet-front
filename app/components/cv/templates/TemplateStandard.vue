@@ -3,7 +3,7 @@
     class="cv-letter-page cv-template-standard text-slate-800 bg-white mx-auto p-10 flex flex-col justify-between font-sans"
     :style="{
       width: '215.9mm',
-      minHeight: '279mm',
+      minHeight: '278.5mm',
       fontSize: fontSizePx,
     }"
   >
@@ -96,7 +96,7 @@
           Resumen Profesional
         </h2>
         <p
-          class="text-xs text-slate-700 leading-relaxed text-justify whitespace-pre-line pt-0.5"
+          class="text-xs text-slate-700 leading-relaxed whitespace-pre-line pt-0.5"
         >
           {{ cv.bio }}
         </p>
@@ -132,7 +132,7 @@
             </div>
             <p
               v-if="exp.descripcion"
-              class="text-xs text-slate-700 leading-relaxed whitespace-pre-line pt-0.5 text-justify"
+              class="text-xs text-slate-700 leading-relaxed whitespace-pre-line pt-0.5"
             >
               {{ exp.descripcion }}
             </p>
@@ -182,7 +182,7 @@
           (options.showSkills && cv.skills && cv.skills.length > 0) ||
           (options.showLanguages && cv.languages && cv.languages.length > 0)
         "
-        class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1"
+        class="grid grid-cols-2 gap-4 pt-1"
       >
         <!-- Skills -->
         <section
@@ -244,6 +244,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { CvData, CvOptions } from "~/types/cv";
+import { getCvBaseFontSize } from "~/composables/useCvGenerator";
 
 const props = defineProps<{
   cv: CvData;
@@ -251,11 +252,7 @@ const props = defineProps<{
   primaryColor?: string;
 }>();
 
-const fontSizePx = computed(() => {
-  if (props.options.fontSize === "sm") return "11px";
-  if (props.options.fontSize === "lg") return "13px";
-  return "12px";
-});
+const fontSizePx = computed(() => getCvBaseFontSize(props.options.fontSize));
 </script>
 
 <style scoped>

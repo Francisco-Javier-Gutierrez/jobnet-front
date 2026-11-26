@@ -23,8 +23,10 @@
   "dependencies": {
     "@sidebase/nuxt-auth": "^0.9.1",
     "html2pdf.js": "^0.14.0",
+    "jspdf": "^4.2.1",
     "leaflet": "^1.9.4",
     "material-symbols": "^0.48.0",
+    "modern-screenshot": "^4.7.0",
     "next-auth": "4.21.1",
     "nuxt": "^4.4.8",
     "pinia": "^2.3.1",

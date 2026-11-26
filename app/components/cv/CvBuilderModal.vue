@@ -51,13 +51,13 @@
 
             <!-- Action Controls in Header -->
             <div class="flex items-center gap-2 shrink-0">
-              <!-- Download PDF Button -->
+              <!-- Download PDF Button (Option B Native Vector Print) -->
               <button
                 type="button"
                 @click="handleDownload"
                 :disabled="isGenerating || isSavingToProfile"
                 class="px-3.5 py-2 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary/50 text-on-surface font-bold text-xs transition flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
-                title="Descargar documento PDF directamente"
+                title="Imprimir o guardar como PDF vectorial 1:1 en tamaño Carta"
               >
                 <span
                   v-if="isGenerating"
@@ -269,7 +269,7 @@
 
               <!-- TAB 1: Contenido del CV -->
               <div
-                v-if="activeTab === 'content'"
+                v-else-if="activeTab === 'content'"
                 class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 text-xs select-text"
               >
                 <!-- Notice: Reset to original profile -->
@@ -414,11 +414,21 @@
                         v-for="verb in quickVerbs"
                         :key="verb"
                         type="button"
+                        :disabled="isVerbUsed(verb)"
                         @click="insertActionVerb(verb)"
-                        class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-surface hover:bg-primary/10 text-on-surface border border-outline-variant/40 transition cursor-pointer"
-                        title="Haz clic para agregar a la descripción"
+                        :class="[
+                          'px-2 py-0.5 rounded-md text-[10px] font-medium border transition',
+                          isVerbUsed(verb)
+                            ? 'bg-primary/10 text-primary border-primary/30 opacity-60 cursor-not-allowed'
+                            : 'bg-surface hover:bg-primary/10 text-on-surface border-outline-variant/40 cursor-pointer',
+                        ]"
+                        :title="
+                          isVerbUsed(verb)
+                            ? 'Este verbo ya fue agregado a la descripción'
+                            : 'Haz clic para agregar a la descripción'
+                        "
                       >
-                        + {{ verb }}
+                        {{ isVerbUsed(verb) ? "✓" : "+" }} {{ verb }}
                       </button>
                     </div>
                   </div>
@@ -1016,7 +1026,7 @@
                     transformOrigin: 'top center',
                     transition: 'transform 0.15s ease-out',
                   }"
-                  class="shadow-2xl rounded-sm"
+                  class="shrink-0 shadow-2xl rounded-sm"
                 >
                   <!-- Print Reference Container for html2pdf.js -->
                   <div ref="cvPrintRef">
@@ -1041,7 +1051,15 @@
 import { ref, reactive, computed, watch } from "vue";
 import type { CandidateProfile } from "~/types/candidate";
 import type { CvData, CvOptions, CvColorTheme, CvTemplateId } from "~/types/cv";
-import { useCvGenerator, CV_COLOR_THEMES } from "~/composables/useCvGenerator";
+import { onBeforeUnmount } from "vue";
+import {
+  useCvGenerator,
+  CV_COLOR_THEMES,
+  QUICK_STAR_VERBS,
+  hasActionVerb,
+  appendActionVerb,
+  cleanupNativePrintRoot,
+} from "~/composables/useCvGenerator";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { calculateCvAtsScore } from "~/utils/cvStarterPacks";
 import TemplateMinimalTech from "./templates/TemplateMinimalTech.vue";
@@ -1259,33 +1277,42 @@ const wordCount = (text?: string): number => {
 };
 
 // Handlers for dynamic editing
-const quickVerbs = computed(() => {
-  return [
-    "Lideré",
-    "Coordiné",
-    "Diseñé",
-    "Desarrollé",
-    "Optimicé",
-    "Implementé",
-    "Gestioné",
-    "Automatice",
-  ];
-});
+const quickVerbs = computed(() => [...QUICK_STAR_VERBS]);
+
+const isVerbUsed = (verb: string) =>
+  hasActionVerb(editableCv.value.experience[0]?.descripcion, verb);
 
 const insertActionVerb = (verb: string) => {
-  if (editableCv.value.experience.length > 0) {
-    const target = editableCv.value.experience[0];
-    target.descripcion = target.descripcion
-      ? `${target.descripcion}\n• ${verb} `
-      : `• ${verb} `;
-    showInfo(
-      "Verbo Añadido",
-      `Se insertó "${verb}" en tu experiencia principal.`,
-    );
-  } else {
+  if (editableCv.value.experience.length === 0) {
     handleAddExperience();
-    editableCv.value.experience[0].descripcion = `• ${verb} `;
+    const first = editableCv.value.experience[0];
+    if (first) {
+      first.descripcion = `• ${verb} `;
+      showInfo(
+        "Verbo Añadido",
+        `Se insertó "${verb}" en tu experiencia principal.`,
+      );
+    }
+    return;
   }
+
+  const target = editableCv.value.experience[0];
+  if (!target) return;
+
+  const { text, inserted } = appendActionVerb(target.descripcion, verb);
+  if (!inserted) {
+    showInfo(
+      "Verbo Ya Agregado",
+      `El verbo "${verb}" ya se encuentra en tu experiencia principal.`,
+    );
+    return;
+  }
+
+  target.descripcion = text;
+  showInfo(
+    "Verbo Añadido",
+    `Se insertó "${verb}" en tu experiencia principal.`,
+  );
 };
 
 const handleAddSkill = (skill: string) => {
@@ -1344,8 +1371,13 @@ const handleResetToOriginal = () => {
 };
 
 const closeModal = () => {
+  cleanupNativePrintRoot();
   emit("update:modelValue", false);
 };
+
+onBeforeUnmount(() => {
+  cleanupNativePrintRoot();
+});
 
 // Download PDF in client
 const handleDownload = async () => {
