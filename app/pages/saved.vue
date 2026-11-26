@@ -287,6 +287,12 @@ const {
 } = useLazyAsyncData(
   "user-personal-favorites",
   async () => {
+    if (isMockEnabled.value) {
+      return {
+        posts: JSON.parse(JSON.stringify(MOCK_POSTS.slice(0, 1))),
+        jobs: JSON.parse(JSON.stringify(MOCK_VACANCIES.slice(0, 2))),
+      };
+    }
     if (!currentUserId.value) return { data: [], posts: [], jobs: [] };
     return $fetch<any>(
       `/api/profile/${encodeURIComponent(currentUserId.value)}/bookmarks?userId=${encodeURIComponent(currentUserId.value)}`,
@@ -412,6 +418,8 @@ const displayedCount = computed(() => {
   return totalCount.value;
 });
 
+const { toggleLike: toggleSharedLike } = useContentInteractions();
+
 // Toggle Job Bookmark (Optimistic removal from favorites)
 const toggleJobBookmark = async (job: any) => {
   const jId = job.id || job.uniqueId;
@@ -434,53 +442,7 @@ const toggleJobBookmark = async (job: any) => {
 
 // Toggle Job Like (Optimistic instant like increment/decrement)
 const toggleJobLike = async (job: any) => {
-  if (!currentUserId.value) return;
-  const uid = currentUserId.value;
-  if (!job.likesList) job.likesList = [];
-
-  const wasLiked = Boolean(
-    job.isLiked ||
-    (Array.isArray(job.likesList) && job.likesList.includes(uid)),
-  );
-
-  if (wasLiked) {
-    job.isLiked = false;
-    job.likesList = job.likesList.filter((id: string) => id !== uid);
-    job.likesCount = Math.max(
-      0,
-      (typeof job.likesCount === "number"
-        ? job.likesCount
-        : job.likesList.length + 1) - 1,
-    );
-  } else {
-    job.isLiked = true;
-    if (!job.likesList.includes(uid)) job.likesList.push(uid);
-    job.likesCount =
-      (typeof job.likesCount === "number"
-        ? job.likesCount
-        : job.likesList.length - 1) + 1;
-  }
-  job.likes = job.likesCount;
-
-  const jId = job.id || job.uniqueId;
-  try {
-    await $fetch(`/api/jobs/${jId}/like`, {
-      method: "POST",
-      body: { userUuid: uid, userId: uid },
-    });
-  } catch (e) {
-    console.error("Error toggling job like:", e);
-    // Revert optimistic update on network error
-    job.isLiked = wasLiked;
-    if (wasLiked) {
-      if (!job.likesList.includes(uid)) job.likesList.push(uid);
-      job.likesCount = job.likesCount + 1;
-    } else {
-      job.likesList = job.likesList.filter((id: string) => id !== uid);
-      job.likesCount = Math.max(0, job.likesCount - 1);
-    }
-    job.likes = job.likesCount;
-  }
+  await toggleSharedLike(job, "job", { userId: currentUserId.value });
 };
 
 // Toggle Post Bookmark (Optimistic removal from favorites)
@@ -505,52 +467,6 @@ const togglePostBookmark = async (post: any) => {
 
 // Toggle Post Like (Optimistic instant like increment/decrement)
 const togglePostLike = async (post: any) => {
-  if (!currentUserId.value) return;
-  const uid = currentUserId.value;
-  if (!post.likesList) post.likesList = [];
-
-  const wasLiked = Boolean(
-    post.isLiked ||
-    (Array.isArray(post.likesList) && post.likesList.includes(uid)),
-  );
-
-  if (wasLiked) {
-    post.isLiked = false;
-    post.likesList = post.likesList.filter((id: string) => id !== uid);
-    post.likesCount = Math.max(
-      0,
-      (typeof post.likesCount === "number"
-        ? post.likesCount
-        : post.likesList.length + 1) - 1,
-    );
-  } else {
-    post.isLiked = true;
-    if (!post.likesList.includes(uid)) post.likesList.push(uid);
-    post.likesCount =
-      (typeof post.likesCount === "number"
-        ? post.likesCount
-        : post.likesList.length - 1) + 1;
-  }
-  post.likes = post.likesCount;
-
-  const pId = post.uniqueId || post.id;
-  try {
-    await $fetch(`/api/posts/${pId}/like`, {
-      method: "POST",
-      body: { userUuid: uid, userId: uid },
-    });
-  } catch (e) {
-    console.error("Error toggling post like:", e);
-    // Revert optimistic update on network error
-    post.isLiked = wasLiked;
-    if (wasLiked) {
-      if (!post.likesList.includes(uid)) post.likesList.push(uid);
-      post.likesCount = post.likesCount + 1;
-    } else {
-      post.likesList = post.likesList.filter((id: string) => id !== uid);
-      post.likesCount = Math.max(0, post.likesCount - 1);
-    }
-    post.likes = post.likesCount;
-  }
+  await toggleSharedLike(post, "post", { userId: currentUserId.value });
 };
 </script>

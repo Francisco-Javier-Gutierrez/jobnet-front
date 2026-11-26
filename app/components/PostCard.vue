@@ -144,69 +144,23 @@
     </div>
 
     <!-- BOTTOM ACTIONS BAR -->
-    <div
-      class="px-4 py-2 flex items-center gap-1 border-t border-outline-variant/30 prevent-post-nav select-none"
-    >
-      <button
-        @click="handleLikeClick"
-        class="flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-        :class="
-          isLiked
-            ? 'text-rose-600 font-bold'
-            : 'text-on-surface-variant dark:text-slate-300 hover:text-rose-600'
-        "
-      >
-        <span
-          class="material-symbols-outlined text-[20px]"
-          :class="{ 'font-fill-1 text-rose-600': isLiked }"
-        >
-          {{ isLiked ? "favorite" : "favorite_border" }}
-        </span>
-        <span class="text-xs font-semibold">{{ likesCount }}</span>
-      </button>
-      <button
-        @click="handleCommentClick"
-        class="flex items-center gap-1.5 text-on-surface-variant dark:text-slate-300 hover:text-primary transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-      >
-        <span class="material-symbols-outlined text-[20px]"
-          >chat_bubble_outline</span
-        >
-        <span class="text-xs font-semibold">{{ commentsCount }}</span>
-      </button>
-      <button
-        @click.stop="handleShareClick"
-        class="flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-        :class="
-          isSharedLocally
-            ? 'text-secondary font-bold'
-            : 'text-on-surface-variant dark:text-slate-300 hover:text-secondary'
-        "
-      >
-        <span
-          class="material-symbols-outlined text-[20px]"
-          :class="{ 'font-fill-1 text-secondary': isSharedLocally }"
-          >share</span
-        >
-        <span class="text-xs font-semibold">{{ sharesCount }}</span>
-      </button>
-      <button
-        @click="handleBookmarkClick"
-        class="ml-auto flex items-center gap-1.5 transition py-1.5 px-2.5 rounded-lg hover:bg-surface-container-low"
-        :class="
-          effectiveIsBookmarked
-            ? 'text-amber-500 font-bold'
-            : 'text-on-surface-variant dark:text-slate-300 hover:text-amber-500'
-        "
-      >
-        <span
-          class="material-symbols-outlined text-[20px]"
-          :class="{ 'font-fill-1 text-amber-500': effectiveIsBookmarked }"
-        >
-          {{ effectiveIsBookmarked ? "bookmark" : "bookmark_border" }}
-        </span>
-        <span class="text-xs font-semibold">{{ bookmarksCount }}</span>
-      </button>
-    </div>
+    <AppInteractionBar
+      :item-id="post.uniqueId || post.id"
+      storage-prefix="shared-posts"
+      :current-user-id="currentUserId"
+      :is-liked="isLiked"
+      :is-bookmarked="effectiveIsBookmarked"
+      :likes-count="likesCount"
+      :comments-count="commentsCount"
+      :shares-count="sharesCount"
+      :bookmarks-count="bookmarksCount"
+      :require-auth-for-comment="true"
+      container-class="prevent-post-nav"
+      @like="emit('like', props.post)"
+      @comment="emit('navigate', props.post.uniqueId || props.post.id)"
+      @share="emit('share', props.post)"
+      @bookmark="emit('bookmark', props.post)"
+    />
 
     <!-- MODAL 1: Author Profile Picture / Avatar Modal -->
     <Teleport to="body">
@@ -347,23 +301,17 @@ const showPdfModal = ref(false);
 const showMediaModal = ref(false);
 const showMenu = ref(false);
 const showReportModal = ref(false);
-const isSharedLocally = ref(false);
 
-const { status, data: authSession } = useAuth();
+const { status } = useAuth();
 const { openProtectedModal } = useProtectedAction();
-
-onMounted(() => {
-  if (process.client) {
-    const currentUserId =
-      props.currentUserId || authSession.value?.user?.id || "anonymous";
-    const shared = JSON.parse(
-      localStorage.getItem(`shared-posts-${currentUserId}`) || "[]",
-    );
-    isSharedLocally.value = shared.includes(
-      props.post.uniqueId || props.post.id,
-    );
-  }
-});
+const {
+  getUserIdentifiers,
+  isItemLiked: checkItemLiked,
+  isItemBookmarked: checkItemBookmarked,
+  getItemLikesCount,
+  getItemBookmarksCount,
+  getItemCommentsCount,
+} = useContentInteractions();
 
 const displayRole = computed(() => {
   const rawRole = (props.post?.role || props.post?.tipoUsuario || "")
@@ -378,56 +326,6 @@ const displayRole = computed(() => {
   return "Candidato";
 });
 
-const handleLikeClick = (e: Event) => {
-  e.stopPropagation();
-  if (status.value !== "authenticated") {
-    openProtectedModal();
-    return;
-  }
-  emit("like", props.post);
-};
-
-const handleBookmarkClick = (e: Event) => {
-  e.stopPropagation();
-  if (status.value !== "authenticated") {
-    openProtectedModal();
-    return;
-  }
-  emit("bookmark", props.post);
-};
-
-const handleCommentClick = (e: Event) => {
-  e.stopPropagation();
-  if (status.value !== "authenticated") {
-    openProtectedModal();
-    return;
-  }
-  emit("navigate", props.post.uniqueId || props.post.id);
-};
-
-const handleShareClick = (e: Event) => {
-  e.stopPropagation();
-
-  if (process.client) {
-    const currentUserId =
-      props.currentUserId || authSession.value?.user?.id || "anonymous";
-    const shared = JSON.parse(
-      localStorage.getItem(`shared-posts-${currentUserId}`) || "[]",
-    );
-    const id = props.post.uniqueId || props.post.id;
-    if (id && !shared.includes(id)) {
-      shared.push(id);
-      localStorage.setItem(
-        `shared-posts-${currentUserId}`,
-        JSON.stringify(shared),
-      );
-    }
-    isSharedLocally.value = true;
-  }
-
-  emit("share", props.post);
-};
-
 const openReportModal = () => {
   showMenu.value = false;
   if (status.value !== "authenticated") {
@@ -439,71 +337,19 @@ const openReportModal = () => {
 
 const isLiked = computed(() => {
   if (props.isLiked !== undefined) return props.isLiked;
-
-  const post = props.post;
-  if (!post) return false;
-
-  const authUser = authSession.value?.user;
-  const loggedEmail = authUser?.email?.toLowerCase();
-  const loggedId = authUser?.id;
-  const passedUserId = props.currentUserId?.toLowerCase();
-
-  const likes = post.likesList || post.likedBy || post.likes_list || [];
-  if (Array.isArray(likes) && likes.length > 0) {
-    const foundInList = likes.some((item: unknown) => {
-      const s = String(item).toLowerCase();
-      return (
-        (passedUserId && s === passedUserId) ||
-        (loggedEmail && s === loggedEmail) ||
-        (loggedId && s === String(loggedId).toLowerCase())
-      );
-    });
-    if (foundInList) return true;
-  }
-
-  return Boolean(post.isLiked);
+  return checkItemLiked(props.post, getUserIdentifiers(props.currentUserId));
 });
 
 const effectiveIsBookmarked = computed(() => {
   if (props.isBookmarked !== undefined) return props.isBookmarked;
-
-  const post = props.post;
-  if (!post) return false;
-
-  const authUser = authSession.value?.user;
-  const loggedEmail = authUser?.email?.toLowerCase();
-  const loggedId = authUser?.id;
-  const passedUserId = props.currentUserId?.toLowerCase();
-
-  const bookmarks =
-    post.bookmarksList || post.bookmarkedBy || post.bookmarks || [];
-  if (Array.isArray(bookmarks) && bookmarks.length > 0) {
-    const foundInList = bookmarks.some((item: unknown) => {
-      const s = String(item).toLowerCase();
-      return (
-        (passedUserId && s === passedUserId) ||
-        (loggedEmail && s === loggedEmail) ||
-        (loggedId && s === String(loggedId).toLowerCase())
-      );
-    });
-    if (foundInList) return true;
-  }
-
-  return Boolean(post.isBookmarked);
+  return checkItemBookmarked(
+    props.post,
+    getUserIdentifiers(props.currentUserId),
+  );
 });
 
-const likesCount = computed(() => {
-  if (typeof props.post?.likesCount === "number") return props.post.likesCount;
-  if (typeof props.post?.likes === "number") return props.post.likes;
-  if (Array.isArray(props.post?.likesList)) return props.post.likesList.length;
-  return 0;
-});
-
-const commentsCount = computed(() => {
-  if (typeof props.post?.commentsCount === "number")
-    return props.post.commentsCount;
-  return props.post?.comments?.length || 0;
-});
+const likesCount = computed(() => getItemLikesCount(props.post));
+const commentsCount = computed(() => getItemCommentsCount(props.post));
 
 const sharesCount = computed(() => {
   if (typeof props.post?.sharesCount === "number")
@@ -511,17 +357,7 @@ const sharesCount = computed(() => {
   return 0;
 });
 
-const bookmarksCount = computed(() => {
-  const bookmarks =
-    props.post?.bookmarksList ||
-    props.post?.bookmarkedBy ||
-    props.post?.bookmarks ||
-    [];
-  if (Array.isArray(bookmarks) && bookmarks.length > 0) return bookmarks.length;
-  if (typeof props.post?.bookmarksCount === "number")
-    return props.post.bookmarksCount;
-  return Array.isArray(bookmarks) ? bookmarks.length : 0;
-});
+const bookmarksCount = computed(() => getItemBookmarksCount(props.post));
 
 const handleClick = (event: Event) => {
   if (props.isDetail) return;

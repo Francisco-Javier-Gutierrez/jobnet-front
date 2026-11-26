@@ -2,6 +2,7 @@ import { useRoute, useRouter } from "#app";
 import { useRuntimeConfig, useLazyAsyncData } from "#imports";
 import { useAuth } from "#imports";
 import { useShare } from "~/composables/useShare";
+import { MOCK_VACANCIES, MOCK_POSTS, MOCK_COMPANIES } from "~/utils/mockData";
 import type { Post, Job, CompanyProfile } from "~/types";
 
 export type CompanyProfileTab =
@@ -119,21 +120,35 @@ export const useCompanyProfile = () => {
     data: profileData,
     pending: profilePending,
     refresh: refreshProfile,
-  } = useLazyAsyncData(`company-profile-${companyId}`, () =>
-    $fetch(`${config.public.apiUrl}/profile/${companyId}`)
+  } = useLazyAsyncData(`company-profile-${companyId}`, async () => {
+    const { isMockEnabled } = useMockSession();
+    if (isMockEnabled.value) {
+      return (
+        MOCK_COMPANIES.find((c) => c.id === companyId || c.companyId === companyId) ||
+        MOCK_COMPANIES[0]
+      );
+    }
+    return $fetch(`${config.public.apiUrl}/profile/${companyId}`)
       .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => null),
-  );
+      .catch(() => null);
+  });
 
   const {
     data: vacanciesData,
     pending: vacanciesPending,
     refresh: refreshVacancies,
-  } = useLazyAsyncData(`company-vacancies-${companyId}`, () =>
-    $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
+  } = useLazyAsyncData(`company-vacancies-${companyId}`, async () => {
+    const { isMockEnabled } = useMockSession();
+    if (isMockEnabled.value) {
+      const matched = MOCK_VACANCIES.filter(
+        (v: any) => v.companyId === companyId || v.empresaUuid === companyId,
+      );
+      return { data: matched.length > 0 ? matched : MOCK_VACANCIES.slice(0, 2) };
+    }
+    return $fetch(`${config.public.apiUrl}/profile/${companyId}/vacancies`)
       .then((res) => (typeof res === "string" ? JSON.parse(res) : res))
-      .catch(() => ({ data: [] })),
-  );
+      .catch(() => ({ data: [] }));
+  });
 
   const { data: postsData, pending: postsPending } = useLazyAsyncData(
     `company-posts-${companyId}`,
@@ -437,6 +452,11 @@ export const useCompanyProfile = () => {
     isPdfModalOpen.value = true;
   };
 
+  const {
+    toggleLike: toggleSharedLike,
+    toggleBookmark: toggleSharedBookmark,
+  } = useContentInteractions();
+
   const toggleLike = async (itemOrId: any) => {
     if (!currentUserId.value) return;
 
@@ -452,49 +472,14 @@ export const useCompanyProfile = () => {
     const targetBookmark = allCompanyBookmarkedPosts.value.find(
       (p) => (p.uniqueId || p.id) === postId,
     );
-    const targets = [
-      targetPost,
-      targetBookmark,
-      typeof itemOrId === "object" ? itemOrId : null,
-    ].filter(Boolean);
+    const primary =
+      typeof itemOrId === "object" ? itemOrId : targetPost || targetBookmark;
+    if (!primary) return;
 
-    targets.forEach((target) => {
-      if (target) {
-        if (!target.likesList) target.likesList = [];
-        const idx = target.likesList.indexOf(currentUserId.value);
-        if (idx !== -1) {
-          target.likesList.splice(idx, 1);
-          if (typeof target.likesCount === "number") {
-            target.likesCount = Math.max(0, target.likesCount - 1);
-          }
-          target.isLiked = false;
-        } else {
-          target.likesList.push(currentUserId.value);
-          if (typeof target.likesCount === "number") {
-            target.likesCount = target.likesCount + 1;
-          } else {
-            target.likesCount = target.likesList.length;
-          }
-          target.isLiked = true;
-        }
-        target.likes = target.likesList.length;
-      }
+    await toggleSharedLike(primary, "post", {
+      userId: currentUserId.value,
+      extraTargets: [targetPost, targetBookmark],
     });
-
-    try {
-      const res = await $fetch<any>(`/api/posts/${postId}/like`, {
-        method: "POST",
-        body: { userUuid: currentUserId.value, userId: currentUserId.value },
-      });
-      targets.forEach((target) => {
-        if (target && res?.likesList) {
-          target.likesList = res.likesList;
-          target.likes = target.likesList.length;
-        }
-      });
-    } catch (e) {
-      console.error("Error toggling like:", e);
-    }
   };
 
   const toggleBookmark = async (itemOrId: any) => {
@@ -512,53 +497,18 @@ export const useCompanyProfile = () => {
     const targetBookmark = allCompanyBookmarkedPosts.value.find(
       (p) => (p.uniqueId || p.id) === postId,
     );
-    const targets = [
-      targetPost,
-      targetBookmark,
-      typeof itemOrId === "object" ? itemOrId : null,
-    ].filter(Boolean);
+    const primary =
+      typeof itemOrId === "object" ? itemOrId : targetPost || targetBookmark;
+    if (!primary) return;
 
-    targets.forEach((target) => {
-      if (target) {
-        if (!target.bookmarksList) target.bookmarksList = [];
-        const idx = target.bookmarksList.indexOf(currentUserId.value);
-        if (idx !== -1) {
-          target.bookmarksList.splice(idx, 1);
-          if (typeof target.bookmarksCount === "number") {
-            target.bookmarksCount = Math.max(0, target.bookmarksCount - 1);
-          }
-          target.isBookmarked = false;
-        } else {
-          target.bookmarksList.push(currentUserId.value);
-          if (typeof target.bookmarksCount === "number") {
-            target.bookmarksCount = target.bookmarksCount + 1;
-          } else {
-            target.bookmarksCount = target.bookmarksList.length;
-          }
-          target.isBookmarked = true;
-        }
-      }
+    await toggleSharedBookmark(primary, "post", {
+      userId: currentUserId.value,
+      extraTargets: [targetPost, targetBookmark],
     });
-
-    try {
-      const res = await $fetch<any>(`/api/posts/${postId}/bookmark`, {
-        method: "POST",
-        body: { userUuid: currentUserId.value, userId: currentUserId.value },
-      });
-      targets.forEach((target) => {
-        if (target && res?.bookmarksList) {
-          target.bookmarksList = res.bookmarksList;
-        }
-      });
-    } catch (e) {
-      console.error("Error toggling bookmark:", e);
-    }
   };
 
   const toggleJobLike = async (itemOrJob: any) => {
     if (!currentUserId.value) return;
-    const uid = currentUserId.value;
-
     const jobId =
       typeof itemOrJob === "string"
         ? itemOrJob
@@ -575,55 +525,11 @@ export const useCompanyProfile = () => {
           );
 
     if (!job) return;
-
-    if (!job.likesList) job.likesList = [];
-    const wasLiked = Boolean(
-      job.isLiked ||
-      (Array.isArray(job.likesList) && job.likesList.includes(uid)),
-    );
-
-    if (wasLiked) {
-      job.isLiked = false;
-      job.likesList = job.likesList.filter((id: string) => id !== uid);
-      job.likesCount = Math.max(
-        0,
-        (typeof job.likesCount === "number"
-          ? job.likesCount
-          : job.likesList.length + 1) - 1,
-      );
-    } else {
-      job.isLiked = true;
-      if (!job.likesList.includes(uid)) job.likesList.push(uid);
-      job.likesCount =
-        (typeof job.likesCount === "number"
-          ? job.likesCount
-          : job.likesList.length - 1) + 1;
-    }
-    job.likes = job.likesCount;
-
-    try {
-      await $fetch(`/api/jobs/${jobId}/like`, {
-        method: "POST",
-        body: { userUuid: uid, userId: uid },
-      });
-    } catch (e) {
-      // Revert on error
-      job.isLiked = wasLiked;
-      if (wasLiked) {
-        if (!job.likesList.includes(uid)) job.likesList.push(uid);
-        job.likesCount = job.likesCount + 1;
-      } else {
-        job.likesList = job.likesList.filter((id: string) => id !== uid);
-        job.likesCount = Math.max(0, job.likesCount - 1);
-      }
-      job.likes = job.likesCount;
-    }
+    await toggleSharedLike(job, "job", { userId: currentUserId.value });
   };
 
   const toggleJobBookmark = async (itemOrJob: any) => {
     if (!currentUserId.value) return;
-    const uid = currentUserId.value;
-
     const jobId =
       typeof itemOrJob === "string"
         ? itemOrJob
@@ -640,49 +546,7 @@ export const useCompanyProfile = () => {
           );
 
     if (!job) return;
-
-    if (!job.bookmarksList) job.bookmarksList = [];
-    const wasBookmarked = Boolean(
-      job.isBookmarked ||
-      (Array.isArray(job.bookmarksList) && job.bookmarksList.includes(uid)),
-    );
-
-    if (wasBookmarked) {
-      job.isBookmarked = false;
-      job.bookmarksList = job.bookmarksList.filter((id: string) => id !== uid);
-      job.bookmarksCount = Math.max(
-        0,
-        (typeof job.bookmarksCount === "number"
-          ? job.bookmarksCount
-          : job.bookmarksList.length + 1) - 1,
-      );
-    } else {
-      job.isBookmarked = true;
-      if (!job.bookmarksList.includes(uid)) job.bookmarksList.push(uid);
-      job.bookmarksCount =
-        (typeof job.bookmarksCount === "number"
-          ? job.bookmarksCount
-          : job.bookmarksList.length - 1) + 1;
-    }
-
-    try {
-      await $fetch(`/api/jobs/${jobId}/bookmark`, {
-        method: "POST",
-        body: { userUuid: uid, userId: uid },
-      });
-    } catch (e) {
-      // Revert on error
-      job.isBookmarked = wasBookmarked;
-      if (wasBookmarked) {
-        if (!job.bookmarksList.includes(uid)) job.bookmarksList.push(uid);
-        job.bookmarksCount = job.bookmarksCount + 1;
-      } else {
-        job.bookmarksList = job.bookmarksList.filter(
-          (id: string) => id !== uid,
-        );
-        job.bookmarksCount = Math.max(0, job.bookmarksCount - 1);
-      }
-    }
+    await toggleSharedBookmark(job, "job", { userId: currentUserId.value });
   };
 
   const refresh = async () => {
