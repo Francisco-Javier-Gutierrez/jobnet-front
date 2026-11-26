@@ -105,7 +105,7 @@ isMockEnabled.value && mockUser
     if (userRole === "ADMIN") {
       return navigateTo("/admin");
     }
-    if (userRole === "ORGANIZACION") {
+    if (userRole === "ORGANIZACION" || userRole === "EMPRESA") {
       return navigateTo("/applicants");
     }
     throw createError({
@@ -125,7 +125,10 @@ isMockEnabled.value && mockUser
   ];
 
   if (orgRoutes.some((r) => path === r || path.startsWith(`${r}/`))) {
-    if (effectiveStatus !== "authenticated" || userRole !== "ORGANIZACION") {
+    if (
+      effectiveStatus !== "authenticated" ||
+      (userRole !== "ORGANIZACION" && userRole !== "EMPRESA")
+    ) {
       throw createError({
         statusCode: 404,
         statusMessage: "Página no encontrada",
