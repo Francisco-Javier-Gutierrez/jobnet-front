@@ -1,6 +1,7 @@
 import { ref, computed } from "vue";
 import type { Incident } from "~/types";
 import { useAuth, useRuntimeConfig } from "#imports";
+import { useActionLoading } from "~/composables/useActionLoading";
 
 export interface AuditMessage {
   id: string;
@@ -20,6 +21,9 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
   const chatMessages = ref<AuditMessage[]>([]);
   const isLoadingChat = ref(false);
   const isSubmittingDictum = ref(false);
+  const { isPending, runWithLoading } = useActionLoading();
+  const isOpeningAudit = (id: string) => isPending(`open-${id}`);
+  const isInspectingAudit = (id: string) => isPending(`inspect-${id}`);
   const dictumAction = ref<
     "SANCION_ORGANIZACION" | "ADVERTENCIA" | "DESESTIMADA"
   >("SANCION_ORGANIZACION");
@@ -90,55 +94,59 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
    * Admite la incidencia formal, despacha notificación a ambas partes y supervisa el canal
    */
   const openAudit = async (incident: Incident) => {
-    errorMsg.value = "";
-    try {
-      const res = await $fetch<any>(
-        `/api/moderator/incidents/${incident.id}/open-audit`,
-        {
-          method: "POST",
-          headers: getAuthHeaders(),
-          body: {
-            notes: `Apertura formal de auditoría por controversia de ${incident.infraccion || "infracción grave"}.`,
+    await runWithLoading(`open-${incident.id}`, async () => {
+      errorMsg.value = "";
+      try {
+        const res = await $fetch<any>(
+          `/api/moderator/incidents/${incident.id}/open-audit`,
+          {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: {
+              notes: `Apertura formal de auditoría por controversia de ${incident.infraccion || "infracción grave"}.`,
+            },
           },
-        },
-      );
+        );
 
-      incident.estatus = "AUDITORIA";
-      incident.status = "AUDITORIA";
-      incident.auditState = "AUDIT_ACTIVE";
-      incident.supervisionStatus = "UNDER_AUDIT";
+        incident.estatus = "AUDITORIA";
+        incident.status = "AUDITORIA";
+        incident.auditState = "AUDIT_ACTIVE";
+        incident.supervisionStatus = "UNDER_AUDIT";
 
-      successMsg.value =
-        res?.message ||
-        "Fase 1 completada: Notificación formal despachada a ambas partes. Canal supervisado.";
+        successMsg.value =
+          res?.message ||
+          "Fase 1 completada: Notificación formal despachada a ambas partes. Canal supervisado.";
 
-      // Automatically inspect the audit chat
-      selectedIncident.value = incident;
-      dictumAction.value = "SANCION_ORGANIZACION";
-      dictumNotes.value = "";
-      graceDays.value = 4;
-      await loadChat(incident.id);
-      isAuditModalOpen.value = true;
+        // Automatically inspect the audit chat
+        selectedIncident.value = incident;
+        dictumAction.value = "SANCION_ORGANIZACION";
+        dictumNotes.value = "";
+        graceDays.value = 4;
+        await loadChat(incident.id);
+        isAuditModalOpen.value = true;
 
-      setTimeout(() => (successMsg.value = ""), 6000);
-      if (onRefresh) await onRefresh();
-    } catch (err: any) {
-      errorMsg.value =
-        err.message || "Error al abrir la auditoría de mensajería.";
-      setTimeout(() => (errorMsg.value = ""), 6000);
-    }
+        setTimeout(() => (successMsg.value = ""), 6000);
+        if (onRefresh) await onRefresh();
+      } catch (err: any) {
+        errorMsg.value =
+          err.message || "Error al abrir la auditoría de mensajería.";
+        setTimeout(() => (errorMsg.value = ""), 6000);
+      }
+    });
   };
 
   /**
    * Fase 2: Inspección de solo lectura del historial
    */
   const inspectAuditChat = async (incident: Incident) => {
-    selectedIncident.value = incident;
-    dictumAction.value = "SANCION_ORGANIZACION";
-    dictumNotes.value = "";
-    graceDays.value = 4;
-    await loadChat(incident.id);
-    isAuditModalOpen.value = true;
+    await runWithLoading(`inspect-${incident.id}`, async () => {
+      selectedIncident.value = incident;
+      dictumAction.value = "SANCION_ORGANIZACION";
+      dictumNotes.value = "";
+      graceDays.value = 4;
+      await loadChat(incident.id);
+      isAuditModalOpen.value = true;
+    });
   };
 
   /**
@@ -204,6 +212,8 @@ export function useDisputeAudit(onRefresh?: () => Promise<void> | void) {
     chatMessages,
     isLoadingChat,
     isSubmittingDictum,
+    isOpeningAudit,
+    isInspectingAudit,
     dictumAction,
     dictumNotes,
     graceDays,

@@ -18,16 +18,19 @@
           sistema.
         </p>
       </div>
-      <button
+      <AppActionButton
         @click="refresh()"
-        class="self-start flex items-center gap-2 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 dark:text-slate-200 text-xs font-bold px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 transition active:scale-95 duration-100 shadow-sm"
-      >
-        <span class="material-symbols-outlined text-[18px]">refresh</span>
-        Sincronizar Datos
-      </button>
+        :loading="loading"
+        icon="refresh"
+        icon-class="text-[18px]"
+        loading-text="Sincronizando..."
+        label="Sincronizar Datos"
+        class="self-start bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 dark:text-slate-200 text-xs font-bold px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 active:scale-95 duration-100 shadow-sm"
+      />
     </div>
 
     <OrganizationStats
+      :loading="loading"
       :orgs-length="orgs.length"
       :verified-count="verifiedCount"
       :in-review-count="inReviewCount"
@@ -61,6 +64,7 @@
       v-model:current-page="currentPage"
       :total-pages="totalPages"
       :get-org-status-key="getOrgStatusKey"
+      :is-toggling-verification="isTogglingVerification"
       @toggle-verification="toggleVerification"
       @open-sanction-modal="openSanctionModal"
     />
@@ -72,6 +76,7 @@
       v-model:suspension-reason-input="suspensionReasonInput"
       v-model:grace-days-input="graceDaysInput"
       :get-org-status-key="getOrgStatusKey"
+      :is-submitting="isApplyingSanction"
       @apply-sanction="applySanction"
     />
   </div>
@@ -116,6 +121,8 @@ const {
   suspensionReasonInput,
   graceDaysInput,
   sanctionSteps,
+  isApplyingSanction,
+  isTogglingVerification,
   toggleVerification,
   openSanctionModal,
   applySanction,

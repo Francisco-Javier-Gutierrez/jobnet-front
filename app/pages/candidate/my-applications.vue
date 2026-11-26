@@ -81,17 +81,12 @@
       class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl overflow-hidden shadow-sm"
     >
       <!-- Loading State -->
-      <div
-        v-if="loading"
-        class="p-12 text-center text-on-surface-variant dark:text-slate-400"
-      >
-        <span
-          class="material-symbols-outlined text-3xl animate-spin text-primary"
-          >sync</span
-        >
-        <p class="mt-2 text-xs font-semibold">
-          Cargando historial de solicitudes...
-        </p>
+      <div v-if="loading" class="p-4">
+        <AppSkeletonLoader
+          type="table"
+          :count="5"
+          label="Cargando historial de solicitudes..."
+        />
       </div>
 
       <!-- Empty State -->

@@ -160,23 +160,15 @@
         </div>
       </div>
 
-      <button
+      <AppActionButton
         @click="$emit('verify')"
-        :disabled="
-          submittingVerification ||
-          !taxId ||
-          !documentoVerificacion ||
-          uploadStore.uploading
-        "
-        class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 active:scale-95 mt-2"
-      >
-        <span class="material-symbols-outlined text-sm">verified</span>
-        {{
-          submittingVerification
-            ? "Enviando..."
-            : "Solicitar Verificación de Organización"
-        }}
-      </button>
+        :loading="submittingVerification"
+        :disabled="!taxId || !documentoVerificacion || uploadStore.uploading"
+        icon="verified"
+        loading-text="Enviando..."
+        label="Solicitar Verificación de Organización"
+        class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-xl active:scale-95 mt-2"
+      />
     </template>
   </div>
 </template>

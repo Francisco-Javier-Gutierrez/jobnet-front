@@ -156,12 +156,21 @@
             </div>
           </NuxtLink>
           <button
+            type="button"
+            :disabled="isSigningOut"
             @click="onSignOut"
-            class="text-on-surface-variant dark:text-slate-400 hover:text-rose-600 transition p-1.5 rounded-lg flex items-center justify-center flex-shrink-0 cursor-pointer"
+            class="text-on-surface-variant dark:text-slate-400 hover:text-rose-600 transition p-1.5 rounded-lg flex items-center justify-center flex-shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             title="Cerrar sesión"
             aria-label="Cerrar sesión"
           >
-            <span class="material-symbols-outlined text-[20px]">logout</span>
+            <span
+              v-if="isSigningOut"
+              class="w-4 h-4 border-2 border-current/25 border-t-current rounded-full animate-spin"
+              aria-hidden="true"
+            ></span>
+            <span v-else class="material-symbols-outlined text-[20px]"
+              >logout</span
+            >
           </button>
         </div>
 
@@ -214,5 +223,6 @@ const {
   isActive,
   handleNavClick,
   onSignOut,
+  isSigningOut,
 } = useAppNavigation();
 </script>

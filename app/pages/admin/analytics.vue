@@ -96,7 +96,7 @@
 
     <!-- Executive KPI Grid -->
     <div class="mb-8">
-      <AnalyticsKpiGrid :kpis="analyticsData.kpis" />
+      <AnalyticsKpiGrid :kpis="analyticsData.kpis" :loading="loading" />
     </div>
 
     <!-- Core Analytical Grid (Top 10 Skills & Monthly Orgs) -->
@@ -105,15 +105,22 @@
       <SkillsBarChart
         :skills="analyticsData.topSkills"
         :region="selectedRegion"
+        :loading="loading"
       />
 
       <!-- 2. Volumen mensual de nuevas organizaciones registradas -->
-      <MonthlyOrgsChart :monthly-data="analyticsData.monthlyOrganizations" />
+      <MonthlyOrgsChart
+        :monthly-data="analyticsData.monthlyOrganizations"
+        :loading="loading"
+      />
     </div>
 
     <!-- 3. Tasa promedio de postulaciones por oferta laboral -->
     <div class="mb-8">
-      <ApplicationRateCard :rate-data="analyticsData.applicationRate" />
+      <ApplicationRateCard
+        :rate-data="analyticsData.applicationRate"
+        :loading="loading"
+      />
     </div>
   </div>
 </template>

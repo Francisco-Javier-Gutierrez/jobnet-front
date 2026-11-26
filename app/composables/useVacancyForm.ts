@@ -66,6 +66,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
   const selectedVacancyFile = ref<File | null>(null);
   const vacancyFileInput = ref<HTMLInputElement | null>(null);
 
+  const loading = ref(Boolean(options.isEdit));
   const submitting = ref(false);
   const successMessage = ref("");
   const errorMessage = ref("");
@@ -248,55 +249,59 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
   };
 
   onMounted(async () => {
-    await fetchCompanyName();
-    await catalogStore.fetchCatalog();
+    try {
+      await fetchCompanyName();
+      await catalogStore.fetchCatalog();
 
-    if (options.isEdit && route.params.id) {
-      try {
-        const job = await $fetch<any>(
-          `${config.public.apiUrl}/jobs/${route.params.id}`,
-        );
-        if (job) {
-          form.value.title = job.title || "";
-          form.value.modality = job.modalidad || "Remoto";
-          form.value.description = job.descripcion || "";
-          form.value.skills = job.habilidadesRequeridas || [];
-          form.value.sectors = job.sectores || [];
-          form.value.sector =
-            job.sector || (job.sectores && job.sectores[0]) || "Tecnología";
-          form.value.aptitudes = job.aptitudes || "";
-          form.value.experienceYears = job.experienciaAnos || null;
-          form.value.vacantesDisponibles = job.vacantesDisponibles || 1;
-          form.value.maxPostulantes = job.maxPostulantes || null;
-          form.value.salaryMin = job.salarioMinimo || null;
-          form.value.salaryMax = job.salarioMaximo || null;
-          form.value.salarioConfidencial = Boolean(
-            job.salarioConfidencial || job.isSalaryConfidential,
+      if (options.isEdit && route.params.id) {
+        try {
+          const job = await $fetch<any>(
+            `${config.public.apiUrl}/jobs/${route.params.id}`,
           );
-          form.value.municipio =
-            job.municipio ||
-            (job.location
-              ? job.location.replace(", Estado de México", "").trim()
-              : "Toluca");
-          form.value.lat = job.lat || 19.2826;
-          form.value.lng = job.lng || -99.6557;
-          form.value.preguntasFiltro = Array.isArray(job.preguntasFiltro)
-            ? job.preguntasFiltro.slice(0, 3)
-            : Array.isArray(job.screeningQuestions)
-              ? job.screeningQuestions.slice(0, 3)
-              : [];
-          if (job.fechaCierre || job.fechaVigencia) {
-            form.value.fechaCierre = (
-              job.fechaCierre || job.fechaVigencia
-            ).split("T")[0];
+          if (job) {
+            form.value.title = job.title || "";
+            form.value.modality = job.modalidad || "Remoto";
+            form.value.description = job.descripcion || "";
+            form.value.skills = job.habilidadesRequeridas || [];
+            form.value.sectors = job.sectores || [];
+            form.value.sector =
+              job.sector || (job.sectores && job.sectores[0]) || "Tecnología";
+            form.value.aptitudes = job.aptitudes || "";
+            form.value.experienceYears = job.experienciaAnos || null;
+            form.value.vacantesDisponibles = job.vacantesDisponibles || 1;
+            form.value.maxPostulantes = job.maxPostulantes || null;
+            form.value.salaryMin = job.salarioMinimo || null;
+            form.value.salaryMax = job.salarioMaximo || null;
+            form.value.salarioConfidencial = Boolean(
+              job.salarioConfidencial || job.isSalaryConfidential,
+            );
+            form.value.municipio =
+              job.municipio ||
+              (job.location
+                ? job.location.replace(", Estado de México", "").trim()
+                : "Toluca");
+            form.value.lat = job.lat || 19.2826;
+            form.value.lng = job.lng || -99.6557;
+            form.value.preguntasFiltro = Array.isArray(job.preguntasFiltro)
+              ? job.preguntasFiltro.slice(0, 3)
+              : Array.isArray(job.screeningQuestions)
+                ? job.screeningQuestions.slice(0, 3)
+                : [];
+            if (job.fechaCierre || job.fechaVigencia) {
+              form.value.fechaCierre = (
+                job.fechaCierre || job.fechaVigencia
+              ).split("T")[0];
+            }
           }
+        } catch (e) {
+          console.error("Error loading job:", e);
+          showError("Error", "No se pudo cargar la vacante", 3000);
         }
-      } catch (e) {
-        console.error("Error loading job:", e);
-        showError("Error", "No se pudo cargar la vacante", 3000);
+      } else {
+        loadDraft();
       }
-    } else {
-      loadDraft();
+    } finally {
+      loading.value = false;
     }
   });
 
@@ -560,6 +565,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
 
   return {
     form,
+    loading,
     submitting,
     successMessage,
     errorMessage,

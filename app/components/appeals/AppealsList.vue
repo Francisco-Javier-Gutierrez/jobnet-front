@@ -62,16 +62,12 @@
     <div
       class="flex-1 min-h-0 overflow-y-auto divide-y divide-outline-variant/30"
     >
-      <div
+      <AppSkeletonLoader
         v-if="isLoading"
-        class="p-8 text-center text-xs text-on-surface-variant"
-      >
-        <span
-          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
-          aria-hidden="true"
-        ></span>
-        Cargando solicitudes de apelación...
-      </div>
+        type="chat-list"
+        :count="4"
+        label="Cargando solicitudes de apelación..."
+      />
       <div
         v-else-if="filteredAppeals.length === 0"
         class="p-8 text-center text-xs text-on-surface-variant space-y-2"

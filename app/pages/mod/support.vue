@@ -122,16 +122,12 @@
         <div
           class="flex-grow overflow-y-auto divide-y divide-outline-variant/30"
         >
-          <div
+          <AppSkeletonLoader
             v-if="isLoadingTickets"
-            class="p-8 text-center text-on-surface-variant text-xs"
-          >
-            <span
-              class="material-symbols-outlined animate-spin text-2xl text-primary mb-2"
-              >progress_activity</span
-            >
-            <p>Cargando tickets...</p>
-          </div>
+            type="chat-list"
+            :count="5"
+            label="Cargando tickets de soporte..."
+          />
 
           <div
             v-else-if="filteredTickets.length === 0"
@@ -326,32 +322,32 @@
             <!-- Moderator Actions Bar -->
             <div class="flex items-center gap-2">
               <!-- If unassigned: Claim Button -->
-              <button
+              <AppActionButton
                 v-if="
                   !activeTicket.assignedModeratorId &&
                   activeTicket.status !== 'RESUELTO'
                 "
                 @click="handleClaim('CLAIM')"
-                :disabled="isProcessingAction"
-                class="px-3 py-1.5 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-              >
-                <span class="material-symbols-outlined text-[16px]"
-                  >touch_app</span
-                >
-                Tomar Caso
-              </button>
+                :loading="isProcessingAction"
+                icon="touch_app"
+                icon-class="text-[16px]"
+                spinner-size="xs"
+                label="Tomar Caso"
+                class="px-3 py-1.5 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-xl shadow-sm"
+              />
 
               <!-- If assigned to ME: Release Button -->
-              <button
+              <AppActionButton
                 v-if="isAssignedToMe && activeTicket.status !== 'RESUELTO'"
                 @click="handleClaim('RELEASE')"
-                :disabled="isProcessingAction"
-                class="px-3 py-1.5 border border-outline-variant hover:border-amber-500 text-xs font-bold text-on-surface-variant dark:text-slate-300 hover:text-amber-600 rounded-xl transition flex items-center gap-1 bg-surface dark:bg-slate-800 disabled:opacity-50"
+                :loading="isProcessingAction"
+                icon="undo"
+                icon-class="text-[16px]"
+                spinner-size="xs"
+                label="Liberar Caso"
+                class="px-3 py-1.5 border border-outline-variant hover:border-amber-500 text-xs font-bold text-on-surface-variant dark:text-slate-300 hover:text-amber-600 rounded-xl bg-surface dark:bg-slate-800"
                 title="Liberar a la cola de otros moderadores"
-              >
-                <span class="material-symbols-outlined text-[16px]">undo</span>
-                Liberar Caso
-              </button>
+              />
 
               <!-- Resolve Button -->
               <button
@@ -497,94 +493,103 @@
               </span>
             </div>
 
+            <AppSkeletonLoader
+              v-if="isLoadingMessages"
+              type="chat-thread"
+              :count="4"
+              label="Cargando mensajes del ticket..."
+            />
+
             <!-- Messages Thread -->
-            <div
-              v-for="msg in messages"
-              :key="msg.messageId || msg.createdAt"
-              class="flex flex-col"
-              :class="isModeratorMessage(msg) ? 'items-end' : 'items-start'"
-            >
+            <template v-else>
               <div
-                class="flex items-center gap-1.5 mb-1 px-1 text-[10px] text-on-surface-variant dark:text-slate-400 font-medium"
+                v-for="msg in messages"
+                :key="msg.messageId || msg.createdAt"
+                class="flex flex-col"
+                :class="isModeratorMessage(msg) ? 'items-end' : 'items-start'"
               >
-                <span
-                  v-if="isModeratorMessage(msg)"
-                  class="font-bold text-primary flex items-center gap-1"
-                >
-                  <span class="material-symbols-outlined text-[12px]"
-                    >verified_user</span
-                  >
-                  {{ msg.senderName || "Moderador" }}
-                </span>
-                <span
-                  v-else
-                  class="font-bold text-on-background dark:text-slate-200"
-                >
-                  {{ activeTicket.userName }}
-                </span>
-                <span>•</span>
-                <span>{{ formatTime(msg.createdAt) }}</span>
-              </div>
-
-              <div
-                class="max-w-[75%] rounded-2xl px-4 py-2.5 text-xs shadow-sm whitespace-pre-wrap"
-                :class="
-                  isModeratorMessage(msg)
-                    ? 'bg-primary text-white rounded-tr-none'
-                    : 'bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/40 text-on-background dark:text-slate-100 rounded-tl-none'
-                "
-              >
-                <p class="leading-relaxed">{{ msg.message || msg.text }}</p>
-
-                <!-- Attachments in message -->
                 <div
-                  v-if="msg.attachments && msg.attachments.length > 0"
-                  class="mt-2 space-y-1.5"
+                  class="flex items-center gap-1.5 mb-1 px-1 text-[10px] text-on-surface-variant dark:text-slate-400 font-medium"
                 >
-                  <div v-for="(att, idx) in msg.attachments" :key="idx">
-                    <!-- Image Preview -->
-                    <div
-                      v-if="isImgAttachment(att)"
-                      class="rounded-xl overflow-hidden border border-outline-variant/40 max-w-[220px]"
+                  <span
+                    v-if="isModeratorMessage(msg)"
+                    class="font-bold text-primary flex items-center gap-1"
+                  >
+                    <span class="material-symbols-outlined text-[12px]"
+                      >verified_user</span
                     >
-                      <a
-                        :href="att.url"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    {{ msg.senderName || "Moderador" }}
+                  </span>
+                  <span
+                    v-else
+                    class="font-bold text-on-background dark:text-slate-200"
+                  >
+                    {{ activeTicket.userName }}
+                  </span>
+                  <span>•</span>
+                  <span>{{ formatTime(msg.createdAt) }}</span>
+                </div>
+
+                <div
+                  class="max-w-[75%] rounded-2xl px-4 py-2.5 text-xs shadow-sm whitespace-pre-wrap"
+                  :class="
+                    isModeratorMessage(msg)
+                      ? 'bg-primary text-white rounded-tr-none'
+                      : 'bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/40 text-on-background dark:text-slate-100 rounded-tl-none'
+                  "
+                >
+                  <p class="leading-relaxed">{{ msg.message || msg.text }}</p>
+
+                  <!-- Attachments in message -->
+                  <div
+                    v-if="msg.attachments && msg.attachments.length > 0"
+                    class="mt-2 space-y-1.5"
+                  >
+                    <div v-for="(att, idx) in msg.attachments" :key="idx">
+                      <!-- Image Preview -->
+                      <div
+                        v-if="isImgAttachment(att)"
+                        class="rounded-xl overflow-hidden border border-outline-variant/40 max-w-[220px]"
                       >
-                        <img
-                          :src="att.url"
-                          :alt="att.name || 'Imagen adjunta'"
-                          class="w-full h-auto object-cover max-h-[180px] hover:opacity-90 transition cursor-pointer"
-                        />
-                      </a>
-                    </div>
-                    <!-- Document Card -->
-                    <div
-                      v-else
-                      class="flex items-center gap-1.5 p-1.5 rounded-lg text-xs"
-                      :class="
-                        isModeratorMessage(msg)
-                          ? 'bg-white/10'
-                          : 'bg-surface-container-low dark:bg-slate-800'
-                      "
-                    >
-                      <span class="material-symbols-outlined text-sm"
-                        >description</span
+                        <a
+                          :href="att.url"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <img
+                            :src="att.url"
+                            :alt="att.name || 'Imagen adjunta'"
+                            class="w-full h-auto object-cover max-h-[180px] hover:opacity-90 transition cursor-pointer"
+                          />
+                        </a>
+                      </div>
+                      <!-- Document Card -->
+                      <div
+                        v-else
+                        class="flex items-center gap-1.5 p-1.5 rounded-lg text-xs"
+                        :class="
+                          isModeratorMessage(msg)
+                            ? 'bg-white/10'
+                            : 'bg-surface-container-low dark:bg-slate-800'
+                        "
                       >
-                      <a
-                        :href="att.url"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="underline truncate max-w-[200px]"
-                      >
-                        {{ att.name || "Documento adjunto" }}
-                      </a>
+                        <span class="material-symbols-outlined text-sm"
+                          >description</span
+                        >
+                        <a
+                          :href="att.url"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="underline truncate max-w-[200px]"
+                        >
+                          {{ att.name || "Documento adjunto" }}
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </template>
           </div>
 
           <!-- Message Input Bar (Disabled if concurrency locked) -->
@@ -822,6 +827,7 @@ const {
   activeTicket,
   messages,
   isLoadingTickets,
+  isLoadingMessages,
   isSending,
   isProcessingAction,
   userId,

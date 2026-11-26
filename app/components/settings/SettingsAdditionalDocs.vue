@@ -401,13 +401,22 @@
               <button
                 type="button"
                 @click="openSecurePreview(doc)"
-                :disabled="loadingSecureUrl"
+                :disabled="isLoadingSecureDoc(doc.s3Key || doc.url || '')"
                 class="text-primary hover:underline font-bold text-[11px] flex items-center gap-1 cursor-pointer disabled:opacity-50"
               >
-                <span class="material-symbols-outlined text-sm"
+                <span
+                  v-if="isLoadingSecureDoc(doc.s3Key || doc.url || '')"
+                  class="w-3 h-3 border-2 border-current/25 border-t-current rounded-full animate-spin"
+                  aria-hidden="true"
+                ></span>
+                <span v-else class="material-symbols-outlined text-sm"
                   >visibility</span
                 >
-                <span>Ver documento seguro</span>
+                <span>{{
+                  isLoadingSecureDoc(doc.s3Key || doc.url || "")
+                    ? "Abriendo..."
+                    : "Ver documento seguro"
+                }}</span>
               </button>
             </template>
 
@@ -438,6 +447,7 @@
 <script setup lang="ts">
 import { useS3Upload } from "~/composables/useS3Upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
+import { useActionLoading } from "~/composables/useActionLoading";
 import type { AdditionalDoc } from "~/types/candidate";
 
 const MAX_PDF_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -464,7 +474,8 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const isDragging = ref(false);
 const docError = ref("");
 const uploadProgress = ref("");
-const loadingSecureUrl = ref(false);
+const { isPending: isLoadingSecureDoc, runWithLoading: runSecureDocPreview } =
+  useActionLoading();
 
 // Formulario Modo PDF
 const newDocType = ref<"CERTIFICACION" | "DIPLOMA" | "CONSTANCIA" | "OTRO">(
@@ -706,14 +717,12 @@ function removeDocument(index: number) {
  */
 async function openSecurePreview(doc: AdditionalDoc) {
   if (!doc.url) return;
-  loadingSecureUrl.value = true;
-  try {
-    const secureUrl = await getSecureViewUrl(doc.s3Key || doc.url);
+  const key = doc.s3Key || doc.url;
+  await runSecureDocPreview(key, async () => {
+    const secureUrl = await getSecureViewUrl(key);
     previewPdfUrl.value = secureUrl;
     previewPdfTitle.value = doc.name || doc.nombre || "Documento Seguro";
     showPdfModal.value = true;
-  } finally {
-    loadingSecureUrl.value = false;
-  }
+  });
 }
 </script>

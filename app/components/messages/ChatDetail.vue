@@ -59,15 +59,12 @@
         ref="messageContainer"
         class="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-950/40"
       >
-        <div
+        <AppSkeletonLoader
           v-if="isLoadingMessages"
-          class="text-center text-xs text-slate-400 my-4 flex items-center justify-center gap-2"
-        >
-          <span
-            class="w-3.5 h-3.5 border-2 border-primary/20 border-t-primary rounded-full animate-spin"
-          ></span>
-          Cargando mensajes...
-        </div>
+          type="chat-thread"
+          :count="5"
+          label="Cargando mensajes..."
+        />
         <div
           v-else-if="messages.length === 0"
           class="text-center text-xs text-slate-400 my-8"
@@ -181,7 +178,7 @@
                     >
                     <span>Ver</span>
                   </button>
-                  <button
+                  <AppActionButton
                     type="button"
                     @click="
                       downloadAttachment(
@@ -189,13 +186,14 @@
                         msg.attachmentName || 'documento.pdf',
                       )
                     "
-                    class="flex-1 text-center py-1 px-2 rounded-lg bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 text-current text-[10px] font-semibold transition flex items-center justify-center gap-1"
-                  >
-                    <span class="material-symbols-outlined text-xs"
-                      >download</span
-                    >
-                    <span>Descargar</span>
-                  </button>
+                    :loading="isAttachmentDownloading(msg.attachmentUrl)"
+                    icon="download"
+                    spinner-size="xs"
+                    icon-class="text-xs"
+                    loading-text="Descargando..."
+                    label="Descargar"
+                    class="flex-1 text-center py-1 px-2 rounded-lg bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 text-current text-[10px] font-semibold"
+                  />
                 </div>
               </div>
             </div>
@@ -369,14 +367,15 @@
             }}</span>
           </div>
           <div class="flex items-center gap-2">
-            <button
+            <AppActionButton
               type="button"
               @click="downloadAttachment(previewModal.url, previewModal.name)"
-              class="p-1.5 text-on-surface-variant hover:text-primary rounded-lg transition"
+              :loading="isAttachmentDownloading(previewModal.url)"
+              icon="download"
+              icon-class="text-lg"
+              class="p-1.5 text-on-surface-variant hover:text-primary rounded-lg"
               title="Descargar imagen"
-            >
-              <span class="material-symbols-outlined text-lg">download</span>
-            </button>
+            />
             <button
               type="button"
               @click="closePreviewModal"
@@ -430,14 +429,15 @@
             }}</span>
           </div>
           <div class="flex items-center gap-2">
-            <button
+            <AppActionButton
               type="button"
               @click="downloadAttachment(previewModal.url, previewModal.name)"
-              class="p-1.5 text-on-surface-variant hover:text-primary rounded-lg transition"
+              :loading="isAttachmentDownloading(previewModal.url)"
+              icon="download"
+              icon-class="text-lg"
+              class="p-1.5 text-on-surface-variant hover:text-primary rounded-lg"
               title="Descargar PDF"
-            >
-              <span class="material-symbols-outlined text-lg">download</span>
-            </button>
+            />
             <button
               type="button"
               @click="closePreviewModal"
@@ -510,8 +510,12 @@ const props = defineProps<{
   openPdfViewer: (url: string, name?: string) => void;
   closePreviewModal: () => void;
   downloadAttachment: (url: string, name?: string) => void;
+  isDownloadingAttachment?: (url?: string | null) => boolean;
   formatTime: (isoString?: string) => string;
 }>();
+
+const isAttachmentDownloading = (url?: string | null) =>
+  Boolean(props.isDownloadingAttachment?.(url));
 
 const emit = defineEmits<{
   (e: "back-to-list"): void;

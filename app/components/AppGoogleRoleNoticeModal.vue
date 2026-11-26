@@ -129,13 +129,15 @@
               <span class="material-symbols-outlined text-base">check</span>
               <span>Entendido y Aceptar (Continuar como Candidato)</span>
             </button>
-            <button
+            <AppActionButton
               type="button"
+              :loading="isLoggingOut"
+              label="Ingresar con Contraseña"
+              loading-text="Cerrando sesión..."
+              spinner-size="xs"
               @click="handleLogout"
-              class="w-full sm:w-auto py-3 px-4 rounded-xl border border-outline-variant/60 dark:border-slate-700 font-semibold text-xs sm:text-sm text-on-surface dark:text-slate-200 hover:bg-surface-container dark:hover:bg-slate-800 transition active:scale-[0.99] whitespace-nowrap"
-            >
-              <span>Ingresar con Contraseña</span>
-            </button>
+              class="w-full sm:w-auto py-3 px-4 rounded-xl border border-outline-variant/60 dark:border-slate-700 font-semibold text-xs sm:text-sm text-on-surface dark:text-slate-200 hover:bg-surface-container dark:hover:bg-slate-800 active:scale-[0.99] whitespace-nowrap"
+            />
           </div>
         </div>
       </div>
@@ -149,6 +151,7 @@ const route = useRoute();
 const router = useRouter();
 
 const isOpen = ref(false);
+const isLoggingOut = ref(false);
 
 const user = computed(() => (session.value?.user as any) || null);
 const userEmail = computed(() => user.value?.email || "");
@@ -217,9 +220,15 @@ const handleAccept = () => {
 };
 
 const handleLogout = async () => {
-  isOpen.value = false;
-  await signOut({
-    callbackUrl: "/login",
-  });
+  if (isLoggingOut.value) return;
+  isLoggingOut.value = true;
+  try {
+    await signOut({
+      callbackUrl: "/login",
+    });
+  } finally {
+    isLoggingOut.value = false;
+    isOpen.value = false;
+  }
 };
 </script>

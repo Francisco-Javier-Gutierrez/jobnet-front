@@ -79,15 +79,15 @@
             class="hidden"
             @change="handleFileChange"
           />
-          <button
+          <AppActionButton
             type="button"
             @click="triggerFileSelect"
-            :disabled="isUploadingFile"
-            class="px-3.5 py-2 rounded-xl border border-dashed border-outline-variant hover:border-primary text-xs font-semibold text-on-surface-variant dark:text-slate-300 hover:text-primary transition flex items-center gap-1.5 bg-surface dark:bg-slate-800/60"
-          >
-            <span class="material-symbols-outlined text-sm">attach_file</span>
-            {{ isUploadingFile ? "Subiendo..." : "Adjuntar captura o archivo" }}
-          </button>
+            :loading="isUploadingFile"
+            icon="attach_file"
+            loading-text="Subiendo..."
+            label="Adjuntar captura o archivo"
+            class="px-3.5 py-2 rounded-xl border border-dashed border-outline-variant hover:border-primary text-xs font-semibold text-on-surface-variant dark:text-slate-300 hover:text-primary bg-surface dark:bg-slate-800/60"
+          />
           <div
             v-if="attachedFile"
             class="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-lg text-xs font-medium"
@@ -114,19 +114,15 @@
         >
           Cancelar
         </button>
-        <button
+        <AppActionButton
           type="submit"
-          :disabled="isSubmitting || !isFormValid"
-          class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-        >
-          <span
-            v-if="isSubmitting"
-            class="material-symbols-outlined text-sm animate-spin"
-            >progress_activity</span
-          >
-          <span class="material-symbols-outlined text-sm">send</span>
-          {{ isSubmitting ? "Enviando reporte..." : "Enviar a moderación" }}
-        </button>
+          :loading="effectiveSubmitting"
+          :disabled="!isFormValid"
+          icon="send"
+          loading-text="Enviando reporte..."
+          label="Enviar a moderación"
+          class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold shadow-sm"
+        />
       </div>
     </form>
   </AppModal>
@@ -144,7 +140,23 @@ import type {
 
 const props = defineProps<{
   modelValue: boolean;
+  submitting?: boolean;
 }>();
+
+const effectiveSubmitting = computed(() =>
+  Boolean(props.submitting || isSubmitting.value),
+);
+
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+    if (!isOpen) {
+      form.subject = "";
+      form.description = "";
+      attachedFile.value = null;
+    }
+  },
+);
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
@@ -209,7 +221,7 @@ const removeAttachment = () => {
 };
 
 const handleSubmit = async () => {
-  if (!isFormValid.value || isSubmitting.value) return;
+  if (!isFormValid.value || effectiveSubmitting.value) return;
 
   const payload: CreateTicketDTO = {
     category: form.category,

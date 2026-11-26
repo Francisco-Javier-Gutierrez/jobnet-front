@@ -29,7 +29,14 @@
     </div>
 
     <!-- Stats row -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <AppSkeletonLoader
+      v-if="!catalog.loaded"
+      type="stats"
+      :count="2"
+      class="mb-6"
+      label="Cargando resumen del catálogo..."
+    />
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
       <div
         class="bg-surface-container-lowest dark:bg-slate-900 dark:border-slate-800 border border-outline-variant/60 rounded-2xl p-5 shadow-sm flex items-center gap-4"
       >
@@ -117,13 +124,16 @@
             ]"
           />
         </div>
-        <button
+        <AppActionButton
           type="submit"
-          class="bg-primary hover:bg-primary-container text-white font-semibold text-sm px-6 h-11 rounded-xl transition flex items-center justify-center gap-1.5 w-full sm:w-auto shadow-sm active:scale-95 duration-100 cursor-pointer"
-        >
-          <span class="material-symbols-outlined text-lg">save</span>
-          Guardar
-        </button>
+          :loading="isCreating"
+          icon="save"
+          icon-class="text-lg"
+          spinner-size="md"
+          loading-text="Guardando..."
+          label="Guardar"
+          class="bg-primary hover:bg-primary-container text-white font-semibold text-sm px-6 h-11 rounded-xl w-full sm:w-auto shadow-sm active:scale-95 duration-100 cursor-pointer"
+        />
       </form>
     </div>
 
@@ -253,14 +263,16 @@
                   v-if="editingId === item.id"
                   class="flex items-center justify-end gap-2"
                 >
-                  <button
+                  <AppActionButton
                     @click="handleSaveEdit(item.id)"
-                    class="bg-secondary text-white hover:bg-[#005236] transition px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm cursor-pointer"
+                    :loading="isSavingEdit(item.id)"
+                    icon="done"
+                    spinner-size="xs"
+                    loading-text="Guardando..."
+                    label="Guardar"
+                    class="bg-secondary text-white hover:bg-[#005236] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm cursor-pointer"
                     title="Guardar cambios"
-                  >
-                    <span class="material-symbols-outlined text-sm">done</span>
-                    Guardar
-                  </button>
+                  />
                   <button
                     @click="cancelEdit"
                     class="bg-surface border border-outline-variant hover:bg-surface-container-high text-on-surface-variant dark:text-slate-300 transition px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer"
@@ -346,6 +358,10 @@ const newItemCategory = ref<"Habilidad" | "Sector">("Habilidad");
 // Inline Editing state
 const editingId = ref<string | null>(null);
 const editingName = ref("");
+const isCreating = ref(false);
+const { isPending: isEditPending, runWithLoading: runEditWithLoading } =
+  useActionLoading();
+const isSavingEdit = (id: string) => isEditPending(`catalog-edit-${id}`);
 
 // Notifications state
 const globalSuccess = ref("");
@@ -395,21 +411,27 @@ const formatDate = (isoString: string) => {
 
 // RF-10: Expansión - Creación de Elemento
 const handleCreateItem = async () => {
+  if (isCreating.value) return;
   globalSuccess.value = "";
   globalError.value = "";
+  isCreating.value = true;
 
-  const result = await catalog.addItem(
-    newItemName.value,
-    newItemCategory.value,
-  );
-  if (result.success) {
-    globalSuccess.value = `¡"${newItemName.value}" se agregó con éxito a ${newItemCategory.value === "Habilidad" ? "habilidades" : "sectores"}!`;
-    activeCategoryTab.value = newItemCategory.value; // Switch to the category we just added to see it
-    newItemName.value = "";
-    resetPage();
-  } else {
-    globalError.value =
-      result.error || "Ocurrió un error al registrar el elemento.";
+  try {
+    const result = await catalog.addItem(
+      newItemName.value,
+      newItemCategory.value,
+    );
+    if (result.success) {
+      globalSuccess.value = `¡"${newItemName.value}" se agregó con éxito a ${newItemCategory.value === "Habilidad" ? "habilidades" : "sectores"}!`;
+      activeCategoryTab.value = newItemCategory.value; // Switch to the category we just added to see it
+      newItemName.value = "";
+      resetPage();
+    } else {
+      globalError.value =
+        result.error || "Ocurrió un error al registrar el elemento.";
+    }
+  } finally {
+    isCreating.value = false;
   }
 };
 
@@ -427,17 +449,19 @@ const cancelEdit = () => {
 
 // RF-11: Modificación - Guardar edición inline
 const handleSaveEdit = async (id: string) => {
-  globalSuccess.value = "";
-  globalError.value = "";
+  await runEditWithLoading(`catalog-edit-${id}`, async () => {
+    globalSuccess.value = "";
+    globalError.value = "";
 
-  const result = await catalog.updateItem(id, editingName.value);
-  if (result.success) {
-    globalSuccess.value = "Elemento actualizado correctamente.";
-    editingId.value = null;
-    editingName.value = "";
-  } else {
-    globalError.value = result.error || "Ocurrió un error al actualizar.";
-  }
+    const result = await catalog.updateItem(id, editingName.value);
+    if (result.success) {
+      globalSuccess.value = "Elemento actualizado correctamente.";
+      editingId.value = null;
+      editingName.value = "";
+    } else {
+      globalError.value = result.error || "Ocurrió un error al actualizar.";
+    }
+  });
 };
 
 // RF-11: Modificación - Eliminar Elemento usando AppConfirmModal

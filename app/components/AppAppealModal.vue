@@ -228,11 +228,20 @@
           class="flex-grow bg-surface dark:bg-slate-800 border border-outline-variant/60 hover:border-outline focus:border-primary rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs text-on-background dark:text-slate-100 outline-none transition"
         />
         <button
+          type="button"
           @click="sendMessage"
-          :disabled="!newMessageText.trim() && !pendingAttachment"
-          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 shadow-sm"
+          :disabled="
+            (!newMessageText.trim() && !pendingAttachment) || isSending
+          "
+          :aria-busy="isSending ? 'true' : undefined"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center transition active:scale-95 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
-          <span class="material-symbols-outlined text-lg">send</span>
+          <span
+            v-if="isSending"
+            class="w-4 h-4 border-2 border-current/25 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
+          <span v-else class="material-symbols-outlined text-lg">send</span>
         </button>
       </div>
 
@@ -523,30 +532,35 @@ const sendMessage = async () => {
   pendingAttachment.value = null;
 
   // Use WS if open; fallback to HTTP only if WS is closed/disconnected
-  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-    try {
-      socket.value.send(
-        JSON.stringify({
-          action: "sendMessage",
-          appealId: props.targetId || props.companyId,
-          appealCompanyId: props.companyId,
-          messageId,
-          text: text || "",
-          attachmentUrl: attachment?.url || null,
-          attachmentType: attachment?.type || null,
-          attachmentName: attachment?.name || null,
-        }),
-      );
-    } catch (wsErr) {
-      console.warn("WebSocket send exception, executing HTTP fallback:", wsErr);
+  try {
+    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+      try {
+        socket.value.send(
+          JSON.stringify({
+            action: "sendMessage",
+            appealId: props.targetId || props.companyId,
+            appealCompanyId: props.companyId,
+            messageId,
+            text: text || "",
+            attachmentUrl: attachment?.url || null,
+            attachmentType: attachment?.type || null,
+            attachmentName: attachment?.name || null,
+          }),
+        );
+      } catch (wsErr) {
+        console.warn(
+          "WebSocket send exception, executing HTTP fallback:",
+          wsErr,
+        );
+        await sendHttpFallback(props.companyId, text, attachment, messageId);
+      }
+    } else {
       await sendHttpFallback(props.companyId, text, attachment, messageId);
     }
-  } else {
-    await sendHttpFallback(props.companyId, text, attachment, messageId);
+  } finally {
+    isSending.value = false;
+    scrollToBottom();
   }
-
-  isSending.value = false;
-  scrollToBottom();
 };
 
 const sendHttpFallback = async (

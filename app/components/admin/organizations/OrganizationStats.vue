@@ -1,5 +1,12 @@
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <AppSkeletonLoader
+    v-if="loading"
+    type="stats"
+    :count="4"
+    class="mb-8"
+    label="Cargando estadísticas de organizaciones..."
+  />
+  <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     <div
       class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex items-center gap-4"
     >
@@ -80,6 +87,7 @@
 
 <script setup lang="ts">
 defineProps<{
+  loading?: boolean;
   orgsLength: number;
   verifiedCount: number;
   inReviewCount: number;

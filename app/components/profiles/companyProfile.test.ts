@@ -405,7 +405,16 @@ describe("Visualización Detallada de Perfil de Organización", () => {
           companyBookmarkedPosts: [],
           currentUserId: "visitor-1",
         },
-        global: { stubs: { JobCard: true, PostCard: true } },
+        global: {
+          stubs: {
+            JobCard: true,
+            PostCard: true,
+            AppSkeletonLoader: {
+              props: ["label"],
+              template: '<div role="status">{{ label }}</div>',
+            },
+          },
+        },
       });
       expect(loadingWrapper.text()).toContain("Cargando publicaciones...");
 

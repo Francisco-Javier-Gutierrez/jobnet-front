@@ -2,6 +2,7 @@ import { useUploadStore } from "~/stores/upload";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { useAuth } from "#imports";
 import { useShare } from "#imports";
+import { useActionLoading } from "~/composables/useActionLoading";
 
 import type { Post, Job } from "~/types";
 
@@ -15,6 +16,10 @@ export function useJobFeeds() {
   const isSubmittingComment = ref(false);
   const isSubmittingReply = ref(false);
   const showAuthModal = ref(false);
+  const { isPending: isDeletePending, runWithLoading: runDeleteWithLoading } =
+    useActionLoading();
+  const isDeletingComment = (id: string) =>
+    isDeletePending(`feed-comment-${id}`);
 
   // State for post creation files
   const selectedImageFile = ref<File | null>(null);
@@ -519,87 +524,90 @@ export function useJobFeeds() {
 
   const deleteComment = async (id: string) => {
     if (!selectedPost.value?.comments) return;
-    try {
-      const isJob =
-        selectedPost.value.isVacancy ||
-        selectedPost.value.tipo === "VACANTE" ||
-        selectedPost.value.type === "VACANCY";
-      const endpoint = isJob
-        ? `/api/jobs/${selectedPost.value.id || selectedPost.value.uniqueId}/comment/${encodeURIComponent(id)}`
-        : `/api/posts/${selectedPost.value.uniqueId || selectedPost.value.id}/comment/${encodeURIComponent(id)}`;
+    await runDeleteWithLoading(`feed-comment-${id}`, async () => {
+      if (!selectedPost.value?.comments) return;
+      try {
+        const isJob =
+          selectedPost.value.isVacancy ||
+          selectedPost.value.tipo === "VACANTE" ||
+          selectedPost.value.type === "VACANCY";
+        const endpoint = isJob
+          ? `/api/jobs/${selectedPost.value.id || selectedPost.value.uniqueId}/comment/${encodeURIComponent(id)}`
+          : `/api/posts/${selectedPost.value.uniqueId || selectedPost.value.id}/comment/${encodeURIComponent(id)}`;
 
-      const res = await $fetch<any>(endpoint, { method: "DELETE" });
+        const res = await $fetch<any>(endpoint, { method: "DELETE" });
 
-      const targetIndex = selectedPost.value.comments.findIndex(
-        (c: any) => String(c.id) === String(id),
-      );
+        const targetIndex = selectedPost.value.comments.findIndex(
+          (c: any) => String(c.id) === String(id),
+        );
 
-      let nextComments = [...selectedPost.value.comments];
+        let nextComments = [...selectedPost.value.comments];
 
-      if (targetIndex !== -1) {
-        const target = nextComments[targetIndex];
-        const isLevel2 = !!target.parentId;
+        if (targetIndex !== -1) {
+          const target = nextComments[targetIndex];
+          const isLevel2 = !!target.parentId;
 
-        if (res?.action === "SOFT_DELETED_PARENT" || res?.isDeleted) {
-          nextComments[targetIndex] = {
-            ...target,
-            text: "Comentario no disponible",
-            user: "Eliminado",
-            isDeleted: true,
-          };
-        } else if (isLevel2) {
-          nextComments.splice(targetIndex, 1);
-          const parentId = target.parentId;
-          const parentIndex = nextComments.findIndex(
-            (c: any) => String(c.id) === String(parentId),
-          );
-          if (parentIndex !== -1 && nextComments[parentIndex].isDeleted) {
-            const parentHasOtherChildren = nextComments.some(
-              (c: any) =>
-                String(c.parentId) === String(parentId) && c.id !== target.id,
-            );
-            if (!parentHasOtherChildren) {
-              nextComments.splice(parentIndex, 1);
-            }
-          }
-        } else {
-          const hasChildren = nextComments.some(
-            (c: any) => String(c.parentId) === String(id),
-          );
-          if (hasChildren) {
+          if (res?.action === "SOFT_DELETED_PARENT" || res?.isDeleted) {
             nextComments[targetIndex] = {
               ...target,
               text: "Comentario no disponible",
               user: "Eliminado",
               isDeleted: true,
             };
-          } else {
+          } else if (isLevel2) {
             nextComments.splice(targetIndex, 1);
+            const parentId = target.parentId;
+            const parentIndex = nextComments.findIndex(
+              (c: any) => String(c.id) === String(parentId),
+            );
+            if (parentIndex !== -1 && nextComments[parentIndex].isDeleted) {
+              const parentHasOtherChildren = nextComments.some(
+                (c: any) =>
+                  String(c.parentId) === String(parentId) && c.id !== target.id,
+              );
+              if (!parentHasOtherChildren) {
+                nextComments.splice(parentIndex, 1);
+              }
+            }
+          } else {
+            const hasChildren = nextComments.some(
+              (c: any) => String(c.parentId) === String(id),
+            );
+            if (hasChildren) {
+              nextComments[targetIndex] = {
+                ...target,
+                text: "Comentario no disponible",
+                user: "Eliminado",
+                isDeleted: true,
+              };
+            } else {
+              nextComments.splice(targetIndex, 1);
+            }
           }
+        } else {
+          nextComments = nextComments.filter(
+            (c: any) => String(c.id) !== String(id),
+          );
         }
-      } else {
-        nextComments = nextComments.filter(
-          (c: any) => String(c.id) !== String(id),
+
+        selectedPost.value = {
+          ...selectedPost.value,
+          comments: nextComments,
+        };
+
+        const selectedId = selectedPost.value.uniqueId || selectedPost.value.id;
+        const postInList = postsList.value.find(
+          (p: any) => (p.uniqueId || p.id) === selectedId,
         );
+        if (postInList) {
+          postInList.comments = nextComments;
+        }
+        buildFeed();
+      } catch (e) {
+        console.error("Error deleting comment:", e);
+        showError("Error", "Error al eliminar el comentario del servidor.");
       }
-
-      selectedPost.value = {
-        ...selectedPost.value,
-        comments: nextComments,
-      };
-
-      const selectedId = selectedPost.value.uniqueId || selectedPost.value.id;
-      const postInList = postsList.value.find(
-        (p: any) => (p.uniqueId || p.id) === selectedId,
-      );
-      if (postInList) {
-        postInList.comments = nextComments;
-      }
-      buildFeed();
-    } catch (e) {
-      console.error("Error deleting comment:", e);
-      showError("Error", "Error al eliminar el comentario del servidor.");
-    }
+    });
   };
 
   onMounted(async () => {
@@ -667,5 +675,6 @@ export function useJobFeeds() {
     submitReply,
     canDeleteComment,
     deleteComment,
+    isDeletingComment,
   };
 }

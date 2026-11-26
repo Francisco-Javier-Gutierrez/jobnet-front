@@ -14,150 +14,168 @@
       </div>
 
       <!-- Save Profile Button -->
-      <button
+      <AppActionButton
         type="button"
         @click="saveProfile"
-        :disabled="isSaving"
-        class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3 rounded-xl transition flex items-center gap-2 shadow-md active:scale-95 disabled:opacity-50"
-      >
-        <span
-          v-if="isSaving"
-          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
-          aria-hidden="true"
-        ></span>
-        <span v-else class="material-symbols-outlined text-sm">save</span>
-        <span>{{ isSaving ? "Guardando..." : "Guardar Cambios" }}</span>
-      </button>
+        :loading="isSaving"
+        :disabled="isLoadingProfile"
+        icon="save"
+        loading-text="Guardando..."
+        label="Guardar Cambios"
+        class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-6 py-3 rounded-xl shadow-md active:scale-95"
+      />
     </div>
 
-    <!-- Draft Banner -->
-    <div
-      v-if="hasDraft"
-      class="mb-4 bg-primary/10 border border-primary/20 text-on-surface text-xs p-3 rounded-xl flex items-center justify-between"
-    >
-      <span class="flex items-center gap-1.5 font-medium">
-        <span class="material-symbols-outlined text-base text-primary"
-          >info</span
-        >
-        Se ha restaurado un borrador con cambios sin guardar de tu
-        configuración.
-      </span>
-      <button
-        type="button"
-        @click="discardDraft"
-        class="text-rose-500 hover:text-rose-600 font-bold transition"
-      >
-        Descartar
-      </button>
-    </div>
+    <!-- Loading Skeleton State -->
+    <AppSkeletonLoader
+      v-if="isLoadingProfile"
+      type="form"
+      :count="2"
+      label="Cargando configuración de perfil..."
+    />
 
-    <!-- Segmented Navigation Tabs -->
-    <div
-      class="w-full border-b border-outline-variant/60 overflow-x-auto overflow-y-hidden touch-pan-x hide-scrollbar mb-6"
-    >
-      <nav class="flex flex-nowrap gap-4 w-max pb-1 px-1">
+    <template v-else>
+      <!-- Draft Banner -->
+      <div
+        v-if="hasDraft"
+        class="mb-4 bg-primary/10 border border-primary/20 text-on-surface text-xs p-3 rounded-xl flex items-center justify-between"
+      >
+        <span class="flex items-center gap-1.5 font-medium">
+          <span class="material-symbols-outlined text-base text-primary"
+            >info</span
+          >
+          Se ha restaurado un borrador con cambios sin guardar de tu
+          configuración.
+        </span>
         <button
-          v-for="tab in tabItems"
-          :key="tab.id"
-          @click="activeTab = tab.id"
-          :class="[
-            activeTab === tab.id
-              ? 'text-primary border-b-2 border-primary font-bold'
-              : 'text-on-surface-variant dark:text-slate-300 hover:text-primary',
-          ]"
-          class="pb-2.5 px-2 text-xs font-medium transition-colors flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap"
+          type="button"
+          @click="discardDraft"
+          class="text-rose-500 hover:text-rose-600 font-bold transition"
         >
-          <span class="material-symbols-outlined text-base">{{
-            tab.icon
-          }}</span>
-          {{ tab.label }}
+          Descartar
         </button>
-      </nav>
-    </div>
+      </div>
 
-    <!-- Main Form Components Stack -->
-    <div class="flex flex-col gap-6">
-      <section v-show="activeTab === 'personales'" class="flex flex-col gap-6">
-        <SettingsPersonalInfo
-          v-model:name="formData.name"
-          v-model:titulo-profesional="formData.tituloProfesional"
-          v-model:location="formData.location"
-          v-model:bio="formData.bio"
-          v-model:foto-perfil="formData.fotoPerfil"
-        />
-        <SettingsLocationMap
-          v-model:lat="formData.lat"
-          v-model:lng="formData.lng"
-          @locationName="(name) => (formData.location = name)"
-        />
-      </section>
-
-      <section v-show="activeTab === 'profesional'" class="flex flex-col gap-6">
-        <SettingsExperienceList v-model:experiencia="formData.experiencia" />
-        <SettingsSectorsSection
-          v-model:sectors="formData.sectores"
-          :catalogSectors="catalogStore.sectors"
-        />
-      </section>
-
-      <section v-show="activeTab === 'habilidades'" class="flex flex-col gap-6">
-        <SettingsEducationList v-model:educacion="formData.educacion" />
-        <SettingsSkillsSection
-          v-model:skills="formData.skills"
-          :catalogSkills="catalogStore.skills"
-        />
-      </section>
-
-      <section v-show="activeTab === 'documentos'" class="flex flex-col gap-6">
-        <SettingsCvUploader
-          v-model:cvUrl="formData.cvUrl"
-          v-model:cvName="formData.cvName"
-          :profile="formData"
-        />
-
-        <SettingsAdditionalDocs
-          v-model:documentosAdicionales="formData.documentosAdicionales"
-        />
-      </section>
-
-      <section v-show="activeTab === 'enlaces'" class="flex flex-col gap-6">
-        <SettingsWebLinks v-model:links="formData.links" />
-      </section>
-
-      <section v-show="activeTab === 'seguridad'" class="flex flex-col gap-6">
-        <SettingsLinkedAccountsCard
-          :is-federated="isFederatedUser"
-          :user-email="(session?.user as any)?.email || formData.email"
-        />
-        <MfaSettingsCard
-          :user-id="(session?.user as any)?.id || ''"
-          :initial-mfa-state="formData.mfaEnabled"
-          :is-federated="isFederatedUser"
-          @mfa-updated="(state) => (formData.mfaEnabled = state)"
-        />
-        <SettingsPasswordCard :is-federated="isFederatedUser" />
-      </section>
-    </div>
-
-    <!-- Bottom Save Action -->
-    <div class="mt-8 flex justify-end">
-      <button
-        type="button"
-        @click="saveProfile"
-        :disabled="isSaving"
-        class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-8 py-3.5 rounded-2xl transition flex items-center gap-2 shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50"
+      <!-- Segmented Navigation Tabs -->
+      <div
+        class="w-full border-b border-outline-variant/60 overflow-x-auto overflow-y-hidden touch-pan-x hide-scrollbar mb-6"
       >
-        <span
-          v-if="isSaving"
-          class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
-          aria-hidden="true"
-        ></span>
-        <span v-else class="material-symbols-outlined text-sm">save</span>
-        <span>{{
-          isSaving ? "Guardando Perfil..." : "Guardar Cambios del Perfil"
-        }}</span>
-      </button>
-    </div>
+        <nav class="flex flex-nowrap gap-4 w-max pb-1 px-1">
+          <button
+            v-for="tab in tabItems"
+            :key="tab.id"
+            @click="activeTab = tab.id"
+            :class="[
+              activeTab === tab.id
+                ? 'text-primary border-b-2 border-primary font-bold'
+                : 'text-on-surface-variant dark:text-slate-300 hover:text-primary',
+            ]"
+            class="pb-2.5 px-2 text-xs font-medium transition-colors flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap"
+          >
+            <span class="material-symbols-outlined text-base">{{
+              tab.icon
+            }}</span>
+            {{ tab.label }}
+          </button>
+        </nav>
+      </div>
+
+      <!-- Main Form Components Stack -->
+      <div class="flex flex-col gap-6">
+        <section
+          v-show="activeTab === 'personales'"
+          class="flex flex-col gap-6"
+        >
+          <SettingsPersonalInfo
+            v-model:name="formData.name"
+            v-model:titulo-profesional="formData.tituloProfesional"
+            v-model:location="formData.location"
+            v-model:bio="formData.bio"
+            v-model:foto-perfil="formData.fotoPerfil"
+          />
+          <SettingsLocationMap
+            v-model:lat="formData.lat"
+            v-model:lng="formData.lng"
+            @locationName="(name) => (formData.location = name)"
+          />
+        </section>
+
+        <section
+          v-show="activeTab === 'profesional'"
+          class="flex flex-col gap-6"
+        >
+          <SettingsExperienceList v-model:experiencia="formData.experiencia" />
+          <SettingsSectorsSection
+            v-model:sectors="formData.sectores"
+            :catalogSectors="catalogStore.sectors"
+          />
+        </section>
+
+        <section
+          v-show="activeTab === 'habilidades'"
+          class="flex flex-col gap-6"
+        >
+          <SettingsEducationList v-model:educacion="formData.educacion" />
+          <SettingsSkillsSection
+            v-model:skills="formData.skills"
+            :catalogSkills="catalogStore.skills"
+          />
+        </section>
+
+        <section
+          v-show="activeTab === 'documentos'"
+          class="flex flex-col gap-6"
+        >
+          <SettingsCvUploader
+            v-model:cvUrl="formData.cvUrl"
+            v-model:cvName="formData.cvName"
+            :profile="formData"
+          />
+
+          <SettingsAdditionalDocs
+            v-model:documentosAdicionales="formData.documentosAdicionales"
+          />
+        </section>
+
+        <section v-show="activeTab === 'enlaces'" class="flex flex-col gap-6">
+          <SettingsWebLinks v-model:links="formData.links" />
+        </section>
+
+        <section v-show="activeTab === 'seguridad'" class="flex flex-col gap-6">
+          <SettingsLinkedAccountsCard
+            :is-federated="isFederatedUser"
+            :user-email="(session?.user as any)?.email || formData.email"
+          />
+          <MfaSettingsCard
+            :user-id="(session?.user as any)?.id || ''"
+            :initial-mfa-state="formData.mfaEnabled"
+            :is-federated="isFederatedUser"
+            @mfa-updated="(state) => (formData.mfaEnabled = state)"
+          />
+          <SettingsPasswordCard :is-federated="isFederatedUser" />
+        </section>
+      </div>
+
+      <!-- Bottom Save Action -->
+      <div class="mt-8 flex justify-end">
+        <button
+          type="button"
+          @click="saveProfile"
+          :disabled="isSaving"
+          class="bg-primary hover:bg-primary-container text-white font-bold text-xs px-8 py-3.5 rounded-2xl transition flex items-center gap-2 shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50"
+        >
+          <span
+            v-if="isSaving"
+            class="w-4 h-4 border-2 border-current/20 border-t-current rounded-full animate-spin"
+            aria-hidden="true"
+          ></span>
+          <span v-else class="material-symbols-outlined text-sm">save</span>
+          <span>{{
+            isSaving ? "Guardando Perfil..." : "Guardar Cambios del Perfil"
+          }}</span>
+        </button>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -216,65 +234,76 @@ const isFederatedUser = computed(() => {
   );
 });
 
+const isLoadingProfile = ref(true);
+
 const { hasDraft, discardDraft } = useDraftAutoSave(
   "jobnet_profile_settings_draft",
   formData,
 );
 
 onMounted(async () => {
-  catalogStore.fetchCatalog();
-  if (session.value?.user?.id) {
-    try {
-      const profile = await apiFetch<any>(`/profile/${session.value.user.id}`);
-      if (profile) {
-        formData.value.name =
-          profile.nombre || profile.name || session.value.user.name || "";
-        formData.value.tituloProfesional =
-          profile.tituloProfesional ||
-          profile.titularProfesional ||
-          profile.titular ||
-          profile.puestoDeseado ||
-          "";
-        formData.value.location =
-          profile.location || profile.ubicacionTexto || "";
-        formData.value.bio = profile.bio || profile.biografia || "";
-        formData.value.fotoPerfil =
-          profile.fotoPerfil || profile.avatarUrl || "";
-        formData.value.experiencia = profile.experiencia || [];
-        formData.value.educacion = profile.educacion || [];
-        formData.value.skills = profile.habilidades || profile.skills || [];
-        formData.value.sectores =
-          profile.sectores || profile.sectoresLaborales || [];
-        formData.value.cvUrl = profile.cvUrl || profile.cvPdfUrl || "";
-        formData.value.cvName = profile.cvName || "";
-        formData.value.documentosAdicionales =
-          profile.documentosAdicionales ||
-          profile.documentosProfesionales ||
-          [];
-        formData.value.mfaEnabled = Boolean(
-          profile.mfaEnabled || profile.mfaConfigured,
+  try {
+    catalogStore.fetchCatalog();
+    if (session.value?.user?.id) {
+      try {
+        const profile = await apiFetch<any>(
+          `/profile/${session.value.user.id}`,
         );
-        if (profile.isFederated || profile.origenRegistro === "GOOGLE_OAUTH") {
-          isFederatedProfile.value = true;
-        }
-        if (Array.isArray(profile.links)) {
-          formData.value.links = profile.links;
-        } else if (
-          profile.enlacesWeb &&
-          typeof profile.enlacesWeb === "object"
-        ) {
-          formData.value.links = Object.entries(profile.enlacesWeb).map(
-            ([label, url]) => ({ label, url: url as string }),
+        if (profile) {
+          formData.value.name =
+            profile.nombre || profile.name || session.value.user.name || "";
+          formData.value.tituloProfesional =
+            profile.tituloProfesional ||
+            profile.titularProfesional ||
+            profile.titular ||
+            profile.puestoDeseado ||
+            "";
+          formData.value.location =
+            profile.location || profile.ubicacionTexto || "";
+          formData.value.bio = profile.bio || profile.biografia || "";
+          formData.value.fotoPerfil =
+            profile.fotoPerfil || profile.avatarUrl || "";
+          formData.value.experiencia = profile.experiencia || [];
+          formData.value.educacion = profile.educacion || [];
+          formData.value.skills = profile.habilidades || profile.skills || [];
+          formData.value.sectores =
+            profile.sectores || profile.sectoresLaborales || [];
+          formData.value.cvUrl = profile.cvUrl || profile.cvPdfUrl || "";
+          formData.value.cvName = profile.cvName || "";
+          formData.value.documentosAdicionales =
+            profile.documentosAdicionales ||
+            profile.documentosProfesionales ||
+            [];
+          formData.value.mfaEnabled = Boolean(
+            profile.mfaEnabled || profile.mfaConfigured,
           );
-        } else {
-          formData.value.links = [];
+          if (
+            profile.isFederated ||
+            profile.origenRegistro === "GOOGLE_OAUTH"
+          ) {
+            isFederatedProfile.value = true;
+          }
+          if (Array.isArray(profile.links)) {
+            formData.value.links = profile.links;
+          } else if (
+            profile.enlacesWeb &&
+            typeof profile.enlacesWeb === "object"
+          ) {
+            formData.value.links = Object.entries(profile.enlacesWeb).map(
+              ([label, url]) => ({ label, url: url as string }),
+            );
+          } else {
+            formData.value.links = [];
+          }
+          formData.value.lat = profile.lat || 19.4326;
+          formData.value.lng = profile.lng || -99.1332;
         }
-        formData.value.lat = profile.lat || 19.4326;
-        formData.value.lng = profile.lng || -99.1332;
+      } catch (e) {
+        console.warn("Failed to load user profile from backend", e);
       }
-    } catch (e) {
-      console.warn("Failed to load user profile from backend", e);
     }
+  } finally {
+    isLoadingProfile.value = false;
   }
 });
 

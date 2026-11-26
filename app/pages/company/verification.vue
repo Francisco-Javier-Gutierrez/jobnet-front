@@ -24,14 +24,11 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex flex-col items-center justify-center p-12">
-      <div
-        class="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"
-      ></div>
-      <p class="mt-4 text-sm text-on-surface-variant font-medium">
-        Cargando estado de verificación...
-      </p>
-    </div>
+    <AppSkeletonLoader
+      v-if="loading"
+      type="detail"
+      label="Cargando estado de verificación..."
+    />
 
     <!-- Verification Component -->
     <CompanyVerificationTab

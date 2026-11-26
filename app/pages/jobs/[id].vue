@@ -184,6 +184,7 @@
         :replyingToCommentId="replyingToCommentId"
         v-model:replyContentText="replyContentText"
         :canDeleteComment="canDeleteComment"
+        :isDeletingComment="isDeletingComment"
         :formatDate="formatDate"
         @submitComment="submitComment"
         @deleteComment="deleteComment"
@@ -409,6 +410,7 @@ const {
   toggleReplyForm,
   submitReply,
   deleteComment,
+  isDeletingComment,
   canDeleteComment,
   formatDate,
 } = useJobComments(jobId, job);

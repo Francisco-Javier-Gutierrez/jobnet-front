@@ -115,15 +115,13 @@
     </header>
 
     <!-- Estado de Carga -->
-    <div
+    <AppSkeletonLoader
       v-if="pending"
-      class="bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/60 dark:border-slate-800 rounded-3xl p-12 text-center text-xs text-on-surface-variant animate-pulse space-y-3"
-    >
-      <div
-        class="w-10 h-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin mx-auto"
-      ></div>
-      <p class="font-semibold">Cargando tus elementos favoritos privados...</p>
-    </div>
+      type="card"
+      :count="4"
+      :columns="2"
+      label="Cargando elementos guardados..."
+    />
 
     <!-- Estado Vacío -->
     <div

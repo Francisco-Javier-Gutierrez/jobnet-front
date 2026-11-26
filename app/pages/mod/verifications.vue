@@ -116,19 +116,33 @@
           </div>
 
           <div class="flex items-center gap-2 flex-shrink-0 self-center">
-            <button
+            <AppActionButton
+              type="button"
+              :loading="isVerificationPending(`approve:${req.companyId}`)"
+              :disabled="
+                isVerificationPending(`approve:${req.companyId}`) ||
+                isVerificationPending(`reject:${req.companyId}`)
+              "
+              icon="verified"
+              label="Aprobar"
+              loading-text="Aprobando..."
+              spinner-size="xs"
               @click="handleAction(req.companyId, true)"
-              class="bg-secondary hover:bg-[#005236] text-white font-bold text-xs px-4 py-2.5 rounded-lg transition active:scale-95 duration-100 flex items-center gap-1 shadow-sm"
-            >
-              <span class="material-symbols-outlined text-sm">verified</span>
-              Aprobar
-            </button>
-            <button
+              class="bg-secondary hover:bg-[#005236] text-white font-bold text-xs px-4 py-2.5 rounded-lg active:scale-95 duration-100 shadow-sm cursor-pointer"
+            />
+            <AppActionButton
+              type="button"
+              :loading="isVerificationPending(`reject:${req.companyId}`)"
+              :disabled="
+                isVerificationPending(`approve:${req.companyId}`) ||
+                isVerificationPending(`reject:${req.companyId}`)
+              "
+              label="Rechazar"
+              loading-text="Rechazando..."
+              spinner-size="xs"
               @click="handleAction(req.companyId, false)"
-              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant dark:text-slate-300 hover:text-rose-600 font-semibold text-xs px-4 py-2.5 rounded-lg transition active:scale-95 duration-100"
-            >
-              Rechazar
-            </button>
+              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant dark:text-slate-300 hover:text-rose-600 font-semibold text-xs px-4 py-2.5 rounded-lg active:scale-95 duration-100 cursor-pointer"
+            />
           </div>
         </div>
       </div>
@@ -138,6 +152,7 @@
 
 <script setup lang="ts">
 import { apiFetch } from "~/composables/useApiClient";
+import { useActionLoading } from "~/composables/useActionLoading";
 
 useSeoMeta({
   title: "Verificaciones Corporativas - JobNet",
@@ -147,6 +162,10 @@ useSeoMeta({
 
 const requests = ref<any[]>([]);
 const loading = ref(true);
+const {
+  isPending: isVerificationPending,
+  runWithLoading: runVerificationAction,
+} = useActionLoading();
 
 const fetchRequests = async () => {
   loading.value = true;
@@ -166,16 +185,19 @@ onMounted(() => {
 });
 
 const handleAction = async (companyId: string, approve: boolean) => {
-  try {
-    await apiFetch(`/moderator/verifications/${companyId}/resolve`, {
-      method: "POST",
-      body: {
-        approve,
-      },
-    });
-    requests.value = requests.value.filter((r) => r.companyId !== companyId);
-  } catch (e) {
-    console.error("Error updating company verification:", e);
-  }
+  const key = `${approve ? "approve" : "reject"}:${companyId}`;
+  await runVerificationAction(key, async () => {
+    try {
+      await apiFetch(`/moderator/verifications/${companyId}/resolve`, {
+        method: "POST",
+        body: {
+          approve,
+        },
+      });
+      requests.value = requests.value.filter((r) => r.companyId !== companyId);
+    } catch (e) {
+      console.error("Error updating company verification:", e);
+    }
+  });
 };
 </script>

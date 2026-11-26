@@ -22,19 +22,12 @@
     </div>
 
     <!-- Candidate Cards Container -->
-    <div
+    <AppSkeletonLoader
       v-if="isLoading"
-      class="flex flex-col gap-3 py-12 items-center justify-center text-center"
-    >
-      <span class="material-symbols-outlined text-3xl text-primary animate-spin"
-        >sync</span
-      >
-      <p
-        class="text-xs text-on-surface-variant dark:text-slate-400 font-medium"
-      >
-        Cargando postulantes...
-      </p>
-    </div>
+      type="chat-list"
+      :count="5"
+      label="Cargando postulantes..."
+    />
 
     <div
       v-else-if="filteredCandidates.length === 0"

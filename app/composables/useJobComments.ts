@@ -1,6 +1,7 @@
 import { useRuntimeConfig } from "#imports";
 import { useAuth } from "#imports";
 import { useAppFeedback } from "#imports";
+import { useActionLoading } from "~/composables/useActionLoading";
 
 interface CommentData {
   id: string;
@@ -22,6 +23,10 @@ export function useJobComments(jobId: string, jobRef: any) {
   const replyContentText = ref("");
   const replyingToCommentId = ref<string | null>(null);
   const isCreatingComment = ref(false);
+  const { isPending: isDeletePending, runWithLoading: runDeleteWithLoading } =
+    useActionLoading();
+  const isDeletingComment = (commentId: string) =>
+    isDeletePending(`job-comment-${commentId}`);
 
   const canDeleteComment = (c: CommentData): boolean => {
     if (status.value !== "authenticated") return false;
@@ -156,36 +161,38 @@ export function useJobComments(jobId: string, jobRef: any) {
 
   const deleteComment = async (commentId: string) => {
     if (confirm("¿Estás seguro de que deseas eliminar este comentario?")) {
-      try {
-        await $fetch(
-          `/api/jobs/${jobId}/comment/${encodeURIComponent(commentId)}`,
-          {
-            method: "DELETE",
-          },
-        );
+      await runDeleteWithLoading(`job-comment-${commentId}`, async () => {
+        try {
+          await $fetch(
+            `/api/jobs/${jobId}/comment/${encodeURIComponent(commentId)}`,
+            {
+              method: "DELETE",
+            },
+          );
 
-        const idsToRemove = new Set<string>();
-        const queue = [commentId];
+          const idsToRemove = new Set<string>();
+          const queue = [commentId];
 
-        while (queue.length > 0) {
-          const currentId = queue.shift();
-          if (!currentId) continue;
-          idsToRemove.add(currentId);
-          commentsList.value
-            .filter((c) => c.parentId === currentId)
-            .forEach((child) => queue.push(child.id));
+          while (queue.length > 0) {
+            const currentId = queue.shift();
+            if (!currentId) continue;
+            idsToRemove.add(currentId);
+            commentsList.value
+              .filter((c) => c.parentId === currentId)
+              .forEach((child) => queue.push(child.id));
+          }
+
+          commentsList.value = commentsList.value.filter(
+            (c) => !idsToRemove.has(c.id),
+          );
+          saveCommentsToLocalStorage();
+          totalComments.value = commentsList.value.length;
+        } catch (e) {
+          console.error("Error deleting comment:", e);
+          const { showError } = useAppFeedback();
+          showError("Error", "No se pudo eliminar el comentario.");
         }
-
-        commentsList.value = commentsList.value.filter(
-          (c) => !idsToRemove.has(c.id),
-        );
-        saveCommentsToLocalStorage();
-        totalComments.value = commentsList.value.length;
-      } catch (e) {
-        console.error("Error deleting comment:", e);
-        const { showError } = useAppFeedback();
-        showError("Error", "No se pudo eliminar el comentario.");
-      }
+      });
     }
   };
 
@@ -219,6 +226,7 @@ export function useJobComments(jobId: string, jobRef: any) {
     toggleReplyForm,
     submitReply,
     deleteComment,
+    isDeletingComment,
     canDeleteComment,
     formatDate,
   };

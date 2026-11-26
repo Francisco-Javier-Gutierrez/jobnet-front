@@ -68,6 +68,7 @@
         :openPdfViewer="openPdfViewer"
         :closePreviewModal="closePreviewModal"
         :downloadAttachment="downloadAttachment"
+        :isDownloadingAttachment="isDownloadingAttachment"
         :formatTime="formatTime"
         @back-to-list="activeChat = null"
         @handle-send="handleSend"
@@ -114,6 +115,7 @@ const {
   openPdfViewer,
   closePreviewModal,
   downloadAttachment,
+  isDownloadingAttachment,
   formatTime,
 } = useMessages();
 </script>

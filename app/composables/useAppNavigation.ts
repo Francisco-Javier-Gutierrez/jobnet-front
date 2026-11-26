@@ -1,4 +1,4 @@
-import { computed, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "#imports";
 import { useProtectedAction } from "~/composables/useProtectedAction";
@@ -420,8 +420,16 @@ export const useAppNavigation = () => {
     }
   });
 
+  const isSigningOut = ref(false);
+
   const onSignOut = async () => {
-    await signOut({ callbackUrl: "/login" });
+    if (isSigningOut.value) return;
+    isSigningOut.value = true;
+    try {
+      await signOut({ callbackUrl: "/login" });
+    } finally {
+      isSigningOut.value = false;
+    }
   };
 
   return {
@@ -436,6 +444,7 @@ export const useAppNavigation = () => {
     navSections,
     isActive,
     handleNavClick,
+    isSigningOut,
     onSignOut,
   };
 };

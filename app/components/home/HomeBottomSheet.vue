@@ -148,10 +148,24 @@
                 </div>
                 <button
                   v-if="!node.isDeleted && canDeleteComment(node)"
+                  type="button"
+                  :disabled="isDeletingComment?.(node.id)"
                   @click="$emit('delete-comment', node.id)"
-                  class="text-rose-600 hover:bg-rose-50 p-1 rounded-md transition opacity-0 group-hover:opacity-100"
+                  :class="[
+                    'text-rose-600 hover:bg-rose-50 p-1 rounded-md transition inline-flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed',
+                    isDeletingComment?.(node.id)
+                      ? 'opacity-100'
+                      : 'opacity-0 group-hover:opacity-100',
+                  ]"
                 >
-                  <span class="material-symbols-outlined text-xs">delete</span>
+                  <span
+                    v-if="isDeletingComment?.(node.id)"
+                    class="w-3 h-3 border-2 border-current/20 border-t-current rounded-full animate-spin"
+                    aria-hidden="true"
+                  ></span>
+                  <span v-else class="material-symbols-outlined text-xs"
+                    >delete</span
+                  >
                 </button>
               </div>
               <p
@@ -198,6 +212,11 @@
                   :disabled="!replyText.trim() || isSubmittingReply"
                   class="bg-secondary text-white disabled:bg-secondary/40 font-bold text-[10px] px-3 py-1.5 rounded-lg hover:bg-[#005236] transition flex items-center gap-1"
                 >
+                  <span
+                    v-if="isSubmittingReply"
+                    class="w-3 h-3 border-2 border-current/20 border-t-current rounded-full animate-spin"
+                    aria-hidden="true"
+                  ></span>
                   <span>{{
                     isSubmittingReply ? "Enviando..." : "Responder"
                   }}</span>
@@ -238,10 +257,22 @@
                     </div>
                     <button
                       v-if="!reply.isDeleted && canDeleteComment(reply)"
+                      type="button"
+                      :disabled="isDeletingComment?.(reply.id)"
                       @click="$emit('delete-comment', reply.id)"
-                      class="text-rose-600 hover:bg-rose-50 p-0.5 rounded transition opacity-0 group-hover:opacity-100"
+                      :class="[
+                        'text-rose-600 hover:bg-rose-50 p-0.5 rounded transition inline-flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed',
+                        isDeletingComment?.(reply.id)
+                          ? 'opacity-100'
+                          : 'opacity-0 group-hover:opacity-100',
+                      ]"
                     >
-                      <span class="material-symbols-outlined text-[10px]"
+                      <span
+                        v-if="isDeletingComment?.(reply.id)"
+                        class="w-2.5 h-2.5 border-2 border-current/20 border-t-current rounded-full animate-spin"
+                        aria-hidden="true"
+                      ></span>
+                      <span v-else class="material-symbols-outlined text-[10px]"
                         >delete</span
                       >
                     </button>
@@ -284,6 +315,7 @@ const props = defineProps<{
   replyingToId: string | null;
   replyText: string;
   isSubmittingReply: boolean;
+  isDeletingComment?: (id: string) => boolean;
 }>();
 
 const emit = defineEmits<{

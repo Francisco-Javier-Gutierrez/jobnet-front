@@ -87,20 +87,11 @@
           </p>
 
           <!-- Loading initialization -->
-          <div
+          <AppSkeletonLoader
             v-if="loadingInit"
-            class="flex flex-col items-center justify-center p-8 space-y-3"
-          >
-            <span
-              class="material-symbols-outlined text-3xl text-primary animate-spin"
-              >sync</span
-            >
-            <p
-              class="text-xs text-on-surface-variant dark:text-slate-300 font-semibold"
-            >
-              Generando token TOTP en AWS Cognito...
-            </p>
-          </div>
+            type="qr"
+            label="Generando token TOTP en AWS Cognito..."
+          />
 
           <template v-else>
             <!-- Step 1: Scan QR Code -->

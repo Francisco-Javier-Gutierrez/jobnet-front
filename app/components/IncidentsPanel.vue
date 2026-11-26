@@ -251,31 +251,35 @@
                 isSeriousInfraction(inc.infraccion)
               "
             >
-              <button
+              <AppActionButton
                 v-if="
                   inc.auditState === 'AUDIT_ACTIVE' ||
                   inc.estatus === 'AUDITORIA'
                 "
                 type="button"
+                :loading="isInspectingAudit(inc.id)"
+                :disabled="isInspectingAudit(inc.id)"
+                icon="visibility"
+                label="Inspeccionar Auditoría"
+                loading-text="Cargando..."
+                spinner-size="xs"
                 @click="inspectAuditChat(inc)"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-xs cursor-pointer"
                 title="Inspeccionar historial íntegro de mensajes en solo lectura y dictaminar (Fase 2)"
-              >
-                <span class="material-symbols-outlined text-sm"
-                  >visibility</span
-                >
-                <span>Inspeccionar Auditoría</span>
-              </button>
-              <button
+              />
+              <AppActionButton
                 v-else-if="inc.auditState !== 'AUDIT_CONCLUDED'"
                 type="button"
+                :loading="isOpeningAudit(inc.id)"
+                :disabled="isOpeningAudit(inc.id)"
+                icon="policy"
+                label="Auditar Mensajes"
+                loading-text="Abriendo..."
+                spinner-size="xs"
                 @click="openAudit(inc)"
-                class="bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+                class="bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold text-xs px-3 py-2 rounded-xl cursor-pointer"
                 title="Admitir controversia y notificar apertura de auditoría a ambas partes (Fase 1)"
-              >
-                <span class="material-symbols-outlined text-sm">policy</span>
-                <span>Auditar Mensajes</span>
-              </button>
+              />
             </template>
 
             <!-- For reports in EVALUACION (under appeal) -->
@@ -297,40 +301,50 @@
 
             <!-- For raw reports PENDIENTE -->
             <template v-else-if="inc.estatus !== 'AUDITORIA'">
-              <button
-                @click="resolve(inc.id, 'approve')"
-                class="bg-surface border border-outline-variant/60 hover:bg-surface-container text-on-surface font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-sm"
-              >
-                Ignorar
-              </button>
-              <button
-                v-if="inc.targetType !== 'POST'"
+              <AppActionButton
+                type="button"
+                :loading="
+                  processingId === inc.id && processingAction === 'approve'
+                "
                 :disabled="processingId === inc.id"
+                label="Ignorar"
+                loading-text="Ignorando..."
+                spinner-size="xs"
+                @click="resolve(inc.id, 'approve')"
+                class="bg-surface border border-outline-variant/60 hover:bg-surface-container text-on-surface font-semibold text-xs px-3.5 py-2 rounded-xl shadow-sm cursor-pointer"
+              />
+              <AppActionButton
+                v-if="inc.targetType !== 'POST'"
+                type="button"
+                :loading="
+                  processingId === inc.id && processingAction === 'evaluate'
+                "
+                :disabled="processingId === inc.id"
+                icon="pause_circle"
+                :label="
+                  inc.targetType === 'VACANTE' || inc.jobId
+                    ? 'Pausar Vacante'
+                    : 'Pausar (Evaluar)'
+                "
+                loading-text="Pausando..."
+                spinner-size="xs"
                 @click="resolve(inc.id, 'evaluate')"
-                class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1 disabled:opacity-50"
-              >
-                <span
-                  v-if="processingId === inc.id"
-                  class="material-symbols-outlined text-sm animate-spin"
-                  >progress_activity</span
-                >
-                <span v-else class="material-symbols-outlined text-sm"
-                  >pause_circle</span
-                >
-                <span>{{
-                  inc.targetType === "VACANTE" || inc.jobId
-                    ? "Pausar Vacante"
-                    : "Pausar (Evaluar)"
-                }}</span>
-              </button>
-              <button
+                class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm cursor-pointer"
+              />
+              <AppActionButton
                 v-else
+                type="button"
+                :loading="
+                  processingId === inc.id && processingAction === 'reject'
+                "
+                :disabled="processingId === inc.id"
+                icon="delete"
+                label="Eliminar"
+                loading-text="Eliminando..."
+                spinner-size="xs"
                 @click="resolve(inc.id, 'reject')"
-                class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1"
-              >
-                <span class="material-symbols-outlined text-sm">delete</span>
-                Eliminar
-              </button>
+                class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm cursor-pointer"
+              />
             </template>
           </template>
         </div>
@@ -396,6 +410,8 @@ const {
   successMsg: auditSuccess,
   openAudit,
   inspectAuditChat,
+  isOpeningAudit,
+  isInspectingAudit,
   submitDictum,
 } = useDisputeAudit(async () => {
   await fetchIncidents();
@@ -428,6 +444,7 @@ const displayedIncidents = computed(() => {
 });
 
 const processingId = ref<string | null>(null);
+const processingAction = ref<string | null>(null);
 
 const fetchIncidents = async (initial = false) => {
   if (initial) loading.value = true;
@@ -473,6 +490,7 @@ const resolve = async (id: string, action: string) => {
         ? "evaluate"
         : "approve";
   processingId.value = id;
+  processingAction.value = action;
   try {
     await apiFetch(`/moderator/incidents/${id}/resolve`, {
       method: "POST",
@@ -509,6 +527,7 @@ const resolve = async (id: string, action: string) => {
     showError(e?.data?.error || e?.message || "Error al resolver incidencia.");
   } finally {
     processingId.value = null;
+    processingAction.value = null;
   }
 };
 </script>

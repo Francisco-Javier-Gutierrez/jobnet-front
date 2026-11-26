@@ -1,11 +1,17 @@
 import { useRuntimeConfig } from "#imports";
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { apiFetch } from "~/composables/useApiClient";
+import { useActionLoading } from "~/composables/useActionLoading";
 
 export function useOrgActions(refreshData: () => Promise<void>) {
   const config = useRuntimeConfig();
   const { showError } = useAppFeedback();
+  const { isPending, runWithLoading } = useActionLoading();
   const successMsg = ref("");
+  const isApplyingSanction = ref(false);
+
+  const isTogglingVerification = (orgId?: string) =>
+    Boolean(orgId && isPending(`verify-${orgId}`));
 
   const isSanctionModalOpen = ref(false);
   const selectedOrg = ref<any | null>(null);
@@ -19,19 +25,22 @@ export function useOrgActions(refreshData: () => Promise<void>) {
   ];
 
   const toggleVerification = async (org: any) => {
-    try {
-      const nextStatus = !org.organizacionVerificada;
-      org.organizacionVerificada = nextStatus;
-      await apiFetch(`/profile/${org.id}`, {
-        method: "POST",
-        body: { organizacionVerificada: nextStatus },
-      });
-      successMsg.value = `Estatus de verificación actualizado con éxito para ${org.nombre}.`;
-      setTimeout(() => (successMsg.value = ""), 4000);
-      await refreshData();
-    } catch (e) {
-      console.error("Error setting verification status:", e);
-    }
+    const orgKey = org.id || org.companyId;
+    await runWithLoading(`verify-${orgKey}`, async () => {
+      try {
+        const nextStatus = !org.organizacionVerificada;
+        org.organizacionVerificada = nextStatus;
+        await apiFetch(`/profile/${org.id}`, {
+          method: "POST",
+          body: { organizacionVerificada: nextStatus },
+        });
+        successMsg.value = `Estatus de verificación actualizado con éxito para ${org.nombre}.`;
+        setTimeout(() => (successMsg.value = ""), 4000);
+        await refreshData();
+      } catch (e) {
+        console.error("Error setting verification status:", e);
+      }
+    });
   };
 
   const openSanctionModal = (org: any) => {
@@ -67,11 +76,12 @@ export function useOrgActions(refreshData: () => Promise<void>) {
     actionType: "INITIATE" | "CANCEL" | "CONFIRM",
     reason?: string,
   ) => {
-    if (!selectedOrg.value) return;
+    if (!selectedOrg.value || isApplyingSanction.value) return;
     const org = selectedOrg.value;
     const orgId = org.id || org.companyId;
     const orgName = org.nombre || org.name || "la organización";
 
+    isApplyingSanction.value = true;
     try {
       if (actionType === "INITIATE") {
         await apiFetch(
@@ -122,6 +132,8 @@ export function useOrgActions(refreshData: () => Promise<void>) {
     } catch (e: any) {
       console.error("Error applying sanction status:", e);
       showError("Error", `Error al procesar la acción: ${e.message || e}`);
+    } finally {
+      isApplyingSanction.value = false;
     }
   };
 
@@ -132,6 +144,8 @@ export function useOrgActions(refreshData: () => Promise<void>) {
     suspensionReasonInput,
     graceDaysInput,
     sanctionSteps,
+    isApplyingSanction,
+    isTogglingVerification,
     getOrgStatusKey,
     toggleVerification,
     openSanctionModal,

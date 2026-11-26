@@ -60,18 +60,20 @@
                 Chat
               </nuxt-link>
 
-              <button
+              <AppActionButton
                 v-if="
                   ['PENDIENTE', 'EN_CONTACTO', 'SELECCIONADO'].includes(
                     selectedCandidate.status,
                   )
                 "
+                type="button"
                 @click="advanceCandidateStage(selectedCandidate)"
-                class="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center gap-1 transition shadow-sm"
+                :loading="isCandidateUpdating(selectedCandidate.id)"
+                icon="trending_up"
+                spinner-size="xs"
+                loading-text="Actualizando..."
+                class="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold shadow-sm"
               >
-                <span class="material-symbols-outlined text-sm"
-                  >trending_up</span
-                >
                 {{
                   selectedCandidate.status === "PENDIENTE"
                     ? "Contactar"
@@ -79,20 +81,21 @@
                       ? "Seleccionar"
                       : "Contratar"
                 }}
-              </button>
+              </AppActionButton>
 
-              <button
+              <AppActionButton
                 v-if="
                   !['RECHAZADO', 'CONTRATADO'].includes(
                     selectedCandidate.status,
                   )
                 "
+                type="button"
                 @click="triggerReject(selectedCandidate)"
-                class="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <span class="material-symbols-outlined text-sm">cancel</span>
-                Descartar
-              </button>
+                :disabled="isCandidateUpdating(selectedCandidate.id)"
+                icon="cancel"
+                class="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold"
+                label="Descartar"
+              />
             </div>
           </div>
 
@@ -213,22 +216,20 @@
               :pendingAttachment="pendingAttachment"
               :isImageUrl="isImageUrl"
               :openImagePreview="openImagePreview"
+              :downloadAttachment="downloadAttachment"
+              :isDownloadingAttachment="isDownloadingAttachment"
               :formatTime="formatTime"
               @handle-send="handleSend"
               @handle-file-upload="handleFileUpload"
               @set-message-container="messageContainer = $event"
               @set-file-input="fileInput = $event"
             />
-            <div
+            <AppSkeletonLoader
               v-else
-              class="flex-grow flex flex-col items-center justify-center p-6 text-center text-on-surface-variant dark:text-slate-400"
-            >
-              <span
-                class="material-symbols-outlined text-2xl text-sky-500 animate-spin mb-2"
-                >sync</span
-              >
-              <p class="text-xs font-medium">Cargando conversación...</p>
-            </div>
+              type="chat-thread"
+              :count="4"
+              label="Cargando conversación..."
+            />
           </template>
           <template v-else>
             <div
@@ -287,6 +288,7 @@ const {
 const {
   getStatusBadgeClass,
   getStatusLabel,
+  isCandidateUpdating,
   advanceCandidateStage,
   triggerReject,
 } = useApplicantActions();
@@ -306,6 +308,8 @@ const {
   handleFileUpload,
   isImageUrl,
   openImagePreview,
+  downloadAttachment,
+  isDownloadingAttachment,
   formatTime,
   chats,
 } = useMessages();

@@ -173,21 +173,33 @@
           </div>
 
           <div class="flex items-center gap-2 flex-shrink-0">
-            <button
+            <AppActionButton
               type="button"
+              :loading="isSkillActionPending(`approve:${sug.id}`)"
+              :disabled="
+                isSkillActionPending(`approve:${sug.id}`) ||
+                isSkillActionPending(`reject:${sug.id}`)
+              "
+              icon="check"
+              label="Aprobar"
+              loading-text="Aprobando..."
+              spinner-size="xs"
               @click="approveItem(sug)"
-              class="bg-secondary hover:bg-[#005236] text-white font-semibold text-xs px-4 py-2 rounded-xl transition active:scale-95 duration-100 shadow-sm flex items-center gap-1 cursor-pointer"
-            >
-              <span class="material-symbols-outlined text-sm">check</span>
-              Aprobar
-            </button>
-            <button
+              class="bg-secondary hover:bg-[#005236] text-white font-semibold text-xs px-4 py-2 rounded-xl active:scale-95 duration-100 shadow-sm cursor-pointer"
+            />
+            <AppActionButton
               type="button"
+              :loading="isSkillActionPending(`reject:${sug.id}`)"
+              :disabled="
+                isSkillActionPending(`approve:${sug.id}`) ||
+                isSkillActionPending(`reject:${sug.id}`)
+              "
+              label="Rechazar"
+              loading-text="Rechazando..."
+              spinner-size="xs"
               @click="rejectItem(sug.id)"
-              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant dark:text-slate-300 hover:text-rose-600 font-semibold text-xs px-4 py-2 rounded-xl transition active:scale-95 duration-100 cursor-pointer"
-            >
-              Rechazar
-            </button>
+              class="bg-surface border border-outline-variant hover:border-rose-600 text-on-surface-variant dark:text-slate-300 hover:text-rose-600 font-semibold text-xs px-4 py-2 rounded-xl active:scale-95 duration-100 cursor-pointer"
+            />
           </div>
         </div>
       </div>
@@ -224,42 +236,61 @@
       <template #footer>
         <div class="flex flex-col gap-2.5 w-full">
           <!-- Option 1: Keep existing catalog name -->
-          <button
+          <AppActionButton
             type="button"
+            :loading="resolvingChoice === 'KEEP_EXISTING'"
+            :disabled="resolvingChoice !== null"
+            icon="check_circle"
+            spinner-size="xs"
             @click="handleResolveChoice('KEEP_EXISTING')"
-            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-xl gap-2 shadow-sm cursor-pointer"
           >
-            <span class="material-symbols-outlined text-sm">check_circle</span>
-            <span>Quedarme con "{{ existingItemName }}" (Recomendado)</span>
-          </button>
+            <span>
+              {{
+                resolvingChoice === "KEEP_EXISTING"
+                  ? "Aplicando..."
+                  : `Quedarme con "${existingItemName}" (Recomendado)`
+              }}
+            </span>
+          </AppActionButton>
 
           <!-- Option 2: Keep suggested name (replace existing catalog name) -->
-          <button
+          <AppActionButton
             type="button"
+            :loading="resolvingChoice === 'REPLACE_EXISTING'"
+            :disabled="resolvingChoice !== null"
+            icon="edit"
+            spinner-size="xs"
             @click="handleResolveChoice('REPLACE_EXISTING')"
-            class="w-full bg-primary hover:bg-primary-container text-white font-bold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+            class="w-full bg-primary hover:bg-primary-container text-white font-bold text-xs py-3 px-4 rounded-xl gap-2 shadow-sm cursor-pointer"
           >
-            <span class="material-symbols-outlined text-sm">edit</span>
-            <span
-              >Quedarme con "{{ selectedSuggestion?.name }}" (Reemplazar
-              nombre)</span
-            >
-          </button>
+            <span>
+              {{
+                resolvingChoice === "REPLACE_EXISTING"
+                  ? "Reemplazando..."
+                  : `Quedarme con "${selectedSuggestion?.name}" (Reemplazar nombre)`
+              }}
+            </span>
+          </AppActionButton>
 
           <!-- Option 3: Add anyway as new independent catalog item -->
-          <button
+          <AppActionButton
             type="button"
+            :loading="resolvingChoice === 'ADD_ANYWAY'"
+            :disabled="resolvingChoice !== null"
+            icon="add"
+            spinner-size="xs"
             @click="handleResolveChoice('ADD_ANYWAY')"
-            class="w-full bg-surface border border-outline-variant hover:bg-surface-container text-on-surface font-semibold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
+            class="w-full bg-surface border border-outline-variant hover:bg-surface-container text-on-surface font-semibold text-xs py-3 px-4 rounded-xl gap-2 cursor-pointer"
           >
-            <span class="material-symbols-outlined text-sm">add</span>
-            <span
-              >Agregar de todas formas como nuevo
+            <span>
               {{
-                (selectedSuggestion?.category || "elemento").toLowerCase()
-              }}</span
-            >
-          </button>
+                resolvingChoice === "ADD_ANYWAY"
+                  ? "Agregando..."
+                  : `Agregar de todas formas como nuevo ${(selectedSuggestion?.category || "elemento").toLowerCase()}`
+              }}
+            </span>
+          </AppActionButton>
         </div>
       </template>
     </AppModal>
@@ -268,6 +299,7 @@
 
 <script setup lang="ts">
 import { apiFetch } from "~/composables/useApiClient";
+import { useActionLoading } from "~/composables/useActionLoading";
 
 useSeoMeta({
   title: "Aprobación de Catálogo (Habilidades y Sectores) - JobNet",
@@ -285,6 +317,11 @@ const loading = ref(true);
 const showWarningModal = ref(false);
 const selectedSuggestion = ref<any | null>(null);
 const existingItemName = ref("");
+const resolvingChoice = ref<
+  "KEEP_EXISTING" | "REPLACE_EXISTING" | "ADD_ANYWAY" | null
+>(null);
+const { isPending: isSkillActionPending, runWithLoading: runSkillAction } =
+  useActionLoading();
 
 const skillSuggestionsCount = computed(
   () => allSuggestions.value.filter((s) => s.category === "Habilidad").length,
@@ -330,41 +367,43 @@ const approveItem = async (sug: any) => {
     return;
   }
 
-  try {
-    const res = await apiFetch<any>(
-      `/moderator/skills/suggestions/${sug.id}/resolve`,
-      {
-        method: "POST",
-        body: {
-          approve: true,
+  await runSkillAction(`approve:${sug.id}`, async () => {
+    try {
+      const res = await apiFetch<any>(
+        `/moderator/skills/suggestions/${sug.id}/resolve`,
+        {
+          method: "POST",
+          body: {
+            approve: true,
+          },
         },
-      },
-    );
+      );
 
-    if (res.duplicate) {
-      existingItemName.value = res.existingName;
-      showWarningModal.value = true;
-      showInfo(
-        `Posible duplicado detectado: "${res.existingName}". ¿Deseas unificar o agregar de todas formas?`,
+      if (res.duplicate) {
+        existingItemName.value = res.existingName;
+        showWarningModal.value = true;
+        showInfo(
+          `Posible duplicado detectado: "${res.existingName}". ¿Deseas unificar o agregar de todas formas?`,
+        );
+      } else {
+        allSuggestions.value = allSuggestions.value.filter(
+          (s) => s.id !== sug.id,
+        );
+        showSuccess(`"${sug.name}" aprobado y añadido al catálogo oficial.`);
+      }
+    } catch (e: any) {
+      console.error("Error approving catalog suggestion:", e);
+      showError(
+        e?.data?.error || "Error al procesar la aprobación de la sugerencia.",
       );
-    } else {
-      allSuggestions.value = allSuggestions.value.filter(
-        (s) => s.id !== sug.id,
-      );
-      showSuccess(`"${sug.name}" aprobado y añadido al catálogo oficial.`);
     }
-  } catch (e: any) {
-    console.error("Error approving catalog suggestion:", e);
-    showError(
-      e?.data?.error || "Error al procesar la aprobación de la sugerencia.",
-    );
-  }
+  });
 };
 
 const handleResolveChoice = async (
   mode: "KEEP_EXISTING" | "REPLACE_EXISTING" | "ADD_ANYWAY",
 ) => {
-  if (!selectedSuggestion.value) return;
+  if (!selectedSuggestion.value || resolvingChoice.value) return;
 
   const sugName = selectedSuggestion.value.name;
   const existName = existingItemName.value;
@@ -383,6 +422,7 @@ const handleResolveChoice = async (
     payload.addAnyway = true;
   }
 
+  resolvingChoice.value = mode;
   try {
     await apiFetch(
       `/moderator/skills/suggestions/${selectedSuggestion.value.id}/resolve`,
@@ -412,22 +452,26 @@ const handleResolveChoice = async (
   } catch (e: any) {
     console.error("Error resolving catalog item choice:", e);
     showError(e?.data?.error || "Error al resolver la unificación.");
+  } finally {
+    resolvingChoice.value = null;
   }
 };
 
 const rejectItem = async (id: string) => {
-  try {
-    await apiFetch(`/moderator/skills/suggestions/${id}/resolve`, {
-      method: "POST",
-      body: {
-        approve: false,
-      },
-    });
-    allSuggestions.value = allSuggestions.value.filter((s) => s.id !== id);
-    showInfo("Sugerencia rechazada y retirada de la cola.");
-  } catch (e: any) {
-    console.error("Error rejecting suggestion:", e);
-    showError(e?.data?.error || "Error al rechazar la sugerencia.");
-  }
+  await runSkillAction(`reject:${id}`, async () => {
+    try {
+      await apiFetch(`/moderator/skills/suggestions/${id}/resolve`, {
+        method: "POST",
+        body: {
+          approve: false,
+        },
+      });
+      allSuggestions.value = allSuggestions.value.filter((s) => s.id !== id);
+      showInfo("Sugerencia rechazada y retirada de la cola.");
+    } catch (e: any) {
+      console.error("Error rejecting suggestion:", e);
+      showError(e?.data?.error || "Error al rechazar la sugerencia.");
+    }
+  });
 };
 </script>
