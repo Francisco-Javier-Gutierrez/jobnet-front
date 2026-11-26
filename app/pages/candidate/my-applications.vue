@@ -413,6 +413,39 @@ const statusFilters = [
   { label: "Descartadas", value: "RECHAZADO" },
 ];
 
+const MOCK_MY_APPLICATIONS = [
+  {
+    id: "app-demo-01",
+    jobId: "vac-frontend-sr-01",
+    jobTitle: "[VACANTE DEMO #01] Desarrollador Frontend Sr. (Vue 3 / Nuxt 3)",
+    companyName: "[MOCK] Acme Corp",
+    status: "EN_CONTACTO",
+    appliedAt: "2026-10-12T15:30:00Z",
+    coverLetter: "[CARTA MOCK] Postulación enviada con portafolio de componentes Vue 3.",
+    matchScore: 95,
+  },
+  {
+    id: "app-demo-02",
+    jobId: "vac-devops-aws-02",
+    jobTitle: "[VACANTE DEMO #02] Especialista Cloud DevOps AWS (Mock Position)",
+    companyName: "[MOCK] Globex Tech",
+    status: "SELECCIONADO",
+    appliedAt: "2026-10-10T11:20:00Z",
+    coverLetter: "[CARTA MOCK] Experiencia en Terraform, Lambda y DynamoDB.",
+    matchScore: 91,
+  },
+  {
+    id: "app-demo-03",
+    jobId: "vac-ui-ux-designer-03",
+    jobTitle: "[VACANTE DEMO #03] Diseñador de Producto Digital (UI / UX Mock)",
+    companyName: "[MOCK] Acme Corp",
+    status: "PENDIENTE",
+    appliedAt: "2026-10-08T09:15:00Z",
+    coverLetter: "[CARTA MOCK] Portafolio de sistemas de diseño en Figma.",
+    matchScore: 84,
+  },
+];
+
 const fetchApplications = async () => {
   if (isMockEnabled.value) {
     applications.value = JSON.parse(JSON.stringify(MOCK_MY_APPLICATIONS));

@@ -304,6 +304,34 @@ const filteredSuggestions = computed(() => {
 const fetchSuggestions = async () => {
   loading.value = true;
   try {
+    const { isMockEnabled } = useMockSession();
+    if (isMockEnabled.value) {
+      allSuggestions.value = [
+        {
+          id: "sug-mock-1",
+          name: "Nuxt 4 / Nitro [MOCK]",
+          category: "Habilidad",
+          hasDuplicate: false,
+          createdAt: "2026-10-12T10:00:00Z",
+        },
+        {
+          id: "sug-mock-2",
+          name: "TypeScript 5.x [MOCK]",
+          category: "Habilidad",
+          hasDuplicate: true,
+          existingName: "TypeScript",
+          createdAt: "2026-10-11T15:30:00Z",
+        },
+        {
+          id: "sug-mock-3",
+          name: "Fintech y Pagos Digitales [MOCK]",
+          category: "Sector",
+          hasDuplicate: false,
+          createdAt: "2026-10-10T09:15:00Z",
+        },
+      ];
+      return;
+    }
     const data = await apiFetch<any[]>("/moderator/skills/suggestions");
     allSuggestions.value = data || [];
   } catch (e) {

@@ -264,6 +264,8 @@
 </template>
 
 <script setup lang="ts">
+import { MOCK_VACANCIES } from "~/utils/mockData";
+
 useSeoMeta({
   title: "Mis Vacantes Publicadas - JobNet",
   description:
@@ -301,6 +303,31 @@ const fetchVacancies = async () => {
 
   const targetCompanyId = companyId.value;
   loading.value = true;
+
+  if (isMockEnabled.value) {
+    const matched = MOCK_VACANCIES.filter(
+      (j: any) => j.companyId === targetCompanyId || j.empresaUuid === targetCompanyId,
+    );
+    const source = matched.length > 0 ? matched : MOCK_VACANCIES.slice(0, 3);
+    vacancies.value = source.map((j: any, idx: number) => ({
+      id: j.id,
+      title: j.title || "Vacante sin título",
+      type: j.modalidad || "Presencial",
+      estado: j.estado || "ACTIVA",
+      location: j.location || "Toluca, Edo. Méx.",
+      salario: j.salario,
+      salarioMinimo: j.salarioMinimo,
+      salarioMaximo: j.salarioMaximo,
+      vacantesDisponibles: j.vacantesDisponibles || 1,
+      maxPostulantes: j.maxPostulantes || 50,
+      createdAt: j.createdAt || new Date().toISOString(),
+      postulantesCount: 6 - idx * 2,
+      fechaCierre: j.fechaCierre,
+      diasParaVencer: 18 - idx * 4,
+    }));
+    loading.value = false;
+    return;
+  }
 
   try {
     let allJobs = await $fetch<any[]>(

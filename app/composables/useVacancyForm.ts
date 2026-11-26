@@ -34,6 +34,7 @@ export function useVacancyForm(options: { isEdit?: boolean } = {}) {
   const route = useRoute();
   const config = useRuntimeConfig();
   const { data: session, status } = useAuth();
+  const { isMockEnabled, currentMockUser } = useMockSession();
   const catalogStore = useCatalogStore();
   const { showSuccess, showError, showWarning } = useAppFeedback();
 

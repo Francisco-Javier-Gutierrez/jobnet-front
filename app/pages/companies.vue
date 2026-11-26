@@ -206,7 +206,10 @@
 </template>
 
 <script setup lang="ts">
+import { MOCK_COMPANIES } from "~/utils/mockData";
+
 const router = useRouter();
+const { isMockEnabled } = useMockSession();
 const loading = ref(true);
 const searchInput = ref("");
 const activeSearchQuery = ref("");
@@ -295,6 +298,13 @@ const clearSearch = () => {
 const fetchProfiles = async (queryTerm = "") => {
   loading.value = true;
   try {
+    if (isMockEnabled.value) {
+      rawProfiles.value = MOCK_COMPANIES.map((c) => ({
+        ...c,
+        tipoUsuario: "ORGANIZACION",
+      }));
+      return;
+    }
     const url = queryTerm
       ? `/api/profiles?tipoUsuario=ORGANIZACION&q=${encodeURIComponent(queryTerm)}`
       : "/api/profiles?tipoUsuario=ORGANIZACION";

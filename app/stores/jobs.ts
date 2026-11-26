@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { MOCK_VACANCIES } from "~/utils/mockData";
 
 export interface Job {
   id: string;
@@ -35,6 +36,27 @@ export const useJobsStore = defineStore("jobs", {
     }) {
       this.loading = true;
       try {
+        const { isMockEnabled } = useMockSession();
+        if (isMockEnabled.value) {
+          let list = [...MOCK_VACANCIES];
+          if (params?.q) {
+            const q = params.q.toLowerCase();
+            list = list.filter(
+              (j) =>
+                j.title.toLowerCase().includes(q) ||
+                j.company.toLowerCase().includes(q),
+            );
+          }
+          if (params?.modalidad) {
+            const m = params.modalidad.toLowerCase();
+            list = list.filter((j) =>
+              (j.modalidad || "").toLowerCase().includes(m),
+            );
+          }
+          this.jobs = list as Job[];
+          return;
+        }
+
         const query: Record<string, any> = {};
         if (params?.q) query.q = params.q;
         if (params?.modalidad) query.modalidad = params.modalidad;

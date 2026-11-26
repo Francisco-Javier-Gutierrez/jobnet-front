@@ -12,6 +12,7 @@ import type {
 
 export function useSupportTickets() {
   const { data: session } = useAuth();
+  const { isMockEnabled, currentMockUser } = useMockSession();
   const { showSuccess, showError, showInfo } = useAppFeedback();
   const config = useRuntimeConfig();
 
@@ -31,11 +32,17 @@ export function useSupportTickets() {
   let wsClient: WebSocketClient | null = null;
 
   const userId = computed(() => {
+    if (isMockEnabled.value && currentMockUser.value) {
+      return currentMockUser.value.id;
+    }
     const s = session.value as any;
     return s?.user?.id || s?.user?.uuid || s?.user?.sub || "";
   });
 
   const userName = computed(() => {
+    if (isMockEnabled.value && currentMockUser.value) {
+      return currentMockUser.value.name;
+    }
     const s = session.value as any;
     return (
       s?.user?.name ||
@@ -46,6 +53,10 @@ export function useSupportTickets() {
   });
 
   const userRole = computed(() => {
+    if (isMockEnabled.value && currentMockUser.value) {
+      const r = (currentMockUser.value.role || "").toUpperCase();
+      return r === "MODERATOR" ? "MODERADOR" : r;
+    }
     const s = session.value as any;
     const r = (s?.user?.tipoUsuario || s?.user?.role || "").toUpperCase();
     return r === "MODERATOR" ? "MODERADOR" : r;
@@ -96,6 +107,43 @@ export function useSupportTickets() {
   const fetchAllTickets = async (statusFilter?: string, silent = false) => {
     if (!silent) isLoadingTickets.value = true;
     try {
+      if (isMockEnabled.value) {
+        const mockTickets: any[] = [
+          {
+            id: "ticket-demo-01",
+            ticketId: "ticket-demo-01",
+            userId: "candidate-francisco-gomez",
+            userName: "[DEMO] Juan Pérez",
+            userEmail: "juan.perez.mock@jobnet-demo.test",
+            userRole: "CANDIDATO",
+            category: "BUG",
+            subject: "[TICKET DEMO #01] Error al subir constancia en PDF",
+            lastMessage: "El archivo pesa 1.2 MB y muestra carga infinita.",
+            status: "ABIERTO",
+            assignedModeratorId: userId.value,
+            assignedModeratorName: userName.value,
+            createdAt: "2026-10-13T10:00:00Z",
+          },
+          {
+            id: "ticket-demo-02",
+            ticketId: "ticket-demo-02",
+            userId: "org-techsolutions-01",
+            userName: "[MOCK] Acme Corp",
+            userEmail: "contacto@mock-acmeweb.test",
+            userRole: "ORGANIZACION",
+            category: "VERIFICACION",
+            subject: "[TICKET DEMO #02] Consulta de estatus KYC",
+            lastMessage: "Enviamos nuestra Constancia de Situación Fiscal ayer.",
+            status: "EN_PROCESO",
+            assignedModeratorId: null,
+            assignedModeratorName: null,
+            createdAt: "2026-10-12T16:30:00Z",
+          },
+        ];
+        tickets.value = mockTickets;
+        wsStatus.value = "connected";
+        return mockTickets;
+      }
       const query =
         statusFilter && statusFilter !== "ALL" && statusFilter !== "MINE"
           ? `?status=${encodeURIComponent(statusFilter)}`
@@ -121,6 +169,31 @@ export function useSupportTickets() {
   const fetchTicketMessages = async (ticketId: string, silent = false) => {
     if (!silent) isLoadingMessages.value = true;
     try {
+      if (isMockEnabled.value) {
+        messages.value = [
+          {
+            id: "smsg-1",
+            ticketId,
+            senderId: "candidate-francisco-gomez",
+            senderName: "[DEMO] Juan Pérez",
+            senderRole: "CANDIDATO",
+            text: "[MENSAJE MOCK] Hola equipo de soporte, al intentar subir mi PDF aparece cargando indefinidamente.",
+            message: "[MENSAJE MOCK] Hola equipo de soporte, al intentar subir mi PDF aparece cargando indefinidamente.",
+            createdAt: "2026-10-13T10:05:00Z",
+          },
+          {
+            id: "smsg-2",
+            ticketId,
+            senderId: userId.value,
+            senderName: userName.value,
+            senderRole: "MODERADOR",
+            text: "[MENSAJE MOCK] ¡Hola Juan! Ya revisamos tu caso en el panel de soporte y validamos el límite de tamaño.",
+            message: "[MENSAJE MOCK] ¡Hola Juan! Ya revisamos tu caso en el panel de soporte y validamos el límite de tamaño.",
+            createdAt: "2026-10-13T10:12:00Z",
+          },
+        ] as any;
+        return messages.value;
+      }
       const res = await apiFetch<any>(`/support/tickets/${ticketId}/messages`);
       const rawMsgs = res?.messages || (Array.isArray(res) ? res : []);
       const msgs = rawMsgs.map((m: any) => ({

@@ -1,5 +1,6 @@
 import { useAppFeedback } from "~/composables/useAppFeedback";
 import { apiFetch } from "~/composables/useApiClient";
+import { MOCK_APPEALS } from "~/utils/mockData";
 import type { Appeal, AppealMessage, AppealAttachment } from "~/types";
 
 export const useAppeals = () => {
@@ -71,6 +72,20 @@ export const useAppeals = () => {
   const fetchAppeals = async () => {
     isLoading.value = true;
     try {
+      const { isMockEnabled } = useMockSession();
+      if (isMockEnabled.value) {
+        appeals.value = JSON.parse(JSON.stringify(MOCK_APPEALS)).map((a: any) => ({
+          ...a,
+          name: a.companyName || a.name,
+          reason: a.motivo || a.reason,
+          type: a.type || "ORGANIZACION",
+        }));
+        wsConnected.value = true;
+        if (appeals.value.length > 0 && !selectedAppealId.value) {
+          selectedAppealId.value = appeals.value[0].id;
+        }
+        return;
+      }
       const data = await apiFetch<any[]>("/moderator/appeals").catch(() => []);
 
       const list = Array.isArray(data) ? data : [];

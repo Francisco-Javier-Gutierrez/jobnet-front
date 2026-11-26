@@ -78,11 +78,15 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { usePreviewStore } from "~/stores/preview";
+import { MOCK_VACANCIES } from "~/utils/mockData";
 
 const router = useRouter();
 const previewStore = usePreviewStore();
+const { isMockEnabled } = useMockSession();
 
-const job = computed(() => previewStore.previewVacancy);
+const job = computed(
+  () => previewStore.previewVacancy || (isMockEnabled.value ? MOCK_VACANCIES[0] : null),
+);
 
 const goBack = () => {
   router.back();

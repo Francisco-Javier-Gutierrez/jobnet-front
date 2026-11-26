@@ -202,6 +202,7 @@ useHead({
 const router = useRouter();
 const config = useRuntimeConfig();
 const { data: sessionData, status } = useAuth();
+const { isMockEnabled } = useMockSession();
 const { showFeedback, showError, showWarning } = useAppFeedback();
 
 const activeTab = ref("identidad");
